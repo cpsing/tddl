@@ -7,7 +7,7 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>com.taobao.tddl</groupId>
-	<artifactId>tddl-security-inner</artifactId>
+	<artifactId>tddl-qatest</artifactId>
 	<packaging>jar</packaging>
 	<name>${project.artifactId} module for tddl ${project.version}</name>
 	<dependencies>
