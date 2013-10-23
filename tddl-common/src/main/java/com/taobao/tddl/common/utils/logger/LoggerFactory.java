@@ -1,15 +1,15 @@
-package com.taobao.tddl.common.logger;
+package com.taobao.tddl.common.utils.logger;
 
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import com.taobao.tddl.common.logger.jcl.JclLoggerAdapter;
-import com.taobao.tddl.common.logger.jdk.JdkLoggerAdapter;
-import com.taobao.tddl.common.logger.log4j.Log4jLoggerAdapter;
-import com.taobao.tddl.common.logger.slf4j.Slf4jLoggerAdapter;
-import com.taobao.tddl.common.logger.support.FailsafeLogger;
+import com.taobao.tddl.common.utils.logger.jcl.JclLoggerAdapter;
+import com.taobao.tddl.common.utils.logger.jdk.JdkLoggerAdapter;
+import com.taobao.tddl.common.utils.logger.log4j.Log4jLoggerAdapter;
+import com.taobao.tddl.common.utils.logger.slf4j.Slf4jLoggerAdapter;
+import com.taobao.tddl.common.utils.logger.support.FailsafeLogger;
 
 /**
  * copy from dubbo logger

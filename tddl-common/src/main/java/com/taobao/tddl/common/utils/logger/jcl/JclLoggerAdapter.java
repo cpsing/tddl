@@ -1,12 +1,12 @@
-package com.taobao.tddl.common.logger.jcl;
+package com.taobao.tddl.common.utils.logger.jcl;
 
 import java.io.File;
 
 import org.apache.commons.logging.LogFactory;
 
-import com.taobao.tddl.common.logger.Level;
-import com.taobao.tddl.common.logger.Logger;
-import com.taobao.tddl.common.logger.LoggerAdapter;
+import com.taobao.tddl.common.utils.logger.Level;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerAdapter;
 
 public class JclLoggerAdapter implements LoggerAdapter {
 

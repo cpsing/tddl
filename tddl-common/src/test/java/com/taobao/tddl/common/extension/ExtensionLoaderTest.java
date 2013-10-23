@@ -4,6 +4,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import com.taobao.tddl.common.utils.extension.ExtensionLoader;
+
 public class ExtensionLoaderTest {
 
     @Test

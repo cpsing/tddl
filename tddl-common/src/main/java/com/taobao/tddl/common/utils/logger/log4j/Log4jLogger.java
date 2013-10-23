@@ -1,9 +1,9 @@
-package com.taobao.tddl.common.logger.log4j;
+package com.taobao.tddl.common.utils.logger.log4j;
 
 import org.apache.log4j.Level;
 
-import com.taobao.tddl.common.logger.Logger;
-import com.taobao.tddl.common.logger.support.FailsafeLogger;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.support.FailsafeLogger;
 
 public class Log4jLogger implements Logger {
 

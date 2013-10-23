@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.logger;
+package com.taobao.tddl.common.utils.logger;
 
 /**
  * Level , copy from dubbo logger

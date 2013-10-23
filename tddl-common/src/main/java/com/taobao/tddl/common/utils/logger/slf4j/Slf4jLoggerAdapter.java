@@ -1,10 +1,10 @@
-package com.taobao.tddl.common.logger.slf4j;
+package com.taobao.tddl.common.utils.logger.slf4j;
 
 import java.io.File;
 
-import com.taobao.tddl.common.logger.Level;
-import com.taobao.tddl.common.logger.Logger;
-import com.taobao.tddl.common.logger.LoggerAdapter;
+import com.taobao.tddl.common.utils.logger.Level;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerAdapter;
 
 public class Slf4jLoggerAdapter implements LoggerAdapter {
 

@@ -6,9 +6,9 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.taobao.tddl.common.logger.Logger;
-import com.taobao.tddl.common.logger.LoggerFactory;
 import com.taobao.tddl.common.utils.ClassHelper;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 public final class Version {
 

@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.logger.log4j;
+package com.taobao.tddl.common.utils.logger.log4j;
 
 import java.io.File;
 import java.util.Enumeration;
@@ -7,9 +7,9 @@ import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.LogManager;
 
-import com.taobao.tddl.common.logger.Level;
-import com.taobao.tddl.common.logger.Logger;
-import com.taobao.tddl.common.logger.LoggerAdapter;
+import com.taobao.tddl.common.utils.logger.Level;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerAdapter;
 
 public class Log4jLoggerAdapter implements LoggerAdapter {
 

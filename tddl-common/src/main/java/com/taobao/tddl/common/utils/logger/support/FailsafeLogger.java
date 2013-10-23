@@ -1,7 +1,7 @@
-package com.taobao.tddl.common.logger.support;
+package com.taobao.tddl.common.utils.logger.support;
 
 import com.taobao.tddl.common.Version;
-import com.taobao.tddl.common.logger.Logger;
+import com.taobao.tddl.common.utils.logger.Logger;
 
 /**
  * copy from dubbo logger

@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.extension;
+package com.taobao.tddl.common.utils.extension;
 
 import org.apache.commons.lang.exception.NestableRuntimeException;
 

@@ -1,8 +1,8 @@
-package com.taobao.tddl.common.logger.slf4j;
+package com.taobao.tddl.common.utils.logger.slf4j;
 
 import java.io.Serializable;
 
-import com.taobao.tddl.common.logger.Logger;
+import com.taobao.tddl.common.utils.logger.Logger;
 
 public class Slf4jLogger implements Logger, Serializable {
 

@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.logger.jdk;
+package com.taobao.tddl.common.utils.logger.jdk;
 
 import java.io.File;
 import java.io.InputStream;
@@ -7,9 +7,9 @@ import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
 
-import com.taobao.tddl.common.logger.Level;
-import com.taobao.tddl.common.logger.Logger;
-import com.taobao.tddl.common.logger.LoggerAdapter;
+import com.taobao.tddl.common.utils.logger.Level;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerAdapter;
 
 public class JdkLoggerAdapter implements LoggerAdapter {
 

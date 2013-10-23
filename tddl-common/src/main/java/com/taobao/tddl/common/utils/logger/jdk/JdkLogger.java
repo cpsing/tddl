@@ -1,8 +1,8 @@
-package com.taobao.tddl.common.logger.jdk;
+package com.taobao.tddl.common.utils.logger.jdk;
 
 import java.util.logging.Level;
 
-import com.taobao.tddl.common.logger.Logger;
+import com.taobao.tddl.common.utils.logger.Logger;
 
 public class JdkLogger implements Logger {
 

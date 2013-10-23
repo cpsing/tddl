@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.logger;
+package com.taobao.tddl.common.utils.logger;
 
 /**
  * 日志接口 copy from dubbo logger

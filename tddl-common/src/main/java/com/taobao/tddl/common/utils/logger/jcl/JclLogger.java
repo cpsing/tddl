@@ -1,10 +1,10 @@
-package com.taobao.tddl.common.logger.jcl;
+package com.taobao.tddl.common.utils.logger.jcl;
 
 import java.io.Serializable;
 
 import org.apache.commons.logging.Log;
 
-import com.taobao.tddl.common.logger.Logger;
+import com.taobao.tddl.common.utils.logger.Logger;
 
 /**
  * copy from dubbo logger ,适配CommonsLogging，依赖于commons-logging.jar <br/>
