@@ -3,35 +3,40 @@ package com.taobao.tddl.common.utils.thread;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 多线程执行器模板代码，otter中好多地方都写多线程，比较多的都是重复的逻辑代码，抽象一下做个模板把
  * 
+ * <pre>
+ * 示例代码：
+ * ExecutorTemplate template = new ExecutorTemplate(executor);
+ * ... 
+ * try {
+ *    for ( ....) {
+ *       template.submit(new Runnable() {})
+ *    }
+ *    
+ *    List<?> result = template.waitForResult();
+ *    // do result 
+ * } finally {
+ *    template.clear();
+ * }
+ * 
+ * 注意：该模板工程，不支持多业务并发调用，会出现数据混乱
+ * </pre>
+ * 
  * @author jianghang 2013-2-26 下午10:46:43
- * @version 4.1.7
  */
-public class ExecutorTemplate implements InitializingBean, DisposableBean {
-
-    private static final Logger                logger            = LoggerFactory.getLogger(ExecutorTemplate.class);
-    private String                             name              = "ExecutorTemplate";
-    private static final int                   DEFAULT_POOL_SIZE = 5;
-    private int                                poolSize          = DEFAULT_POOL_SIZE;
-    private ExecutorService                    executor;
+public class ExecutorTemplate {
 
     private volatile ExecutorCompletionService completionService = null;
     private volatile List<Future>              futures           = null;
 
-    public void start() {
+    public ExecutorTemplate(ThreadPoolExecutor executor){
         completionService = new ExecutorCompletionService(executor);
         futures = Collections.synchronizedList(new ArrayList<Future>());
     }
@@ -83,7 +88,7 @@ public class ExecutorTemplate implements InitializingBean, DisposableBean {
             index++;
         }
 
-        if (index < futures.size()) {
+        if (exception != null) {
             // 小于代表有错误，需要对未完成的记录进行cancel操作，对已完成的结果进行收集，做重复录入过滤记录
             cancel();
             throw exception;
@@ -93,7 +98,6 @@ public class ExecutorTemplate implements InitializingBean, DisposableBean {
     }
 
     public void cancel() {
-        logger.info("canal Futures[{}]", futures.size());
         for (int i = 0; i < futures.size(); i++) {
             Future future = futures.get(i);
             if (!future.isDone() && !future.isCancelled()) {
@@ -102,42 +106,8 @@ public class ExecutorTemplate implements InitializingBean, DisposableBean {
         }
     }
 
-    // 调整一下线程池
-    public void adjustPoolSize(int newPoolSize) {
-        if (newPoolSize != poolSize) {
-            poolSize = newPoolSize;
-            if (executor instanceof ThreadPoolExecutor) {
-                ThreadPoolExecutor pool = (ThreadPoolExecutor) executor;
-                pool.setCorePoolSize(newPoolSize);
-                pool.setMaximumPoolSize(newPoolSize);
-            }
-        }
-    }
-
-    public void afterPropertiesSet() throws Exception {
-        executor = new ThreadPoolExecutor(poolSize,
-            poolSize,
-            0L,
-            TimeUnit.MILLISECONDS,
-            new ArrayBlockingQueue(poolSize * 4),
-            new NamedThreadFactory(name),
-            new ThreadPoolExecutor.CallerRunsPolicy());
-    }
-
-    public void destroy() throws Exception {
-        if (futures != null) {
-            futures.clear();
-        }
-
-        executor.shutdownNow(); // 立即关闭
-    }
-
-    public void setPoolSize(int poolSize) {
-        this.poolSize = poolSize;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void clear() {
+        futures.clear();
     }
 
 }
