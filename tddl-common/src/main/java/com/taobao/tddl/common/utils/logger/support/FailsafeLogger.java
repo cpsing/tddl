@@ -1,6 +1,6 @@
 package com.taobao.tddl.common.utils.logger.support;
 
-import com.taobao.tddl.common.Version;
+import com.taobao.tddl.common.utils.Version;
 import com.taobao.tddl.common.utils.logger.Logger;
 
 /**

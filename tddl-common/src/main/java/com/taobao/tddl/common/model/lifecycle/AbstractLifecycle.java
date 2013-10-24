@@ -15,7 +15,7 @@ public class AbstractLifecycle implements Lifecycle {
                 return;
             }
             state = LifecycleState.RUNNING;
-            doStart();
+            init();
         }
     }
 
@@ -53,6 +53,13 @@ public class AbstractLifecycle implements Lifecycle {
 
     public boolean isStopped() {
         return state.isStopped() || state.isAborted();
+    }
+
+    /**
+     * 保留为init名字，兼容老的代码习惯
+     */
+    protected void init() {
+        doStart();
     }
 
     protected void doStart() {

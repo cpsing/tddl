@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.utils;
+package com.taobao.tddl.common.utils.mbean;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,13 +23,13 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  * @version 1.0
  * @since 1.6
  */
-public class TDDLMBean implements DynamicMBean {
+public class TddlMBean implements DynamicMBean {
 
-    private static Logger          logger        = LoggerFactory.getLogger(TDDLMBean.class);
+    private static Logger          logger        = LoggerFactory.getLogger(TddlMBean.class);
     private Map<String, Attribute> attributesMap = new HashMap<String, Attribute>();
     private String                 desc;
 
-    public TDDLMBean(String desc){
+    public TddlMBean(String desc){
         this.desc = desc;
     }
 
