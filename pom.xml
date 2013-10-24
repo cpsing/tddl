@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.taobao.tddl</groupId>
 	<artifactId>tddl</artifactId>
@@ -7,9 +8,9 @@
 	<version>5.1.0-SNAPSHOT</version>
 	<url>https://github.com/tddl/tddl</url>
 	<parent>
-	    <groupId>org.sonatype.oss</groupId>
-	    <artifactId>oss-parent</artifactId>
-	    <version>7</version>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
 	</parent>
 	<developers>
 		<developer>
@@ -32,7 +33,7 @@
 		<connection>scm:git:git@github.com:tddl/tddl.git</connection>
 		<developerConnection>scm:git:git@github.com:tddl/tddl.git</developerConnection>
 	</scm>
-	
+
 	<repositories>
 		<repository>
 			<id>java.net</id>
@@ -45,10 +46,10 @@
 			</snapshots>
 		</repository>
 	</repositories>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<!--maven properties-->
+		<!--maven properties -->
 		<maven.test.skip>true</maven.test.skip>
 		<downloadSources>true</downloadSources>
 		<!-- compiler settings properties -->
@@ -63,7 +64,7 @@
 		<!-- Test libs -->
 		<junit_version>4.11</junit_version>
 	</properties>
-	
+
 	<modules>
 		<module>tddl-common</module>
 		<module>tddl-config</module>
@@ -82,7 +83,7 @@
 		<module>tddl-sample</module>
 		<module>tddl-qatest</module>
 	</modules>
-	
+
 	<dependencyManagement>
 		<dependencies>
 			<!-- Common libs -->
@@ -110,6 +111,10 @@
 				<groupId>com.alibaba</groupId>
 				<artifactId>fastjson</artifactId>
 				<version>1.1.36</version>
+			<dependency>
+				<groupId>com.taobao.diamond</groupId>
+				<artifactId>diamond-client</artifactId>
+				<version>2.0.5.9</version>
 			</dependency>
 			<!-- Log libs -->
 			<dependency>
@@ -151,7 +156,7 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -168,36 +173,36 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.5</version>
 				<configuration>
-				  <includes>
-					<include>**/*Test.java</include>
-				  </includes>
-				  <excludes>
-					<exclude>**/*NoRunTest.java</exclude>
-				  </excludes>
+					<includes>
+						<include>**/*Test.java</include>
+					</includes>
+					<excludes>
+						<exclude>**/*NoRunTest.java</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 			<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.5</version>
-            </plugin>
-            <plugin>
-			   <groupId>org.apache.maven.plugins</groupId>  
-			   <artifactId>maven-eclipse-plugin</artifactId>  
-			   <version>2.5.1</version>  
-			   <configuration>  
-				  <additionalConfig>  
-					 <file>  
-						<name>.settings/org.eclipse.core.resources.prefs</name>  
-						<content>  
-						   <![CDATA[eclipse.preferences.version=1${line.separator}encoding/<project>=${file_encoding}${line.separator}]]>  
-						</content>  
-					 </file>  
-				  </additionalConfig>  
-			   </configuration>  
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.5</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+					<additionalConfig>
+						<file>
+							<name>.settings/org.eclipse.core.resources.prefs</name>
+							<content>  
+						   <![CDATA[eclipse.preferences.version=1${line.separator}encoding/<project>=${file_encoding}${line.separator}]]>
+							</content>
+						</file>
+					</additionalConfig>
+				</configuration>
 			</plugin>
 		</plugins>
-		<sourceDirectory>src/main/java</sourceDirectory>  
+		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<resources>
 			<resource>
@@ -222,7 +227,7 @@
 			</testResource>
 		</testResources>
 	</build>
-	
+
 	<distributionManagement>
 		<snapshotRepository>
 			<id>sonatype-nexus-snapshots</id>
