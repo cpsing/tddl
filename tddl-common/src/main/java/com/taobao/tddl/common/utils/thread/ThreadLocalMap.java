@@ -6,6 +6,10 @@ import java.util.Map;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
+/**
+ * @author jianghang 2013-10-24 下午2:01:31
+ * @since 5.1.0
+ */
 public class ThreadLocalMap {
 
     private static final Logger                             log           = LoggerFactory.getLogger(ThreadLocalMap.class);
