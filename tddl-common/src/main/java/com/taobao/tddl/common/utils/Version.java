@@ -1,4 +1,4 @@
-package com.taobao.tddl.common;
+package com.taobao.tddl.common.utils;
 
 import java.net.URL;
 import java.security.CodeSource;
@@ -6,7 +6,6 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.taobao.tddl.common.utils.ClassHelper;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 

@@ -94,4 +94,8 @@ public class Slf4jLogger implements Logger, Serializable {
         return logger.isErrorEnabled();
     }
 
+    public Object getDelegate() {
+        return logger;
+    }
+
 }

@@ -1,7 +1,6 @@
 package com.taobao.tddl.common.extension;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.taobao.tddl.common.utils.extension.ExtensionLoader;

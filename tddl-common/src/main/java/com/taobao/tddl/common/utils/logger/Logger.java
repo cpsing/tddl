@@ -154,4 +154,10 @@ public interface Logger {
      */
     public boolean isErrorEnabled();
 
+    /**
+     * 返回delegate对象
+     * 
+     * @return
+     */
+    public Object getDelegate();
 }
