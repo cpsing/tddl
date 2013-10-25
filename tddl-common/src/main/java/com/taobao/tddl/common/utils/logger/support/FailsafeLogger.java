@@ -173,4 +173,7 @@ public class FailsafeLogger implements Logger {
         }
     }
 
+    public Object getDelegate() {
+        return logger.getDelegate();
+    }
 }

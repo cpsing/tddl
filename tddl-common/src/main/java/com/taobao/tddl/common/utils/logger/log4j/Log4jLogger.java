@@ -95,4 +95,8 @@ public class Log4jLogger implements Logger {
         return logger.isEnabledFor(Level.ERROR);
     }
 
+    public Object getDelegate() {
+        return logger;
+    }
+
 }

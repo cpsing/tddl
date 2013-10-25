@@ -272,8 +272,7 @@ public class TStringUtil extends StringUtils {
 
         try {
             while ((currentChar = sourceReader.read()) != -1) {
-
-                if (false && currentChar == '\\') {
+                if (currentChar == '\\') {
                     escaped = !escaped;
                 } else if (markerTypeFound != -1 && currentChar == stringCloses.charAt(markerTypeFound) && !escaped) {
                     contextMarker = Character.MIN_VALUE;

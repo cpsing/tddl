@@ -103,4 +103,8 @@ public class JclLogger implements Logger, Serializable {
         return logger.isErrorEnabled();
     }
 
+    public Object getDelegate() {
+        return logger;
+    }
+
 }

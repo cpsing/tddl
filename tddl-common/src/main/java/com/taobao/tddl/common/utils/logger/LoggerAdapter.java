@@ -52,5 +52,4 @@ public interface LoggerAdapter {
      * @param file 输出日志文件
      */
     void setFile(File file);
-
 }

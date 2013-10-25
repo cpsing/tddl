@@ -92,4 +92,8 @@ public class JdkLogger implements Logger {
         return logger.isLoggable(Level.SEVERE);
     }
 
+    public Object getDelegate() {
+        return logger;
+    }
+
 }

@@ -70,6 +70,15 @@ public class LoggerFactory {
     }
 
     /**
+     * 获取当前的日志输出器供给器
+     * 
+     * @return
+     */
+    public static LoggerAdapter getLoggerAdapter() {
+        return LoggerFactory.LOGGER_ADAPTER;
+    }
+
+    /**
      * 获取日志输出器
      * 
      * @param key 分类键
