@@ -1,14 +1,19 @@
 package com.taobao.tddl.common.utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+
+import com.taobao.tddl.common.exception.TddlRuntimeException;
 
 /**
  * 公共方便方法
@@ -157,6 +162,26 @@ public class GeneralUtil {
 
         return dest;
 
+    }
+
+    public static Properties parseProperties(Object data, String msg) {
+        Properties p = null;
+        if (data == null) {
+            return null;
+        } else if (data instanceof Properties) {
+            p = (Properties) data;
+        } else if (data instanceof String) {
+            p = new Properties();
+            try {
+                p.load(new ByteArrayInputStream(((String) data).getBytes()));
+            } catch (IOException e) {
+                throw new TddlRuntimeException(e);
+            }
+        } else {
+            throw new TddlRuntimeException("unsupport data parse : " + data);
+        }
+
+        return p;
     }
 
 }
