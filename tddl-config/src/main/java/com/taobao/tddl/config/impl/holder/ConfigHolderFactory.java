@@ -1,8 +1,11 @@
-package com.taobao.tddl.config;
+package com.taobao.tddl.config.impl.holder;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 简单的{@linkplain ConfigDataHolder}管理
+ */
 public class ConfigHolderFactory {
 
     private static Map<String, ConfigDataHolder> holderMap = new ConcurrentHashMap<String, ConfigDataHolder>();
@@ -20,7 +23,7 @@ public class ConfigHolderFactory {
     }
 
     public static boolean isInit(String appName) {
-        return holderMap.containsKey(appName);
+        return appName != null && holderMap.containsKey(appName);
     }
 
 }

@@ -29,7 +29,7 @@ public class TddlToStringStyle extends ToStringStyle {
      * Person[name=John Doe,age=33,smoker=false ,time=2010-04-01 00:00:00]
      * </pre>
      */
-    public static final ToStringStyle TIME_STYLE       = new OtterDateStyle(DEFAULT_TIME);
+    public static final ToStringStyle TIME_STYLE       = new TddlDateStyle(DEFAULT_TIME);
 
     /**
      * <pre>
@@ -37,7 +37,7 @@ public class TddlToStringStyle extends ToStringStyle {
      * Person[name=John Doe,age=33,smoker=false ,day=2010-04-01]
      * </pre>
      */
-    public static final ToStringStyle DAY_STYLE        = new OtterDateStyle(DEFAULT_DAY);
+    public static final ToStringStyle DAY_STYLE        = new TddlDateStyle(DEFAULT_DAY);
 
     /**
      * <pre>
@@ -52,14 +52,14 @@ public class TddlToStringStyle extends ToStringStyle {
     /**
      * 支持日期格式化的ToStringStyle
      */
-    private static class OtterDateStyle extends ToStringStyle {
+    private static class TddlDateStyle extends ToStringStyle {
 
         private static final long serialVersionUID = 5208917932254652886L;
 
         // 日期format格式
         private String            pattern;
 
-        public OtterDateStyle(String pattern){
+        public TddlDateStyle(String pattern){
             super();
             this.setUseShortClassName(true);
             this.setUseIdentityHashCode(false);

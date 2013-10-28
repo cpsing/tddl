@@ -5,12 +5,14 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 
 /**
+ * 获取{@linkplain ConfigDataHandler}处理工厂，单例
+ * 
  * @author whisper
  * @author <a href="zylicfc@gmail.com">junyu</a>
+ * @author <a href="jianghang.loujh@taobao.com">jianghang</a>
  * @version 1.0
  * @since 1.6
  * @date 2011-1-11上午11:22:29
- * @desc 得到具体的配置处理器实例
  */
 public interface ConfigDataHandlerFactory {
 
@@ -20,7 +22,7 @@ public interface ConfigDataHandlerFactory {
      * @param dataId 数据在配置中心注册的id
      * @return 返回配置数据处理器实例
      */
-    ConfigDataHandler getConfigDataHandler(String dataId, String unitName);
+    ConfigDataHandler getConfigDataHandler(String dataId);
 
     /**
      * 对某一个dataId进行监听，使用者提供回调监听器
@@ -29,8 +31,7 @@ public interface ConfigDataHandlerFactory {
      * @param configDataListener 数据回调监听器
      * @return 返回配置数据处理器实例
      */
-    ConfigDataHandler getConfigDataHandlerWithListener(String dataId, ConfigDataListener configDataListener,
-                                                       String unitName);
+    ConfigDataHandler getConfigDataHandlerWithListener(String dataId, ConfigDataListener configDataListener);
 
     /**
      * 对某一个dataId进行监听，使用者提供回调监听器列表， 并且提供执行线程池和内部一些配置(可能被handler忽视)
@@ -43,5 +44,6 @@ public interface ConfigDataHandlerFactory {
      */
     ConfigDataHandler getConfigDataHandlerWithFullConfig(String dataId,
                                                          List<ConfigDataListener> configDataListenerList,
-                                                         Executor executor, Map<String, String> config, String unitName);
+                                                         Executor executor, Map<String, Object> config);
+
 }

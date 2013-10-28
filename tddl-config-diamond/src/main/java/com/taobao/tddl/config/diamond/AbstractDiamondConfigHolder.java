@@ -12,13 +12,14 @@ import com.taobao.diamond.domain.ConfigInfoEx;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
-import com.taobao.tddl.config.ConfigDataHolder;
 
-public abstract class AbstractConfigHolder implements ConfigDataHolder {
+import com.taobao.tddl.config.impl.holder.ConfigDataHolder;
 
-    private static final Logger    log                 = LoggerFactory.getLogger(AbstractConfigHolder.class);
+public abstract class AbstractDiamondConfigHolder implements ConfigDataHolder {
 
-    protected AbstractConfigHolder sonConfigDataHolder = null;
+    private static final Logger    log                 = LoggerFactory.getLogger(AbstractDiamondConfigHolder.class);
+
+    protected AbstractDiamondConfigHolder sonConfigDataHolder = null;
 
     protected Map<String, String>  configHouse         = new HashMap<String, String>();
 
