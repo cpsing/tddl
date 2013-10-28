@@ -9,7 +9,7 @@ import com.taobao.diamond.client.impl.DiamondEnv;
 import com.taobao.diamond.client.impl.DiamondEnvRepo;
 import com.taobao.diamond.client.impl.DiamondUnitSite;
 import com.taobao.diamond.domain.ConfigInfoEx;
-import com.taobao.tddl.common.utils.StringUtils;
+import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.config.ConfigDataHolder;
@@ -27,7 +27,7 @@ public abstract class AbstractConfigHolder implements ConfigDataHolder {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     protected Map<String, String> queryAndHold(List<String> dataIds, String unitName) {
         DiamondEnv env = null;
-        if (!StringUtils.nullOrEmpty(unitName)) {
+        if (!TStringUtil.isEmpty(unitName)) {
             env = DiamondUnitSite.getDiamondUnitEnv(unitName);
         } else {
             env = DiamondEnvRepo.defaultEnv;

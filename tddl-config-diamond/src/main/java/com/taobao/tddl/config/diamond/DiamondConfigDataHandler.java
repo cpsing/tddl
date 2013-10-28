@@ -12,10 +12,10 @@ import com.taobao.diamond.client.impl.DiamondUnitSite;
 import com.taobao.diamond.common.Constants;
 import com.taobao.diamond.manager.ManagerListener;
 import com.taobao.diamond.manager.SkipInitialCallbackListener;
-import com.taobao.tddl.common.utils.TDDLMBean;
-import com.taobao.tddl.common.utils.TDDLMBeanServer;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
+import com.taobao.tddl.common.utils.mbean.TddlMBean;
+import com.taobao.tddl.common.utils.mbean.TddlMBeanServer;
 import com.taobao.tddl.config.ConfigDataHandler;
 import com.taobao.tddl.config.ConfigDataListener;
 
@@ -34,7 +34,7 @@ public class DiamondConfigDataHandler implements ConfigDataHandler {
     protected String            dataId;
     protected String            unitName;
     private String              mbeanId;
-    private TDDLMBean           mbean;
+    private TddlMBean           mbean;
     private DiamondEnv          env;
 
     public void init(final String dataId, final List<ConfigDataListener> configDataListenerList,
@@ -44,7 +44,7 @@ public class DiamondConfigDataHandler implements ConfigDataHandler {
 
     public void init(final String dataId, final List<ConfigDataListener> configDataListenerList,
                      final Map<String, Object> config, final String unitName, String initialData) {
-        mbean = new TDDLMBean("Diamond Config Info " + System.currentTimeMillis());
+        mbean = new TddlMBean("Diamond Config Info " + System.currentTimeMillis());
         mbeanId = dataId + System.currentTimeMillis();
         if (unitName != null && !"".equals(unitName.trim())) {
             env = DiamondUnitSite.getDiamondUnitEnv(unitName);
@@ -85,7 +85,7 @@ public class DiamondConfigDataHandler implements ConfigDataHandler {
 
         this.unitName = unitName;
         this.dataId = dataId;
-        TDDLMBeanServer.registerMBeanWithId(mbean, mbeanId);
+        TddlMBeanServer.registerMBeanWithId(mbean, mbeanId);
     }
 
     public String getNullableData(long timeout, String strategy) {
