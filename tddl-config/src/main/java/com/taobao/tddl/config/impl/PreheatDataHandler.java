@@ -23,10 +23,20 @@ public class PreheatDataHandler extends UnitConfigDataHandler {
     private UnitConfigDataHandler delagate;
     private String                dataId;
 
+    public PreheatDataHandler(){
+        delagate = loadHandlerExtension();
+    }
+
     @Override
     public void init(String dataId, List<ConfigDataListener> listenerList, Map<String, Object> prop) {
         this.dataId = dataId;
-        delagate.init(dataId, listenerList, prop);
+
+        String initialData = null;
+        if (ConfigHolderFactory.isInit(delagate.getAppName())) {
+            initialData = ConfigHolderFactory.getConfigDataHolder(delagate.getAppName()).getData(dataId);
+        }
+
+        delagate.init(dataId, listenerList, prop, initialData);
     }
 
     @Override

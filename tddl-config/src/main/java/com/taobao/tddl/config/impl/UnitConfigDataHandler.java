@@ -14,7 +14,7 @@ public abstract class UnitConfigDataHandler implements ConfigDataHandler {
     protected String unitName;
     protected String appName;
 
-    protected ConfigDataHandler loadHandlerExtension() {
+    protected UnitConfigDataHandler loadHandlerExtension() {
         UnitConfigDataHandler unitHandler = ExtensionLoader.load(UnitConfigDataHandler.class);
         unitHandler.setUnitName(unitName);
         return unitHandler;
