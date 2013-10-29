@@ -1,0 +1,29 @@
+package com.taobao.tddl.common.model.sqljep;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * 结果集筛选器
+ * 
+ * @author shenxun
+ */
+public interface ComparativeMapChoicer {
+
+    /**
+     * 根据PartinationSet 获取列名和他对应值的map.
+     * 
+     * @param arguments PrepareStatement设置的参数
+     * @param partnationSet 指定的column set
+     * @return
+     */
+    Map<String, Comparative> getColumnsMap(List<Object> arguments, Set<String> partnationSet);
+
+    /**
+     * @param arguments PrepareStatement设置的参数
+     * @param colName 指定的column name
+     * @return
+     */
+    Comparative getColumnComparative(List<Object> arguments, String colName);
+}

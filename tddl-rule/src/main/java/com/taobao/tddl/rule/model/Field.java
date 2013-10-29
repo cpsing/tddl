@@ -1,0 +1,61 @@
+package com.taobao.tddl.rule.model;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+/**
+ * <pre>
+ * 存放列名->sourceKey的映射，比如支持id in (xx)时，根据param计算后得出了目标库地址，可将该记录的sourceKey的发送到目标库上进行执行.
+ * </pre>
+ * 
+ * @author shenxun
+ */
+public class Field {
+
+    public static final Field                               EMPTY_FIELD = new Field(0);
+    public Map<String/* 列名 */, Set<Object>/* 得到该结果的描点值名 */> sourceKeys;
+
+    /**
+     * 用于映射规则中存放映射后的所有值，这些值都应该有相同的列名，对应mappingTargetColumn
+     */
+    public Set<Object>                                      mappingKeys;
+
+    /**
+     * 对应上述mappingKeys的targetColumn
+     */
+    public String                                           mappingTargetColumn;
+
+    public Field(int capacity){
+        sourceKeys = new HashMap<String, Set<Object>>(capacity);
+    }
+
+    public boolean equals(Object obj, Map<String, String> alias) {
+        // 用于比较两个field是否相等。field包含多个列，那么多列内的每一个值都应该能找到对应的值才算相等。
+        if (!(obj instanceof Field)) {
+            return false;
+        }
+        Map<String, Set<Object>> target = ((Field) obj).sourceKeys;
+        for (Entry<String, Set<Object>> entry : sourceKeys.entrySet()) {
+            String srcKey = entry.getKey();
+            if (alias.containsKey(srcKey)) {
+                srcKey = alias.get(srcKey);
+            }
+            Set<Object> targetValueSet = target.get(srcKey);
+            Set<Object> sourceValueSet = entry.getValue();
+            for (Object srcValue : sourceValueSet) {
+                boolean eq = false;
+                for (Object tarValue : targetValueSet) {
+                    if (tarValue.equals(srcValue)) {
+                        eq = true;
+                    }
+                }
+                if (!eq) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+}
