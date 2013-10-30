@@ -22,10 +22,12 @@
 			<artifactId>tddl-monitor</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>com.taobao.tbdatasource</groupId>
 			<artifactId>tbdatasource</artifactId>
 		</dependency>
+		 -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

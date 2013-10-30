@@ -17,6 +17,11 @@
 			<artifactId>tddl-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>tddl-config</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!-- logger -->
 		<dependency>
 			<groupId>org.slf4j</groupId>

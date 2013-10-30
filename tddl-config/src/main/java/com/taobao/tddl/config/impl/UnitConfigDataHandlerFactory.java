@@ -22,9 +22,9 @@ import com.taobao.tddl.config.ConfigDataListener;
  */
 public class UnitConfigDataHandlerFactory implements ConfigDataHandlerFactory {
 
-    protected static final String DEFAULT_UNITNAME = "";              // 空值
-    protected String              unitName         = DEFAULT_UNITNAME;
-    protected String              appName;                            // 如果为null，则不会进入holder处理逻辑
+    public static final String DEFAULT_UNITNAME = "";              // 空值
+    protected String           unitName         = DEFAULT_UNITNAME;
+    protected String           appName;                            // 如果为null，则不会进入holder处理逻辑
 
     public UnitConfigDataHandlerFactory(){
     }

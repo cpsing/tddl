@@ -16,6 +16,7 @@ public class DynamicLog4jLogger extends DynamicLogger {
     public void init() {
         Appender tddlAppender = buildAppender("TDDL_Appender", "tddl.log", "%d %p [%c{10}] - %m%n");
         Appender md5sqlAppender = buildAppender("TDDL_MD5_TO_SQL_Appender", "tddl.md5sql.log", "%d %p [%c{10}] - %m%n");
+        Appender nagiosAppender = buildAppender("TDDL_Nagios_Appender", "Nagios.log", "%m%n");
         Appender atomStatisticAppender = buildDailyMaxRollingAppender("TDDL_Atom_Statistic_Appender",
             "tddl-atom-statistic.log",
             "%m",
@@ -43,6 +44,12 @@ public class DynamicLog4jLogger extends DynamicLogger {
         logger.removeAllAppenders();
         logger.addAppender(md5sqlAppender);
         logger.setLevel(Level.DEBUG);
+
+        logger = (Logger) LoggerInit.TDDL_Nagios_LOG.getDelegate();
+        logger.setAdditivity(false);
+        logger.removeAllAppenders();
+        logger.addAppender(nagiosAppender);
+        logger.setLevel(Level.INFO);
 
         logger = (Logger) LoggerInit.TDDL_Atom_Statistic_LOG.getDelegate();
         logger.setAdditivity(false);
