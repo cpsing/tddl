@@ -12,20 +12,17 @@ import com.taobao.diamond.domain.ConfigInfoEx;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
-
+import com.taobao.tddl.config.impl.holder.AbstractConfigDataHolder;
 import com.taobao.tddl.config.impl.holder.ConfigDataHolder;
 
-public abstract class AbstractDiamondConfigHolder implements ConfigDataHolder {
+public class DiamondConfigHolder extends AbstractConfigDataHolder {
 
-    private static final Logger    log                 = LoggerFactory.getLogger(AbstractDiamondConfigHolder.class);
+    private static final Logger   log                 = LoggerFactory.getLogger(DiamondConfigHolder.class);
 
-    protected AbstractDiamondConfigHolder sonConfigDataHolder = null;
+    protected ConfigDataHolder    sonConfigDataHolder = null;
 
-    protected Map<String, String>  configHouse         = new HashMap<String, String>();
+    protected Map<String, String> configHouse         = new HashMap<String, String>();
 
-    public abstract void init();
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     protected Map<String, String> queryAndHold(List<String> dataIds, String unitName) {
         DiamondEnv env = null;
         if (!TStringUtil.isEmpty(unitName)) {
@@ -68,5 +65,10 @@ public abstract class AbstractDiamondConfigHolder implements ConfigDataHolder {
 
     protected String getDataFromSonHolder(String dataId) {
         return sonConfigDataHolder == null ? null : sonConfigDataHolder.getData(dataId);
+    }
+
+    @Override
+    public void init() {
+
     }
 }
