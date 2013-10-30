@@ -11,5 +11,16 @@
 	<packaging>jar</packaging>
 	<name>${project.artifactId} module for tddl ${project.version}</name>
 	<dependencies>
-  </dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>tddl-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- Test libs -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+ 	 </dependencies>
 </project>
