@@ -10,10 +10,11 @@ import com.taobao.diamond.client.impl.DiamondEnvRepo;
 import com.taobao.diamond.client.impl.DiamondUnitSite;
 import com.taobao.diamond.domain.ConfigInfoEx;
 import com.taobao.tddl.common.utils.TStringUtil;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.config.impl.holder.AbstractConfigDataHolder;
 import com.taobao.tddl.config.impl.holder.ConfigDataHolder;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 public class DiamondConfigHolder extends AbstractConfigDataHolder {
 
@@ -25,6 +26,8 @@ public class DiamondConfigHolder extends AbstractConfigDataHolder {
 
     protected Map<String, String> queryAndHold(List<String> dataIds, String unitName) {
         DiamondEnv env = null;
+
+        // TODO 外部直接指定ip进行访问
         if (!TStringUtil.isEmpty(unitName)) {
             env = DiamondUnitSite.getDiamondUnitEnv(unitName);
         } else {

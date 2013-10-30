@@ -48,6 +48,8 @@ public class DiamondConfigDataHandler extends UnitConfigDataHandler {
         this.dataId = dataId;
         mbean = new TddlMBean("Diamond Config Info " + System.currentTimeMillis());
         mbeanId = dataId + System.currentTimeMillis();
+
+        // TODO 外部直接指定ip进行访问
         if (unitName != null && !"".equals(unitName.trim())) {
             env = DiamondUnitSite.getDiamondUnitEnv(unitName);
         } else {
