@@ -22,6 +22,11 @@
 			<artifactId>tddl-monitor</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+				<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>tddl-config</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.taobao.tbdatasource</groupId>
 			<artifactId>tbdatasource</artifactId>
