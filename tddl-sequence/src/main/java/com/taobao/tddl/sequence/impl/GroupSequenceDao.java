@@ -26,14 +26,13 @@ import javax.sql.DataSource;
 import org.apache.commons.lang.StringUtils;
 
 import com.taobao.eagleeye.EagleEye;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.jdbc.group.TGroupDataSource;
 import com.taobao.tddl.sequence.SequenceDao;
 import com.taobao.tddl.sequence.SequenceRange;
 import com.taobao.tddl.sequence.exception.SequenceException;
 import com.taobao.tddl.sequence.util.RandomSequence;
-
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 public class GroupSequenceDao implements SequenceDao {
 
@@ -220,7 +219,8 @@ public class GroupSequenceDao implements SequenceDao {
                 conn = tGroupDataSource.getConnection();
                 stmt = conn.prepareStatement(getSelectSql());
                 stmt.setString(1, name);
-                GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
+                // FIXME QUERY FROM MASTER
+                // GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
                 rs = stmt.executeQuery();
                 int item = 0;
                 while (rs.next()) {
@@ -231,7 +231,7 @@ public class GroupSequenceDao implements SequenceDao {
                         if (this.isAdjust()) {
                             this.adjustUpdate(i, val, name);
                         } else {
-                            log.error("数据库中配置的初值出错！请调整你的数据库，或者启动adjust开关");
+                            logger.error("数据库中配置的初值出错！请调整你的数据库，或者启动adjust开关");
                             throw new SequenceException("数据库中配置的初值出错！请调整你的数据库，或者启动adjust开关");
                         }
                     }
@@ -283,7 +283,8 @@ public class GroupSequenceDao implements SequenceDao {
             stmt.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
             stmt.setString(3, name);
             stmt.setLong(4, value);
-            GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
+            // FIXME QUERY FROM MASTER
+            // GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
                 throw new SequenceException("faild to auto adjust init value at  " + name + " update affectedRow =0");
@@ -324,7 +325,8 @@ public class GroupSequenceDao implements SequenceDao {
             stmt.setString(1, name);
             stmt.setLong(2, newValue);
             stmt.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
-            GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
+            // FIXME QUERY FROM MASTER
+            // GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
                 throw new SequenceException("faild to auto adjust init value at  " + name + " update affectedRow =0");
@@ -379,7 +381,7 @@ public class GroupSequenceDao implements SequenceDao {
         if (excludedKeyCount.get(index) != null) {
             if (excludedKeyCount.get(index).incrementAndGet() > maxSkipCount) {
                 excludedKeyCount.remove(index);
-                log.error(maxSkipCount + "次数已过，index为" + index + "的数据源后续重新尝试取序列");
+                logger.error(maxSkipCount + "次数已过，index为" + index + "的数据源后续重新尝试取序列");
             } else {
                 result = false;
             }
@@ -395,7 +397,8 @@ public class GroupSequenceDao implements SequenceDao {
             conn = dataSource.getConnection();
             stmt = conn.prepareStatement(getSelectSql());
             stmt.setString(1, keyName);
-            GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
+            // FIXME QUERY FROM MASTER
+            // GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
             rs = stmt.executeQuery();
             rs.next();
             return rs.getLong(1);
@@ -427,7 +430,8 @@ public class GroupSequenceDao implements SequenceDao {
             stmt.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
             stmt.setString(3, keyName);
             stmt.setLong(4, oldValue);
-            GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
+            // FIXME QUERY FROM MASTER
+            // GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
             return stmt.executeUpdate();
         } finally {
             // 直接抛出异常外面接，但是这里需要直接关闭链接
@@ -525,7 +529,7 @@ public class GroupSequenceDao implements SequenceDao {
         if (!result) {
             message.append(" Sequence value  = ").append(oldValue);
             message.append(", please check table ").append(getTableName());
-            log.info(message);
+            logger.info(message.toString());
         }
         return result;
     }
@@ -568,7 +572,7 @@ public class GroupSequenceDao implements SequenceDao {
                             continue;
                         }
                     } catch (SQLException e) {
-                        log.error("取范围过程中--查询出错！" + dbGroupKeys.get(index) + ":" + name, e);
+                        logger.error("取范围过程中--查询出错！" + dbGroupKeys.get(index) + ":" + name, e);
                         excludeDataSource(index);
                         continue;
                     }
