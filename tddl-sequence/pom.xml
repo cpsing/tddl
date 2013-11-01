@@ -17,27 +17,33 @@
 			<artifactId>tddl-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
+		
+		
+<!-- 		<dependency>
 			<groupId>com.alibaba.unit.rule</groupId>
 			<artifactId>unitrouter</artifactId>
 			<version>1.0.8</version>
-		</dependency>
-		<dependency>
+		</dependency> -->
+		
+<!-- 		<dependency>
 			<groupId>com.taobao.tddl</groupId>
 			<artifactId>tddl-group-datasource</artifactId>
 			<version>3.1.0.6-2</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency> -->
+		
 		<dependency>
 			<groupId>com.taobao.diamond</groupId>
 			<artifactId>diamond-client</artifactId>
 			<version>3.6.7</version>
 		</dependency>
-		<dependency>
+		
+<!-- 		<dependency>
 			<groupId>com.taobao.eagleeye</groupId>
 			<artifactId>eagleeye-core</artifactId>
 			<version>1.2.4</version>
-		</dependency>
+		</dependency> -->
+		
 		<!-- Test libs -->
 		<dependency>
 			<groupId>junit</groupId>

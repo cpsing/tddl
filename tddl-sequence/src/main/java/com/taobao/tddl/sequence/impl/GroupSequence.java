@@ -6,11 +6,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.taobao.eagleeye.EagleEye;
 import com.taobao.tddl.sequence.Sequence;
 import com.taobao.tddl.sequence.SequenceDao;
 import com.taobao.tddl.sequence.SequenceRange;
 import com.taobao.tddl.sequence.exception.SequenceException;
+import com.taobao.tddl.sequence.temp.EagleEye;
 
 public class GroupSequence implements Sequence {
 

@@ -25,15 +25,19 @@ import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.taobao.eagleeye.EagleEye;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
-import com.taobao.tddl.jdbc.group.TGroupDataSource;
 import com.taobao.tddl.sequence.SequenceDao;
 import com.taobao.tddl.sequence.SequenceRange;
 import com.taobao.tddl.sequence.exception.SequenceException;
+import com.taobao.tddl.sequence.temp.EagleEye;
+import com.taobao.tddl.sequence.temp.TGroupDataSource;
 import com.taobao.tddl.sequence.util.RandomSequence;
 
+/**
+ * @author JIECHEN 2013-10-31 下午5:48:48
+ * @since 5.1.0
+ */
 public class GroupSequenceDao implements SequenceDao {
 
     private static final Logger       logger                           = LoggerFactory.getLogger(GroupSequenceDao.class);
@@ -55,10 +59,6 @@ public class GroupSequenceDao implements SequenceDao {
     private static final Boolean      DEFAULT_ADJUST                   = false;
 
     protected static final long       DELTA                            = 100000000L;
-    // /**
-    // * 数据源阵列
-    // */
-    // private DataSourceMatrixCreator dataSourceMatrixCreator;
 
     /**
      * 应用名
@@ -71,11 +71,6 @@ public class GroupSequenceDao implements SequenceDao {
     protected List<String>            dbGroupKeys;
 
     protected List<String>            oriDbGroupKeys;
-
-    /**
-     * groupDs使用的数据源类型
-     */
-    // protected DataSourceType dataSourceType = DataSourceType.TbDataSource;
 
     /**
      * 数据源
@@ -171,6 +166,13 @@ public class GroupSequenceDao implements SequenceDao {
         }
         outStep = innerStep * dscount;// 计算外步长
 
+        markProperties();
+    }
+
+    /**
+     * 初始化完打印配置信息
+     */
+    private void markProperties() {
         StringBuilder sb = new StringBuilder();
         sb.append("GroupSequenceDao初始化完成：\r\n ");
         sb.append("appName:").append(appName).append("\r\n");
@@ -199,10 +201,15 @@ public class GroupSequenceDao implements SequenceDao {
     }
 
     /**
-     * 检查并初试某个sequence 1、如果sequece不处在，插入值，并初始化值 2、如果已经存在，但有重叠，重新生成
+     * <pre>
+     * 检查并初试某个sequence。 
+     * 
+     * 1、如果sequece不处在，插入值，并初始化值。 
+     * 2、如果已经存在，但有重叠，重新生成。
      * 3、如果已经存在，且无重叠。
      * 
      * @throws SequenceException
+     * </pre>
      */
     public void adjust(String name) throws SequenceException, SQLException {
         Connection conn = null;
