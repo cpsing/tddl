@@ -1,5 +1,6 @@
 package com.taobao.tddl.atom.config;
 
+import com.taobao.tddl.config.ConfigDataListener;
 
 /**
  * TAtom数据源全局和应用的配置管理接口定义

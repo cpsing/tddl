@@ -11,19 +11,24 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.sql.DataSource;
 
-import com.google.common.util.concurrent.Monitor;
 import com.taobao.tddl.atom.AtomDbStatusEnum;
 import com.taobao.tddl.atom.AtomDbTypeEnum;
 import com.taobao.tddl.atom.config.TAtomDsConfDO;
+import com.taobao.tddl.atom.exception.AtomNotAvailableException;
 import com.taobao.tddl.atom.utils.CountPunisher;
 import com.taobao.tddl.atom.utils.SmoothValve;
 import com.taobao.tddl.atom.utils.TimesliceFlowControl;
+import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.jdbc.sort.ExceptionSorter;
 import com.taobao.tddl.common.utils.jdbc.sort.MySQLExceptionSorter;
 import com.taobao.tddl.common.utils.jdbc.sort.OracleExceptionSorter;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
-import com.taobao.tddl.monitor.utils.SnapshotValuesOutputCallBack;
+import com.taobao.tddl.monitor.Monitor;
+import com.taobao.tddl.monitor.SnapshotValuesOutputCallBack;
+import com.taobao.tddl.monitor.stat.AbstractStatLogWriter.LogCounter;
+import com.taobao.tddl.monitor.stat.StatLogWriter;
+import com.taobao.tddl.monitor.utils.NagiosUtils;
 
 public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallBack {
 
@@ -236,7 +241,7 @@ public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallB
                 }
             }
         } catch (SQLException e) {
-            ExceptionSorter exceptionSorter = exceptionSorters.get(StringUtil.toUpperCase(this.runTimeConf.getDbType()));
+            ExceptionSorter exceptionSorter = exceptionSorters.get(TStringUtil.upperCase(this.runTimeConf.getDbType()));
             if (exceptionSorter.isExceptionFatal(e)) {
                 NagiosUtils.addNagiosLog(NagiosUtils.KEY_DB_NOT_AVAILABLE + "|" + this.runTimeConf.getDbName(),
                     e.getMessage());

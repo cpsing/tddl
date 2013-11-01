@@ -8,6 +8,7 @@ import java.sql.Statement;
 
 import com.google.common.util.concurrent.Monitor;
 import com.taobao.tddl.atom.AtomDbStatusEnum;
+import com.taobao.tddl.common.model.SqlMetaData;
 import com.taobao.tddl.common.utils.jdbc.SqlTypeParser;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;

@@ -1,5 +1,6 @@
 package com.taobao.tddl.atom.config;
 
+import com.taobao.tddl.config.ConfigDataListener;
 
 public interface DbPasswdManager {
 

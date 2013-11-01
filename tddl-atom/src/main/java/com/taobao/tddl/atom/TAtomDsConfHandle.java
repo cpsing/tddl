@@ -7,19 +7,26 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.sql.DataSource;
 
-import com.google.common.util.concurrent.Monitor;
 import com.taobao.datasource.LocalTxDataSourceDO;
 import com.taobao.datasource.TaobaoDataSourceFactory;
 import com.taobao.datasource.resource.adapter.jdbc.local.LocalTxDataSource;
+import com.taobao.tddl.atom.config.DbConfManager;
+import com.taobao.tddl.atom.config.DbPasswdManager;
+import com.taobao.tddl.atom.config.DiamondDbConfManager;
+import com.taobao.tddl.atom.config.DiamondDbPasswdManager;
 import com.taobao.tddl.atom.config.TAtomConfParser;
 import com.taobao.tddl.atom.config.TAtomDsConfDO;
 import com.taobao.tddl.atom.config.listener.TAtomDbStatusListener;
 import com.taobao.tddl.atom.exception.AtomAlreadyInitException;
+import com.taobao.tddl.atom.exception.AtomIllegalException;
+import com.taobao.tddl.atom.exception.AtomInitialException;
 import com.taobao.tddl.atom.jdbc.ConnRestrictEntry;
 import com.taobao.tddl.atom.jdbc.TDataSourceWrapper;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
+import com.taobao.tddl.config.ConfigDataListener;
+import com.taobao.tddl.monitor.Monitor;
 
 /**
  * 数据库动态切换的Handle类，所有数据库的动态切换 都是由这个类完成

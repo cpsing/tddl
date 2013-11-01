@@ -1,4 +1,4 @@
-package com.taobao.tddl.atom.jdbc;
+package com.taobao.tddl.common.model;
 
 import java.util.List;
 

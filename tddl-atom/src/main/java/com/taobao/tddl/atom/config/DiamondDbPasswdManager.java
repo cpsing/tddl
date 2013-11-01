@@ -7,6 +7,12 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import com.taobao.tddl.atom.TAtomConstants;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
+import com.taobao.tddl.config.ConfigDataHandler;
+import com.taobao.tddl.config.ConfigDataHandlerFactory;
+import com.taobao.tddl.config.ConfigDataListener;
+import com.taobao.tddl.config.impl.ConfigDataHandlerCity;
 
 /**
  * 密码管理器Diamond实现
@@ -15,7 +21,7 @@ import com.taobao.tddl.atom.TAtomConstants;
  */
 public class DiamondDbPasswdManager implements DbPasswdManager {
 
-    private static Log                        logger             = LogFactory.getLog(DiamondDbPasswdManager.class);
+    private static Logger                     logger             = LoggerFactory.getLogger(DiamondDbPasswdManager.class);
     private String                            passwdConfDataId;
     private String                            unitName;
     private ConfigDataHandlerFactory          configFactory;
@@ -23,19 +29,18 @@ public class DiamondDbPasswdManager implements DbPasswdManager {
     private volatile List<ConfigDataListener> passwdConfListener = new ArrayList<ConfigDataListener>();
 
     public void init(String appName) {
-        configFactory = ConfigDataHandlerCity.getFactory(appName);
-        Map<String, String> config = new HashMap<String, String>();
+        configFactory = ConfigDataHandlerCity.getFactory(appName, unitName);
+        Map<String, Object> config = new HashMap<String, Object>();
         config.put("group", TAtomConstants.DEFAULT_DIAMOND_GROUP);
         passwdHandler = configFactory.getConfigDataHandlerWithFullConfig(passwdConfDataId,
             passwdConfListener,
             Executors.newSingleThreadScheduledExecutor(),
-            config,
-            unitName);
+            config);
     }
 
     public String getPasswd() {
         if (null != passwdHandler) {
-            String passwdStr = passwdHandler.getData(TDDLConstant.DIAMOND_GET_DATA_TIMEOUT,
+            String passwdStr = passwdHandler.getData(ConfigDataHandler.GET_DATA_TIMEOUT,
                 ConfigDataHandler.FIRST_CACHE_THEN_SERVER_STRATEGY);
             if (passwdStr == null) {
                 logger.error("[getDataError] remote password string is empty !");

@@ -7,6 +7,12 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import com.taobao.tddl.atom.TAtomConstants;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
+import com.taobao.tddl.config.ConfigDataHandler;
+import com.taobao.tddl.config.ConfigDataHandlerFactory;
+import com.taobao.tddl.config.ConfigDataListener;
+import com.taobao.tddl.config.impl.ConfigDataHandlerCity;
 
 /**
  * 全局和应用的配置管理Diamond实现
@@ -15,7 +21,7 @@ import com.taobao.tddl.atom.TAtomConstants;
  */
 public class DiamondDbConfManager implements DbConfManager {
 
-    private static Log                        logger               = LogFactory.getLog(DiamondDbConfManager.class);
+    private static Logger                     logger               = LoggerFactory.getLogger(DiamondDbConfManager.class);
     private String                            globalConfigDataId;
     private String                            appConfigDataId;
     private String                            unitName;
@@ -26,19 +32,17 @@ public class DiamondDbConfManager implements DbConfManager {
     private volatile List<ConfigDataListener> appDbConfListener    = new ArrayList<ConfigDataListener>();
 
     public void init(String appName) {
-        configFactory = ConfigDataHandlerCity.getFactory(appName);
-        Map<String, String> config = new HashMap<String, String>();
+        configFactory = ConfigDataHandlerCity.getFactory(appName, unitName);
+        Map<String, Object> config = new HashMap<String, Object>();
         config.put("group", TAtomConstants.DEFAULT_DIAMOND_GROUP);
         globalHandler = configFactory.getConfigDataHandlerWithFullConfig(globalConfigDataId,
             globalDbConfListener,
             Executors.newSingleThreadScheduledExecutor(),
-            config,
-            unitName);
+            config);
         appDBHandler = configFactory.getConfigDataHandlerWithFullConfig(appConfigDataId,
             appDbConfListener,
             Executors.newSingleThreadScheduledExecutor(),
-            config,
-            unitName);
+            config);
     }
 
     public String getAppDbConfDataId() {
@@ -47,7 +51,7 @@ public class DiamondDbConfManager implements DbConfManager {
 
     public String getAppDbDbConf() {
         if (null != appDBHandler) {
-            return appDBHandler.getData(TDDLConstant.DIAMOND_GET_DATA_TIMEOUT,
+            return appDBHandler.getData(ConfigDataHandler.GET_DATA_TIMEOUT,
                 ConfigDataHandler.FIRST_CACHE_THEN_SERVER_STRATEGY);
         }
         logger.error("[getDataError] appDBConfig not init !");
@@ -56,7 +60,7 @@ public class DiamondDbConfManager implements DbConfManager {
 
     public String getGlobalDbConf() {
         if (null != globalHandler) {
-            return globalHandler.getData(TDDLConstant.DIAMOND_GET_DATA_TIMEOUT,
+            return globalHandler.getData(ConfigDataHandler.GET_DATA_TIMEOUT,
                 ConfigDataHandler.FIRST_CACHE_THEN_SERVER_STRATEGY);
         }
         logger.error("[getDataError] globalConfig not init !");

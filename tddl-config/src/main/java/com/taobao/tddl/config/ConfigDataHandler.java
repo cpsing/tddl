@@ -16,6 +16,7 @@ public interface ConfigDataHandler {
 
     public static final String FIRST_SERVER_STRATEGY            = "firstServer";
     public static final String FIRST_CACHE_THEN_SERVER_STRATEGY = "firstCache";
+    public static final long   GET_DATA_TIMEOUT                 = 10 * 1000;
 
     /**
      * DefaultConfigDataHandler会在 实例化具体的Handler之后调用此方法 给予Handler相关信息
