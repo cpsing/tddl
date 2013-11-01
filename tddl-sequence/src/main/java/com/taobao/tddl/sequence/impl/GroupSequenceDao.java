@@ -166,13 +166,13 @@ public class GroupSequenceDao implements SequenceDao {
         }
         outStep = innerStep * dscount;// 计算外步长
 
-        markProperties();
+        outputInitResult();
     }
 
     /**
      * 初始化完打印配置信息
      */
-    private void markProperties() {
+    private void outputInitResult() {
         StringBuilder sb = new StringBuilder();
         sb.append("GroupSequenceDao初始化完成：\r\n ");
         sb.append("appName:").append(appName).append("\r\n");
@@ -256,15 +256,8 @@ public class GroupSequenceDao implements SequenceDao {
                 logger.error("初值校验和自适应过程中出错.", e);
                 throw e;
             } finally {
-                closeResultSet(rs);
-                rs = null;
-                closeStatement(stmt);
-                stmt = null;
-                closeConnection(conn);
-                conn = null;
-
+                closeDbResource(rs, stmt, conn);
             }
-
         }
     }
 
@@ -304,10 +297,7 @@ public class GroupSequenceDao implements SequenceDao {
             throw new SequenceException("由于SQLException,更新初值自适应失败！dbGroupIndex:" + dbGroupKeys.get(index)
                                         + "，sequence Name：" + name + "更新过程：" + value + "-->" + newValue, e);
         } finally {
-            closeStatement(stmt);
-            stmt = null;
-            closeConnection(conn);
-            conn = null;
+            closeDbResource(null, stmt, conn);
         }
     }
 
@@ -340,18 +330,13 @@ public class GroupSequenceDao implements SequenceDao {
             }
             logger.info(dbGroupKeys.get(index) + "   name:" + name + "插入初值:" + name + "value:" + newValue);
 
-        } catch (SQLException e) { // 吃掉SQL异常，抛sequence异常
+        } catch (SQLException e) {
             logger.error("由于SQLException,插入初值自适应失败！dbGroupIndex:" + dbGroupKeys.get(index) + "，sequence Name：" + name
                          + "   value:" + newValue, e);
             throw new SequenceException("由于SQLException,插入初值自适应失败！dbGroupIndex:" + dbGroupKeys.get(index)
                                         + "，sequence Name：" + name + "   value:" + newValue, e);
         } finally {
-            closeResultSet(rs);
-            rs = null;
-            closeStatement(stmt);
-            stmt = null;
-            closeConnection(conn);
-            conn = null;
+            closeDbResource(rs, stmt, conn);
         }
     }
 
@@ -410,7 +395,6 @@ public class GroupSequenceDao implements SequenceDao {
             rs.next();
             return rs.getLong(1);
         } finally {
-            // 直接抛出异常外面接，但是这里需要直接关闭链接
             closeDbResource(rs, stmt, conn);
         }
     }
@@ -441,7 +425,6 @@ public class GroupSequenceDao implements SequenceDao {
             // GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
             return stmt.executeUpdate();
         } finally {
-            // 直接抛出异常外面接，但是这里需要直接关闭链接
             closeDbResource(rs, stmt, conn);
         }
     }
@@ -746,10 +729,6 @@ public class GroupSequenceDao implements SequenceDao {
         this.oriDbGroupKeys = dbGroupKeys;
         this.dbGroupKeys = dbGroupKeys;
     }
-
-    // public void setDataSourceType(DataSourceType dataSourceType) {
-    // this.dataSourceType = dataSourceType;
-    // }
 
     public boolean isAdjust() {
         return adjust;

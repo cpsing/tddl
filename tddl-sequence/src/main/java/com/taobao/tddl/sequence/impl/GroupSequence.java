@@ -23,7 +23,7 @@ public class GroupSequence implements Sequence {
     private volatile SequenceRange testCurrentRange;
 
     /**
-     * 初始化一下，如果name不存在，则给其初始值
+     * 初始化一下，如果name不存在，则给其初始值<br>
      * 
      * @throws SequenceException
      * @throws SQLException
