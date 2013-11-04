@@ -9,7 +9,7 @@ public class ExtensionLoaderTest {
 
     @Test
     public void testSimple() {
-        PluginService plugin = ExtensionLoader.load(PluginService.class);
+        AbstractPluginService plugin = ExtensionLoader.load(AbstractPluginService.class);
         Assert.assertEquals(plugin.getClass(), ExamplePlugin.class);
         Assert.assertEquals(plugin.echo("hello"), "hello");
     }

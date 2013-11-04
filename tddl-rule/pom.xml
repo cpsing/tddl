@@ -16,6 +16,10 @@
 			<artifactId>tddl-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+		</dependency>
 		<!-- Test libs -->
 		<dependency>
 			<groupId>junit</groupId>

@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,6 +56,14 @@ public class GeneralUtil {
         }
     }
 
+    public static boolean isEmpty(Collection collection) {
+        return collection == null || collection.size() == 0;
+    }
+
+    public static boolean isNotEmpty(Collection collection) {
+        return collection != null && collection.size() != 0;
+    }
+
     public static String getColumnName(int index, String columns) {
         String[] strs = columns.split(",");
         if (index >= strs.length) {
@@ -65,7 +74,6 @@ public class GeneralUtil {
     }
 
     public static InputStream getInputStream(String fileName) throws FileNotFoundException {
-
         String rootClassPath = GeneralUtil.class.getResource("/").getPath();
         String tempClassFileName = null;
         if (fileName.startsWith("/")) {
@@ -147,19 +155,12 @@ public class GeneralUtil {
     }
 
     public static String replaceBlank(String str) {
-
         String dest = "";
-
         if (str != null) {
-
             Pattern p = Pattern.compile("\t|\r|\n");
-
             Matcher m = p.matcher(str);
-
             dest = m.replaceAll("");
-
         }
-
         return dest;
 
     }
