@@ -5,35 +5,31 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import com.taobao.datasource.LocalTxDataSourceDO;
-import com.taobao.datasource.TaobaoDataSourceFactory;
-import com.taobao.datasource.resource.adapter.jdbc.local.LocalTxDataSource;
-import com.taobao.tddl.atom.config.TAtomConfParser;
+import com.alibaba.druid.pool.DruidDataSource;
 import com.taobao.tddl.atom.config.TAtomDsConfDO;
 import com.taobao.tddl.atom.exception.AtomAlreadyInitException;
-import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
- * 静态剥离的jboss数据源，不支持动态改参数 主要用来方便测试
+ * 静态剥离的druid数据源，不支持动态改参数 主要用来方便测试
  * 
  * @author qihao
  */
 public class StaticTAtomDataSource extends AbstractTAtomDataSource {
 
-    private static Logger     logger = LoggerFactory.getLogger(StaticTAtomDataSource.class);
+    private static Logger    logger = LoggerFactory.getLogger(StaticTAtomDataSource.class);
     /**
      * 数据源配置信息
      */
-    private TAtomDsConfDO     confDO = new TAtomDsConfDO();
+    private TAtomDsConfDO    confDO = new TAtomDsConfDO();
 
     /**
      * Jboss数据源通过init初始化
      */
-    private LocalTxDataSource jbossDataSource;
+    private DruidDataSource  druidDataSource;
 
-    private volatile boolean  init;
+    private volatile boolean init;
 
     @Override
     public void init(String appName, String dsKey, String unitName) throws Exception {
@@ -44,11 +40,15 @@ public class StaticTAtomDataSource extends AbstractTAtomDataSource {
         if (init) {
             throw new AtomAlreadyInitException("[AlreadyInit] double call Init !");
         }
-        LocalTxDataSourceDO localTxDataSourceDO = TAtomDsConfHandle.convertTAtomDsConf2JbossConf(confDO,
+        DruidDataSource localDruidDataSource = DruidDsConfHandle.convertTAtomDsConf2DruidConf(confDO.getIp(),
+            confDO,
             confDO.getDbName());
-        boolean checkPram = TAtomDsConfHandle.checkLocalTxDataSourceDO(localTxDataSourceDO);
+        boolean checkPram = DruidDsConfHandle.checkLocalTxDataSourceDO(localDruidDataSource);
         if (checkPram) {
-            jbossDataSource = TaobaoDataSourceFactory.createLocalTxDataSource(localTxDataSourceDO);
+            localDruidDataSource.init();
+            // druidDataSource =
+            // TaobaoDataSourceFactory.createLocalTxDataSource(localDruidDataSource);
+            druidDataSource = localDruidDataSource;
             init = true;
         } else {
             throw new Exception("Init DataSource Error Pleace Check!");
@@ -56,23 +56,25 @@ public class StaticTAtomDataSource extends AbstractTAtomDataSource {
     }
 
     public void destroyDataSource() throws Exception {
-        if (null != this.jbossDataSource) {
+        if (null != this.druidDataSource) {
             logger.warn("[DataSource Stop] Start!");
-            this.jbossDataSource.destroy();
+            this.druidDataSource.close();
             logger.warn("[DataSource Stop] End!");
         }
     }
 
     public void flushDataSource() {
-        if (null != this.jbossDataSource) {
+        if (null != this.druidDataSource) {
             logger.warn("[DataSource Flush] Start!");
-            this.jbossDataSource.flush();
+            DruidDataSource tempDataSource = this.druidDataSource.cloneDruidDataSource();
+            this.druidDataSource.close();
+            this.druidDataSource = tempDataSource;
             logger.warn("[DataSource Flush] End!");
         }
     }
 
     protected DataSource getDataSource() throws SQLException {
-        return jbossDataSource.getDatasource();
+        return druidDataSource;
     }
 
     public String getIp() {
@@ -187,22 +189,17 @@ public class StaticTAtomDataSource extends AbstractTAtomDataSource {
         return this.confDO.getConnectionProperties();
     }
 
+    public void setConnectionProperties(Map<String, String> connectionProperties) {
+        this.confDO.setConnectionProperties(connectionProperties);
+    }
+
     @Override
-    public AtomDbStatusEnum getDbStatus() {
+    public TAtomDbStatusEnum getDbStatus() {
         return confDO.getDbStautsEnum();
     }
 
     @Override
-    public AtomDbTypeEnum getDbType() {
+    public TAtomDbTypeEnum getDbType() {
         return confDO.getDbTypeEnum();
     }
-
-    public void setConnectionProperties(Map<String, String> connectionProperties) {
-        this.confDO.setConnectionProperties(connectionProperties);
-        String driverClass = connectionProperties.get(TAtomConfParser.APP_DRIVER_CLASS_KEY);
-        if (!TStringUtil.isBlank(driverClass)) {
-            this.confDO.setDriverClass(driverClass);
-        }
-    }
-
 }

@@ -4,15 +4,16 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.sql.DataSource;
 
-import com.taobao.tddl.atom.AtomDbStatusEnum;
-import com.taobao.tddl.atom.AtomDbTypeEnum;
+import com.alibaba.druid.support.logging.Log;
+import com.alibaba.druid.support.logging.LogFactory;
+import com.taobao.tddl.atom.TAtomDbStatusEnum;
+import com.taobao.tddl.atom.TAtomDbTypeEnum;
 import com.taobao.tddl.atom.config.TAtomDsConfDO;
 import com.taobao.tddl.atom.exception.AtomNotAvailableException;
 import com.taobao.tddl.atom.utils.CountPunisher;
@@ -22,51 +23,39 @@ import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.jdbc.sort.ExceptionSorter;
 import com.taobao.tddl.common.utils.jdbc.sort.MySQLExceptionSorter;
 import com.taobao.tddl.common.utils.jdbc.sort.OracleExceptionSorter;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.monitor.Monitor;
 import com.taobao.tddl.monitor.SnapshotValuesOutputCallBack;
-import com.taobao.tddl.monitor.stat.AbstractStatLogWriter.LogCounter;
 import com.taobao.tddl.monitor.stat.StatLogWriter;
 import com.taobao.tddl.monitor.utils.NagiosUtils;
 
 public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallBack {
 
-    private static Logger                             logger                     = LoggerFactory.getLogger(TDataSourceWrapper.class);
+    private static Log                                logger                     = LogFactory.getLog(TDataSourceWrapper.class);
     private final DataSource                          targetDataSource;
     /**
      * 当前线程的threadCount值,如果进行了切换。 那么使用的是不同的Datasource包装类，不会相互影响。
      * threadCount输出在切换过程中在那个时候不能反应准确的值。
      * 但因为旧的被丢弃前也有用，等于在内存中维持了两份不同的TDataSourceWrapper. 因此线程计数不会额外增加。
      */
-    final AtomicInteger                               threadCount                = new AtomicInteger();                              // 包权限
-    final AtomicInteger                               threadCountReject          = new AtomicInteger();                              // 包权限
-    final AtomicInteger                               concurrentReadCount        = new AtomicInteger();                              // 包权限
-    final AtomicInteger                               concurrentWriteCount       = new AtomicInteger();                              // 包权限
-    volatile TimesliceFlowControl                     writeFlowControl;                                                              // 包权限
-    volatile TimesliceFlowControl                     readFlowControl;                                                               // 包权限
+    final AtomicInteger                               threadCount                = new AtomicInteger();                        // 包权限
+    final AtomicInteger                               threadCountReject          = new AtomicInteger();                        // 包权限
+    final AtomicInteger                               concurrentReadCount        = new AtomicInteger();                        // 包权限
+    final AtomicInteger                               concurrentWriteCount       = new AtomicInteger();                        // 包权限
+    volatile TimesliceFlowControl                     writeFlowControl;                                                        // 包权限
+    volatile TimesliceFlowControl                     readFlowControl;                                                         // 包权限
 
     /**
      * 写计数
      */
     // final AtomicInteger writeTimes = new AtomicInteger();//包权限
-    final AtomicInteger                               writeTimesReject           = new AtomicInteger();                              // 包权限
+    final AtomicInteger                               writeTimesReject           = new AtomicInteger();                        // 包权限
 
     /**
      * 读计数
      */
     // final AtomicInteger readTimes = new AtomicInteger();//包权限
-    final AtomicInteger                               readTimesReject            = new AtomicInteger();                              // 包权限
-    volatile ConnectionProperties                     connectionProperties       = new ConnectionProperties();                       // 包权限
-
-    /**
-     * 应用连接限制
-     */
-    private ConnRestrictor                            connRestrictor;
-
-    // changyuan.lh: 并发连接数和阻塞等待的统计对象
-    private LogCounter                                statConnNumber;
-    private LogCounter                                statConnBlocking;
+    final AtomicInteger                               readTimesReject            = new AtomicInteger();                        // 包权限
+    volatile ConnectionProperties                     connectionProperties       = new ConnectionProperties();                 // 包权限
 
     // final private Timer timer = new Timer();
     // private volatile TimerTask timerTask = new TimerTaskC();
@@ -74,19 +63,18 @@ public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallB
     protected TAtomDsConfDO                           runTimeConf;
     private static final Map<String, ExceptionSorter> exceptionSorters           = new HashMap<String, ExceptionSorter>(2);
     static {
-        exceptionSorters.put(AtomDbTypeEnum.ORACLE.name(), new OracleExceptionSorter());
-        exceptionSorters.put(AtomDbTypeEnum.MYSQL.name(), new MySQLExceptionSorter());
+        exceptionSorters.put(TAtomDbTypeEnum.ORACLE.name(), new OracleExceptionSorter());
+        exceptionSorters.put(TAtomDbTypeEnum.MYSQL.name(), new MySQLExceptionSorter());
     }
     private final ReentrantLock                       lock                       = new ReentrantLock();
     // private volatile boolean isNotAvailable = false; //是否不可用
-    // private volatile SmoothValve smoothValve = new SmoothValve(20);
     private volatile SmoothValve                      smoothValve                = new SmoothValve(0);
     private volatile CountPunisher                    timeOutPunisher            = new CountPunisher(new SmoothValve(0),
                                                                                      3000,
-                                                                                     300);                                           // 3秒钟之内超时300次则惩罚，不可能的阀值，相当于关闭了
+                                                                                     300);                                     // 3秒钟之内超时300次则惩罚，不可能的阀值，相当于关闭了
 
-    private static final int                          default_retryBadDbInterval = 2000;                                             // milliseconds
-    protected static int                              retryBadDbInterval;                                                            // milliseconds
+    private static final int                          default_retryBadDbInterval = 2000;                                       // milliseconds
+    protected static int                              retryBadDbInterval;                                                      // milliseconds
     static {
         int interval = default_retryBadDbInterval;
         String propvalue = System.getProperty("com.taobao.tddl.DBSelector.retryBadDbInterval");
@@ -100,17 +88,17 @@ public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallB
         retryBadDbInterval = interval;
     }
 
-    public AtomDbStatusEnum getDbStatus() {
+    public TAtomDbStatusEnum getDbStatus() {
         return connectionProperties.dbStatus;
     }
 
-    public void setDbStatus(AtomDbStatusEnum dbStatus) {
+    public void setDbStatus(TAtomDbStatusEnum dbStatus) {
         this.connectionProperties.dbStatus = dbStatus;
     }
 
     public static class ConnectionProperties {
 
-        public volatile AtomDbStatusEnum dbStatus;
+        public volatile TAtomDbStatusEnum dbStatus;
         /**
          * 当前数据库的名字
          */
@@ -150,6 +138,13 @@ public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallB
     public TDataSourceWrapper(DataSource targetDataSource, TAtomDsConfDO runTimeConf){
         this.runTimeConf = runTimeConf;
         this.targetDataSource = targetDataSource;
+
+        // timerTask = new TimerTaskC();
+        Monitor.addSnapshotValuesCallbask(this);
+        // Monitor.addGlobalConfigListener(globalConfigListener);
+        // timer.schedule(timerTask, 0,
+        // this.connectionProperties.timeSliceInMillis);
+
         this.readFlowControl = new TimesliceFlowControl("读流量",
             runTimeConf.getTimeSliceInMillis(),
             runTimeConf.getReadRestrictTimes());
@@ -175,23 +170,6 @@ public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallB
 
         logger.warn("set maxConcurrentWriteRestrict " + runTimeConf.getMaxConcurrentWriteRestrict());
         this.connectionProperties.maxConcurrentWriteRestrict = runTimeConf.getMaxConcurrentWriteRestrict();
-    }
-
-    public void init() {
-        // changyuan.lh: 初始化连接分桶
-        final String datasourceKey = connectionProperties.datasourceName;
-        List<ConnRestrictEntry> connRestrictEntries = runTimeConf.getConnRestrictEntries();
-        if (connRestrictEntries != null) {
-            this.connRestrictor = new ConnRestrictor(datasourceKey, connRestrictEntries);
-        }
-        this.statConnNumber = Monitor.connStat(datasourceKey, "-", Monitor.KEY3_CONN_NUMBER);
-        this.statConnBlocking = Monitor.connStat(datasourceKey, "-", Monitor.KEY3_CONN_BLOCKING);
-
-        // timerTask = new TimerTaskC();
-        Monitor.addSnapshotValuesCallbask(this);
-        // Monitor.addGlobalConfigListener(globalConfigListener);
-        // timer.schedule(timerTask, 0,
-        // this.connectionProperties.timeSliceInMillis);
     }
 
     // 包权限，给下游对象调用
@@ -248,56 +226,23 @@ public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallB
                 // isNotAvailable = true;
                 valve.setNotAvailable();
             }
-
-            // throw e;
-            // modify by junyu
-            throw new SQLException("get connection failed,dbKey(if null,with dbName) is "
-                                   + (connectionProperties.datasourceName != null ? connectionProperties.datasourceName : this.runTimeConf.getDbName()),
-                e);
+            throw e;
         }
     }
 
     private Connection getConnection0(String username, String password) throws SQLException {
-        final long callMillis = System.currentTimeMillis();
-        ConnRestrictSlot connRestrictSlot = null;
         TConnectionWrapper tconnectionWrapper;
         try {
             recordThreadCount();
-            if (connRestrictor != null) {
-                connRestrictSlot = connRestrictor.doRestrict(runTimeConf.getBlockingTimeout());
-            }
-            tconnectionWrapper = new TConnectionWrapper(getConnectionByTargetDataSource(username, password),
-                connRestrictSlot,
-                this);
+            tconnectionWrapper = new TConnectionWrapper(getConnectionByTargetDataSource(username, password), this);
         } catch (SQLException e) {
-            if (connRestrictSlot != null) {
-                connRestrictSlot.freeConnection();
-            }
             threadCount.decrementAndGet();
             throw e;
         } catch (RuntimeException e) {
-            if (connRestrictSlot != null) {
-                connRestrictSlot.freeConnection();
-            }
             threadCount.decrementAndGet();
             throw e;
-        } finally {
-            // changyuan.lh: 记录统计信息
-            final long connMillis = System.currentTimeMillis() - callMillis;
-            if (connRestrictSlot != null) {
-                connRestrictSlot.statConnection(connMillis);
-            }
-            addConnStat(connMillis);
         }
         return tconnectionWrapper;
-    }
-
-    /**
-     * changyuan.lh: 记录统计信息
-     */
-    private final void addConnStat(final long connMillis) {
-        statConnNumber.stat(1, threadCount.get());
-        statConnBlocking.stat(1, connMillis);
     }
 
     private Connection getConnectionByTargetDataSource(String username, String password) throws SQLException {

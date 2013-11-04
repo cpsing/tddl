@@ -27,12 +27,11 @@
 			<artifactId>tddl-config</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!--
+		<!--druid DataSource -->
 		<dependency>
-			<groupId>com.taobao.tbdatasource</groupId>
-			<artifactId>tbdatasource</artifactId>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
 		</dependency>
-		-->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

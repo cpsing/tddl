@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import com.taobao.tddl.atom.AtomDataSourceHelper;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
@@ -28,15 +27,12 @@ public class TConnectionWrapper implements Connection {
 
     private static Logger            log        = LoggerFactory.getLogger(TConnectionWrapper.class);
     private final Connection         targetConnection;
-    private ConnRestrictSlot         connRestrictSlot;
     private final TDataSourceWrapper dataSourceWrapper;
 
     private Set<TStatementWrapper>   statements = new HashSet<TStatementWrapper>(1);
 
-    public TConnectionWrapper(Connection targetConnection, ConnRestrictSlot connRestrictSlot,
-                              TDataSourceWrapper dataSourceWrapper){
+    public TConnectionWrapper(Connection targetConnection, TDataSourceWrapper dataSourceWrapper){
         this.targetConnection = targetConnection;
-        this.connRestrictSlot = connRestrictSlot;
         this.dataSourceWrapper = dataSourceWrapper;
     }
 
@@ -53,12 +49,7 @@ public class TConnectionWrapper implements Connection {
                 sb.append("appname : ").append(dataSourceWrapper.connectionProperties.datasourceName).append(" ");
                 sb.append("threadcount : ").append(dataSourceWrapper.threadCount);
             }
-            if (connRestrictSlot != null) {
-                connRestrictSlot.freeConnection();
-                connRestrictSlot = null; // 防止重复关闭
-            }
             dataSourceWrapper.threadCount.decrementAndGet();
-            AtomDataSourceHelper.removeConnRestrictKey();
         }
 
         for (TStatementWrapper statementWrapper : this.statements) {

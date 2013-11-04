@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import com.taobao.datasource.resource.security.SecureIdentityLoginModule;
+import com.taobao.tddl.atom.SecureIdentityLoginModule;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;

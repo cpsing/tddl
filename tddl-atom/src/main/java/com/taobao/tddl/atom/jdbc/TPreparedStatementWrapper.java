@@ -23,13 +23,14 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 
 import com.taobao.tddl.common.utils.jdbc.SqlTypeParser;
+import com.taobao.tddl.monitor.unit.UnitDeployProtect;
 
 /**
  * preparedStatement 包装类
  * 
  * @author shenxun
  */
-public class TPreparedStatementWrapper extends TStatementWrapper implements java.sql.PreparedStatement {
+public class TPreparedStatementWrapper extends TStatementWrapper implements TPreparedStatement {
 
     protected final String sql;
 
@@ -58,48 +59,46 @@ public class TPreparedStatementWrapper extends TStatementWrapper implements java
     }
 
     public ResultSet executeQuery() throws SQLException {
+        if (sqlMetaData == null) throw new NullPointerException("miss sql meta data.");
         ensureResultSetIsEmpty();
         recordReadTimes();
         increaseConcurrentRead();
-
-        Exception e0 = null;
-        startRpc(QUERY);
         long time0 = System.currentTimeMillis();
+        Exception e0 = null;
+
+        startRpc(QUERY);
         try {
             currentResultSet = new TResultSetWrapper(this, ((PreparedStatement) targetStatement).executeQuery());
             return currentResultSet;
         } catch (SQLException e) {
             decreaseConcurrentRead();
             e0 = e;
-            // throw e;
-            throw new SQLException("execute query failed,dbKey is "
-                                   + datasourceWrapper.connectionProperties.datasourceName, e);
+            throw e;
         } finally {
-            recordSql(sql, System.currentTimeMillis() - time0, e0);
             endRpc(sql, e0);
+            recordSql(sql, System.currentTimeMillis() - time0, e0);
         }
     }
 
     public int executeUpdate() throws SQLException {
+        if (sqlMetaData == null) throw new NullPointerException("miss sql meta data.");
         ensureResultSetIsEmpty();
         recordWriteTimes();
         increaseConcurrentWrite();
+        long time0 = System.currentTimeMillis();
         Exception e0 = null;
 
         startRpc(UPDATE);
-        long time0 = System.currentTimeMillis();
         try {
             UnitDeployProtect.unitDeployProtect();
             return ((PreparedStatement) targetStatement).executeUpdate();
         } catch (SQLException e) {
             e0 = e;
-            // throw e;
-            throw new SQLException("execute update failed,dbKey is "
-                                   + datasourceWrapper.connectionProperties.datasourceName, e);
+            throw e;
         } finally {
-            recordSql(sql, System.currentTimeMillis() - time0, e0);
             endRpc(sql, e0);
             decreaseConcurrentWrite();
+            recordSql(sql, System.currentTimeMillis() - time0, e0);
         }
     }
 

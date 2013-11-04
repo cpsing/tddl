@@ -7,7 +7,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import com.taobao.tddl.atom.config.listener.TAtomDbStatusListener;
+import com.taobao.tddl.atom.config.listener.AtomDbStatusListener;
 import com.taobao.tddl.atom.exception.AtomAlreadyInitException;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
@@ -22,9 +22,9 @@ public class TAtomDataSource extends AbstractTAtomDataSource {
 
     protected static Logger                       logger             = LoggerFactory.getLogger(TAtomDataSource.class);
 
-    private static Map<String, TAtomDsConfHandle> cacheConfHandleMap = new HashMap<String, TAtomDsConfHandle>();
+    private static Map<String, DruidDsConfHandle> cacheConfHandleMap = new HashMap<String, DruidDsConfHandle>();
 
-    private volatile TAtomDsConfHandle            dsConfHandle       = new TAtomDsConfHandle();
+    private volatile DruidDsConfHandle            dsConfHandle       = new DruidDsConfHandle();
 
     @Override
     public void init(String appName, String dsKey, String unitName) throws Exception {
@@ -37,7 +37,7 @@ public class TAtomDataSource extends AbstractTAtomDataSource {
     public void init() throws Exception {
         String dbName = TAtomConstants.getDbNameStr(this.getAppName(), this.getDbKey());
         synchronized (cacheConfHandleMap) {
-            TAtomDsConfHandle cacheConfHandle = cacheConfHandleMap.get(dbName);
+            DruidDsConfHandle cacheConfHandle = cacheConfHandleMap.get(dbName);
             if (null == cacheConfHandle) {
                 // 初始化config的管理器
                 this.dsConfHandle.init();
@@ -55,7 +55,7 @@ public class TAtomDataSource extends AbstractTAtomDataSource {
      */
     public static void cleanAllDataSource() {
         synchronized (cacheConfHandleMap) {
-            for (TAtomDsConfHandle handles : cacheConfHandleMap.values()) {
+            for (DruidDsConfHandle handles : cacheConfHandleMap.values()) {
                 try {
                     handles.destroyDataSource();
                 } catch (Exception e) {
@@ -107,11 +107,11 @@ public class TAtomDataSource extends AbstractTAtomDataSource {
         this.dsConfHandle.setUnitName(unitName);
     }
 
-    public AtomDbStatusEnum getDbStatus() {
+    public TAtomDbStatusEnum getDbStatus() {
         return this.dsConfHandle.getStatus();
     }
 
-    public void setDbStatusListeners(List<TAtomDbStatusListener> dbStatusListeners) {
+    public void setDbStatusListeners(List<AtomDbStatusListener> dbStatusListeners) {
         this.dsConfHandle.setDbStatusListeners(dbStatusListeners);
     }
 
@@ -128,7 +128,7 @@ public class TAtomDataSource extends AbstractTAtomDataSource {
         this.dsConfHandle.setLocalDriverClass(driverClass);
     }
 
-    public AtomDbTypeEnum getDbType() {
+    public TAtomDbTypeEnum getDbType() {
         return this.dsConfHandle.getDbType();
     }
 

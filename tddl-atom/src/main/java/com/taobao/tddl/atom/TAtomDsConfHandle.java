@@ -3,24 +3,22 @@ package com.taobao.tddl.atom;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.sql.DataSource;
 
-import com.taobao.datasource.LocalTxDataSourceDO;
-import com.taobao.datasource.TaobaoDataSourceFactory;
-import com.taobao.datasource.resource.adapter.jdbc.local.LocalTxDataSource;
+import com.alibaba.druid.pool.DruidDataSource;
 import com.taobao.tddl.atom.config.DbConfManager;
 import com.taobao.tddl.atom.config.DbPasswdManager;
 import com.taobao.tddl.atom.config.DiamondDbConfManager;
 import com.taobao.tddl.atom.config.DiamondDbPasswdManager;
 import com.taobao.tddl.atom.config.TAtomConfParser;
 import com.taobao.tddl.atom.config.TAtomDsConfDO;
-import com.taobao.tddl.atom.config.listener.TAtomDbStatusListener;
+import com.taobao.tddl.atom.config.listener.AtomDbStatusListener;
 import com.taobao.tddl.atom.exception.AtomAlreadyInitException;
 import com.taobao.tddl.atom.exception.AtomIllegalException;
 import com.taobao.tddl.atom.exception.AtomInitialException;
-import com.taobao.tddl.atom.jdbc.ConnRestrictEntry;
 import com.taobao.tddl.atom.jdbc.TDataSourceWrapper;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
@@ -33,9 +31,9 @@ import com.taobao.tddl.monitor.Monitor;
  * 
  * @author qihao
  */
-class TAtomDsConfHandle {
+class DruidDsConfHandle {
 
-    private static Logger                        logger      = LoggerFactory.getLogger(TAtomDsConfHandle.class);
+    private static Logger                        logger      = LoggerFactory.getLogger(DruidDsConfHandle.class);
 
     private String                               appName;
 
@@ -64,14 +62,14 @@ class TAtomDsConfHandle {
     private DbPasswdManager                      dbPasswdManager;
 
     /**
-     * Jboss数据源通过init初始化
+     * druid数据源通过init初始化
      */
-    private volatile LocalTxDataSource           jbossDataSource;
+    private volatile DruidDataSource             druidDataSource;
 
     /**
      * 数据库状态改变回调
      */
-    private volatile List<TAtomDbStatusListener> dbStatusListeners;
+    private volatile List<AtomDbStatusListener> dbStatusListeners;
 
     /**
      * 初始化标记为一但初始化过，所有本地的配置禁止改动
@@ -82,6 +80,9 @@ class TAtomDsConfHandle {
      * 数据源操作锁，当需要对数据源进行重建或者刷新时需要先获得该锁
      */
     private final ReentrantLock                  lock        = new ReentrantLock();
+
+    // public static final int druidStatMaxKeySize = 5000;
+    // public static final int druidFlushIntervalMill = 300*1000;
 
     /**
      * 初始化方法，创建对应的数据源，只能被调用一次
@@ -102,18 +103,16 @@ class TAtomDsConfHandle {
         DiamondDbConfManager defaultDbConfManager = new DiamondDbConfManager();
         defaultDbConfManager.setGlobalConfigDataId(TAtomConstants.getGlobalDataId(this.dbKey));
         defaultDbConfManager.setAppConfigDataId(TAtomConstants.getAppDataId(this.appName, this.dbKey));
+        defaultDbConfManager.setUnitName(unitName);
         // 初始化dbConfManager
         defaultDbConfManager.init(appName);
-        defaultDbConfManager.setUnitName(unitName);
         dbConfManager = defaultDbConfManager;
         // 3.获取全局配置
         String globaConfStr = dbConfManager.getGlobalDbConf();
         // 注册全局配置监听
         registerGlobaDbConfListener(defaultDbConfManager);
         if (TStringUtil.isBlank(globaConfStr)) {
-
-            String errorMsg = "[ConfError] read globalConfig is Empty ! dataId: "
-                              + TAtomConstants.getGlobalDataId(this.dbKey);
+            String errorMsg = "[ConfError] read globalConfig is Empty !";
             logger.error(errorMsg);
             throw new AtomInitialException(errorMsg);
         }
@@ -122,9 +121,7 @@ class TAtomDsConfHandle {
         // 注册应用配置监听
         registerAppDbConfListener(defaultDbConfManager);
         if (TStringUtil.isBlank(appConfStr)) {
-
-            String errorMsg = "[ConfError] read appConfig is Empty ! dataId: "
-                              + TAtomConstants.getAppDataId(this.appName, this.dbKey);
+            String errorMsg = "[ConfError] read appConfig is Empty !";
             logger.error(errorMsg);
             throw new AtomInitialException(errorMsg);
         }
@@ -146,42 +143,38 @@ class TAtomDsConfHandle {
                 diamondDbPasswdManager.setPasswdConfDataId(TAtomConstants.getPasswdDataId(runTimeConf.getDbName(),
                     runTimeConf.getDbType(),
                     runTimeConf.getUserName()));
-
-                diamondDbPasswdManager.init(appName);
                 diamondDbPasswdManager.setUnitName(unitName);
+                diamondDbPasswdManager.init(appName);
                 dbPasswdManager = diamondDbPasswdManager;
                 // 获取密码
                 String passwd = dbPasswdManager.getPasswd();
                 registerPasswdConfListener(diamondDbPasswdManager);
                 if (TStringUtil.isBlank(passwd)) {
-                    StringBuilder errorMsgBuilder = new StringBuilder();
-                    errorMsgBuilder.append("[PasswdError] read passwd is Empty ! dataId: ");
-                    errorMsgBuilder.append(TAtomConstants.getPasswdDataId(runTimeConf.getDbName(),
-                        runTimeConf.getDbType(),
-                        runTimeConf.getUserName()));
-                    errorMsgBuilder.append(", maybe passwd parse error, please grep '[parserPasswd Error]' ");
-
-                    logger.error(errorMsgBuilder.toString());
-                    throw new AtomInitialException(errorMsgBuilder.toString());
+                    String errorMsg = "[PasswdError] read passwd is Empty !";
+                    logger.error(errorMsg);
+                    throw new AtomInitialException(errorMsg);
                 }
                 runTimeConf.setPasswd(passwd);
             }
             // 8.转换tAtomDsConfDO
-            LocalTxDataSourceDO localTxDataSourceDO = convertTAtomDsConf2JbossConf(this.runTimeConf,
+            DruidDataSource druidDataSource = convertTAtomDsConf2DruidConf(DruidDsConfHandle.this.dbKey,
+                this.runTimeConf,
                 TAtomConstants.getDbNameStr(this.appName, this.dbKey));
             // 9.参数检查如果参数不正确直接抛出异常
-            if (!checkLocalTxDataSourceDO(localTxDataSourceDO)) {
-                String errorMsg = "[ConfigError]init dataSource Prams Error! config is : "
-                                  + localTxDataSourceDO.toString();
+            if (!checkLocalTxDataSourceDO(druidDataSource)) {
+                String errorMsg = "[ConfigError]init dataSource Prams Error! config is : " + druidDataSource.toString();
                 logger.error(errorMsg);
                 throw new AtomInitialException(errorMsg);
             }
             // 10.创建数据源
-            // 关闭TB-DATASOURCE的JMX注册
-            localTxDataSourceDO.setUseJmx(false);
-            LocalTxDataSource localTxDataSource = TaobaoDataSourceFactory.createLocalTxDataSource(localTxDataSourceDO);
+            // druidDataSource.setUseJmx(false);
+            // LocalTxDataSource localTxDataSource = TaobaoDataSourceFactory
+            // .createLocalTxDataSource(localTxDataSourceDO);
             // 11.将创建好的数据源是指到TAtomDatasource中
-            this.jbossDataSource = localTxDataSource;
+            druidDataSource.init();
+
+            // druidDataSource.getDataSourceStat().setMaxSqlSize(DruidDsConfHandle.druidStatMaxKeySize);
+            this.druidDataSource = druidDataSource;
             clearDataSourceWrapper();
             initFalg = true;
         } finally {
@@ -203,28 +196,40 @@ class TAtomDsConfHandle {
         dbPasswdManager.registerPasswdConfListener(new ConfigDataListener() {
 
             public void onDataRecieved(String dataId, String data) {
-                logger.warn("[Passwd HandleData] handle received password data, dataId : " + dataId + " data: " + data);
+                logger.error("[Passwd HandleData] dataId : " + dataId + " data: " + data);
                 if (null == data || TStringUtil.isBlank(data)) {
                     return;
                 }
                 lock.lock();
                 try {
-                    String localPasswd = TAtomDsConfHandle.this.localConf.getPasswd();
+                    String localPasswd = DruidDsConfHandle.this.localConf.getPasswd();
                     if (TStringUtil.isNotBlank(localPasswd)) {
                         // 如果本地配置了passwd直接返回不支持动态修改
                         return;
                     }
                     String newPasswd = TAtomConfParser.parserPasswd(data);
-                    String runPasswd = TAtomDsConfHandle.this.runTimeConf.getPasswd();
+                    String runPasswd = DruidDsConfHandle.this.runTimeConf.getPasswd();
                     if (!TStringUtil.equals(runPasswd, newPasswd)) {
-                        TAtomDsConfHandle.this.jbossDataSource.setPassword(newPasswd);
                         try {
-                            // 更新数据源
-                            TAtomDsConfHandle.this.flushDataSource();
+                            // modify by junyu 2013-06-14:dynamic change
+                            // passwd,not recreate it!
+                            // DruidDataSource newDruidDataSource =
+                            // DruidDsConfHandle.this.druidDataSource.cloneDruidDataSource();
+                            // newDruidDataSource.setPassword(newPasswd);
+                            // newDruidDataSource.init();
+                            // DruidDataSource tempDataSource =
+                            // DruidDsConfHandle.this.druidDataSource;
+                            // DruidDsConfHandle.this.druidDataSource =
+                            // newDruidDataSource;
+                            // tempDataSource.close();
+                            // logger.warn("[DRUID CHANGE PASSWORD] ReCreate DataSource !");
                             // 是用新的配置覆盖运行时的配置
-                            TAtomDsConfHandle.this.runTimeConf.setPasswd(newPasswd);
+                            // clearDataSourceWrapper();
+                            DruidDsConfHandle.this.druidDataSource.setPassword(newPasswd);
+                            logger.warn("[DRUID CHANGE PASSWORD] already reset the new passwd!");
+                            DruidDsConfHandle.this.runTimeConf.setPasswd(newPasswd);
                         } catch (Exception e) {
-                            logger.error("[Flsh Passwd Error] flush dataSource Error !", e);
+                            logger.error("[DRUID CHANGE PASSWORD] reset new passwd error!", e);
                         }
                     }
                 } finally {
@@ -243,7 +248,7 @@ class TAtomDsConfHandle {
         dbConfManager.registerGlobaDbConfListener(new ConfigDataListener() {
 
             public void onDataRecieved(String dataId, String data) {
-                logger.warn("[GlobaConf HandleData] handle received global data, dataId : " + dataId + " data: " + data);
+                logger.error("[DRUID GlobaConf HandleData] dataId : " + dataId + " data: " + data);
                 if (null == data || TStringUtil.isBlank(data)) {
                     return;
                 }
@@ -252,7 +257,7 @@ class TAtomDsConfHandle {
                     String globaConfStr = data;
                     // 如果是全局配置发生变化，可能是IP,PORT,DBNAME,DBTYPE,STATUS
                     TAtomDsConfDO tmpConf = TAtomConfParser.parserTAtomDsConfDO(globaConfStr, null);
-                    TAtomDsConfDO newConf = TAtomDsConfHandle.this.runTimeConf.clone();
+                    TAtomDsConfDO newConf = DruidDsConfHandle.this.runTimeConf.clone();
                     // 是用推送的配置，覆盖当前的配置
                     newConf.setIp(tmpConf.getIp());
                     newConf.setPort(tmpConf.getPort());
@@ -260,86 +265,109 @@ class TAtomDsConfHandle {
                     newConf.setDbType(tmpConf.getDbType());
                     newConf.setDbStatus(tmpConf.getDbStatus());
                     // 处理本地优先配置
-                    overConfByLocal(TAtomDsConfHandle.this.localConf, newConf);
+                    overConfByLocal(DruidDsConfHandle.this.localConf, newConf);
                     // 如果推送过来的数据库状态是 RW/R->NA,直接销毁掉数据源，以下业务逻辑不做处理
-                    if (AtomDbStatusEnum.NA_STATUS != TAtomDsConfHandle.this.runTimeConf.getDbStautsEnum()
-                        && AtomDbStatusEnum.NA_STATUS == tmpConf.getDbStautsEnum()) {
+                    if (TAtomDbStatusEnum.NA_STATUS != DruidDsConfHandle.this.runTimeConf.getDbStautsEnum()
+                        && TAtomDbStatusEnum.NA_STATUS == tmpConf.getDbStautsEnum()) {
                         try {
-                            TAtomDsConfHandle.this.jbossDataSource.destroy();
-                            logger.warn("[NA STATUS PUSH] destroy DataSource !");
+                            DruidDsConfHandle.this.druidDataSource.close();
+                            logger.warn("[DRUID NA STATUS PUSH] destroy DataSource !");
                         } catch (Exception e) {
-                            logger.error("[NA STATUS PUSH] destroy DataSource  Error!", e);
+                            logger.error("[DRUID NA STATUS PUSH] destroy DataSource  Error!", e);
                         }
                     } else {
                         // 转换tAtomDsConfDO
-                        LocalTxDataSourceDO localTxDataSourceDO = convertTAtomDsConf2JbossConf(newConf,
-                            TAtomConstants.getDbNameStr(TAtomDsConfHandle.this.appName, TAtomDsConfHandle.this.dbKey));
+                        DruidDataSource druidDataSource;
+                        try {
+                            druidDataSource = convertTAtomDsConf2DruidConf(DruidDsConfHandle.this.dbKey,
+                                newConf,
+                                TAtomConstants.getDbNameStr(DruidDsConfHandle.this.appName,
+                                    DruidDsConfHandle.this.dbKey));
+                        } catch (Exception e1) {
+                            logger.error("[DRUID GlobaConfError] convertTAtomDsConf2DruidConf Error! dataId : "
+                                         + dataId + " config : " + data);
+                            return;
+                        }
                         // 检查转换后结果是否正确
-                        if (!checkLocalTxDataSourceDO(localTxDataSourceDO)) {
-                            logger.error("[GlobaConfError] dataSource Prams Error! dataId : " + dataId + " config : "
-                                         + data);
+                        if (!checkLocalTxDataSourceDO(druidDataSource)) {
+                            logger.error("[DRUID GlobaConfError] dataSource Prams Error! dataId : " + dataId
+                                         + " config : " + data);
                             return;
                         }
                         // 如果推送的状态时 NA->RW/R 时需要重新创建数据源，无需再刷新
-                        if (TAtomDsConfHandle.this.runTimeConf.getDbStautsEnum() == AtomDbStatusEnum.NA_STATUS
-                            && (newConf.getDbStautsEnum() == AtomDbStatusEnum.RW_STATUS
-                                || newConf.getDbStautsEnum() == AtomDbStatusEnum.R_STATUS || newConf.getDbStautsEnum() == AtomDbStatusEnum.W_STATUS)) {
+                        if (DruidDsConfHandle.this.runTimeConf.getDbStautsEnum() == TAtomDbStatusEnum.NA_STATUS
+                            && (newConf.getDbStautsEnum() == TAtomDbStatusEnum.RW_STATUS
+                                || newConf.getDbStautsEnum() == TAtomDbStatusEnum.R_STATUS || newConf.getDbStautsEnum() == TAtomDbStatusEnum.W_STATUS)) {
                             // 创建数据源
                             try {
                                 // 关闭TB-DATASOURCE的JMX注册
-                                localTxDataSourceDO.setUseJmx(false);
-                                LocalTxDataSource localTxDataSource = TaobaoDataSourceFactory.createLocalTxDataSource(localTxDataSourceDO);
-                                TAtomDsConfHandle.this.jbossDataSource = localTxDataSource;
-                                logger.warn("[NA->RW/R STATUS PUSH] ReCreate DataSource !");
+                                // localTxDataSourceDO.setUseJmx(false);
+                                // LocalTxDataSource localTxDataSource =
+                                // TaobaoDataSourceFactory
+                                // .createLocalTxDataSource(localTxDataSourceDO);
+                                druidDataSource.init();
+                                // druidDataSource.getDataSourceStat().setMaxSqlSize(DruidDsConfHandle.druidStatMaxKeySize);
+                                DruidDataSource tempDataSource = DruidDsConfHandle.this.druidDataSource;
+                                DruidDsConfHandle.this.druidDataSource = druidDataSource;
+                                tempDataSource.close();
+                                logger.warn("[DRUID NA->RW/R STATUS PUSH] ReCreate DataSource !");
                             } catch (Exception e) {
-                                logger.error("[NA->RW/R STATUS PUSH] ReCreate DataSource Error!", e);
+                                logger.error("[DRUID NA->RW/R STATUS PUSH] ReCreate DataSource Error!", e);
                             }
                         } else {
-                            boolean needFlush = checkGlobaConfChange(TAtomDsConfHandle.this.runTimeConf, newConf);
+                            boolean needCreate = isGlobalChangeNeedReCreate(DruidDsConfHandle.this.runTimeConf, newConf);
                             // 如果发生的配置变化是否需要重建数据源
-                            if (needFlush) {
-                                TAtomDsConfHandle.this.jbossDataSource.setConnectionURL(localTxDataSourceDO.getConnectionURL());
-                                TAtomDsConfHandle.this.jbossDataSource.setDriverClass(localTxDataSourceDO.getDriverClass());
-                                TAtomDsConfHandle.this.jbossDataSource.setExceptionSorterClassName(localTxDataSourceDO.getExceptionSorterClassName());
+                            // druid 没有flush方法，只能重建数据源 jiechen.qzm
+                            if (needCreate) {
                                 try {
                                     // 更新数据源
-                                    TAtomDsConfHandle.this.flushDataSource();
+                                    druidDataSource.init();
+                                    // druidDataSource.getDataSourceStat().setMaxSqlSize(druidStatMaxKeySize);
+                                    DruidDataSource tempDataSource = DruidDsConfHandle.this.druidDataSource;
+                                    DruidDsConfHandle.this.druidDataSource = druidDataSource;
+                                    tempDataSource.close();
+                                    logger.warn("[DRUID CONFIG CHANGE STATUS] Always ReCreate DataSource !");
                                 } catch (Exception e) {
-                                    logger.error("[Flsh GlobaConf Error] flush dataSource Error !", e);
+                                    logger.error("[DRUID Create GlobaConf Error]  Always ReCreate DataSource Error !",
+                                        e);
                                 }
+                            } else {
+                                logger.warn("[DRUID Create GlobaConf Error]  global config is same!nothing will be done! the global config is:"
+                                            + globaConfStr);
                             }
                         }
                     }
                     // 处理数据库状态监听器
-                    processDbStatusListener(TAtomDsConfHandle.this.runTimeConf.getDbStautsEnum(),
+                    processDbStatusListener(DruidDsConfHandle.this.runTimeConf.getDbStautsEnum(),
                         newConf.getDbStautsEnum());
                     // 是用新的配置覆盖运行时的配置
-                    TAtomDsConfHandle.this.runTimeConf = newConf;
+                    DruidDsConfHandle.this.runTimeConf = newConf;
                     clearDataSourceWrapper();
                 } finally {
                     lock.unlock();
                 }
             }
 
-            private boolean checkGlobaConfChange(TAtomDsConfDO runConf, TAtomDsConfDO newConf) {
-                boolean needFlush = false;
+            private boolean isGlobalChangeNeedReCreate(TAtomDsConfDO runConf, TAtomDsConfDO newConf) {
+                boolean needReCreate = false;
                 if (!TStringUtil.equals(runConf.getIp(), newConf.getIp())) {
-                    needFlush = true;
-                    return needFlush;
+                    needReCreate = true;
+                    return needReCreate;
                 }
                 if (!TStringUtil.equals(runConf.getPort(), newConf.getPort())) {
-                    needFlush = true;
-                    return needFlush;
+                    needReCreate = true;
+                    return needReCreate;
                 }
                 if (!TStringUtil.equals(runConf.getDbName(), newConf.getDbName())) {
-                    needFlush = true;
-                    return needFlush;
+                    needReCreate = true;
+                    return needReCreate;
                 }
                 if (runConf.getDbTypeEnum() != newConf.getDbTypeEnum()) {
-                    needFlush = true;
-                    return needFlush;
+                    needReCreate = true;
+                    return needReCreate;
                 }
-                return needFlush;
+
+                return needReCreate;
             }
         });
     }
@@ -353,7 +381,7 @@ class TAtomDsConfHandle {
         dbConfManager.registerAppDbConfListener(new ConfigDataListener() {
 
             public void onDataRecieved(String dataId, String data) {
-                logger.warn("[AppConf HandleData] handle received app data, dataId : " + dataId + " data: " + data);
+                logger.error("[DRUID AppConf HandleData] dataId : " + dataId + " data: " + data);
                 if (null == data || TStringUtil.isBlank(data)) {
                     return;
                 }
@@ -361,7 +389,7 @@ class TAtomDsConfHandle {
                 try {
                     String appConfStr = data;
                     TAtomDsConfDO tmpConf = TAtomConfParser.parserTAtomDsConfDO(null, appConfStr);
-                    TAtomDsConfDO newConf = TAtomDsConfHandle.this.runTimeConf.clone();
+                    TAtomDsConfDO newConf = DruidDsConfHandle.this.runTimeConf.clone();
                     // 有些既有配置不能变更，所以克隆老的配置，然后将新的set进去
                     newConf.setUserName(tmpConf.getUserName());
                     newConf.setMinPoolSize(tmpConf.getMinPoolSize());
@@ -377,53 +405,75 @@ class TAtomDsConfHandle {
                     newConf.setThreadCountRestrict(tmpConf.getThreadCountRestrict());
                     newConf.setTimeSliceInMillis(tmpConf.getTimeSliceInMillis());
                     newConf.setDriverClass(tmpConf.getDriverClass());
-                    // 应用连接限制配置
-                    newConf.setConnRestrictEntries(tmpConf.getConnRestrictEntries());
                     // 处理本地优先配置
-                    overConfByLocal(TAtomDsConfHandle.this.localConf, newConf);
-                    // 转换tAtomDsConfDO
-                    LocalTxDataSourceDO localTxDataSourceDO = convertTAtomDsConf2JbossConf(newConf,
-                        TAtomConstants.getDbNameStr(TAtomDsConfHandle.this.appName, TAtomDsConfHandle.this.dbKey));
-                    // 检查转换后结果是否正确
-                    if (!checkLocalTxDataSourceDO(localTxDataSourceDO)) {
-                        logger.error("[GlobaConfError] dataSource Prams Error! dataId : " + dataId + " config : "
-                                     + data);
-                        return;
-                    }
-                    boolean isNeedReCreate = isNeedReCreate(TAtomDsConfHandle.this.runTimeConf, newConf);
+                    overConfByLocal(DruidDsConfHandle.this.localConf, newConf);
+
+                    boolean isNeedReCreate = isAppChangeNeedReCreate(DruidDsConfHandle.this.runTimeConf, newConf);
                     if (isNeedReCreate) {
+                        // 转换tAtomDsConfDO
+                        DruidDataSource druidDataSource;
                         try {
-                            // 这个必须在最前面，否则下次推送可能无法比较出不同而不创建新数据源
-                            TAtomDsConfHandle.this.runTimeConf = newConf;
-                            TAtomDsConfHandle.this.jbossDataSource.destroy();
-                            logger.warn("[destroy OldDataSource] dataId : " + dataId);
-                            LocalTxDataSource localTxDataSource = TaobaoDataSourceFactory.createLocalTxDataSource(localTxDataSourceDO);
-                            logger.warn("[create newDataSource] dataId : " + dataId);
-                            TAtomDsConfHandle.this.jbossDataSource = localTxDataSource;
+                            druidDataSource = convertTAtomDsConf2DruidConf(DruidDsConfHandle.this.dbKey,
+                                newConf,
+                                TAtomConstants.getDbNameStr(DruidDsConfHandle.this.appName,
+                                    DruidDsConfHandle.this.dbKey));
+                        } catch (Exception e1) {
+                            logger.error("[DRUID GlobaConfError] convertTAtomDsConf2DruidConf Error! dataId : "
+                                         + dataId + " config : " + data);
+                            return;
+                        }
+                        // 检查转换后结果是否正确
+                        if (!checkLocalTxDataSourceDO(druidDataSource)) {
+                            logger.error("[DRUID GlobaConfError] dataSource Prams Error! dataId : " + dataId
+                                         + " config : " + data);
+                            return;
+                        }
+
+                        try {
+                            // 这个必须在最前面，否则下次推送可能无法比较出不同而不创建新数据
+                            DruidDsConfHandle.this.runTimeConf = newConf;
+                            DruidDsConfHandle.this.druidDataSource.close();
+                            logger.warn("[DRUID destroy OldDataSource] dataId : " + dataId);
+                            druidDataSource.init();
+                            // druidDataSource.getDataSourceStat().setMaxSqlSize(DruidDsConfHandle.druidStatMaxKeySize);
+                            logger.warn("[DRUID create newDataSource] dataId : " + dataId);
+                            DruidDsConfHandle.this.druidDataSource = druidDataSource;
                             clearDataSourceWrapper();
                         } catch (Exception e) {
-                            logger.error("[Flsh AppConf Error] reCreate dataSource Error ! dataId: " + dataId, e);
+                            logger.error("[DRUID Create GlobaConf Error]  Always ReCreate DataSource Error ! dataId: "
+                                         + dataId, e);
                         }
                     } else {
-                        boolean isNeedFlush = isNeedFlush(TAtomDsConfHandle.this.runTimeConf, newConf);
-                        /**
-                         * 阀值变化无需刷新持有的数据源，只要更新runTimeConf，并且清空wrapDataSource
-                         */
-                        boolean isRestrictChange = isRestrictChange(TAtomDsConfHandle.this.runTimeConf, newConf);
+                        boolean isNeedFlush = isAppChangeNeedFlush(DruidDsConfHandle.this.runTimeConf, newConf);
+
                         if (isNeedFlush) {
-                            TAtomDsConfHandle.this.jbossDataSource.setConnectionURL(localTxDataSourceDO.getConnectionURL());
-                            TAtomDsConfHandle.this.jbossDataSource.setUserName(localTxDataSourceDO.getUserName());
                             try {
-                                // 是用新的配置覆盖运行时的配置
-                                TAtomDsConfHandle.this.runTimeConf = newConf;
-                                // 更新数据源
-                                TAtomDsConfHandle.this.flushDataSource();
+                                DruidDsConfHandle.this.runTimeConf = newConf;
+                                Properties prop = new Properties();
+                                prop.putAll(newConf.getConnectionProperties());
+                                DruidDsConfHandle.this.druidDataSource.setConnectProperties(prop);
+                                DruidDsConfHandle.this.druidDataSource.setMinIdle(newConf.getMinPoolSize());
+                                DruidDsConfHandle.this.druidDataSource.setMaxActive(newConf.getMaxPoolSize());
+                                if (newConf.getPreparedStatementCacheSize() > 0
+                                    && TAtomDbTypeEnum.MYSQL != newConf.getDbTypeEnum()) {
+                                    DruidDsConfHandle.this.druidDataSource.setPoolPreparedStatements(true);
+                                    DruidDsConfHandle.this.druidDataSource.setMaxPoolPreparedStatementPerConnectionSize(newConf.getPreparedStatementCacheSize());
+                                }
+                                if (newConf.getIdleTimeout() > 0) {
+                                    DruidDsConfHandle.this.druidDataSource.setTimeBetweenEvictionRunsMillis(newConf.getIdleTimeout() * 60 * 1000);
+                                    DruidDsConfHandle.this.druidDataSource.setMinEvictableIdleTimeMillis(newConf.getIdleTimeout() * 60 * 1000);
+                                }
+                                if (newConf.getBlockingTimeout() > 0) {
+                                    DruidDsConfHandle.this.druidDataSource.setMaxWait(newConf.getBlockingTimeout());
+                                }
+                                logger.info("[TDDL DRUID] flush ds success,dataId : " + dataId);
                                 clearDataSourceWrapper();
                             } catch (Exception e) {
-                                logger.error("[Flash GlobaConf Error] flush dataSource Error !", e);
+                                logger.error("[TDDL DRUID] flush DataSource Error ! dataId:" + dataId + ",data:"
+                                             + appConfStr, e);
                             }
-                        } else if (isRestrictChange) {
-                            TAtomDsConfHandle.this.runTimeConf = newConf;
+                        } else {
+                            DruidDsConfHandle.this.runTimeConf = newConf;
                             clearDataSourceWrapper();
                         }
                     }
@@ -432,99 +482,90 @@ class TAtomDsConfHandle {
                 }
             }
 
-            private boolean isNeedReCreate(TAtomDsConfDO runConf, TAtomDsConfDO newConf) {
-                boolean needReCreate = false;
+            private boolean isAppChangeNeedReCreate(TAtomDsConfDO runConf, TAtomDsConfDO newConf) {
                 if (!newConf.getDriverClass().equals(runConf.getDriverClass())) {
                     return true;
                 }
 
-                if (AtomDbTypeEnum.ORACLE == newConf.getDbTypeEnum()) {
+                if (TAtomDbTypeEnum.ORACLE == newConf.getDbTypeEnum()) {
                     Map<String, String> newProp = newConf.getConnectionProperties();
                     Map<String, String> runProp = runConf.getConnectionProperties();
+                    // oracle的连接参数变化会导致
                     if (!runProp.equals(newProp)) {
                         return true;
                     }
                 }
-                if (runConf.getMinPoolSize() != newConf.getMinPoolSize()) {
-                    return true;
-                }
-                if (runConf.getMaxPoolSize() != newConf.getMaxPoolSize()) {
-                    return true;
-                }
-                if (runConf.getBlockingTimeout() != newConf.getBlockingTimeout()) {
-                    return true;
-                }
-                if (runConf.getIdleTimeout() != newConf.getIdleTimeout()) {
-                    return true;
-                }
-                if (runConf.getPreparedStatementCacheSize() != newConf.getPreparedStatementCacheSize()) {
-                    return true;
-                }
-                return needReCreate;
-            }
 
-            private boolean isNeedFlush(TAtomDsConfDO runConf, TAtomDsConfDO newConf) {
-                boolean needFlush = false;
-                if (AtomDbTypeEnum.MYSQL == newConf.getDbTypeEnum()) {
-                    Map<String, String> newProp = newConf.getConnectionProperties();
-                    Map<String, String> runProp = runConf.getConnectionProperties();
-                    if (!runProp.equals(newProp)) {
-                        return true;
-                    }
-                }
                 if (!TStringUtil.equals(runConf.getUserName(), newConf.getUserName())) {
                     return true;
                 }
-                if (!TStringUtil.equals(runConf.getPasswd(), newConf.getPasswd())) {
+
+                if (runConf.getOracleConType() != newConf.getOracleConType()) {
                     return true;
                 }
-                return needFlush;
+
+                if (runConf.getDbTypeEnum() != newConf.getDbTypeEnum()) {
+                    return true;
+                }
+
+                return false;
             }
 
-            private boolean isRestrictChange(TAtomDsConfDO runConf, TAtomDsConfDO newConf) {
-                if (runConf.getReadRestrictTimes() != newConf.getReadRestrictTimes()) {
-                    return true;
-                }
-
-                if (runConf.getWriteRestrictTimes() != newConf.getWriteRestrictTimes()) {
-                    return true;
-                }
-
-                if (runConf.getThreadCountRestrict() != newConf.getThreadCountRestrict()) {
-                    return true;
-                }
-
-                if (runConf.getTimeSliceInMillis() != newConf.getTimeSliceInMillis()) {
-                    return true;
-                }
-
-                List<ConnRestrictEntry> runEntries = runConf.getConnRestrictEntries();
-                List<ConnRestrictEntry> newEntries = newConf.getConnRestrictEntries();
-                if (runEntries != newEntries) {
-                    if (runEntries == null || newEntries == null || !newEntries.equals(runEntries)) {
+            private boolean isAppChangeNeedFlush(TAtomDsConfDO runConf, TAtomDsConfDO newConf) {
+                if (TAtomDbTypeEnum.MYSQL == newConf.getDbTypeEnum()) {
+                    Map<String, String> newProp = newConf.getConnectionProperties();
+                    Map<String, String> runProp = runConf.getConnectionProperties();
+                    if (!runProp.equals(newProp)) {
                         return true;
                     }
                 }
+
+                if (!TStringUtil.equals(runConf.getPasswd(), newConf.getPasswd())) {
+                    return true;
+                }
+
+                if (runConf.getMinPoolSize() != newConf.getMinPoolSize()) {
+                    return true;
+                }
+
+                if (runConf.getMaxPoolSize() != newConf.getMaxPoolSize()) {
+                    return true;
+                }
+
+                if (runConf.getIdleTimeout() != newConf.getIdleTimeout()) {
+                    return true;
+                }
+
+                if (runConf.getBlockingTimeout() != newConf.getBlockingTimeout()) {
+                    return true;
+                }
+
+                if (runConf.getPreparedStatementCacheSize() != newConf.getPreparedStatementCacheSize()) {
+                    return true;
+                }
+
                 return false;
             }
         });
     }
 
-    protected static Class<?> findClass(String className) {
-        Class<?> foundClass = null;
-        try {
-            foundClass = Class.forName(className);
-        } catch (ClassNotFoundException e) {
-            if (logger.isInfoEnabled()) {
-                logger.info("Class not found: " + className);
-            }
-        } catch (NoClassDefFoundError e) {
-            if (logger.isInfoEnabled()) {
-                logger.info("No class def: " + className);
-            }
+    /**
+     * druid特殊开关，针对特殊编码转换，目前是B2B中文站专用
+     * 
+     * @param connectionProperties
+     * @param druidDataSource
+     * @throws SQLException
+     */
+    protected static void fillDruidFilters(Map<String, String> connectionProperties, DruidDataSource druidDataSource)
+                                                                                                                     throws SQLException {
+        if (connectionProperties.containsKey("clientEncoding") || connectionProperties.containsKey("serverEncoding")) {
+            druidDataSource.setFilters(TDDL_DRUID_ENCODING_FILTER);
         }
-        return foundClass;
     }
+
+    private static final String TDDL_DRUID_ENCODING_FILTER = "encoding";
+
+    // private static final String DEFAULT_TDDL_DRUID_FILTERS="mergeStat";
 
     /**
      * 将TAtomDsConfDO转换成LocalTxDataSourceDO
@@ -533,112 +574,141 @@ class TAtomDsConfHandle {
      * @return
      */
     @SuppressWarnings("rawtypes")
-    protected static LocalTxDataSourceDO convertTAtomDsConf2JbossConf(TAtomDsConfDO tAtomDsConfDO, String dbName) {
-        LocalTxDataSourceDO localTxDataSourceDO = new LocalTxDataSourceDO();
-        if (TStringUtil.isNotBlank(dbName)) {
-            localTxDataSourceDO.setJndiName(dbName);
-        }
-        localTxDataSourceDO.setUserName(tAtomDsConfDO.getUserName());
-        localTxDataSourceDO.setPassword(tAtomDsConfDO.getPasswd());
-        localTxDataSourceDO.setDriverClass(tAtomDsConfDO.getDriverClass());
-        localTxDataSourceDO.setExceptionSorterClassName(tAtomDsConfDO.getSorterClass());
+    protected static DruidDataSource convertTAtomDsConf2DruidConf(String dbKey, TAtomDsConfDO tAtomDsConfDO,
+                                                                  String dbName) throws Exception {
+        DruidDataSource localDruidDataSource = new DruidDataSource();
+        // 一下三个是druid监控需要的特殊配置
+        localDruidDataSource.setName(dbKey);
+        localDruidDataSource.setTestOnBorrow(false);
+        localDruidDataSource.setTestWhileIdle(true);
+
+        // localDruidDataSource.setFilters(DEFAULT_TDDL_DRUID_FILTERS);
+        localDruidDataSource.setUsername(tAtomDsConfDO.getUserName());
+        localDruidDataSource.setPassword(tAtomDsConfDO.getPasswd());
+        localDruidDataSource.setDriverClassName(tAtomDsConfDO.getDriverClass());
+        localDruidDataSource.setExceptionSorterClassName(tAtomDsConfDO.getSorterClass());
         // 根据数据库类型设置conURL和setConnectionProperties
-        if (AtomDbTypeEnum.ORACLE == tAtomDsConfDO.getDbTypeEnum()) {
+        if (TAtomDbTypeEnum.ORACLE == tAtomDsConfDO.getDbTypeEnum()) {
             String conUlr = TAtomConURLTools.getOracleConURL(tAtomDsConfDO.getIp(),
                 tAtomDsConfDO.getPort(),
                 tAtomDsConfDO.getDbName(),
                 tAtomDsConfDO.getOracleConType());
-            localTxDataSourceDO.setConnectionURL(conUlr);
+            localDruidDataSource.setUrl(conUlr);
             // 如果是oracle没有设置ConnectionProperties则给以个默认的
+            Properties connectionProperties = new Properties();
             if (!tAtomDsConfDO.getConnectionProperties().isEmpty()) {
-                localTxDataSourceDO.setConnectionProperties(tAtomDsConfDO.getConnectionProperties());
+                connectionProperties.putAll(tAtomDsConfDO.getConnectionProperties());
+                fillDruidFilters(tAtomDsConfDO.getConnectionProperties(), localDruidDataSource);
             } else {
-                localTxDataSourceDO.setConnectionProperties(TAtomConstants.DEFAULT_ORACLE_CONNECTION_PROPERTIES);
+                connectionProperties.putAll(TAtomConstants.DEFAULT_ORACLE_CONNECTION_PROPERTIES);
             }
-        } else if (AtomDbTypeEnum.MYSQL == tAtomDsConfDO.getDbTypeEnum()) {
+            localDruidDataSource.setConnectProperties(connectionProperties);
+            localDruidDataSource.setValidationQuery(TAtomConstants.DEFAULT_DRUID_ORACLE_VALIDATION_QUERY);
+        } else if (TAtomDbTypeEnum.MYSQL == tAtomDsConfDO.getDbTypeEnum()) {
             String conUlr = TAtomConURLTools.getMySqlConURL(tAtomDsConfDO.getIp(),
                 tAtomDsConfDO.getPort(),
                 tAtomDsConfDO.getDbName(),
                 tAtomDsConfDO.getConnectionProperties());
-            localTxDataSourceDO.setConnectionURL(conUlr);
-            // 如果可以找到mysqlDriver中的Valid就使用，否则设置默认的
-            Class validConnectionClass = findClass(TAtomConstants.MYSQL_VALID_CONNECTION_CHECKERCLASS);
-            if (null == validConnectionClass) {
-                logger.warn("MYSQL Driver is NOT support valid connection checker "
-                            + TAtomConstants.MYSQL_VALID_CONNECTION_CHECKERCLASS + ", use default "
-                            + TAtomConstants.DEFAULT_MYSQL_VALID_CHECKERCLASS);
-                validConnectionClass = findClass(TAtomConstants.DEFAULT_MYSQL_VALID_CHECKERCLASS);
+            localDruidDataSource.setUrl(conUlr);
+            // 如果可以找到mysqlDriver中的Valid就使用，否则不设置valid
+            try {
+                Class validClass = Class.forName(TAtomConstants.DEFAULT_DRUID_MYSQL_VALID_CONNECTION_CHECKERCLASS);
+                if (null != validClass) {
+                    localDruidDataSource.setValidConnectionCheckerClassName(TAtomConstants.DEFAULT_DRUID_MYSQL_VALID_CONNECTION_CHECKERCLASS);
+                } else {
+                    logger.warn("MYSQL Driver is Not Suport "
+                                + TAtomConstants.DEFAULT_DRUID_MYSQL_VALID_CONNECTION_CHECKERCLASS);
+                }
+            } catch (ClassNotFoundException e) {
+                logger.warn("MYSQL Driver is Not Suport "
+                            + TAtomConstants.DEFAULT_DRUID_MYSQL_VALID_CONNECTION_CHECKERCLASS);
+            } catch (NoClassDefFoundError e) {
+                logger.warn("MYSQL Driver is Not Suport "
+                            + TAtomConstants.DEFAULT_DRUID_MYSQL_VALID_CONNECTION_CHECKERCLASS);
             }
-            if (null != validConnectionClass) {
-                localTxDataSourceDO.setValidConnectionCheckerClassName(validConnectionClass.getName());
-            } else {
-                logger.error("NOT found default valid connection checker "
-                             + TAtomConstants.DEFAULT_MYSQL_VALID_CHECKERCLASS);
-            }
+
             // 如果可以找到mysqlDriver中的integrationSorter就使用否则使用默认的
-            Class integrationSorterClass = findClass(TAtomConstants.MYSQL_INTEGRATION_SORTER_CLASS);
-            if (null == integrationSorterClass) {
-                logger.warn("MYSQL Driver is NOT support integration sorter "
-                            + TAtomConstants.MYSQL_INTEGRATION_SORTER_CLASS + " use default sorter "
-                            + TAtomConstants.DEFAULT_MYSQL_SORTER_CLASS);
-                integrationSorterClass = findClass(TAtomConstants.DEFAULT_MYSQL_SORTER_CLASS);
+            try {
+                Class integrationSorterCalss = Class.forName(TAtomConstants.DRUID_MYSQL_INTEGRATION_SORTER_CLASS);
+                if (null != integrationSorterCalss) {
+                    localDruidDataSource.setExceptionSorterClassName(TAtomConstants.DRUID_MYSQL_INTEGRATION_SORTER_CLASS);
+                } else {
+                    localDruidDataSource.setExceptionSorterClassName(TAtomConstants.DEFAULT_DRUID_MYSQL_SORTER_CLASS);
+                    logger.warn("MYSQL Driver is Not Suport " + TAtomConstants.DRUID_MYSQL_INTEGRATION_SORTER_CLASS
+                                + " use default sorter " + TAtomConstants.DEFAULT_DRUID_MYSQL_SORTER_CLASS);
+                }
+            } catch (ClassNotFoundException e) {
+                logger.warn("MYSQL Driver is Not Suport " + TAtomConstants.DRUID_MYSQL_INTEGRATION_SORTER_CLASS
+                            + " use default sorter " + TAtomConstants.DEFAULT_DRUID_MYSQL_SORTER_CLASS);
+            } catch (NoClassDefFoundError e) {
+                logger.warn("MYSQL Driver is Not Suport " + TAtomConstants.DRUID_MYSQL_INTEGRATION_SORTER_CLASS
+                            + " use default sorter " + TAtomConstants.DEFAULT_DRUID_MYSQL_SORTER_CLASS);
             }
-            if (null != integrationSorterClass) {
-                localTxDataSourceDO.setExceptionSorterClassName(integrationSorterClass.getName());
-            } else {
-                logger.error("NOT found default integration sorter " + TAtomConstants.DEFAULT_MYSQL_SORTER_CLASS);
-            }
+            localDruidDataSource.setValidationQuery(TAtomConstants.DEFAULT_DRUID_MYSQL_VALIDATION_QUERY);
         }
-        localTxDataSourceDO.setMinPoolSize(tAtomDsConfDO.getMinPoolSize());
-        localTxDataSourceDO.setMaxPoolSize(tAtomDsConfDO.getMaxPoolSize());
-        localTxDataSourceDO.setPreparedStatementCacheSize(tAtomDsConfDO.getPreparedStatementCacheSize());
+        // lazy init 先设置为0 后续真正执行时才创建连接
+        localDruidDataSource.setInitialSize(tAtomDsConfDO.getInitPoolSize());
+        localDruidDataSource.setMinIdle(tAtomDsConfDO.getMinPoolSize());
+        localDruidDataSource.setMaxActive(tAtomDsConfDO.getMaxPoolSize());
+        if (tAtomDsConfDO.getPreparedStatementCacheSize() > 0 && TAtomDbTypeEnum.MYSQL != tAtomDsConfDO.getDbTypeEnum()) {
+            localDruidDataSource.setPoolPreparedStatements(true);
+            localDruidDataSource.setMaxPoolPreparedStatementPerConnectionSize(tAtomDsConfDO.getPreparedStatementCacheSize());
+        }
         if (tAtomDsConfDO.getIdleTimeout() > 0) {
-            localTxDataSourceDO.setIdleTimeoutMinutes(tAtomDsConfDO.getIdleTimeout());
+            localDruidDataSource.setTimeBetweenEvictionRunsMillis(tAtomDsConfDO.getIdleTimeout() * 60 * 1000);
+            localDruidDataSource.setMinEvictableIdleTimeMillis(tAtomDsConfDO.getIdleTimeout() * 60 * 1000);
         }
         if (tAtomDsConfDO.getBlockingTimeout() > 0) {
-            localTxDataSourceDO.setBlockingTimeoutMillis(tAtomDsConfDO.getBlockingTimeout());
+            localDruidDataSource.setMaxWait(tAtomDsConfDO.getBlockingTimeout());
         }
-        return localTxDataSourceDO;
+
+        // 添加druid日志输出
+        // DruidDataSourceStatLogger
+        // logger=localDruidDataSource.getStatLogger();
+        // logger.setLogger(new Log4jImpl(LoggerInit.TDDL_Atom_Statistic_LOG));
+        // localDruidDataSource.setTimeBetweenLogStatsMillis(DruidDsConfHandle.druidFlushIntervalMill);
+
+        return localDruidDataSource;
     }
 
-    protected static boolean checkLocalTxDataSourceDO(LocalTxDataSourceDO localTxDataSourceDO) {
-        if (null == localTxDataSourceDO) {
+    protected static boolean checkLocalTxDataSourceDO(DruidDataSource druidDataSource) {
+        if (null == druidDataSource) {
             return false;
         }
 
-        if (TStringUtil.isBlank(localTxDataSourceDO.getConnectionURL())) {
-            logger.error("[DsConfig Check] ConnectionURL is Empty !");
+        if (TStringUtil.isBlank(druidDataSource.getUrl())) {
+            logger.error("[DsConfig Check] URL is Empty !");
             return false;
         }
 
-        if (TStringUtil.isBlank(localTxDataSourceDO.getUserName())) {
-            logger.error("[DsConfig Check] UserName is Empty !");
+        if (TStringUtil.isBlank(druidDataSource.getUsername())) {
+            logger.error("[DsConfig Check] Username is Empty !");
             return false;
         }
 
-        if (TStringUtil.isBlank(localTxDataSourceDO.getPassword())) {
+        if (TStringUtil.isBlank(druidDataSource.getPassword())) {
             logger.error("[DsConfig Check] Password is Empty !");
             return false;
         }
 
-        if (TStringUtil.isBlank(localTxDataSourceDO.getDriverClass())) {
-            logger.error("[DsConfig Check] DriverClass is Empty !");
+        if (TStringUtil.isBlank(druidDataSource.getDriverClassName())) {
+            logger.error("[DsConfig Check] DriverClassName is Empty !");
             return false;
         }
 
-        if (localTxDataSourceDO.getMinPoolSize() < 1) {
-            logger.error("[DsConfig Check] MinPoolSize Error size is:" + localTxDataSourceDO.getMinPoolSize());
+        if (druidDataSource.getMinIdle() < 1) {
+            logger.error("[DsConfig Check] MinIdle Error size is:" + druidDataSource.getMinIdle());
             return false;
         }
 
-        if (localTxDataSourceDO.getMaxPoolSize() < 1) {
-            logger.error("[DsConfig Check] MaxPoolSize Error size is:" + localTxDataSourceDO.getMaxPoolSize());
+        if (druidDataSource.getMaxActive() < 1) {
+            logger.error("[DsConfig Check] MaxActive Error size is:" + druidDataSource.getMaxActive());
             return false;
         }
 
-        if (localTxDataSourceDO.getMinPoolSize() > localTxDataSourceDO.getMaxPoolSize()) {
-            logger.error("[DsConfig Check] MinPoolSize Over MaxPoolSize Minsize is:"
-                         + localTxDataSourceDO.getMinPoolSize() + "MaxSize is :" + localTxDataSourceDO.getMaxPoolSize());
+        if (druidDataSource.getMinIdle() > druidDataSource.getMaxActive()) {
+            logger.error("[DsConfig Check] MinPoolSize Over MaxPoolSize Minsize is:" + druidDataSource.getMinIdle()
+                         + "MaxSize is :" + druidDataSource.getMaxActive());
             return false;
         }
         return true;
@@ -653,8 +723,8 @@ class TAtomDsConfHandle {
         if (null == newDsConfDO || null == localDsConfDO) {
             return;
         }
-        // 允许设置driver
-        // if (TStringUtil.isNotBlank(localDsConfDO.getDriverClass())) {
+        // 允许设置driverClass
+        // if (StringUtil.isNotBlank(localDsConfDO.getDriverClass())) {
         // newDsConfDO.setDriverClass(localDsConfDO.getDriverClass());
         // }
         if (TStringUtil.isNotBlank(localDsConfDO.getSorterClass())) {
@@ -682,12 +752,12 @@ class TAtomDsConfHandle {
                     return wrapDataSource;
                 }
                 String errorMsg = "";
-                if (null == jbossDataSource) {
+                if (null == druidDataSource) {
                     errorMsg = "[InitError] TAtomDsConfHandle maybe forget init !";
                     logger.error(errorMsg);
                     throw new SQLException(errorMsg);
                 }
-                DataSource dataSource = jbossDataSource.getDatasource();
+                DataSource dataSource = druidDataSource;
                 if (null == dataSource) {
                     errorMsg = "[InitError] TAtomDsConfHandle maybe init fail !";
                     logger.error(errorMsg);
@@ -706,7 +776,6 @@ class TAtomDsConfHandle {
                 tDataSourceWrapper.setDatasourceRealDbName(runTimeConf.getDbName());
                 tDataSourceWrapper.setDbStatus(getStatus());
                 logger.warn("set datasource key: " + dbKey);
-                tDataSourceWrapper.init();
                 wrapDataSource = tDataSourceWrapper;
 
                 return wrapDataSource;
@@ -720,17 +789,15 @@ class TAtomDsConfHandle {
     }
 
     public void flushDataSource() {
-        if (null != this.jbossDataSource) {
-            logger.warn("[DataSource Flush] Start!");
-            this.jbossDataSource.flush();
-            logger.warn("[DataSource Flush] End!");
-        }
+        // 暂时不支持flush 抛错
+        logger.error("DRUID DATASOURCE DO NOT SUPPORT FLUSH.");
+        throw new RuntimeException("DRUID DATASOURCE DO NOT SUPPORT FLUSH.");
     }
 
     protected void destroyDataSource() throws Exception {
-        if (null != this.jbossDataSource) {
+        if (null != this.druidDataSource) {
             logger.warn("[DataSource Stop] Start!");
-            this.jbossDataSource.destroy();
+            this.druidDataSource.close();
             if (null != this.dbConfManager) {
                 this.dbConfManager.stopDbConfManager();
             }
@@ -808,22 +875,22 @@ class TAtomDsConfHandle {
         return dbKey;
     }
 
-    public AtomDbStatusEnum getStatus() {
+    public TAtomDbStatusEnum getStatus() {
         return this.runTimeConf.getDbStautsEnum();
     }
 
-    public AtomDbTypeEnum getDbType() {
+    public TAtomDbTypeEnum getDbType() {
         return this.runTimeConf.getDbTypeEnum();
     }
 
-    public void setDbStatusListeners(List<TAtomDbStatusListener> dbStatusListeners) {
+    public void setDbStatusListeners(List<AtomDbStatusListener> dbStatusListeners) {
         this.dbStatusListeners = dbStatusListeners;
     }
 
-    private void processDbStatusListener(AtomDbStatusEnum oldStatus, AtomDbStatusEnum newStatus) {
+    private void processDbStatusListener(TAtomDbStatusEnum oldStatus, TAtomDbStatusEnum newStatus) {
         if (null != oldStatus && oldStatus != newStatus) {
             if (null != dbStatusListeners) {
-                for (TAtomDbStatusListener statusListener : dbStatusListeners) {
+                for (AtomDbStatusListener statusListener : dbStatusListeners) {
                     try {
                         statusListener.handleData(oldStatus, newStatus);
                     } catch (Exception e) {
