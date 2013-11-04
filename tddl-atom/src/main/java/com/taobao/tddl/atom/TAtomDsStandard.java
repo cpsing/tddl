@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-public interface AtomDsStandard extends DataSource {
+public interface TAtomDsStandard extends DataSource {
 
     /**
      * @param appName
@@ -19,9 +19,9 @@ public interface AtomDsStandard extends DataSource {
 
     public void setShutDownMBean(boolean shutDownMBean);
 
-    public AtomDbTypeEnum getDbType();
+    public TAtomDbTypeEnum getDbType();
 
-    public AtomDbStatusEnum getDbStatus();
+    public TAtomDbStatusEnum getDbStatus();
 
     public void destroyDataSource() throws Exception;
 

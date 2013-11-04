@@ -13,13 +13,15 @@ import com.taobao.tddl.common.utils.mbean.TddlMBeanServer;
  * 
  * @author qihao
  */
-public abstract class AbstractTAtomDataSource implements AtomDsStandard {
+public abstract class AbstractTAtomDataSource implements TAtomDsStandard {
 
     protected abstract DataSource getDataSource() throws SQLException;
 
     public abstract void init() throws Exception;
 
     public abstract void flushDataSource();
+
+    public abstract void destroyDataSource() throws Exception;
 
     public Connection getConnection() throws SQLException {
         return getDataSource().getConnection();

@@ -1,7 +1,7 @@
 package com.taobao.tddl.common.utils;
 
 public enum DataSourceType {
-    TbDataSource(0), DruidDataSource(1);
+    DruidDataSource(1);
 
     private int i;
 
