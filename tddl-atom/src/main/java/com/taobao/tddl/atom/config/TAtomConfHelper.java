@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import com.taobao.tddl.atom.SecureIdentityLoginModule;
+import com.taobao.tddl.atom.securety.PasswordCoder;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
@@ -82,7 +82,7 @@ public class TAtomConfHelper {
         if (TStringUtil.isNotBlank(encPasswd)) {
             String encKey = passwdProp.getProperty(TAtomConfHelper.PASSWD_ENC_KEY_KEY);
             try {
-                passwd = SecureIdentityLoginModule.decode(encKey, encPasswd);
+                passwd = new PasswordCoder().decode(encKey, encPasswd);
             } catch (Exception e) {
                 logger.error("[parserPasswd Error] decode dbPasswdError!may jdk version error!", e);
             }

@@ -40,10 +40,10 @@ public class StaticTAtomDataSource extends AbstractTAtomDataSource {
         if (init) {
             throw new AtomAlreadyInitException("[AlreadyInit] double call Init !");
         }
-        DruidDataSource localDruidDataSource = DruidDsConfHandle.convertTAtomDsConf2DruidConf(confDO.getIp(),
+        DruidDataSource localDruidDataSource = TAtomDsConfHandle.convertTAtomDsConf2DruidConf(confDO.getIp(),
             confDO,
             confDO.getDbName());
-        boolean checkPram = DruidDsConfHandle.checkLocalTxDataSourceDO(localDruidDataSource);
+        boolean checkPram = TAtomDsConfHandle.checkLocalTxDataSourceDO(localDruidDataSource);
         if (checkPram) {
             localDruidDataSource.init();
             // druidDataSource =

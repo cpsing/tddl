@@ -22,9 +22,9 @@ public class TAtomDataSource extends AbstractTAtomDataSource {
 
     protected static Logger                       logger             = LoggerFactory.getLogger(TAtomDataSource.class);
 
-    private static Map<String, DruidDsConfHandle> cacheConfHandleMap = new HashMap<String, DruidDsConfHandle>();
+    private static Map<String, TAtomDsConfHandle> cacheConfHandleMap = new HashMap<String, TAtomDsConfHandle>();
 
-    private volatile DruidDsConfHandle            dsConfHandle       = new DruidDsConfHandle();
+    private volatile TAtomDsConfHandle            dsConfHandle       = new TAtomDsConfHandle();
 
     @Override
     public void init(String appName, String dsKey, String unitName) throws Exception {
@@ -37,7 +37,7 @@ public class TAtomDataSource extends AbstractTAtomDataSource {
     public void init() throws Exception {
         String dbName = TAtomConstants.getDbNameStr(this.getAppName(), this.getDbKey());
         synchronized (cacheConfHandleMap) {
-            DruidDsConfHandle cacheConfHandle = cacheConfHandleMap.get(dbName);
+            TAtomDsConfHandle cacheConfHandle = cacheConfHandleMap.get(dbName);
             if (null == cacheConfHandle) {
                 // 初始化config的管理器
                 this.dsConfHandle.init();
@@ -55,7 +55,7 @@ public class TAtomDataSource extends AbstractTAtomDataSource {
      */
     public static void cleanAllDataSource() {
         synchronized (cacheConfHandleMap) {
-            for (DruidDsConfHandle handles : cacheConfHandleMap.values()) {
+            for (TAtomDsConfHandle handles : cacheConfHandleMap.values()) {
                 try {
                     handles.destroyDataSource();
                 } catch (Exception e) {
