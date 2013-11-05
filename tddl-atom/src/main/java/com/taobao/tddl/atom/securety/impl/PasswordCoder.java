@@ -1,4 +1,4 @@
-package com.taobao.tddl.atom.securety;
+package com.taobao.tddl.atom.securety.impl;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -7,6 +7,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import com.taobao.tddl.atom.securety.TPasswordCoder;
 import com.taobao.tddl.common.utils.extension.ExtensionLoader;
 
 public class PasswordCoder implements TPasswordCoder {

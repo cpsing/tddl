@@ -1,5 +1,6 @@
 package com.taobao.tddl.atom;
 
+import com.taobao.tddl.atom.common.TAtomConstants;
 import com.taobao.tddl.common.utils.DataSourceType;
 
 /**

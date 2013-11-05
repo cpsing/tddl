@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.taobao.tddl.atom.config.TAtomDsConfDO;
+import com.taobao.tddl.atom.config.TAtomDsConfHandle;
 import com.taobao.tddl.atom.exception.AtomAlreadyInitException;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;

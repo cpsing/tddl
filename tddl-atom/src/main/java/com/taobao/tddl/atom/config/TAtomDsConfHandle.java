@@ -1,4 +1,4 @@
-package com.taobao.tddl.atom;
+package com.taobao.tddl.atom.config;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -9,12 +9,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.sql.DataSource;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.taobao.tddl.atom.config.DbConfManager;
-import com.taobao.tddl.atom.config.DbPasswdManager;
-import com.taobao.tddl.atom.config.DiamondDbConfManager;
-import com.taobao.tddl.atom.config.DiamondDbPasswdManager;
-import com.taobao.tddl.atom.config.TAtomConfParser;
-import com.taobao.tddl.atom.config.TAtomDsConfDO;
+import com.taobao.tddl.atom.TAtomDbStatusEnum;
+import com.taobao.tddl.atom.TAtomDbTypeEnum;
+import com.taobao.tddl.atom.common.TAtomConURLTools;
+import com.taobao.tddl.atom.common.TAtomConstants;
 import com.taobao.tddl.atom.config.listener.AtomDbStatusListener;
 import com.taobao.tddl.atom.exception.AtomAlreadyInitException;
 import com.taobao.tddl.atom.exception.AtomIllegalException;
@@ -89,7 +87,7 @@ public class TAtomDsConfHandle {
      * 
      * @throws Exception
      */
-    protected void init() throws Exception {
+    public void init() throws Exception {
         if (initFalg) {
             throw new AtomAlreadyInitException("[AlreadyInit] double call Init !");
         }
@@ -556,8 +554,8 @@ public class TAtomDsConfHandle {
      * @param druidDataSource
      * @throws SQLException
      */
-    protected static void fillDruidFilters(Map<String, String> connectionProperties, DruidDataSource druidDataSource)
-                                                                                                                     throws SQLException {
+    public static void fillDruidFilters(Map<String, String> connectionProperties, DruidDataSource druidDataSource)
+                                                                                                                  throws SQLException {
         if (connectionProperties.containsKey("clientEncoding") || connectionProperties.containsKey("serverEncoding")) {
             druidDataSource.setFilters(TDDL_DRUID_ENCODING_FILTER);
         }
@@ -574,8 +572,8 @@ public class TAtomDsConfHandle {
      * @return
      */
     @SuppressWarnings("rawtypes")
-    protected static DruidDataSource convertTAtomDsConf2DruidConf(String dbKey, TAtomDsConfDO tAtomDsConfDO,
-                                                                  String dbName) throws Exception {
+    public static DruidDataSource convertTAtomDsConf2DruidConf(String dbKey, TAtomDsConfDO tAtomDsConfDO, String dbName)
+                                                                                                                        throws Exception {
         DruidDataSource localDruidDataSource = new DruidDataSource();
         // 一下三个是druid监控需要的特殊配置
         localDruidDataSource.setName(dbKey);
@@ -671,7 +669,7 @@ public class TAtomDsConfHandle {
         return localDruidDataSource;
     }
 
-    protected static boolean checkLocalTxDataSourceDO(DruidDataSource druidDataSource) {
+    public static boolean checkLocalTxDataSourceDO(DruidDataSource druidDataSource) {
         if (null == druidDataSource) {
             return false;
         }
@@ -794,7 +792,7 @@ public class TAtomDsConfHandle {
         throw new RuntimeException("DRUID DATASOURCE DO NOT SUPPORT FLUSH.");
     }
 
-    protected void destroyDataSource() throws Exception {
+    public void destroyDataSource() throws Exception {
         if (null != this.druidDataSource) {
             logger.warn("[DataSource Stop] Start!");
             this.druidDataSource.close();
@@ -809,7 +807,7 @@ public class TAtomDsConfHandle {
 
     }
 
-    void setSingleInGroup(boolean isSingleInGroup) {
+    public void setSingleInGroup(boolean isSingleInGroup) {
         this.runTimeConf.setSingleInGroup(isSingleInGroup);
     }
 

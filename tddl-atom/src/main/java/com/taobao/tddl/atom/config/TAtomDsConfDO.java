@@ -3,9 +3,9 @@ package com.taobao.tddl.atom.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.taobao.tddl.atom.TAtomConstants;
 import com.taobao.tddl.atom.TAtomDbStatusEnum;
 import com.taobao.tddl.atom.TAtomDbTypeEnum;
+import com.taobao.tddl.atom.common.TAtomConstants;
 import com.taobao.tddl.common.utils.DataSourceType;
 import com.taobao.tddl.common.utils.TStringUtil;
 
