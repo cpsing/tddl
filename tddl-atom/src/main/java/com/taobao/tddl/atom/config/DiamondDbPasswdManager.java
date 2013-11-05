@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 
-import com.taobao.tddl.atom.TAtomConstants;
+import com.taobao.tddl.atom.common.TAtomConstants;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.config.ConfigDataHandler;

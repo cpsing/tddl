@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.taobao.tddl.atom.config.TAtomDsConfDO;
+import com.taobao.tddl.atom.config.TAtomDsConfHandle;
 import com.taobao.tddl.atom.exception.AtomAlreadyInitException;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
@@ -40,10 +41,10 @@ public class StaticTAtomDataSource extends AbstractTAtomDataSource {
         if (init) {
             throw new AtomAlreadyInitException("[AlreadyInit] double call Init !");
         }
-        DruidDataSource localDruidDataSource = DruidDsConfHandle.convertTAtomDsConf2DruidConf(confDO.getIp(),
+        DruidDataSource localDruidDataSource = TAtomDsConfHandle.convertTAtomDsConf2DruidConf(confDO.getIp(),
             confDO,
             confDO.getDbName());
-        boolean checkPram = DruidDsConfHandle.checkLocalTxDataSourceDO(localDruidDataSource);
+        boolean checkPram = TAtomDsConfHandle.checkLocalTxDataSourceDO(localDruidDataSource);
         if (checkPram) {
             localDruidDataSource.init();
             // druidDataSource =

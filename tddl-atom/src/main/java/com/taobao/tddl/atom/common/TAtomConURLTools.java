@@ -1,4 +1,4 @@
-package com.taobao.tddl.atom;
+package com.taobao.tddl.atom.common;
 
 import java.text.MessageFormat;
 import java.util.Map;
