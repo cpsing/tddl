@@ -9,11 +9,8 @@ import com.taobao.tddl.rule.model.virtualnode.DbTableMap;
 import com.taobao.tddl.rule.model.virtualnode.TableSlotMap;
 
 /**
- * <pre>
- * TDataSource持有所有虚拟表名到该对象的引用
- * tddl-client根据解析/预解析结果取得虚拟表名
- * 根据虚拟表名取得对应的VirtualTableRule对象
- * </pre>
+ * 对应月tddl中的一张逻辑表，每张逻辑表上存在db/tb的{@linkplain Rule}<br/>
+ * 基于该静态Rule(利用枚举步长和次数)可简单推算出数据库拓扑结构
  * 
  * @author linxuan
  */

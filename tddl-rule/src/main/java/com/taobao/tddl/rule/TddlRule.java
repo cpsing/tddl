@@ -17,8 +17,9 @@ import com.taobao.tddl.rule.model.TargetDB;
 import com.taobao.tddl.rule.utils.ComparativeStringAnalyser;
 
 /**
- * 基于{@linkplain VirtualTableRule}规则定义，根据sql中condition或者是setParam()提交的参数计算出路由规则
- * {@linkplain MatcherResult}
+ * 类名取名兼容老的rule代码，其实应该叫TddlTable更协调一些<br/>
+ * 结合tddl的动态规则管理体系，获取对应{@linkplain VirtualTableRule}
+ * 规则定义，再根据sql中condition或者是setParam()提交的参数计算出路由规则 {@linkplain MatcherResult}
  * 
  * @author jianghang 2013-11-5 下午8:11:43
  * @since 5.1.0
