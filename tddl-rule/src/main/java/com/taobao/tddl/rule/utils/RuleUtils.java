@@ -36,8 +36,15 @@ public class RuleUtils {
         return !isEmpty(map);
     }
 
-    public static Map<String, Set<Object>/* 抽样后描点的key和值的pair */> getSamplingField(Map<String, Comparative> argumentsMap,
-                                                                                  Set<AdvancedParameter> param) {
+    /**
+     * 返回对应column的枚举值
+     * 
+     * @param argumentsMap
+     * @param param
+     * @return
+     */
+    public static Map<String, Set<Object>> getSamplingField(Map<String, Comparative> argumentsMap,
+                                                            Set<AdvancedParameter> param) {
         // 枚举以后的columns与他们的描点之间的对应关系
         Map<String, Set<Object>> enumeratedMap = new HashMap<String, Set<Object>>(param.size());
         for (AdvancedParameter entry : param) {

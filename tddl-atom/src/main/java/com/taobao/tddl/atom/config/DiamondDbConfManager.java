@@ -35,11 +35,11 @@ public class DiamondDbConfManager implements DbConfManager {
         configFactory = ConfigDataHandlerCity.getFactory(appName, unitName);
         Map<String, Object> config = new HashMap<String, Object>();
         config.put("group", TAtomConstants.DEFAULT_DIAMOND_GROUP);
-        globalHandler = configFactory.getConfigDataHandlerWithFullConfig(globalConfigDataId,
+        globalHandler = configFactory.getConfigDataHandler(globalConfigDataId,
             globalDbConfListener,
             Executors.newSingleThreadScheduledExecutor(),
             config);
-        appDBHandler = configFactory.getConfigDataHandlerWithFullConfig(appConfigDataId,
+        appDBHandler = configFactory.getConfigDataHandler(appConfigDataId,
             appDbConfListener,
             Executors.newSingleThreadScheduledExecutor(),
             config);

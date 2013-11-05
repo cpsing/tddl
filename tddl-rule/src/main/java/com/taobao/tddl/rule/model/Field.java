@@ -17,16 +17,6 @@ public class Field {
     public static final Field                               EMPTY_FIELD = new Field(0);
     public Map<String/* 列名 */, Set<Object>/* 得到该结果的描点值名 */> sourceKeys;
 
-    /**
-     * 用于映射规则中存放映射后的所有值，这些值都应该有相同的列名，对应mappingTargetColumn
-     */
-    public Set<Object>                                      mappingKeys;
-
-    /**
-     * 对应上述mappingKeys的targetColumn
-     */
-    public String                                           mappingTargetColumn;
-
     public Field(int capacity){
         sourceKeys = new HashMap<String, Set<Object>>(capacity);
     }

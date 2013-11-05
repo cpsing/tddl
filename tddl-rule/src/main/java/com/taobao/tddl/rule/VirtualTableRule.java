@@ -52,10 +52,6 @@ public interface VirtualTableRule<D, T> {
 
     boolean isAllowFullTableScan();
 
-    boolean isNeedRowCopy();
-
-    List<String> getUniqueKeys();
-
     public String getTbNamePattern();
 
     public String getDbNamePattern();

@@ -21,7 +21,7 @@ public class DbSlotMapTest {
         map.put("NSEARCH_GROUP_EXTRA", "5");
 
         slot.setDbTableMap(map);
-        slot.start();
+        slot.init();
 
         Assert.assertEquals("NSEARCH_GROUP_1", slot.getValue("0"));
         Assert.assertEquals("NSEARCH_GROUP_2", slot.getValue("1"));
@@ -56,7 +56,7 @@ public class DbSlotMapTest {
         map.put("NSEARCH_GROUP_EXTRA", valueFunc3);
 
         slot.setParFuncMap(map);
-        slot.start();
+        slot.init();
 
         Assert.assertEquals("NSEARCH_GROUP_1", slot.getValue("0"));
         Assert.assertEquals("NSEARCH_GROUP_2", slot.getValue("1"));

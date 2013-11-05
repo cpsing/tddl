@@ -31,6 +31,8 @@ public abstract class DynamicLogger {
 
     public abstract void init();
 
+    public abstract void initRule();
+
     public void setEncode(String encode) {
         this.encode = encode;
     }

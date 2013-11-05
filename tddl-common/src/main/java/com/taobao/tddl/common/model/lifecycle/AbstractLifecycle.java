@@ -6,69 +6,38 @@ package com.taobao.tddl.common.model.lifecycle;
  */
 public class AbstractLifecycle implements Lifecycle {
 
-    private final Object              lock  = new Object();
-    protected volatile LifecycleState state = LifecycleState.STOPPED;
+    private final Object       lock     = new Object();
+    protected volatile boolean isInited = false;
 
-    public void start() {
+    public void init() {
         synchronized (lock) {
-            if (isRunning()) {
+            if (isInited()) {
                 return;
             }
-            state = LifecycleState.RUNNING;
+            isInited = true;
             init();
         }
     }
 
-    public void stop(String why) {
+    public void destory() {
         synchronized (lock) {
-            if (!isRunning()) {
+            if (!isInited()) {
                 return;
             }
-            doStop(why);
-            state = LifecycleState.STOPPED;
+
+            doDestory();
+            isInited = false;
         }
     }
 
-    public void stop() {
-        stop("caller doesn't tell any reason to stop");
+    public boolean isInited() {
+        return isInited;
     }
 
-    public void abort(String why, Throwable e) {
-        synchronized (lock) {
-            if (!isRunning()) {
-                return;
-            }
-            doAbort(why, e);
-            state = LifecycleState.ABORTED;
-        }
+    protected void doInit() {
     }
 
-    public boolean isAborted() {
-        return state.isAborted();
-    }
-
-    public boolean isRunning() {
-        return state.isRunning();
-    }
-
-    public boolean isStopped() {
-        return state.isStopped() || state.isAborted();
-    }
-
-    /**
-     * 保留为init名字，兼容老的代码习惯
-     */
-    protected void init() {
-        doStart();
-    }
-
-    protected void doStart() {
-    }
-
-    protected void doStop(String why) {
-    }
-
-    protected void doAbort(String why, Throwable e) {
+    protected void doDestory() {
     }
 
 }

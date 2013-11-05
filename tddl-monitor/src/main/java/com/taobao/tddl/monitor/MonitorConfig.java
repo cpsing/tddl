@@ -193,7 +193,7 @@ public class MonitorConfig {
             }
 
         };
-        ConfigDataHandler dataHandler = cdhf.getConfigDataHandlerWithListener(dataId, tddlConfigListener);
+        ConfigDataHandler dataHandler = cdhf.getConfigDataHandler(dataId, tddlConfigListener);
         String data = dataHandler.getNullableData(15 * 1000, ConfigDataHandler.FIRST_CACHE_THEN_SERVER_STRATEGY);
         tddlConfigListener.onDataRecieved(dataId, data);
     }

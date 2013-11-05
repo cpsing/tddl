@@ -32,7 +32,7 @@ public class DiamondDbPasswdManager implements DbPasswdManager {
         configFactory = ConfigDataHandlerCity.getFactory(appName, unitName);
         Map<String, Object> config = new HashMap<String, Object>();
         config.put("group", TAtomConstants.DEFAULT_DIAMOND_GROUP);
-        passwdHandler = configFactory.getConfigDataHandlerWithFullConfig(passwdConfDataId,
+        passwdHandler = configFactory.getConfigDataHandler(passwdConfDataId,
             passwdConfListener,
             Executors.newSingleThreadScheduledExecutor(),
             config);

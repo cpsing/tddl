@@ -40,21 +40,21 @@ public class UnitConfigDataHandlerFactory implements ConfigDataHandlerFactory {
 
     @Override
     public ConfigDataHandler getConfigDataHandler(String dataId) {
-        return this.getConfigDataHandlerWithListener(dataId, null);
+        return this.getConfigDataHandler(dataId, null);
     }
 
     @Override
-    public ConfigDataHandler getConfigDataHandlerWithListener(String dataId, ConfigDataListener configDataListener) {
+    public ConfigDataHandler getConfigDataHandler(String dataId, ConfigDataListener configDataListener) {
         List<ConfigDataListener> configDataListenerList = new ArrayList<ConfigDataListener>();
         configDataListenerList.add(configDataListener);
-        return this.getConfigDataHandlerWithFullConfig(dataId,
+        return this.getConfigDataHandler(dataId,
             configDataListenerList,
             null,
             new HashMap<String, Object>());
     }
 
     @Override
-    public ConfigDataHandler getConfigDataHandlerWithFullConfig(String dataId,
+    public ConfigDataHandler getConfigDataHandler(String dataId,
                                                                 List<ConfigDataListener> configDataListenerList,
                                                                 Executor executor, Map<String, Object> config) {
         // 获取config data handler的扩展实现

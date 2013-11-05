@@ -22,7 +22,7 @@ public class TableSlotMapTest {
         map.put("4", "719-1024");
         map.put("5", "1025");
         slot.setTableSlotMap(map);
-        slot.start();
+        slot.init();
 
         Assert.assertEquals("0", slot.getValue("0"));
         Assert.assertEquals("1", slot.getValue("257"));
@@ -30,7 +30,7 @@ public class TableSlotMapTest {
         Assert.assertEquals("3", slot.getValue("514"));
         Assert.assertEquals("4", slot.getValue("719"));
         Assert.assertEquals("5", slot.getValue("1025"));
-        slot.stop();
+        slot.init();
     }
 
     @Test
@@ -48,7 +48,7 @@ public class TableSlotMapTest {
 
         slot.setKeyPartitionFunction(keyFunc);
         slot.setValuePartitionFunction(valueFunc);
-        slot.start();
+        slot.init();
 
         Assert.assertEquals("0", slot.getValue("0"));
         Assert.assertEquals("1", slot.getValue("257"));
@@ -56,6 +56,6 @@ public class TableSlotMapTest {
         Assert.assertEquals("3", slot.getValue("514"));
         Assert.assertEquals("4", slot.getValue("719"));
         Assert.assertEquals("5", slot.getValue("1025"));
-        slot.stop();
+        slot.destory();
     }
 }

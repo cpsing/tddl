@@ -51,7 +51,7 @@ import com.taobao.tddl.rule.utils.sample.Samples;
  * @author jianghang 2013-11-4 下午5:33:51
  * @since 5.1.0
  */
-public class VirtualTable extends VirtualTableSupport {
+public class VirtualTable extends VirtualTableSupport implements VirtualTableRule {
 
     /** =================================================== **/
     /** == 原始的配置字符串 == **/
@@ -374,6 +374,54 @@ public class VirtualTable extends VirtualTableSupport {
 
     public DBType getDbType() {
         return dbType;
+    }
+
+    public List getDbShardRules() {
+        return dbShardRules;
+    }
+
+    public List getTbShardRules() {
+        return tbShardRules;
+    }
+
+    public Map getActualTopology() {
+        return actualTopology;
+    }
+
+    public Object getOuterContext() {
+        return outerContext;
+    }
+
+    public TableSlotMap getTableSlotMap() {
+        return tableSlotMap;
+    }
+
+    public DbTableMap getDbTableMap() {
+        return dbTableMap;
+    }
+
+    public boolean isAllowReverseOutput() {
+        return allowReverseOutput;
+    }
+
+    public boolean isAllowFullTableScan() {
+        return allowFullTableScan;
+    }
+
+    public String getTbNamePattern() {
+        return tbNamePattern;
+    }
+
+    public String getDbNamePattern() {
+        return dbNamePattern;
+    }
+
+    public String[] getDbRuleStrs() {
+        return dbRules;
+    }
+
+    public String[] getTbRulesStrs() {
+        return tbRules;
     }
 
 }

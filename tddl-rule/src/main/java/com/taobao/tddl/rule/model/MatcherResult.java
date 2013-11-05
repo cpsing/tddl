@@ -14,8 +14,8 @@ import com.taobao.tddl.common.model.sqljep.Comparative;
 public class MatcherResult {
 
     private final List<TargetDB>           calculationResult;     // 匹配的db结果
-    private final Map<String, Comparative> databaseComparativeMap; // 库参数
-    private final Map<String, Comparative> tableComparativeMap;   // 表参数
+    private final Map<String, Comparative> databaseComparativeMap; // 计算出该结果Rule中匹配的库参数
+    private final Map<String, Comparative> tableComparativeMap;   // 计算出该结果Rule中匹配的表参数
 
     public MatcherResult(List<TargetDB> calculationResult, Map<String, Comparative> databaseComparativeMap,
                          Map<String, Comparative> tableComparativeMap){

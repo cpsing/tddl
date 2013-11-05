@@ -31,7 +31,7 @@ public interface ConfigDataHandlerFactory {
      * @param configDataListener 数据回调监听器
      * @return 返回配置数据处理器实例
      */
-    ConfigDataHandler getConfigDataHandlerWithListener(String dataId, ConfigDataListener configDataListener);
+    ConfigDataHandler getConfigDataHandler(String dataId, ConfigDataListener configDataListener);
 
     /**
      * 对某一个dataId进行监听，使用者提供回调监听器列表， 并且提供执行线程池和内部一些配置(可能被handler忽视)
@@ -42,7 +42,7 @@ public interface ConfigDataHandlerFactory {
      * @param config TDDL内部对handler提供的一些配置
      * @return 返回配置数据处理器实例
      */
-    ConfigDataHandler getConfigDataHandlerWithFullConfig(String dataId,
+    ConfigDataHandler getConfigDataHandler(String dataId,
                                                          List<ConfigDataListener> configDataListenerList,
                                                          Executor executor, Map<String, Object> config);
 
