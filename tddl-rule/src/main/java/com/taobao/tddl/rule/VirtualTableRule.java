@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.taobao.tddl.common.model.DBType;
-import com.taobao.tddl.rule.model.virtualnode.DbTableMap;
-import com.taobao.tddl.rule.model.virtualnode.TableSlotMap;
+import com.taobao.tddl.rule.virtualnode.DBTableMap;
+import com.taobao.tddl.rule.virtualnode.TableSlotMap;
 
 /**
  * 对应月tddl中的一张逻辑表，每张逻辑表上存在db/tb的{@linkplain Rule}<br/>
@@ -37,7 +37,7 @@ public interface VirtualTableRule<D, T> {
 
     public TableSlotMap getTableSlotMap();
 
-    public DbTableMap getDbTableMap();
+    public DBTableMap getDbTableMap();
 
     // =========================================================================
     // 规则和其他属性的分割线

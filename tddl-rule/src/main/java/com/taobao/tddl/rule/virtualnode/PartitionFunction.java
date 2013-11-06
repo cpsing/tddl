@@ -1,4 +1,4 @@
-package com.taobao.tddl.rule.model.virtualnode;
+package com.taobao.tddl.rule.virtualnode;
 
 /**
  * 虚拟节点的节点区间标识

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="gb2312"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="vtabroot" class="com.taobao.tddl.rule.VirtualTableRoot" init-method="init">
+		<property name="dbType" value="MYSQL" />
+		<property name="tableRules">
+			<map>
+				<entry key="hsflog" value-ref="hsflog" />
+				<entry key="notify_msg" value-ref="notify_msg" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="hsflog" init-method="init" class="com.taobao.tddl.rule.TableRule">
+		<property name="dbNamePattern" value="eaglelog" />
+		<property name="tbRuleArray">
+			<list>
+				<value>
+					return "hsflog_" + (#traceid?,1,2#.toString().hashCode().abs().longValue() % 2) + "_" + (#days?,1,5#.longValue()%5);
+				</value>
+				<!-- 
+				<value>
+					return "hsflog_" + "0|1" + "_" + (#days,1,5#.longValue()%5);
+				</value>
+				<value>
+					return "hsflog_" + (#traceid,1,2#.toString().hashCode().abs().longValue() % 2) + "_" + "0|1|2|3|4";
+				</value>
+				 -->
+			</list>
+		</property>
+		<property name="allowFullTableScan" value="true" />
+	</bean>
+	
+	<bean id="notify_msg" init-method="init" class="com.taobao.tddl.rule.TableRule">
+      <property name="dbNamePattern" value="notify_track_group_{0}"/>
+      <property name="dbRuleArray">
+         <value>(#message_id?,1,4#.toString().hashCode().abs().longValue() % 4).intdiv(2)</value>
+      </property>
+      <property name="tbRuleArray">
+         <value>
+         return "notify_msg_"  + (#message_id?,1,4#.toString().hashCode().abs().longValue() % 4) + "_" + (#gmt_create_days?,1,30#.longValue()%30);
+         </value>
+      </property>
+      <property name="allowFullTableScan" value="true"/>
+   </bean>
+</beans>
+

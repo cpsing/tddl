@@ -1,17 +1,50 @@
 package com.taobao.tddl.rule.utils;
 
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+
+import org.apache.commons.lang.time.DateFormatUtils;
 
 import com.taobao.tddl.common.model.sqljep.Comparative;
 import com.taobao.tddl.common.model.sqljep.ComparativeAND;
 import com.taobao.tddl.common.model.sqljep.ComparativeBaseList;
 import com.taobao.tddl.common.model.sqljep.ComparativeOR;
 import com.taobao.tddl.common.utils.TStringUtil;
+import com.taobao.tddl.rule.exceptions.TddlRuleException;
 
+/**
+ * 提供一种机制，允许业务自定义condition，通过该解析类转化为Rule锁需要的{@linkplain Comparative}对象
+ * 
+ * <pre>
+ * 简单语法： KEY CMP VALUE [:TYPE]
+ * 1. KEY： 类似字段名字，用户随意定义
+ * 2. CMP： 链接符，比如< = > 等，具体可查看{@linkplain Comparative}
+ * 3. VALUE: 对应的值，比如1
+ * 4. TYPE: 描述VALUE的类型，可选型，如果不填默认为Long类型。支持: int/long/string/date，可以使用首字母做为缩写，比如i/l/s/d。
+ * 
+ * 几个例子：
+ * 1. id = 1
+ * 2. id = 1 : long
+ * 3. id > 1 and id < 1 : long
+ * 4. gmt_create = 2011-11-11 : date
+ * 5. id in (1,2,3,4) : long
+ * </pre>
+ * 
+ * @author jianghang 2013-11-6 下午5:23:02
+ * @since 5.1.0
+ */
 public class ComparativeStringAnalyser {
+
+    private static final String   TYPE_SPLIT   = ":";
+    private static final String[] DATE_FORMATS = new String[] { "yyyy-MM-dd", "HH:mm:ss", "yyyy-MM-dd HH:mm:ss",
+            "yyyy-MM-dd hh:mm:ss.S", "EEE MMM dd HH:mm:ss zzz yyyy", DateFormatUtils.ISO_DATETIME_FORMAT.getPattern(),
+            DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.getPattern(),
+            DateFormatUtils.SMTP_DATETIME_FORMAT.getPattern(), };
 
     public static Map<String, Comparative> decodeComparativeString2Map(String conditionStr) {
         Map<String, Comparative> comparativeMap = new HashMap<String, Comparative>();
@@ -32,16 +65,16 @@ public class ComparativeStringAnalyser {
                         comparativeBaseList = new ComparativeAND();
                         op = "and";
                     } else {
-                        throw new RuntimeException("decodeComparative not support ComparativeBaseList value:" + value);
+                        throw new TddlRuleException("decodeComparative not support ComparativeBaseList value:" + value);
                     }
-                    String[] compValues = twoPartSplit(value, op);
+                    String[] compValues = TStringUtil.twoPartSplit(value, op);
                     String key = null;
                     for (String compValue : compValues) {
-                        Comparative comparative = decodeComparativeForOuter(compValue);
+                        Comparative comparative = decodeComparative(compValue);
                         if (null != comparative) {
                             comparativeBaseList.addComparative(comparative);
                         }
-                        String temp = getComparativeKey(compValue).trim();
+                        String temp = decodeComparativeKey(compValue).trim();
                         if (null == key) {
                             key = temp;
                         } else if (!temp.equals(key)) {
@@ -49,13 +82,13 @@ public class ComparativeStringAnalyser {
                                                        + value);
                         }
                     }
-                    comparativeMap.put(key.toUpperCase(), comparativeBaseList);
+                    comparativeMap.put(key.toUpperCase(), comparativeBaseList); // 必须大写
                 } else {
                     // 说明只是Comparative
-                    String key = getComparativeKey(value);
-                    Comparative comparative = decodeComparativeForOuter(value);
+                    String key = decodeComparativeKey(value);
+                    Comparative comparative = decodeComparative(value);
                     if (null != comparative) {
-                        comparativeMap.put(key.toUpperCase().trim(), comparative);
+                        comparativeMap.put(key.toUpperCase(), comparative); // 必须大写
                     }
                 }
             }
@@ -63,7 +96,13 @@ public class ComparativeStringAnalyser {
         return comparativeMap;
     }
 
-    protected static Comparative decodeComparativeForOuter(String compValue) {
+    /**
+     * 解析类似: =1:int or in(1,2,3):long
+     * 
+     * @param compValue
+     * @return
+     */
+    public static Comparative decodeComparative(String compValue) {
         boolean containsIn = TStringUtil.contains(compValue, " in");
         Comparative comparative = null;
         if (!containsIn) {
@@ -72,158 +111,120 @@ public class ComparativeStringAnalyser {
             int size = splitor.length();
             int index = compValue.indexOf(splitor);
             String valueTypeStr = TStringUtil.substring(compValue, index + size);
-            int lastColonIndex = valueTypeStr.lastIndexOf(":");
-            String value = valueTypeStr.substring(0, lastColonIndex);
-            String type = valueTypeStr.substring(lastColonIndex + 1);
-            if (null != type && null != value) {
-                if ("i".equals(type.trim())) {
-                    comparative = new Comparative(compEnum, Integer.valueOf(value.trim()));
-                } else if ("l".equals(type.trim())) {
-                    comparative = new Comparative(compEnum, Long.valueOf(value.trim()));
-                } else if ("s".equals(type.trim())) {
-                    comparative = new Comparative(compEnum, value.trim());
-                } else if ("d".equals(type.trim())) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    try {
-                        comparative = new Comparative(compEnum, sdf.parse(value.trim()));
-                    } catch (ParseException e) {
-                        throw new RuntimeException("only support 'yyyy-MM-dd',now date string is:" + value.trim());
-                    }
-                } else if ("int".equals(type.trim())) {
-                    comparative = new Comparative(compEnum, Integer.valueOf(value.trim()));
-                } else if ("long".equals(type.trim())) {
-                    comparative = new Comparative(compEnum, Long.valueOf(value.trim()));
-                } else if ("string".equals(type.trim())) {
-                    comparative = new Comparative(compEnum, value.trim());
-                } else if ("date".equals(type.trim())) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    try {
-                        comparative = new Comparative(compEnum, sdf.parse(value.trim()));
-                    } catch (ParseException e) {
-                        throw new RuntimeException("only support 'yyyy-MM-dd',now date string is:" + value.trim());
-                    }
-                } else {
-                    throw new RuntimeException("decodeComparative Error notSupport Comparative valueType value: "
-                                               + compValue);
-                }
-            } else {
-                throw new RuntimeException("decodeComparative Error notSupport Comparative valueType value: "
-                                           + compValue);
+            int lastColonIndex = valueTypeStr.lastIndexOf(TYPE_SPLIT);
+            if (lastColonIndex != -1) {
+                String value = valueTypeStr.substring(0, lastColonIndex);
+                String type = valueTypeStr.substring(lastColonIndex + 1);
+                comparative = decodeComparative(type, compEnum, value);
+            } else { // 如果不存在类型
+                comparative = decodeComparative(null, compEnum, valueTypeStr);
             }
         } else {
-            String[] compValues = twoPartSplit(compValue, " in");
-            int lastColonIndex = compValues[1].lastIndexOf(":");
-            String inValues = compValues[1].substring(0, lastColonIndex);
-            String type = compValues[1].substring(lastColonIndex + 1);
-            if (null != inValues && null != type) {
-                ComparativeOR comparativeBaseList = new ComparativeOR();
-                String[] values = TStringUtil.split(getBetween(inValues, "(", ")"), ",");
-                if ("i".equals(type.trim())) {
-                    for (String value : values) {
-                        Comparative temp = new Comparative(Comparative.Equivalent, Integer.valueOf(value.trim()));
-                        comparativeBaseList.addComparative(temp);
-                    }
-                } else if ("l".equals(type.trim())) {
-                    for (String value : values) {
-                        Comparative temp = new Comparative(Comparative.Equivalent, Long.valueOf(value.trim()));
-                        comparativeBaseList.addComparative(temp);
-                    }
-                } else if ("s".equals(type.trim())) {
-                    for (String value : values) {
-                        Comparative temp = new Comparative(Comparative.Equivalent, value.trim());
-                        comparativeBaseList.addComparative(temp);
-                    }
-                } else if ("d".equals(type.trim())) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    for (String value : values) {
-                        Comparative temp = null;
-                        try {
-                            temp = new Comparative(Comparative.Equivalent, sdf.parse(value.trim()));
-                        } catch (ParseException e) {
-                            throw new RuntimeException("only support 'yyyy-MM-dd',now date string is:" + value.trim());
-                        }
-                        comparativeBaseList.addComparative(temp);
-                    }
-                } else if ("int".equals(type.trim())) {
-                    for (String value : values) {
-                        Comparative temp = new Comparative(Comparative.Equivalent, Integer.valueOf(value.trim()));
-                        comparativeBaseList.addComparative(temp);
-                    }
-                } else if ("long".equals(type.trim())) {
-                    for (String value : values) {
-                        Comparative temp = new Comparative(Comparative.Equivalent, Long.valueOf(value.trim()));
-                        comparativeBaseList.addComparative(temp);
-                    }
-                } else if ("string".equals(type.trim())) {
-                    for (String value : values) {
-                        Comparative temp = new Comparative(Comparative.Equivalent, value.trim());
-                        comparativeBaseList.addComparative(temp);
-                    }
-                } else if ("date".equals(type.trim())) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    for (String value : values) {
-                        Comparative temp = null;
-                        try {
-                            temp = new Comparative(Comparative.Equivalent, sdf.parse(value.trim()));
-                        } catch (ParseException e) {
-                            throw new RuntimeException("only support 'yyyy-MM-dd',now date string is:" + value.trim());
-                        }
-                        comparativeBaseList.addComparative(temp);
-                    }
-                } else {
-                    throw new RuntimeException("decodeComparative Error notSupport Comparative valueType value: "
-                                               + compValue);
-                }
-                comparative = comparativeBaseList;
+            // 处理下in表达式
+            String[] compValues = TStringUtil.twoPartSplit(compValue, " in");
+            int lastColonIndex = compValues[1].lastIndexOf(TYPE_SPLIT);
+            String inValues = compValues[1];
+            String type = null;
+            if (lastColonIndex != -1) {
+                inValues = compValues[1].substring(0, lastColonIndex);
+                type = compValues[1].substring(lastColonIndex + 1);
             }
+
+            ComparativeOR comparativeBaseList = new ComparativeOR();
+            String[] values = TStringUtil.split(TStringUtil.getBetween(inValues, "(", ")"), ",");
+            for (String value : values) {
+                Comparative cmp = decodeComparative(type, Comparative.Equivalent, value);
+                comparativeBaseList.addComparative(cmp);
+            }
+            comparative = comparativeBaseList;
         }
 
         return comparative;
     }
 
     /**
-     * 只做一次切分
+     * 根据类型解析下数据
      * 
-     * @param str
-     * @param splitor
+     * @param type
+     * @param compEnum
+     * @param value
      * @return
      */
-    private static String[] twoPartSplit(String str, String splitor) {
-        if (splitor != null) {
-            int index = str.indexOf(splitor);
-            String first = str.substring(0, index);
-            String sec = str.substring(index + splitor.length());
-            return new String[] { first, sec };
-        } else {
-            return new String[] { str };
+    private static Comparative decodeComparative(String type, int compEnum, String value) {
+        if (value == null) {
+            throw new RuntimeException("decodeComparative Error notSupport Comparative valueType value: " + value
+                                       + TYPE_SPLIT + type);
         }
+
+        if (type == null) {
+            type = "l"; // 默认按照long来处理
+        }
+
+        Comparative comparative = null;
+        if ("i".equals(type.trim()) || "int".equals(type.trim())) {
+            comparative = new Comparative(compEnum, Integer.valueOf(value.trim()));
+        } else if ("l".equals(type.trim()) || "long".equals(type.trim())) {
+            comparative = new Comparative(compEnum, Long.valueOf(value.trim()));
+        } else if ("s".equals(type.trim()) || "string".equals(type.trim())) {
+            comparative = new Comparative(compEnum, value.trim());
+        } else if ("d".equals(type.trim()) || "date".equals(type.trim())) {
+            Date date = null;
+            try {
+                date = parseDate(value.trim(), DATE_FORMATS, Locale.ENGLISH);
+            } catch (Exception err) {
+                try {
+                    date = parseDate(value.trim(), DATE_FORMATS, Locale.getDefault());
+                } catch (Exception e) {
+                    throw new TddlRuleException("unSupport date parse :" + value.trim());
+                }
+            }
+
+            comparative = new Comparative(compEnum, date);
+        } else {
+            throw new TddlRuleException("decodeComparative Error notSupport Comparative valueType value: " + value
+                                        + TYPE_SPLIT + type);
+        }
+
+        return comparative;
     }
 
-    private static String getComparativeKey(String compValue) {
+    /**
+     * 获取对应的key，类似id=xx中的id信息
+     */
+    private static String decodeComparativeKey(String compValue) {
         boolean containsIn = TStringUtil.contains(compValue, " in");
         if (containsIn) {
-            String[] compValues = twoPartSplit(compValue, " in");
-            return compValues[0];
+            String[] compValues = TStringUtil.twoPartSplit(compValue, " in");
+            return compValues[0].trim();
         } else {
             int value = Comparative.getComparisonByCompleteString(compValue);
             String splitor = Comparative.getComparisonName(value);
             int index = compValue.indexOf(splitor);
-            return TStringUtil.substring(compValue, 0, index);
+            return TStringUtil.substring(compValue, 0, index).trim();
         }
     }
 
-    /**
-     * 获得第一个start，end之间的字串， 不包括start，end本身。返回值已做了trim
-     */
-    private static String getBetween(String sql, String start, String end) {
-        int index0 = sql.indexOf(start);
-        if (index0 == -1) {
-            return null;
+    private static Date parseDate(String str, String[] parsePatterns, Locale locale) throws ParseException {
+        if ((str == null) || (parsePatterns == null)) {
+            throw new IllegalArgumentException("Date and Patterns must not be null");
         }
-        int index1 = sql.indexOf(end, index0);
-        if (index1 == -1) {
-            return null;
+
+        SimpleDateFormat parser = null;
+        ParsePosition pos = new ParsePosition(0);
+
+        for (int i = 0; i < parsePatterns.length; i++) {
+            if (i == 0) {
+                parser = new SimpleDateFormat(parsePatterns[0], locale);
+            } else {
+                parser.applyPattern(parsePatterns[i]);
+            }
+            pos.setIndex(0);
+            Date date = parser.parse(str, pos);
+            if ((date != null) && (pos.getIndex() == str.length())) {
+                return date;
+            }
         }
-        return sql.substring(index0 + start.length(), index1).trim();
+
+        throw new ParseException("Unable to parse the date: " + str, -1);
     }
 }

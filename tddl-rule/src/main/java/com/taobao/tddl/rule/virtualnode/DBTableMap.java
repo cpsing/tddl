@@ -1,4 +1,4 @@
-package com.taobao.tddl.rule.model.virtualnode;
+package com.taobao.tddl.rule.virtualnode;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,7 +13,7 @@ import com.google.common.collect.Maps;
  * @since 1.6
  * @date 2011-6-2 03:12:39
  */
-public class DbTableMap extends WrappedLogic implements VirtualNodeMap {
+public class DBTableMap extends WrappedLogic implements VirtualNodeMap {
 
     private Map<String/* slot number */, String/* group_0 */> dbContext  = Maps.newConcurrentMap();
     private Map<String, String>                               dbTableMap = Maps.newHashMap();

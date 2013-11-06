@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="gb2312"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+   <bean id="rule" class="com.taobao.tddl.rule.TddlRule" init-method="init">
+      <property name="appRuleFile" value="classpath:groovy/tddl-rule.xml"/>
+      <property name="appName" value="TDDL_RULE"></property>
+   </bean>
+</beans>
+

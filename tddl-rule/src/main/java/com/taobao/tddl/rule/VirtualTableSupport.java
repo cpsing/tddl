@@ -18,8 +18,8 @@ import com.taobao.tddl.rule.impl.DbVirtualNodeRule;
 import com.taobao.tddl.rule.impl.GroovyRule;
 import com.taobao.tddl.rule.impl.TableVirtualNodeRule;
 import com.taobao.tddl.rule.impl.WrappedGroovyRule;
-import com.taobao.tddl.rule.model.virtualnode.DbTableMap;
-import com.taobao.tddl.rule.model.virtualnode.TableSlotMap;
+import com.taobao.tddl.rule.virtualnode.DBTableMap;
+import com.taobao.tddl.rule.virtualnode.TableSlotMap;
 
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
@@ -34,7 +34,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  */
 public abstract class VirtualTableSupport extends AbstractLifecycle implements Lifecycle, VirtualTableRule {
 
-    protected static final Logger      logger               = LoggerFactory.getLogger(VirtualTable.class);
+    protected static final Logger      logger               = LoggerFactory.getLogger(TableRule.class);
     protected static final String      tableNameSepInSpring = ",";
     protected static final int         showColsPerRow       = 5;
 
@@ -107,7 +107,7 @@ public abstract class VirtualTableSupport extends AbstractLifecycle implements L
      * @return
      */
     protected List<Rule<String>> convertToRuleArray(String[] rules, String namePattern, String extraPackagesStr,
-                                                    DbTableMap dbTableMap, TableSlotMap tableSlotMap,
+                                                    DBTableMap dbTableMap, TableSlotMap tableSlotMap,
                                                     boolean isTableRule) {
         List<Rule<String>> ruleList = new ArrayList<Rule<String>>(1);
         if (null == rules) {// 没有rule定义
@@ -198,7 +198,7 @@ public abstract class VirtualTableSupport extends AbstractLifecycle implements L
             return;
         }
         sb = new StringBuilder("\nYou could add below segement as the actualTopology property to ");
-        sb.append(this.virtualTbName + "'s TableRule bean in the rule file\n\n");
+        sb.append(this.virtualTbName + "'s VirtualTable bean in the rule file\n\n");
         sb.append("        <property name=\"actualTopology\">\n");
         sb.append("          <map>\n");
         for (Map.Entry<String/* 库 */, Set<String/* 表 */>> e : this.actualTopology.entrySet()) {
@@ -319,6 +319,14 @@ public abstract class VirtualTableSupport extends AbstractLifecycle implements L
 
     public void setVirtualTbName(String virtualTbName) {
         this.virtualTbName = virtualTbName;
+    }
+
+    public Map<String, Set<String>> getActualTopology() {
+        return actualTopology;
+    }
+
+    public void setActualTopology(Map<String, Set<String>> actualTopology) {
+        this.actualTopology = actualTopology;
     }
 
 }

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="gb2312"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+   <bean id="vtabroot" class="com.taobao.tddl.rule.VirtualTableRoot" init-method="init">
+      <property name="dbType" value="MYSQL" />
+      <property name="tableRules">
+         <map>
+            <entry key="nserch" value-ref="nserch" />
+         </map>
+      </property>
+   </bean>
+
+   <bean id="nserch" class="com.taobao.tddl.rule.TableRule">
+      <property name="tbRuleArray">
+         <value>def message_id=#message_id,1024#;
+                if(message_id==1000||message_id==1001){
+                    return ""+1025;
+                }else{
+                    return ""+(message_id % 1024);
+                }
+         </value>
+      </property>
+      <property name="dbTableMap" ref="nsearchDbTableMap"/>
+      <property name="tableSlotMap" ref="nsearchTableSlotMap"/>
+      <property name="tableSlotKeyFormat" value="nserch_{0000}"/>
+   </bean>
+   
+   <bean id="nsearchTableSlotMap" class="com.taobao.tddl.rule.virtualnode.TableSlotMap">
+       <property name="tableSlotMap">
+           <map>
+               <entry key="0" value="0,1-256"/>
+               <entry key="1" value="257-512"/>
+               <entry key="2" value="513"/>
+               <entry key="3" value="514-718"/>
+               <entry key="4" value="719-1024"/>
+               <entry key="5" value="1025"/>
+           </map>
+       </property>
+   </bean>
+   
+   <bean id="nsearchDbTableMap" class="com.taobao.tddl.rule.virtualnode.DBTableMap">
+       <property name="dbTableMap">
+           <map>
+               <entry key="NSEARCH_GROUP_1" value="0,2-3"/>
+               <entry key="NSEARCH_GROUP_2" value="1,4"/>
+               <entry key="NSEARCH_GROUP_EXTRA" value="5"/>
+           </map>
+       </property>
+   </bean>
+</beans>
+

@@ -15,11 +15,27 @@ import com.taobao.tddl.rule.model.Field;
 import com.taobao.tddl.rule.model.MatcherResult;
 import com.taobao.tddl.rule.model.TargetDB;
 import com.taobao.tddl.rule.utils.ComparativeStringAnalyser;
+import com.taobao.tddl.rule.utils.MatchResultCompare;
 
 /**
- * 类名取名兼容老的rule代码，其实应该叫TddlTable更协调一些<br/>
+ * 类名取名兼容老的rule代码<br/>
  * 结合tddl的动态规则管理体系，获取对应{@linkplain VirtualTableRule}
  * 规则定义，再根据sql中condition或者是setParam()提交的参数计算出路由规则 {@linkplain MatcherResult}
+ * 
+ * <pre>
+ * condition简单语法： KEY CMP VALUE [:TYPE]
+ * 1. KEY： 类似字段名字，用户随意定义
+ * 2. CMP： 链接符，比如< = > 等，具体可查看{@linkplain Comparative}
+ * 3. VALUE: 对应的值，比如1
+ * 4. TYPE: 描述VALUE的类型，可选型，如果不填默认为Long类型。支持: int/long/string/date，可以使用首字母做为缩写，比如i/l/s/d。
+ * 
+ * 几个例子：
+ * 1. id = 1
+ * 2. id = 1 : long
+ * 3. id > 1 and id < 1 : long
+ * 4. gmt_create = 2011-11-11 : date
+ * 5. id in (1,2,3,4) : long
+ * </pre>
  * 
  * @author jianghang 2013-11-5 下午8:11:43
  * @since 5.1.0
@@ -50,7 +66,7 @@ public class TddlRule extends TddlTableRuleConfig implements TddlTableRule {
 
     public MatcherResult route(String vtab, ComparativeMapChoicer choicer, List<Object> args,
                                VirtualTableRoot specifyVtr) {
-        VirtualTable rule = specifyVtr.getVirtualTable(vtab);
+        TableRule rule = specifyVtr.getVirtualTable(vtab);
         if (rule != null) {
             return matcher.match(choicer, args, rule, true);
         } else {
@@ -61,7 +77,34 @@ public class TddlRule extends TddlTableRuleConfig implements TddlTableRule {
 
     public MatcherResult routeMverAndCompare(SqlType sqlType, String vtab, ComparativeMapChoicer choicer,
                                              List<Object> args) throws RouteCompareDiffException {
-        return null;
+        if (this.vtrs.size() == 0) {
+            throw new RuntimeException("routeWithMulVersion method just support multy version rule,use route method instead or config with multy version style!");
+        }
+
+        // 如果只有单套规则,直接返回这套规则的路由结果
+        if (this.vtrs.size() == 1) {
+            return route(vtab, choicer, args, super.getCurrentRule());
+        }
+
+        // 如果不止一套规则,那么计算两套规则,默认都返回新规则
+        if (this.vtrs.size() != 2 || this.versionIndex.size() != 2) {
+            throw new RuntimeException("not support more than 2 copy rule compare");
+        }
+
+        // 第一个排位的为旧规则
+        MatcherResult oldResult = route(vtab, choicer, args, super.getCurrentRule());
+        if (sqlType.equals(SqlType.SELECT) || sqlType.equals(SqlType.SELECT_FOR_UPDATE)) {
+            return oldResult;
+        } else {
+            // 第二个排位的为新规则
+            MatcherResult newResult = route(vtab, choicer, args, super.getVersionRule(versionIndex.get(1)));
+            boolean compareResult = MatchResultCompare.matchResultCompare(newResult, oldResult);
+            if (compareResult) {
+                return oldResult;
+            } else {
+                throw new RouteCompareDiffException("sql type is not-select,rule calculate result diff");
+            }
+        }
     }
 
     // ================ helper method ================

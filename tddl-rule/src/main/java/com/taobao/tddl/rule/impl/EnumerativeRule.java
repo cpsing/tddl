@@ -36,6 +36,7 @@ public abstract class EnumerativeRule<T> extends ExpressionRule<T> {
             // 这里必需RuleColumn的对于Key的处理方式一致(toUpperCase())，否则将取不到，这是一个风险点
             ruleColumn = parameters.get(paramInDoller.trim().toUpperCase());
         }
+
         if (ruleColumn == null) {
             ruleColumn = AdvancedParameterParser.getAdvancedParamByParamTokenNew(paramInDoller, true);
             parameters.put(ruleColumn.key, ruleColumn);

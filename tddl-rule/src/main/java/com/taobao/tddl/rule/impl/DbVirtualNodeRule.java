@@ -2,7 +2,7 @@ package com.taobao.tddl.rule.impl;
 
 import java.util.Map;
 
-import com.taobao.tddl.rule.model.virtualnode.VirtualNodeMap;
+import com.taobao.tddl.rule.virtualnode.VirtualNodeMap;
 
 /**
  * @description

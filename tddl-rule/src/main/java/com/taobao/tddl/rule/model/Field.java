@@ -5,6 +5,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
+import com.taobao.tddl.common.utils.TddlToStringStyle;
+
 /**
  * <pre>
  * 存放列名->sourceKey的映射，比如支持id in (xx)时，根据param计算后得出了目标库地址，可将该记录的sourceKey的发送到目标库上进行执行.
@@ -47,5 +51,10 @@ public class Field {
             }
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, TddlToStringStyle.DEFAULT_STYLE);
     }
 }

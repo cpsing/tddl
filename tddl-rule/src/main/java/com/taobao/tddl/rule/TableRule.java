@@ -13,13 +13,14 @@ import java.util.TreeSet;
 import com.taobao.tddl.common.model.DBType;
 import com.taobao.tddl.rule.impl.EnumerativeRule;
 import com.taobao.tddl.rule.model.AdvancedParameter;
-import com.taobao.tddl.rule.model.virtualnode.DbTableMap;
-import com.taobao.tddl.rule.model.virtualnode.TableSlotMap;
 import com.taobao.tddl.rule.utils.RuleUtils;
 import com.taobao.tddl.rule.utils.sample.Samples;
+import com.taobao.tddl.rule.virtualnode.DBTableMap;
+import com.taobao.tddl.rule.virtualnode.TableSlotMap;
 
 /**
- * 一个逻辑表怎样分库分表
+ * 类名取名兼容老的rule代码<br/>
+ * 描述一个逻辑表怎样分库分表，允许指定逻辑表名和db/table的{@linkplain Rule}规则
  * 
  * <pre>
  *   一个配置事例： 
@@ -51,7 +52,7 @@ import com.taobao.tddl.rule.utils.sample.Samples;
  * @author jianghang 2013-11-4 下午5:33:51
  * @since 5.1.0
  */
-public class VirtualTable extends VirtualTableSupport implements VirtualTableRule {
+public class TableRule extends VirtualTableSupport implements VirtualTableRule {
 
     /** =================================================== **/
     /** == 原始的配置字符串 == **/
@@ -70,7 +71,7 @@ public class VirtualTable extends VirtualTableSupport implements VirtualTableRul
      * 虚拟节点映射
      */
     protected TableSlotMap       tableSlotMap;
-    protected DbTableMap         dbTableMap;
+    protected DBTableMap         dbTableMap;
     protected String             tableSlotKeyFormat;
 
     /** ============ 运行时变量 ================= **/
@@ -79,14 +80,7 @@ public class VirtualTable extends VirtualTableSupport implements VirtualTableRul
     protected List<Rule<String>> tbShardRules;
     protected Object             outerContext;
 
-    public void init() {
-        if (tbShardRules == null || tbShardRules.size() == 0) {
-            if (this.tbNamePattern == null) {
-                // 表规则没有，tbKeyPattern为空
-                this.tbNamePattern = this.virtualTbName;
-            }
-        }
-
+    public void doInit() {
         // 初始化虚拟节点
         if (tableSlotMap != null) {
             tableSlotMap.setTableSlotKeyFormat(tableSlotKeyFormat);
@@ -105,9 +99,20 @@ public class VirtualTable extends VirtualTableSupport implements VirtualTableRul
         replaceWithParam(this.tbRules, tbRuleParames != null ? tbRuleParames : ruleParames);
 
         // 构造一下Rule对象
-        String extraPackagesStr = buildExtraPackagesStr(extraPackages);
-        setDbShardRules(convertToRuleArray(dbRules, dbNamePattern, extraPackagesStr, dbTableMap, tableSlotMap, false));
-        setTbShardRules(convertToRuleArray(tbRules, tbNamePattern, extraPackagesStr, dbTableMap, tableSlotMap, true));
+        String packagesStr = buildExtraPackagesStr(extraPackages);
+        if (dbShardRules == null) { // 如果未设置Rule对象，基于string生成rule对象
+            setDbShardRules(convertToRuleArray(dbRules, dbNamePattern, packagesStr, dbTableMap, tableSlotMap, false));
+        }
+        if (tbShardRules == null) {
+            setTbShardRules(convertToRuleArray(tbRules, tbNamePattern, packagesStr, dbTableMap, tableSlotMap, true));
+        }
+
+        if (tbShardRules == null || tbShardRules.size() == 0) {
+            if (this.tbNamePattern == null) {
+                // 表规则没有，tbKeyPattern为空
+                this.tbNamePattern = this.virtualTbName;
+            }
+        }
 
         // 基于rule计算一下拓扑结构
         initActualTopology();
@@ -332,14 +337,6 @@ public class VirtualTable extends VirtualTableSupport implements VirtualTableRul
         this.extraPackages = extraPackages;
     }
 
-    public void setTableSlotMap(TableSlotMap tableSlotMap) {
-        this.tableSlotMap = tableSlotMap;
-    }
-
-    public void setTableSlotKeyFormat(String tableSlotKeyFormat) {
-        this.tableSlotKeyFormat = tableSlotKeyFormat;
-    }
-
     public void setOuterContext(Object outerContext) {
         this.outerContext = outerContext;
     }
@@ -396,7 +393,7 @@ public class VirtualTable extends VirtualTableSupport implements VirtualTableRul
         return tableSlotMap;
     }
 
-    public DbTableMap getDbTableMap() {
+    public DBTableMap getDbTableMap() {
         return dbTableMap;
     }
 
@@ -424,4 +421,15 @@ public class VirtualTable extends VirtualTableSupport implements VirtualTableRul
         return tbRules;
     }
 
+    public void setDbTableMap(DBTableMap dbTableMap) {
+        this.dbTableMap = dbTableMap;
+    }
+
+    public void setTableSlotMap(TableSlotMap tableSlotMap) {
+        this.tableSlotMap = tableSlotMap;
+    }
+
+    public void setTableSlotKeyFormat(String tableSlotKeyFormat) {
+        this.tableSlotKeyFormat = tableSlotKeyFormat;
+    }
 }

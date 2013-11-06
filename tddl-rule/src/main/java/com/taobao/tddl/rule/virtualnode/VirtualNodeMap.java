@@ -1,4 +1,4 @@
-package com.taobao.tddl.rule.model.virtualnode;
+package com.taobao.tddl.rule.virtualnode;
 
 import com.taobao.tddl.common.model.lifecycle.Lifecycle;
 

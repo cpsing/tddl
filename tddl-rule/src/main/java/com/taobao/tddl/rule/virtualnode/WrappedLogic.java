@@ -1,4 +1,4 @@
-package com.taobao.tddl.rule.model.virtualnode;
+package com.taobao.tddl.rule.virtualnode;
 
 import java.util.HashSet;
 import java.util.Map;

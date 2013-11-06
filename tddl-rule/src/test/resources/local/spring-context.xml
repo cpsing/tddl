@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="gb2312"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+   <bean id="rule" class="com.taobao.tddl.rule.TddlRule" init-method="init">
+      <property name="appRuleFile" value="classpath:local/tddl-rule.xml"/>
+      <property name="appName" value="TDDL_RULE"></property>
+   </bean>
+      
+   <bean id="mvrRule" class="com.taobao.tddl.rule.TddlRule" init-method="init">
+      <property name="appRuleFile" value="V0#classpath:local/tddl-rule.xml;V1#classpath:local/tddl-rule.xml"/>
+      <property name="appName" value="TDDL_RULE_LE"></property>
+   </bean>
+</beans>
+

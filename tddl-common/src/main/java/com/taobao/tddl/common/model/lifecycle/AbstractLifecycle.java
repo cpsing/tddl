@@ -15,7 +15,7 @@ public class AbstractLifecycle implements Lifecycle {
                 return;
             }
             isInited = true;
-            init();
+            doInit();
         }
     }
 

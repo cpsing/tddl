@@ -50,13 +50,17 @@ public class RuleUtils {
         for (AdvancedParameter entry : param) {
             String key = entry.key;
             // 当前enumerator中指定当前规则是否需要处理交集问题。
-            // enumerator.setNeedMergeValueInCloseInterval();
             try {
-                Set<Object> samplingField = enumerator.getEnumeratedValue(argumentsMap.get(key),
-                    entry.cumulativeTimes,
-                    entry.atomicIncreateValue,
-                    entry.needMergeValueInCloseInterval);
-                enumeratedMap.put(key, samplingField);
+                if (argumentsMap.containsKey(key)) {
+                    Set<Object> samplingField = enumerator.getEnumeratedValue(argumentsMap.get(key),
+                        entry.cumulativeTimes,
+                        entry.atomicIncreateValue,
+                        entry.needMergeValueInCloseInterval);
+                    enumeratedMap.put(key, samplingField);
+                } else {
+                    // 如果sql中不存在，则进行全表扫
+                    enumeratedMap.put(key, entry.enumerateRange());
+                }
             } catch (UnsupportedOperationException e) {
                 throw new UnsupportedOperationException("当前列分库分表出现错误，出现错误的列名是:" + entry.key, e);
             }

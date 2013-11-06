@@ -6,8 +6,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.google.common.collect.Maps;
-import com.taobao.tddl.rule.model.virtualnode.PartitionFunction;
-import com.taobao.tddl.rule.model.virtualnode.TableSlotMap;
+import com.taobao.tddl.rule.virtualnode.PartitionFunction;
+import com.taobao.tddl.rule.virtualnode.TableSlotMap;
 
 public class TableSlotMapTest {
 

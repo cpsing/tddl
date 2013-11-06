@@ -568,6 +568,7 @@ public class VirtualTableRuleMatcher {
     private static <T> Rule<T> findMatchedRule(Map<String, Comparative> allRuleColumnArgs, List<Rule<T>> rules,
                                                Map<String, Comparative> matchArgs, ComparativeMapChoicer choicer,
                                                List<Object> args) {
+        // 优先匹配必选列
         for (Rule<T> r : rules) {
             matchArgs.clear();
             for (RuleColumn ruleColumn : r.getRuleColumns().values()) {
@@ -582,13 +583,15 @@ public class VirtualTableRuleMatcher {
             }
         }
 
+        // 匹配必选列 + 可选列
         for (Rule<T> r : rules) {
             matchArgs.clear();
             int mandatoryColumnCount = 0;
             for (RuleColumn ruleColumn : r.getRuleColumns().values()) {
-                if (!ruleColumn.needAppear) {
+                if (ruleColumn.optional) {
                     continue;
                 }
+
                 mandatoryColumnCount++;
                 Comparative comparative = getComparative(ruleColumn.key, allRuleColumnArgs, choicer, args);
                 if (comparative == null) {
@@ -603,15 +606,19 @@ public class VirtualTableRuleMatcher {
         }
 
         // 针对没有必选列的规则如：rule=..#a?#..#b?#.. 并且只有a或者b列在sql中有
-        arule: for (Rule<T> r : rules) {
+        for (Rule<T> r : rules) {
             matchArgs.clear();
             for (RuleColumn ruleColumn : r.getRuleColumns().values()) {
-                if (ruleColumn.needAppear) continue arule; // 如果当前规则有必选项，直接跳过,因为走到这里必选列已经不匹配了
+                if (!ruleColumn.optional) {
+                    break; // 如果当前规则有必选项，直接跳过,因为走到这里必选列已经不匹配了
+                }
+
                 Comparative comparative = getComparative(ruleColumn.key, allRuleColumnArgs, choicer, args);
                 if (comparative != null) {
                     matchArgs.put(ruleColumn.key, allRuleColumnArgs.get(ruleColumn.key));
                 }
             }
+
             if (matchArgs.size() != 0) {
                 return r; // 第一个全是可选列的规则，并且args包含该规则的部分可选列
             }

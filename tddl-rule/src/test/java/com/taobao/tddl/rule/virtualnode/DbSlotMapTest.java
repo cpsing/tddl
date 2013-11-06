@@ -6,14 +6,14 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.google.common.collect.Maps;
-import com.taobao.tddl.rule.model.virtualnode.DbTableMap;
-import com.taobao.tddl.rule.model.virtualnode.PartitionFunction;
+import com.taobao.tddl.rule.virtualnode.DBTableMap;
+import com.taobao.tddl.rule.virtualnode.PartitionFunction;
 
 public class DbSlotMapTest {
 
     @Test
     public void testSimple() {
-        DbTableMap slot = new DbTableMap();
+        DBTableMap slot = new DBTableMap();
 
         Map<String, String> map = Maps.newHashMap();
         map.put("NSEARCH_GROUP_1", "0,2-3");
@@ -33,7 +33,7 @@ public class DbSlotMapTest {
 
     @Test
     public void testPartition() {
-        DbTableMap slot = new DbTableMap();
+        DBTableMap slot = new DBTableMap();
 
         PartitionFunction valueFunc1 = new PartitionFunction();
         valueFunc1.setFirstValue(-1);

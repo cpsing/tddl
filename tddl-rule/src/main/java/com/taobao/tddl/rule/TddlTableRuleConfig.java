@@ -128,6 +128,7 @@ public class TddlTableRuleConfig extends AbstractLifecycle implements Lifecycle 
         Map<Integer, String> tempIndexMap = new HashMap<Integer, String>();
         for (String version : vtrs.keySet()) {
             tempIndexMap.put(index, version);
+            index++;
         }
         this.versionIndex = tempIndexMap;
     }
@@ -156,6 +157,19 @@ public class TddlTableRuleConfig extends AbstractLifecycle implements Lifecycle 
         }
 
         return vtr;
+    }
+
+    /**
+     * 获取当前在用的版本，理论上正常只有一个版本(切换时出现两个版本)，顺序返回版本，第一个版本为当前正在使用中的旧版本
+     */
+    public List<String> getAllVersions() {
+        int size = versionIndex.size();
+        List<String> versions = Lists.newArrayList();
+        for (int i = 0; i < size; i++) {
+            versions.add(versionIndex.get(i));
+        }
+
+        return versions;
     }
 
     /**
@@ -263,7 +277,7 @@ public class TddlTableRuleConfig extends AbstractLifecycle implements Lifecycle 
      * @return
      */
     private ApplicationContext buildRuleByStr(String data) {
-        return new StringXmlApplicationContext(appRuleString, outerClassLoader);
+        return new StringXmlApplicationContext(data, outerClassLoader);
     }
 
     private String getCurrentRuleStr() {
