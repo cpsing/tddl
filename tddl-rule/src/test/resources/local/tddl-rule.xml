@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="gb2312"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+   <bean id="vtabroot" class="com.taobao.tddl.rule.VirtualTableRoot" init-method="init">
+      <property name="dbType" value="MYSQL" />
+      <property name="defaultDbIndex" value="defaultDbName" />
+      <property name="tableRules">
+         <map>
+            <entry key="nserch" value-ref="nserch" />
+         </map>
+      </property>
+   </bean>
+
+   <bean id="nserch" class="com.taobao.tddl.rule.TableRule">
+      <property name="tbRuleArray">
+         <value>"nserch_"+(#message_id,24# % 24)</value>
+      </property>
+      <property name="dbRuleArray">
+          <value>"NSEARCH_GROUP_"+(#message_id,24# % 3+1)</value>
+      </property>
+      <property name="allowFullTableScan" value="true"/>
+   </bean>
+</beans>
+

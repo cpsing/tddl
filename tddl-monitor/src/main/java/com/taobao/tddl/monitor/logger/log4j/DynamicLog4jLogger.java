@@ -82,6 +82,30 @@ public class DynamicLog4jLogger extends DynamicLogger {
         logger.setLevel(Level.INFO);
     }
 
+    public void initRule() {
+        Appender dbTabAppender = buildAppender("TDDL_Vtab_Appender", "tddl-db-tab.log", "%m");
+        Appender vSlotAppender = buildAppender("TDDL_Vtab_Appender", "tddl-vslot.log", "%m");
+        Appender dynamicRuleAppender = buildAppender("TDDL_DynamicRule_Appender", "tddl-dynamic-rule.log", "%m");
+
+        org.apache.log4j.Logger logger = (Logger) LoggerInit.DB_TAB_LOG.getDelegate();
+        logger.setAdditivity(false);
+        logger.removeAllAppenders();
+        logger.addAppender(dbTabAppender);
+        logger.setLevel(Level.INFO);
+
+        logger = (Logger) LoggerInit.VSLOT_LOG.getDelegate();
+        logger.setAdditivity(false);
+        logger.removeAllAppenders();
+        logger.addAppender(vSlotAppender);
+        logger.setLevel(Level.INFO);
+
+        logger = (Logger) LoggerInit.DYNAMIC_RULE_LOG.getDelegate();
+        logger.setAdditivity(false);
+        logger.removeAllAppenders();
+        logger.addAppender(dynamicRuleAppender);
+        logger.setLevel(Level.INFO);
+    }
+
     private Appender buildAppender(String name, String fileName, String pattern) {
         DailyRollingFileAppender appender = new DailyRollingFileAppender();
         appender.setName(name);

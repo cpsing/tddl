@@ -2,7 +2,6 @@ package com.taobao.tddl.atom.jdbc;
 
 import com.taobao.tddl.common.model.SqlMetaData;
 
-
 /**
  * @author JIECHEN
  */

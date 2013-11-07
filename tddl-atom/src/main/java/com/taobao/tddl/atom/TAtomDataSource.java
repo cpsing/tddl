@@ -7,7 +7,9 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import com.taobao.tddl.atom.config.listener.TAtomDbStatusListener;
+import com.taobao.tddl.atom.common.TAtomConstants;
+import com.taobao.tddl.atom.config.TAtomDsConfHandle;
+import com.taobao.tddl.atom.config.listener.AtomDbStatusListener;
 import com.taobao.tddl.atom.exception.AtomAlreadyInitException;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
@@ -107,11 +109,11 @@ public class TAtomDataSource extends AbstractTAtomDataSource {
         this.dsConfHandle.setUnitName(unitName);
     }
 
-    public AtomDbStatusEnum getDbStatus() {
+    public TAtomDbStatusEnum getDbStatus() {
         return this.dsConfHandle.getStatus();
     }
 
-    public void setDbStatusListeners(List<TAtomDbStatusListener> dbStatusListeners) {
+    public void setDbStatusListeners(List<AtomDbStatusListener> dbStatusListeners) {
         this.dsConfHandle.setDbStatusListeners(dbStatusListeners);
     }
 
@@ -128,7 +130,7 @@ public class TAtomDataSource extends AbstractTAtomDataSource {
         this.dsConfHandle.setLocalDriverClass(driverClass);
     }
 
-    public AtomDbTypeEnum getDbType() {
+    public TAtomDbTypeEnum getDbType() {
         return this.dsConfHandle.getDbType();
     }
 

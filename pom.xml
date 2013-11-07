@@ -61,6 +61,8 @@
 		<jcl_version>1.1</jcl_version>
 		<log4j_version>1.2.16</log4j_version>
 		<logback_version>1.0.6</logback_version>
+		<groovy_version>2.1.9</groovy_version>
+		<spring_version>2.5.6.SEC03</spring_version>
 		<!-- Test libs -->
 		<junit_version>4.11</junit_version>
 	</properties>
@@ -127,6 +129,22 @@
 				<artifactId>druid</artifactId>
 				<version>0.2.21</version>
 			</dependency>
+			<dependency>
+				<groupId>org.codehaus.groovy</groupId>
+				<artifactId>groovy-all</artifactId>
+				<version>${groovy_version}</version>
+			</dependency>
+			<!-- spring libs -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>${spring_version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${spring_version}</version>
+			</dependency>
 			<!-- Log libs -->
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -164,6 +182,24 @@
 				<artifactId>junit</artifactId>
 				<version>${junit_version}</version>
 				<scope>test</scope>
+			</dependency>
+			
+			<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>5.1.6</version>
+			</dependency>
+			
+						<dependency>
+				<groupId>org.apache.ibatis</groupId>
+				<artifactId>ibatis-sqlmap</artifactId>
+				<version>2.3.4.726</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-jdbc</artifactId>
+				<version>2.5.6.SEC03</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

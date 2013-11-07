@@ -3,6 +3,7 @@ package com.taobao.tddl.config.impl.holder;
 import java.util.List;
 import java.util.Map;
 
+import com.taobao.tddl.common.model.lifecycle.Lifecycle;
 import com.taobao.tddl.config.ConfigDataHandler;
 
 /**
@@ -11,7 +12,7 @@ import com.taobao.tddl.config.ConfigDataHandler;
  * @author jianghang 2013-10-28 下午5:45:07
  * @since 5.1.0
  */
-public interface ConfigDataHolder {
+public interface ConfigDataHolder extends Lifecycle {
 
     public String getData(String dataId);
 

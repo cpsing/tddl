@@ -1,13 +1,11 @@
 package com.taobao.tddl.atom.config;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import com.taobao.tddl.atom.AtomDbStatusEnum;
-import com.taobao.tddl.atom.AtomDbTypeEnum;
-import com.taobao.tddl.atom.TAtomConstants;
-import com.taobao.tddl.atom.jdbc.ConnRestrictEntry;
+import com.taobao.tddl.atom.TAtomDbStatusEnum;
+import com.taobao.tddl.atom.TAtomDbTypeEnum;
+import com.taobao.tddl.atom.common.TAtomConstants;
 import com.taobao.tddl.common.utils.DataSourceType;
 import com.taobao.tddl.common.utils.TStringUtil;
 
@@ -19,78 +17,85 @@ import com.taobao.tddl.common.utils.TStringUtil;
  */
 public class TAtomDsConfDO implements Cloneable {
 
-    private String                  ip;
+    /**
+     * 默认初始化的线程池连接数量
+     */
+    public static final int     defaultInitPoolSize  = 0;
 
-    private String                  port;
+    /**
+     * 默认初始化的defaultMaxWait druid专用，目前是和jboss的blockingTimeout是同一个配置。运维人员请注意。
+     */
+    public static final int     defaultMaxWait       = 5000;
 
-    private String                  dbName;
+    private String              ip;
 
-    private String                  userName;
+    private String              port;
 
-    private String                  passwd;
+    private String              dbName;
 
-    private String                  driverClass;
+    private String              userName;
 
-    private String                  sorterClass;
+    private String              passwd;
 
-    private int                     preparedStatementCacheSize;
+    private String              driverClass;
 
-    private int                     minPoolSize;
+    private String              sorterClass;
 
-    private int                     maxPoolSize;
+    private int                 preparedStatementCacheSize;
 
-    private int                     blockingTimeout;
+    private int                 initPoolSize         = defaultInitPoolSize;
 
-    private long                    idleTimeout;
+    private int                 minPoolSize;
+
+    private int                 maxPoolSize;
+
+    private int                 blockingTimeout      = defaultMaxWait;
+
+    private long                idleTimeout;
 
     // private String dbType;
 
-    private String                  oracleConType        = TAtomConstants.DEFAULT_ORACLE_CON_TYPE;
+    private String              oracleConType        = TAtomConstants.DEFAULT_ORACLE_CON_TYPE;
 
-    private AtomDbTypeEnum          dbTypeEnum;
+    private TAtomDbTypeEnum      dbTypeEnum;
 
-    private AtomDbStatusEnum        dbStautsEnum;
+    private TAtomDbStatusEnum    dbStautsEnum;
 
-    private String                  dbStatus;
+    private String              dbStatus;
 
-    private Map<String, String>     connectionProperties = new HashMap<String, String>();
+    private Map<String, String> connectionProperties = new HashMap<String, String>();
 
     /**
      * 写 次数限制
      */
-    private int                     writeRestrictTimes;
+    private int                 writeRestrictTimes;
 
     /**
      * 读 次数限制
      */
-    private int                     readRestrictTimes;
+    private int                 readRestrictTimes;
 
     /**
      * 统计时间片
      */
-    private int                     timeSliceInMillis;
+    private int                 timeSliceInMillis;
 
     /**
      * 线程技术count限制
      */
-    private int                     threadCountRestrict;
+    private int                 threadCountRestrict;
 
     /**
      * 允许并发读的最大个数，0为不限制
      */
-    private int                     maxConcurrentReadRestrict;
+    private int                 maxConcurrentReadRestrict;
 
     /**
      * 允许并发写的最大个数，0为不限制
      */
-    private int                     maxConcurrentWriteRestrict;
+    private int                 maxConcurrentWriteRestrict;
 
-    private volatile boolean        isSingleInGroup;
-
-    /**
-     * 应用连接限制: 限制某个应用键值的并发连接数。
-     */
-    private List<ConnRestrictEntry> connRestrictEntries;
+    private volatile boolean    isSingleInGroup;
 
     public String getIp() {
         return ip;
@@ -162,6 +167,14 @@ public class TAtomDsConfDO implements Cloneable {
         this.preparedStatementCacheSize = preparedStatementCacheSize;
     }
 
+    public int getInitPoolSize() {
+        return initPoolSize;
+    }
+
+    public void setInitPoolSize(int initPoolSize) {
+        this.initPoolSize = initPoolSize;
+    }
+
     public int getMinPoolSize() {
         return minPoolSize;
     }
@@ -203,7 +216,7 @@ public class TAtomDsConfDO implements Cloneable {
     }
 
     public void setDbType(String dbType) {
-        this.dbTypeEnum = AtomDbTypeEnum.getAtomDbTypeEnum(dbType, DataSourceType.TbDataSource);
+        this.dbTypeEnum = TAtomDbTypeEnum.getAtomDbTypeEnum(dbType, DataSourceType.DruidDataSource);
     }
 
     public String getDbStatus() {
@@ -213,15 +226,15 @@ public class TAtomDsConfDO implements Cloneable {
     public void setDbStatus(String dbStatus) {
         this.dbStatus = dbStatus;
         if (TStringUtil.isNotBlank(dbStatus)) {
-            this.dbStautsEnum = AtomDbStatusEnum.getAtomDbStatusEnumByType(dbStatus);
+            this.dbStautsEnum = TAtomDbStatusEnum.getAtomDbStatusEnumByType(dbStatus);
         }
     }
 
-    public AtomDbStatusEnum getDbStautsEnum() {
+    public TAtomDbStatusEnum getDbStautsEnum() {
         return dbStautsEnum;
     }
 
-    public AtomDbTypeEnum getDbTypeEnum() {
+    public TAtomDbTypeEnum getDbTypeEnum() {
         return dbTypeEnum;
     }
 
@@ -283,14 +296,6 @@ public class TAtomDsConfDO implements Cloneable {
 
     public void setMaxConcurrentWriteRestrict(int maxConcurrentWriteRestrict) {
         this.maxConcurrentWriteRestrict = maxConcurrentWriteRestrict;
-    }
-
-    public List<ConnRestrictEntry> getConnRestrictEntries() {
-        return connRestrictEntries;
-    }
-
-    public void setConnRestrictEntries(List<ConnRestrictEntry> connRestrictEntries) {
-        this.connRestrictEntries = connRestrictEntries;
     }
 
     public TAtomDsConfDO clone() {

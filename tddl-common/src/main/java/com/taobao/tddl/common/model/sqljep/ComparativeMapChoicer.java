@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 结果集筛选器
+ * 参数筛选器
  * 
  * @author shenxun
  */

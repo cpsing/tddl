@@ -23,9 +23,9 @@ public interface Rule<T> {
     public class RuleColumn {
 
         /**
-         * 若optional==true，则选择rule时，sql可以不包含该列。到时对该列值域做遍历
+         * 是否为可选列，若optional==true，则选择rule时，sql可以不包含该列。到时对该列值域做遍历
          */
-        public final boolean needAppear; //
+        public final boolean optional; //
         /**
          * sql中的列名，必须是大写，这里在setter显示的设置成大写了
          */
@@ -33,7 +33,7 @@ public interface Rule<T> {
 
         public RuleColumn(String name, boolean optional){
             this.key = name.toUpperCase();
-            this.needAppear = optional;
+            this.optional = optional;
         }
     }
 

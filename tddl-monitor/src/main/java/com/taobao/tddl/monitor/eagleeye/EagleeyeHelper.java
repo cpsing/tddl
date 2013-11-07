@@ -5,7 +5,7 @@ import com.taobao.tddl.common.utils.extension.ExtensionLoader;
 import com.taobao.tddl.monitor.eagleeye.TddlEagleeye;
 
 /**
- * @author jiechen.qzm Eagleeye帮助类，协助记录查询时间
+ * @author mengshi.sunmengshi
  */
 public class EagleeyeHelper {
 

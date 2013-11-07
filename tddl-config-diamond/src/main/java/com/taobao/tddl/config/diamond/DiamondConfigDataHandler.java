@@ -3,7 +3,6 @@ package com.taobao.tddl.config.diamond;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executor;
 
 import com.taobao.diamond.client.impl.DiamondEnv;
@@ -12,6 +11,7 @@ import com.taobao.diamond.client.impl.DiamondUnitSite;
 import com.taobao.diamond.common.Constants;
 import com.taobao.diamond.manager.ManagerListener;
 import com.taobao.diamond.manager.SkipInitialCallbackListener;
+import com.taobao.tddl.common.utils.extension.Activate;
 import com.taobao.tddl.common.utils.mbean.TddlMBean;
 import com.taobao.tddl.common.utils.mbean.TddlMBeanServer;
 import com.taobao.tddl.config.ConfigDataListener;
@@ -29,23 +29,16 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  * @since 1.6
  * @date 2011-1-11 11:22:29
  */
+@Activate(order = 1)
 public class DiamondConfigDataHandler extends UnitConfigDataHandler {
 
     private static final Logger logger  = LoggerFactory.getLogger(DiamondConfigDataHandler.class);
     public static final long    TIMEOUT = 10 * 1000;
-    protected String            dataId;
     private String              mbeanId;
     private TddlMBean           mbean;
     private DiamondEnv          env;
 
-    public void init(final String dataId, final List<ConfigDataListener> configDataListenerList,
-                     final Map<String, Object> config) {
-        this.init(dataId, configDataListenerList, config, null);
-    }
-
-    public void init(final String dataId, final List<ConfigDataListener> configDataListenerList,
-                     final Map<String, Object> config, String initialData) {
-        this.dataId = dataId;
+    public void doInit() {
         mbean = new TddlMBean("Diamond Config Info " + System.currentTimeMillis());
         mbeanId = dataId + System.currentTimeMillis();
 
@@ -59,7 +52,7 @@ public class DiamondConfigDataHandler extends UnitConfigDataHandler {
         if (initialData == null) {
             initialData = getData(TIMEOUT, FIRST_SERVER_STRATEGY);
         }
-        addListener0(configDataListenerList, (Executor) config.get("executor"), initialData);
+        addListener0(listeners, (Executor) config.get("executor"), initialData);
         TddlMBeanServer.registerMBeanWithId(mbean, mbeanId);
     }
 

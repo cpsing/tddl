@@ -3,13 +3,12 @@ package com.taobao.tddl.config.impl.holder;
 import java.util.List;
 import java.util.Map;
 
+import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.extension.ExtensionLoader;
 
-public abstract class AbstractConfigDataHolder implements ConfigDataHolder {
+public abstract class AbstractConfigDataHolder extends AbstractLifecycle implements ConfigDataHolder {
 
     AbstractConfigDataHolder delegateDataHolder = null;
-
-    public abstract void init();
 
     protected void loadDelegateExtension() {
         this.delegateDataHolder = ExtensionLoader.load(AbstractConfigDataHolder.class);

@@ -3,7 +3,10 @@ package com.taobao.tddl.rule.model;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 import com.taobao.tddl.common.model.sqljep.Comparative;
+import com.taobao.tddl.common.utils.TddlToStringStyle;
 
 /**
  * 匹配结果对象
@@ -14,8 +17,8 @@ import com.taobao.tddl.common.model.sqljep.Comparative;
 public class MatcherResult {
 
     private final List<TargetDB>           calculationResult;     // 匹配的db结果
-    private final Map<String, Comparative> databaseComparativeMap; // 库参数
-    private final Map<String, Comparative> tableComparativeMap;   // 表参数
+    private final Map<String, Comparative> databaseComparativeMap; // 计算出该结果Rule中匹配的库参数
+    private final Map<String, Comparative> tableComparativeMap;   // 计算出该结果Rule中匹配的表参数
 
     public MatcherResult(List<TargetDB> calculationResult, Map<String, Comparative> databaseComparativeMap,
                          Map<String, Comparative> tableComparativeMap){
@@ -49,5 +52,10 @@ public class MatcherResult {
      */
     public Map<String, Comparative> getTableComparativeMap() {
         return tableComparativeMap;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, TddlToStringStyle.DEFAULT_STYLE);
     }
 }

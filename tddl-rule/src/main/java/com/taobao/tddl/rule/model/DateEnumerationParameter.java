@@ -2,6 +2,10 @@ package com.taobao.tddl.rule.model;
 
 import java.util.Calendar;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
+import com.taobao.tddl.common.utils.TddlToStringStyle;
+
 /**
  * 用于传递自增数字和自增数字对应在Calendar里的类型 继承Comparable是因为开始预留的接口是Comparable...
  * 
@@ -29,6 +33,11 @@ public class DateEnumerationParameter implements Comparable {
 
     public int compareTo(Object o) {
         throw new IllegalArgumentException("should not be here !");
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, TddlToStringStyle.DEFAULT_STYLE);
     }
 
 }

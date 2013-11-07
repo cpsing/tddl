@@ -1,8 +1,9 @@
 package com.taobao.tddl.config;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executor;
+
+import com.taobao.tddl.common.model.lifecycle.Lifecycle;
 
 /**
  * 获取配置的处理器
@@ -12,32 +13,11 @@ import java.util.concurrent.Executor;
  * @since 1.6
  * @date 2011-1-11上午11:22:29
  */
-public interface ConfigDataHandler {
+public interface ConfigDataHandler extends Lifecycle {
 
     public static final String FIRST_SERVER_STRATEGY            = "firstServer";
     public static final String FIRST_CACHE_THEN_SERVER_STRATEGY = "firstCache";
     public static final long   GET_DATA_TIMEOUT                 = 10 * 1000;
-
-    /**
-     * DefaultConfigDataHandler会在 实例化具体的Handler之后调用此方法 给予Handler相关信息
-     * 
-     * @param dataId 数据在配置平台上注册的id
-     * @param listenerList 数据监听器列表
-     * @param prop 全局配置和运行时
-     */
-    void init(String dataId, List<ConfigDataListener> listenerList, Map<String, Object> prop);
-
-    /**
-     * 允许指定initialData进行初始化
-     * 
-     * @param dataId
-     * @param configDataListenerList
-     * @param config
-     * @param unitName
-     * @param initialData
-     */
-    void init(final String dataId, final List<ConfigDataListener> configDataListenerList,
-              final Map<String, Object> config, String initialData);
 
     /**
      * 从配置中心拉取数据
@@ -73,8 +53,4 @@ public interface ConfigDataHandler {
      */
     void addListeners(List<ConfigDataListener> configDataListenerList, Executor executor);
 
-    /**
-     * 停止底层配置管理器
-     */
-    void closeUnderManager();
 }

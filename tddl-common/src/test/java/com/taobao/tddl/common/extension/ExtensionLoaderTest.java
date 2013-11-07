@@ -9,8 +9,8 @@ public class ExtensionLoaderTest {
 
     @Test
     public void testSimple() {
-        PluginService plugin = ExtensionLoader.load(PluginService.class);
-        Assert.assertEquals(plugin.getClass(), ExamplePlugin.class);
-        Assert.assertEquals(plugin.echo("hello"), "hello");
+        AbstractPluginService plugin = ExtensionLoader.load(AbstractPluginService.class);
+        Assert.assertEquals(plugin.getClass(), OrderedPlugin.class);
+        Assert.assertEquals(plugin.echo("hello"), "ordered : hello");
     }
 }

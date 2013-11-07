@@ -1,9 +1,10 @@
 package com.taobao.tddl.monitor.logger;
 
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.monitor.logger.log4j.DynamicLog4jLogger;
 import com.taobao.tddl.monitor.logger.logback.DynamicLogbackLogger;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 public class LoggerInit {
 
@@ -22,11 +23,32 @@ public class LoggerInit {
     public static final Logger TDDL_Snapshot_LOG            = LoggerFactory.getLogger("TDDL_Snapshot_LOG");
     public static final Logger logger                       = TDDL_LOG;                                             // Logger.getLogger(LoggerInit.class);
 
+    // tddl rule相关日志，需要独立出来，rule会被多个地方共享
+    public static final Logger DB_TAB_LOG                   = LoggerFactory.getLogger("DB_TAB_LOG");
+    public static final Logger VSLOT_LOG                    = LoggerFactory.getLogger("VSLOT_LOG");
+    public static final Logger DYNAMIC_RULE_LOG             = LoggerFactory.getLogger("DYNAMIC_RULE_LOG");
+
     static {
         initTddlLog();
     }
 
-    synchronized static public void initTddlLog() {
+    static public void initTddlLog() {
+        DynamicLogger dynamic = buildDynamic();
+
+        if (dynamic != null) {
+            dynamic.init();
+        }
+    }
+
+    static public void initRuleLog() {
+        DynamicLogger dynamic = buildDynamic();
+
+        if (dynamic != null) {
+            dynamic.initRule();
+        }
+    }
+
+    private synchronized static DynamicLogger buildDynamic() {
         DynamicLogger dynamic = null;
         String LOGBACK = "logback";
         String LOG4J = "log4j";
@@ -39,10 +61,7 @@ public class LoggerInit {
         } else {
             logger.warn("logger is not a log4j/logback instance, dynamic logger is disabled");
         }
-
-        if (dynamic != null) {
-            dynamic.init();
-        }
+        return dynamic;
     }
 
     private static boolean checkLogger(Logger logger, String name) {

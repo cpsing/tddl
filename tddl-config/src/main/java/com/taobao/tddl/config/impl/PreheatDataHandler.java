@@ -1,7 +1,6 @@
 package com.taobao.tddl.config.impl;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executor;
 
 import com.taobao.tddl.common.utils.TStringUtil;
@@ -23,27 +22,15 @@ public class PreheatDataHandler extends UnitConfigDataHandler {
     private UnitConfigDataHandler delagate;
     private String                dataId;
 
-    public PreheatDataHandler(){
-        delagate = loadHandlerExtension();
-    }
-
     @Override
-    public void init(String dataId, List<ConfigDataListener> listenerList, Map<String, Object> prop) {
-        this.dataId = dataId;
-
-        String initialData = null;
-        if (ConfigHolderFactory.isInit(delagate.getAppName())) {
-            initialData = ConfigHolderFactory.getConfigDataHolder(delagate.getAppName()).getData(dataId);
+    public void doInit() {
+        delagate = loadHandlerExtension();
+        // 做一下数据预热
+        if (delagate.initialData == null && ConfigHolderFactory.isInit(delagate.getAppName())) {
+            delagate.initialData = ConfigHolderFactory.getConfigDataHolder(delagate.getAppName()).getData(dataId);
         }
 
-        delagate.init(dataId, listenerList, prop, initialData);
-    }
-
-    @Override
-    public void init(String dataId, List<ConfigDataListener> configDataListenerList, Map<String, Object> config,
-                     String initialData) {
-        this.dataId = dataId;
-        delagate.init(dataId, configDataListenerList, config, initialData);
+        delagate.init();
     }
 
     @Override
@@ -79,9 +66,7 @@ public class PreheatDataHandler extends UnitConfigDataHandler {
 
     }
 
-    @Override
-    public void closeUnderManager() {
-        delagate.closeUnderManager();
+    protected void doDestory() {
+        delagate.destory();
     }
-
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="gb2312"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+   <bean id="vtabroot" class="com.taobao.tddl.interact.rule.VirtualTableRoot"
+      init-method="init">
+      <property name="dbType" value="MYSQL" />
+      <property name="defaultDbIndex" value="defaultDbName" />
+      <property name="tableRules">
+         <map>
+            <entry key="nserch" value-ref="nserch" />
+         </map>
+      </property>
+   </bean>
+
+   <bean id="nserch" class="com.taobao.tddl.interact.rule.TableRule">
+      <property name="tbRuleArray">
+         <value>"nserch_"+week(#gmt_create,1_date,7#)%7+"_"+Math.abs(#message_id,24#.hashCode()%24)</value>
+      </property>
+      <property name="dbRuleArray">
+          <value>"NSEARCH_GROUP_"+(Math.abs(#message_id,3#.hashCode() % 4)+1)</value>
+       </property>
+   </bean>
+</beans>
