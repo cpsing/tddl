@@ -19,7 +19,7 @@ import com.taobao.tddl.rule.model.MatcherResult;
 import com.taobao.tddl.rule.model.TargetDB;
 import com.taobao.tddl.rule.utils.ComparativeStringAnalyser;
 
-public class RemoteRuleTest extends BaseRuleTest {
+public class RemoteRuleIntegration extends BaseRuleTest {
 
     static TddlRule rule;
 
@@ -82,7 +82,7 @@ public class RemoteRuleTest extends BaseRuleTest {
 
         try {
             List<TargetDB> db = null;
-            MatcherResult result = rule.routeMverAndCompare(SqlType.SELECT,
+            MatcherResult result = rule.routeMverAndCompare(SqlType.INSERT,
                 "nserch",
                 new Choicer(ComparativeStringAnalyser.decodeComparativeString2Map(conditionStr)),
                 Lists.newArrayList());

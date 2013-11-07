@@ -1,5 +1,6 @@
 package com.taobao.tddl.rule;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -8,9 +9,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.SystemUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractXmlApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -35,9 +40,9 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  * @author jianghang 2013-11-5 下午3:34:36
  * @since 5.1.0
  */
-public class TddlTableRuleConfig extends AbstractLifecycle implements Lifecycle {
+public class TddlRuleConfig extends AbstractLifecycle implements Lifecycle {
 
-    protected static final Logger                               logger                       = LoggerFactory.getLogger(TddlTableRuleConfig.class);
+    protected static final Logger                               logger                       = LoggerFactory.getLogger(TddlRuleConfig.class);
     private static final int                                    TIMEOUT                      = 10 * 1000;
     private static final String                                 ROOT_BEAN_NAME               = "vtabroot";
     private static final String                                 TDDL_RULE_LE_PREFIX          = "com.taobao.tddl.rule.le.";
@@ -60,19 +65,21 @@ public class TddlTableRuleConfig extends AbstractLifecycle implements Lifecycle 
     /**
      * key = 0(old),1(new),2,3,4... value= version
      */
-    protected volatile Map<String, VirtualTableRoot>            vtrs                         = Maps.newLinkedHashMap();
-    protected volatile Map<String, String>                      ruleStrs                     = Maps.newHashMap();
-    protected volatile Map<Integer, String>                     versionIndex                 = Maps.newHashMap();
+    private volatile Map<String, VirtualTableRoot>              vtrs                         = Maps.newLinkedHashMap();
+    private volatile Map<String, String>                        ruleStrs                     = Maps.newHashMap();
+    private volatile Map<Integer, String>                       versionIndex                 = Maps.newHashMap();
     private volatile Map<String, AbstractXmlApplicationContext> oldCtxs                      = Maps.newHashMap();
 
     private ClassLoader                                         outerClassLoader             = null;
+    // 是否兼容历史老的rule，主要是tdd5代码修改过类的全路径，针对tddl3之前的rule需要考虑做兼容处理
+    private boolean                                             compatibleOldRule            = true;
 
     public void doInit() {
         if (appRuleFile != null) { // 如果存在本地规则
             String[] rulePaths = appRuleFile.split(";");
             if (rulePaths.length == 1 && !rulePaths[0].matches("^V[0-9]*#.+$")) {
                 // 本地文件单版本规则
-                ApplicationContext ctx = buildRuleByFile(appRuleFile);
+                ApplicationContext ctx = buildRuleByFile(NO_VERSION_NAME, appRuleFile);
                 vtrs.put(NO_VERSION_NAME, (VirtualTableRoot) ctx.getBean(ROOT_BEAN_NAME));
             } else {
                 // 本地文件存在多版本规则
@@ -88,18 +95,17 @@ public class TddlTableRuleConfig extends AbstractLifecycle implements Lifecycle 
                 for (int i = 0; i < rulePaths.length; i++) {
                     String rulePath = rulePaths[i];
                     String[] temp = rulePath.split("#");
-                    ApplicationContext ctx = buildRuleByFile(temp[1]);
+                    ApplicationContext ctx = buildRuleByFile(temp[0], temp[1]);
                     vtrs.put(temp[0], (VirtualTableRoot) ctx.getBean(ROOT_BEAN_NAME));
                 }
             }
         } else if (appRuleString != null) { // 直接设置了规则字符串
-            ApplicationContext ctx = buildRuleByStr(appRuleString);
+            ApplicationContext ctx = buildRuleByStr(NO_VERSION_NAME, appRuleString);
             vtrs.put(NO_VERSION_NAME, (VirtualTableRoot) ctx.getBean(ROOT_BEAN_NAME));
-            ruleStrs.put(NO_VERSION_NAME, appRuleString);
         } else if (appName != null) { // 使用动态rule配置
             String versionsDataId = getVersionsDataId(appName);
             if (cdhf == null) {
-                cdhf = new UnitConfigDataHandlerFactory(appName, unitName);
+                cdhf = new UnitConfigDataHandlerFactory(unitName, appName);
             }
             versionHandler = cdhf.getConfigDataHandler(versionsDataId, new VersionsConfigListener());
             String versionData = versionHandler.getData(TIMEOUT, ConfigDataHandler.FIRST_CACHE_THEN_SERVER_STRATEGY);
@@ -176,18 +182,18 @@ public class TddlTableRuleConfig extends AbstractLifecycle implements Lifecycle 
      * 初始化某个版本的rule
      */
     private synchronized boolean initVersionRule(String data, String version) {
+        if (version == null) {
+            version = NO_VERSION_NAME;
+        }
+
         ApplicationContext ctx = null;
         try {
             // this rule may be wrong rule,don't throw it but log it,
             // and will not change the vtr!
-            ctx = buildRuleByStr(data);
+            ctx = buildRuleByStr(version, data);
         } catch (Exception e) {
             logger.error("init rule error,rule str is:" + data, e);
             return false;
-        }
-
-        if (version == null) {
-            version = NO_VERSION_NAME;
         }
 
         VirtualTableRoot tempvtr = (VirtualTableRoot) ctx.getBean(ROOT_BEAN_NAME);
@@ -227,9 +233,8 @@ public class TddlTableRuleConfig extends AbstractLifecycle implements Lifecycle 
                 return true;
             }
         } catch (Exception e) {
+            ruleHandler.destory();
             logger.error("get diamond data error!", e);
-        } finally {
-            ruleHandler.closeUnderManager();
         }
 
         return false;
@@ -240,11 +245,11 @@ public class TddlTableRuleConfig extends AbstractLifecycle implements Lifecycle 
      */
     public void doDestory() {
         if (versionHandler != null) {
-            versionHandler.closeUnderManager();
+            versionHandler.destory();
         }
 
         for (ConfigDataHandler ruleListener : this.ruleHandlers.values()) {
-            ruleListener.closeUnderManager();
+            ruleListener.destory();
         }
     }
 
@@ -256,18 +261,14 @@ public class TddlTableRuleConfig extends AbstractLifecycle implements Lifecycle 
      * @param file
      * @return
      */
-    private ApplicationContext buildRuleByFile(String file) {
-        ApplicationContext ctx = new ClassPathXmlApplicationContext(file) {
-
-            public ClassLoader getClassLoader() {
-                if (outerClassLoader == null) {
-                    return super.getClassLoader();
-                } else {
-                    return outerClassLoader;
-                }
-            }
-        };
-        return ctx;
+    private ApplicationContext buildRuleByFile(String version, String file) {
+        try {
+            Resource resource = new PathMatchingResourcePatternResolver().getResource(file);
+            String ruleStr = StringUtils.join(IOUtils.readLines(resource.getInputStream()), SystemUtils.LINE_SEPARATOR);
+            return buildRuleByStr(ruleStr, version);
+        } catch (IOException e) {
+            throw new TddlRuleException(e);
+        }
     }
 
     /**
@@ -276,8 +277,13 @@ public class TddlTableRuleConfig extends AbstractLifecycle implements Lifecycle 
      * @param data
      * @return
      */
-    private ApplicationContext buildRuleByStr(String data) {
-        return new StringXmlApplicationContext(data, outerClassLoader);
+    private ApplicationContext buildRuleByStr(String version, String data) {
+        if (compatibleOldRule) {
+            data = RuleCompatibleHelper.compatibleRule(data);
+        }
+        ApplicationContext applicationContext = new StringXmlApplicationContext(data, outerClassLoader);
+        ruleStrs.put(version, data); // 记录一下
+        return applicationContext;
     }
 
     private String getCurrentRuleStr() {
@@ -384,7 +390,7 @@ public class TddlTableRuleConfig extends AbstractLifecycle implements Lifecycle 
                 // 清理
                 for (String version : needRemove) {
                     ConfigDataHandler handler = ruleHandlers.get(version);
-                    handler.closeUnderManager();
+                    handler.destory();
                     ruleHandlers.remove(version);
                     vtrs.remove(version);
                     ruleStrs.remove(version);
@@ -463,6 +469,10 @@ public class TddlTableRuleConfig extends AbstractLifecycle implements Lifecycle 
 
     public void setUnitName(String unitName) {
         this.unitName = unitName;
+    }
+
+    public void setCompatibleOldRule(boolean compatibleOldRule) {
+        this.compatibleOldRule = compatibleOldRule;
     }
 
 }

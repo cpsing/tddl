@@ -40,7 +40,7 @@ import com.taobao.tddl.rule.utils.MatchResultCompare;
  * @author jianghang 2013-11-5 下午8:11:43
  * @since 5.1.0
  */
-public class TddlRule extends TddlTableRuleConfig implements TddlTableRule {
+public class TddlRule extends TddlRuleConfig implements TddlTableRule {
 
     private VirtualTableRuleMatcher matcher = new VirtualTableRuleMatcher();
 
@@ -77,17 +77,17 @@ public class TddlRule extends TddlTableRuleConfig implements TddlTableRule {
 
     public MatcherResult routeMverAndCompare(SqlType sqlType, String vtab, ComparativeMapChoicer choicer,
                                              List<Object> args) throws RouteCompareDiffException {
-        if (this.vtrs.size() == 0) {
+        if (super.getAllVersions().size() == 0) {
             throw new RuntimeException("routeWithMulVersion method just support multy version rule,use route method instead or config with multy version style!");
         }
 
         // 如果只有单套规则,直接返回这套规则的路由结果
-        if (this.vtrs.size() == 1) {
+        if (super.getAllVersions().size() == 1) {
             return route(vtab, choicer, args, super.getCurrentRule());
         }
 
         // 如果不止一套规则,那么计算两套规则,默认都返回新规则
-        if (this.vtrs.size() != 2 || this.versionIndex.size() != 2) {
+        if (super.getAllVersions().size() != 2) {
             throw new RuntimeException("not support more than 2 copy rule compare");
         }
 
@@ -97,7 +97,7 @@ public class TddlRule extends TddlTableRuleConfig implements TddlTableRule {
             return oldResult;
         } else {
             // 第二个排位的为新规则
-            MatcherResult newResult = route(vtab, choicer, args, super.getVersionRule(versionIndex.get(1)));
+            MatcherResult newResult = route(vtab, choicer, args, super.getVersionRule(super.getAllVersions().get(1)));
             boolean compareResult = MatchResultCompare.matchResultCompare(newResult, oldResult);
             if (compareResult) {
                 return oldResult;

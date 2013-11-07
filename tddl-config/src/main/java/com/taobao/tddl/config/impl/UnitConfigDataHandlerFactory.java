@@ -47,21 +47,20 @@ public class UnitConfigDataHandlerFactory implements ConfigDataHandlerFactory {
     public ConfigDataHandler getConfigDataHandler(String dataId, ConfigDataListener configDataListener) {
         List<ConfigDataListener> configDataListenerList = new ArrayList<ConfigDataListener>();
         configDataListenerList.add(configDataListener);
-        return this.getConfigDataHandler(dataId,
-            configDataListenerList,
-            null,
-            new HashMap<String, Object>());
+        return this.getConfigDataHandler(dataId, configDataListenerList, null, new HashMap<String, Object>());
     }
 
     @Override
-    public ConfigDataHandler getConfigDataHandler(String dataId,
-                                                                List<ConfigDataListener> configDataListenerList,
-                                                                Executor executor, Map<String, Object> config) {
+    public ConfigDataHandler getConfigDataHandler(String dataId, List<ConfigDataListener> configDataListenerList,
+                                                  Executor executor, Map<String, Object> config) {
         // 获取config data handler的扩展实现
         PreheatDataHandler instance = new PreheatDataHandler();
-        instance.setAppName(appName);
         instance.setUnitName(unitName);
-        instance.init(dataId, clearNullListener(configDataListenerList), config);
+        instance.setAppName(appName);
+        instance.setDataId(dataId);
+        instance.setListeners(clearNullListener(configDataListenerList));
+        instance.setConfig(config);
+        instance.init(); // 启动
         return instance;
     }
 
