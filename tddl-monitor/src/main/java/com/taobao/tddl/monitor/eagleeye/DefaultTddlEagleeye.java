@@ -28,4 +28,10 @@ public class DefaultTddlEagleeye implements TddlEagleeye {
 
     }
 
+    @Override
+    public String getUserData(String key) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }
