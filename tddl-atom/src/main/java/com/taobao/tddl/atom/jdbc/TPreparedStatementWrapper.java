@@ -59,7 +59,8 @@ public class TPreparedStatementWrapper extends TStatementWrapper implements TPre
     }
 
     public ResultSet executeQuery() throws SQLException {
-        if (sqlMetaData == null) throw new NullPointerException("miss sql meta data.");
+        // if (sqlMetaData == null) throw new
+        // NullPointerException("miss sql meta data.");
         ensureResultSetIsEmpty();
         recordReadTimes();
         increaseConcurrentRead();
@@ -81,7 +82,8 @@ public class TPreparedStatementWrapper extends TStatementWrapper implements TPre
     }
 
     public int executeUpdate() throws SQLException {
-        if (sqlMetaData == null) throw new NullPointerException("miss sql meta data.");
+        // if (sqlMetaData == null) throw new
+        // NullPointerException("miss sql meta data.");
         ensureResultSetIsEmpty();
         recordWriteTimes();
         increaseConcurrentWrite();
