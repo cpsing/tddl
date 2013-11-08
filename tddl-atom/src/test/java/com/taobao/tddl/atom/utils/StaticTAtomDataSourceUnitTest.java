@@ -1,7 +1,6 @@
 package com.taobao.tddl.atom.utils;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 

@@ -24,4 +24,7 @@ public class NotSupportException extends TddlRuntimeException {
         super(cause);
     }
 
+    public NotSupportException(){
+        super("not support yet!");
+    }
 }

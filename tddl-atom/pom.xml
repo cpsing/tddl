@@ -32,13 +32,12 @@
 			<groupId>com.alibaba</groupId>
 			<artifactId>druid</artifactId>
 		</dependency>
+		<!-- Test -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
-		<!-- Test -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -60,6 +59,5 @@
 			<artifactId>spring-jdbc</artifactId>
 			<scope>test</scope>
 		</dependency>
-					
 	</dependencies>
 </project>
