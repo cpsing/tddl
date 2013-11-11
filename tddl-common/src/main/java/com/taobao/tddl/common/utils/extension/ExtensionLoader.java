@@ -54,47 +54,34 @@ public class ExtensionLoader<S> {
         return loadFile(service, findClassLoader());
     }
 
+    /**
+     * 获取所有的扩展类，按照{@linkplain Activate}定义的order顺序进行排序
+     * 
+     * @return
+     */
+    public static <S> List<Class> getAllExtendsionClass(Class<S> service) {
+        return findAllExtensionClass(service, findClassLoader());
+    }
+
+    /**
+     * 获取所有的扩展类，按照{@linkplain Activate}定义的order顺序进行排序
+     * 
+     * @return
+     */
+    public static <S> List<Class> getAllExtendsionClass(Class<S> service, ClassLoader loader) {
+        return findAllExtensionClass(service, loader);
+    }
+
     private static <S> S loadFile(Class<S> service, ClassLoader loader) {
         Class<?> extension = providers.get(service);
         if (extension == null) {
             synchronized (service) {
                 extension = providers.get(service);
                 if (extension == null) {
-                    List<Class> extensions = Lists.newArrayList();
-                    try {
-                        loadFile(service, SERVICES_DIRECTORY, loader, extensions);
-                        loadFile(service, TDDL_DIRECTORY, loader, extensions);
-                    } catch (IOException e) {
-                        throw new ExtensionNotFoundException("not found service provider for : " + service.getName()
-                                                             + " caused by " + ExceptionUtils.getFullStackTrace(e));
-                    }
-
+                    List<Class> extensions = findAllExtensionClass(service, loader);
                     if (extensions.isEmpty()) {
                         throw new ExtensionNotFoundException("not found service provider for : " + service.getName());
                     }
-
-                    // 做一下排序
-                    Collections.sort(extensions, new Comparator<Class>() {
-
-                        public int compare(Class c1, Class c2) {
-                            Integer o1 = 0;
-                            Integer o2 = 0;
-                            Activate a1 = (Activate) c1.getAnnotation(Activate.class);
-                            Activate a2 = (Activate) c2.getAnnotation(Activate.class);
-
-                            if (a1 != null) {
-                                o1 = a1.order();
-                            }
-
-                            if (a2 != null) {
-                                o2 = a2.order();
-                            }
-
-                            return o1.compareTo(o2);
-
-                        }
-                    });
-
                     extension = extensions.get(extensions.size() - 1);// 最大的一个
                 }
             }
@@ -109,6 +96,44 @@ public class ExtensionLoader<S> {
             throw new ExtensionNotFoundException("not found service provider for : " + service.getName()
                                                  + " caused by " + ExceptionUtils.getFullStackTrace(e));
         }
+    }
+
+    private static <S> List<Class> findAllExtensionClass(Class<S> service, ClassLoader loader) {
+        List<Class> extensions = Lists.newArrayList();
+        try {
+            loadFile(service, SERVICES_DIRECTORY, loader, extensions);
+            loadFile(service, TDDL_DIRECTORY, loader, extensions);
+        } catch (IOException e) {
+            throw new ExtensionNotFoundException("not found service provider for : " + service.getName()
+                                                 + " caused by " + ExceptionUtils.getFullStackTrace(e));
+        }
+
+        if (extensions.isEmpty()) {
+            return extensions;
+        }
+
+        // 做一下排序
+        Collections.sort(extensions, new Comparator<Class>() {
+
+            public int compare(Class c1, Class c2) {
+                Integer o1 = 0;
+                Integer o2 = 0;
+                Activate a1 = (Activate) c1.getAnnotation(Activate.class);
+                Activate a2 = (Activate) c2.getAnnotation(Activate.class);
+
+                if (a1 != null) {
+                    o1 = a1.order();
+                }
+
+                if (a2 != null) {
+                    o2 = a2.order();
+                }
+
+                return o1.compareTo(o2);
+
+            }
+        });
+        return extensions;
     }
 
     private static void loadFile(Class<?> service, String dir, ClassLoader classLoader, List<Class> extensions)

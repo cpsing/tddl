@@ -2,6 +2,7 @@ package com.taobao.tddl.monitor.eagleeye;
 
 import com.taobao.tddl.common.model.SqlMetaData;
 import com.taobao.tddl.common.utils.extension.ExtensionLoader;
+import com.taobao.tddl.monitor.eagleeye.TddlEagleeye;
 
 /**
  * @author mengshi.sunmengshi
@@ -44,7 +45,10 @@ public class EagleeyeHelper {
      */
     public static void endRpc(SqlMetaData sqlMetaData, Exception e) {
         eagleeye.endRpc(sqlMetaData, e);
+    }
 
+    public static String getUserData(String key) {
+        return eagleeye.getUserData(key);
     }
 
 }

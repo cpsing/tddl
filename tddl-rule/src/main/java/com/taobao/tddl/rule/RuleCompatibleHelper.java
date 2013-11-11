@@ -3,9 +3,8 @@ package com.taobao.tddl.rule;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * 做一下老的rule兼容处理
+ * 做一下老的rule兼容处理，tddl5版本类名做了下统一调整，所以以前配置中使用的一下类名已经不存在，需要做转换
  * 
- * @author <a href="junyu@taobao.com">junyu</a>
  * @author <a href="jianghang.loujh@taobao.com">jianghang</a>
  * @since 5.1.0
  */
