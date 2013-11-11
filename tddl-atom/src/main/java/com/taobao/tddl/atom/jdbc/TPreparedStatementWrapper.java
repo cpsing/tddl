@@ -22,7 +22,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 
-import com.taobao.tddl.common.utils.jdbc.SqlTypeParser;
+import com.taobao.tddl.common.jdbc.SqlTypeParser;
 import com.taobao.tddl.monitor.unit.UnitDeployProtect;
 
 /**

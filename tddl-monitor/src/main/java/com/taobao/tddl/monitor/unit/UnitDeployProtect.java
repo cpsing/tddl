@@ -8,9 +8,9 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ThreadLocalString;
 import com.taobao.tddl.common.utils.TStringUtil;
-import com.taobao.tddl.common.utils.jdbc.ParameterContext;
 import com.taobao.tddl.common.utils.thread.ThreadLocalMap;
 
 /**

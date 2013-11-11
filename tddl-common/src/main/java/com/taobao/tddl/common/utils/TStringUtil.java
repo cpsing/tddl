@@ -342,4 +342,66 @@ public class TStringUtil extends StringUtils {
 
         return buf.toString();
     }
+
+    /**
+     * 去除第一个start,end之间的字符串，包括start,end本身
+     * 
+     * @param sql
+     * @param start
+     * @param end
+     * @return
+     */
+    public static String removeBetweenWithSplitor(String sql, String start, String end) {
+        int index0 = sql.indexOf(start);
+        if (index0 == -1) {
+            return sql;
+        }
+        int index1 = sql.indexOf(end, index0);
+        if (index1 == -1) {
+            return sql;
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(sql.substring(0, index0));
+        sb.append(" ");
+        sb.append(sql.substring(index1 + end.length()));
+        return sb.toString();
+    }
+
+    public static String removeBetweenWithSplitorNotExistNull(String sql, String start, String end) {
+        int index0 = sql.indexOf(start);
+        if (index0 == -1) {
+            return null;
+        }
+        int index1 = sql.indexOf(end, index0);
+        if (index1 == -1) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(sql.substring(0, index0));
+        sb.append(" ");
+        sb.append(sql.substring(index1 + end.length()));
+        return sb.toString();
+    }
+
+    /**
+     * 简单地检查是否是逻辑表与具体子表的关系。子表名满足父表名+"_数字";
+     * 
+     * @param fatherTable
+     * @param sonTable
+     * @return
+     */
+    public static boolean isTableFatherAndSon(String fatherTable, String sonTable) {
+        if (fatherTable == null || fatherTable.trim().isEmpty() || sonTable == null || sonTable.trim().isEmpty()) {
+            return false;
+        }
+        if (!sonTable.startsWith(fatherTable) || fatherTable.length() + 2 > sonTable.length()) {
+            return false;
+        }
+        String suffix = sonTable.substring(fatherTable.length());
+        if (suffix.matches("_[\\d]+")) {
+            return true;
+        }
+        return false;
+
+    }
 }

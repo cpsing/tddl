@@ -17,5 +17,23 @@
 			<artifactId>tddl-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>tddl-config</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>tddl-monitor</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+				<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>tddl-atom</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

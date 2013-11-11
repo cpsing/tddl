@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.utils.jdbc;
+package com.taobao.tddl.common.jdbc;
 
 /**
  * 参数上下文

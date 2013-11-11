@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Random;
 
 import com.taobao.tddl.common.utils.RuntimeConfigHolder;
-
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 

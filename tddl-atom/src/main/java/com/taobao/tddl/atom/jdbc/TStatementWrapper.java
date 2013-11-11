@@ -7,8 +7,8 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 
 import com.taobao.tddl.atom.TAtomDbStatusEnum;
+import com.taobao.tddl.common.jdbc.SqlTypeParser;
 import com.taobao.tddl.common.model.SqlMetaData;
-import com.taobao.tddl.common.utils.jdbc.SqlTypeParser;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.monitor.Monitor;
