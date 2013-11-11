@@ -699,7 +699,7 @@ public class ConfigManager {
         // 关闭global datasource handler
         try {
             if (globalHandler != null) {
-                globalHandler.closeUnderManager();
+                globalHandler.destory();
             }
         } catch (Exception e) {
             logger.error("we got exception when close datasource .", e);
@@ -707,7 +707,7 @@ public class ConfigManager {
         // 关闭extraDataSource handler.
         try {
             if (extraHandler != null) {
-                extraHandler.closeUnderManager();
+                extraHandler.destory();
             }
         } catch (Exception e) {
             logger.error("we got exception when close datasource .", e);
