@@ -22,5 +22,7 @@
 			<groupId>com.taobao.diamond</groupId>
 			<artifactId>diamond-client</artifactId>
 		</dependency>
+		
+
 	</dependencies>
 </project>

@@ -6,7 +6,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author jiechen.qzm
+ * @author mengshi.sunmengshi 2013-11-12 下午5:16:49
+ * @since 5.1.0
  */
 public class GroupExtraConfig {
 

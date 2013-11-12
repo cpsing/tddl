@@ -11,20 +11,16 @@ import com.taobao.diamond.client.impl.DiamondUnitSite;
 import com.taobao.diamond.domain.ConfigInfoEx;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.extension.Activate;
-import com.taobao.tddl.config.impl.holder.AbstractConfigDataHolder;
-import com.taobao.tddl.config.impl.holder.ConfigDataHolder;
-
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
+import com.taobao.tddl.config.impl.holder.AbstractConfigDataHolder;
 
 @Activate(order = 1)
 public class DiamondConfigHolder extends AbstractConfigDataHolder {
 
-    private static final Logger   log                 = LoggerFactory.getLogger(DiamondConfigHolder.class);
+    private static final Logger   log         = LoggerFactory.getLogger(DiamondConfigHolder.class);
 
-    protected ConfigDataHolder    sonConfigDataHolder = null;
-
-    protected Map<String, String> configHouse         = new HashMap<String, String>();
+    protected Map<String, String> configHouse = new HashMap<String, String>();
 
     public void doInit() {
 

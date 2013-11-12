@@ -8,7 +8,9 @@ import com.taobao.tddl.common.utils.extension.ExtensionLoader;
 
 public abstract class AbstractConfigDataHolder extends AbstractLifecycle implements ConfigDataHolder {
 
-    AbstractConfigDataHolder delegateDataHolder = null;
+    AbstractConfigDataHolder   delegateDataHolder  = null;
+
+    protected ConfigDataHolder sonConfigDataHolder = null;
 
     protected void loadDelegateExtension() {
         this.delegateDataHolder = ExtensionLoader.load(AbstractConfigDataHolder.class);

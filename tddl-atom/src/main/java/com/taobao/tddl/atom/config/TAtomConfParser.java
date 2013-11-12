@@ -177,7 +177,7 @@ public class TAtomConfParser {
         return passwd;
     }
 
-    private static Properties parserConfStr2Properties(String data) {
+    public static Properties parserConfStr2Properties(String data) {
         Properties prop = new Properties();
         if (TStringUtil.isNotBlank(data)) {
             ByteArrayInputStream byteArrayInputStream = null;
