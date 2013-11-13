@@ -8,7 +8,7 @@ public class ConfigDataHandlerCity {
         if (appName == null || appName.trim().isEmpty()) {
             return getSimpleFactory();
         }
-        return getPreHeatFactory(unitName, appName);
+        return getPreHeatFactory(appName, unitName);
     }
 
     public static ConfigDataHandlerFactory getSimpleFactory() {

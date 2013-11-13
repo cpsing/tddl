@@ -48,8 +48,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
-			<dependency>
+		<dependency>
 			<groupId>org.apache.ibatis</groupId>
 			<artifactId>ibatis-sqlmap</artifactId>
 			<scope>test</scope>
@@ -57,6 +56,12 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
