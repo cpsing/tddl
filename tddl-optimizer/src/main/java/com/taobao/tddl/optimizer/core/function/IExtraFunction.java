@@ -111,6 +111,13 @@ public interface IExtraFunction {
     public DATA_TYPE getMapReturnType(IFunction f);
 
     /**
+     * 如果可以用db的函数，那就直接使用
+     * 
+     * @param function
+     */
+    public String getDbFunction(IFunction func);
+
+    /**
      * 清除函数计算的中间结果，group by时使用
      */
     void clear();

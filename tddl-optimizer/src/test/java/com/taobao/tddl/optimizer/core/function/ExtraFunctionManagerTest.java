@@ -3,7 +3,6 @@ package com.taobao.tddl.optimizer.core.function;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.taobao.tddl.optimizer.core.function.ExtraFunctionManager;
 import com.taobao.tddl.optimizer.core.function.aggregate.Sum;
 
 /**

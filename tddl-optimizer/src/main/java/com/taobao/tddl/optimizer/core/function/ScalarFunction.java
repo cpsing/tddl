@@ -53,5 +53,9 @@ public abstract class ScalarFunction implements IExtraFunction {
         result = null;
     }
 
+    public String getDbFunction(IFunction func) {
+        return func.getColumnName();
+    }
+
     public abstract void compute(Object[] args, IFunction f) throws FunctionException;
 }

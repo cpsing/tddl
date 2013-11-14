@@ -2,8 +2,9 @@ package com.taobao.tddl.optimizer.core.ast;
 
 import java.util.Map;
 
-import com.taobao.tddl.common.utils.jdbc.ParameterContext;
+import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
+import com.taobao.tddl.optimizer.exceptions.QueryException;
 
 /**
  * 可优化的语法树
@@ -11,7 +12,7 @@ import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
  * @author jianghang 2013-11-8 下午2:30:25
  * @since 5.1.0
  */
-public abstract class CanOptimizedNode<RT extends CanOptimizedNode> {
+public abstract class ASTNode<RT extends ASTNode> {
 
     protected String dataNode = null;
     protected Object extra;
@@ -23,7 +24,7 @@ public abstract class CanOptimizedNode<RT extends CanOptimizedNode> {
     /**
      * 构造执行计划
      */
-    public abstract IDataNodeExecutor toDataNodeExecutor();
+    public abstract IDataNodeExecutor toDataNodeExecutor() throws QueryException;
 
     public abstract void assignment(Map<Integer, ParameterContext> parameterSettings);
 
@@ -62,4 +63,5 @@ public abstract class CanOptimizedNode<RT extends CanOptimizedNode> {
     public abstract RT deepCopy();
 
     public abstract RT copy();
+
 }

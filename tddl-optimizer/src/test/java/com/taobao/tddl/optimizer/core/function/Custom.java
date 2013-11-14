@@ -65,4 +65,8 @@ public class Custom implements IExtraFunction {
 
     }
 
+    public String getDbFunction(IFunction func) {
+        return null;
+    }
+
 }

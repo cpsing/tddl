@@ -3,7 +3,13 @@ package com.taobao.tddl.optimizer.core.expression;
 import java.util.List;
 
 /**
- * boolean filter . BooleanFilter represent boolean operation .ex. Column > 100
+ * boolean filter.
+ * 
+ * <pre>
+ * 例子：
+ * a. column > 100
+ * b. count(id) > 100
+ * </pre>
  * 
  * @author jianxing <jianxing.qx@taobao.com>
  * @author whisper
@@ -20,10 +26,13 @@ public interface IBooleanFilter extends IFilter<IBooleanFilter> {
 
     public Comparable getValue();
 
+    public IBooleanFilter setValue(Comparable value);
+
+    /**
+     * 多个value，出现id in ()
+     */
     public List<Comparable> getValues();
 
     public IBooleanFilter setValues(List<Comparable> values);
-
-    public IBooleanFilter setValue(Comparable value);
 
 }

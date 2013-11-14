@@ -40,7 +40,11 @@ public enum SqlType {
     /** */
     EXPLAIN(16),
     /** */
-    DEFAULT_SQL_TYPE(-100);
+    DEFAULT_SQL_TYPE(-100),
+    /** */
+    SHOW_WITH_TABLE(101),
+    /** */
+    SHOW_WITHOUT_TABLE(102);
 
     private int i;
 

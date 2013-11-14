@@ -49,7 +49,7 @@ public class Min extends AggregateFunction {
 
     public Map<String, Object> getResult(IFunction f) {
         Map<String, Object> resMap = new HashMap<String, Object>();
-        resMap.put(f.getName(), min);
+        resMap.put(f.getColumnName(), min);
         return resMap;
     }
 

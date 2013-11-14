@@ -2,7 +2,7 @@ package com.taobao.tddl.optimizer.core.plan;
 
 import java.util.Map;
 
-import com.taobao.tddl.common.utils.jdbc.ParameterContext;
+import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.optimizer.core.CanVisit;
 
 /**

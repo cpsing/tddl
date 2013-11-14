@@ -35,6 +35,10 @@ public interface IFunction<RT extends IFunction> extends ISelectable<RT> {
 
     public FunctionType getFunctionType();
 
+    public String getFunctionName();
+
+    public IFunction setFunctionName(String funcName);
+
     // TODO 不知道这些参数怎么用，做到后面查询树构造再来看看
     public List getMapArgs();
 
@@ -50,7 +54,7 @@ public interface IFunction<RT extends IFunction> extends ISelectable<RT> {
 
     public boolean isNeedDistinctArg();
 
-    public void setNeedDistinctArg(boolean b);
+    public RT setNeedDistinctArg(boolean b);
 
     /**
      * 清除函数计算的中间结果，group by时使用

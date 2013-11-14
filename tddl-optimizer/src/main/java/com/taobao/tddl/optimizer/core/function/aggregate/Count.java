@@ -35,7 +35,7 @@ public class Count extends AggregateFunction {
 
     public Map<String, Object> getResult(IFunction f) {
         Map<String, Object> resMap = new HashMap<String, Object>();
-        resMap.put(f.getName(), count);
+        resMap.put(f.getColumnName(), count);
         return resMap;
     }
 

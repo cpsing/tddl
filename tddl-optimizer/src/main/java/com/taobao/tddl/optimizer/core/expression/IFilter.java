@@ -1,6 +1,5 @@
 package com.taobao.tddl.optimizer.core.expression;
 
-
 /**
  * 条件表达式
  * 
@@ -71,7 +70,7 @@ public interface IFilter<RT extends IFilter> extends IFunction<RT> {
         }
     }
 
-    public IFilter setOperation(OPERATION operation);
+    public RT setOperation(OPERATION operation);
 
     public OPERATION getOperation();
 

@@ -1,39 +1,63 @@
 package com.taobao.tddl.optimizer.core.ast.dml;
 
-import java.util.Map;
-
-import com.taobao.tddl.common.utils.jdbc.ParameterContext;
+import com.taobao.tddl.optimizer.config.table.TableMeta;
+import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.DMLNode;
+import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
+import com.taobao.tddl.optimizer.core.plan.dml.IInsert;
 
 public class InsertNode extends DMLNode<InsertNode> {
 
-    public void build() {
+    private boolean createPk = true; // 是否为自增长字段
 
+    public InsertNode(TableNode qtn){
+        super(qtn);
+    }
+
+    public TableNode getQueryTreeNode() {
+        return (TableNode) this.qtn;
+    }
+
+    public TableMeta getTableMeta() {
+        return this.getQueryTreeNode().getTableMeta();
     }
 
     public IDataNodeExecutor toDataNodeExecutor() {
-        return null;
-    }
-
-    public void assignment(Map<Integer, ParameterContext> parameterSettings) {
-
-    }
-
-    public boolean isNeedBuild() {
-        return false;
-    }
-
-    public String toString(int inden) {
-        return null;
+        IInsert insert = ASTNodeFactory.getInstance().createInsert();
+        // TODO
+        // insert.setDbName(this.getNode().getDbName());
+        // insert.setIndexName((this.getNode()).getIndexUsed().getName());
+        //
+        // insert.setConsistent(true);
+        // insert.setUpdateColumns(this.getColumns());
+        // insert.setUpdateValues(this.getValues());
+        // insert.executeOn(this.getDataNode());
+        //
+        return insert;
     }
 
     public InsertNode deepCopy() {
-        return null;
+        InsertNode insert = new InsertNode(null);
+        super.deepCopySelfTo(insert);
+        insert.setCreatePk(this.isCreatePk());
+        return insert;
     }
 
     public InsertNode copy() {
-        return null;
+        InsertNode insert = new InsertNode(null);
+        super.copySelfTo(insert);
+        insert.setCreatePk(this.isCreatePk());
+        return insert;
+    }
+
+    public boolean isCreatePk() {
+        return createPk;
+    }
+
+    public InsertNode setCreatePk(boolean createPk) {
+        this.createPk = createPk;
+        return this;
     }
 
 }

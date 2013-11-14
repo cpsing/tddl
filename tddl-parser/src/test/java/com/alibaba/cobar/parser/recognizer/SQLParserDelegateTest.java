@@ -20,7 +20,7 @@ package com.alibaba.cobar.parser.recognizer;
 
 import java.sql.SQLSyntaxErrorException;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import com.alibaba.cobar.parser.ast.stmt.SQLStatement;
 import com.alibaba.cobar.parser.ast.stmt.dml.DMLSelectStatement;

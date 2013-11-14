@@ -18,7 +18,7 @@
  */
 package com.alibaba.cobar.parser.recognizer.mysql.syntax;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import com.alibaba.cobar.parser.ast.stmt.SQLStatement;
 import com.alibaba.cobar.parser.ast.stmt.dal.DALSetCharacterSetStatement;

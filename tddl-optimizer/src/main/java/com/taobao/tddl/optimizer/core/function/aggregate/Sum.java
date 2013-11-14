@@ -71,7 +71,7 @@ public class Sum extends AggregateFunction {
 
     public Map<String, Object> getResult(IFunction f) {
         Map<String, Object> resMap = new HashMap<String, Object>();
-        resMap.put(f.getName(), total);
+        resMap.put(f.getColumnName(), total);
         return resMap;
     }
 

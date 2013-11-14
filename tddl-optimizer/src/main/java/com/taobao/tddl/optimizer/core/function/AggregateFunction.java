@@ -31,5 +31,9 @@ public abstract class AggregateFunction implements IExtraFunction {
         return false;
     }
 
+    public String getDbFunction(IFunction func) {
+        return func.getColumnName();
+    }
+
     public abstract Map<String, Object> getResult(IFunction f);
 }

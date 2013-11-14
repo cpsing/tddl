@@ -20,8 +20,9 @@ package com.alibaba.cobar.parser.recognizer.mysql.lexer;
 
 import java.sql.SQLSyntaxErrorException;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
+
+import org.junit.Assert;
 
 import com.alibaba.cobar.parser.Performance;
 import com.alibaba.cobar.parser.recognizer.mysql.MySQLToken;
@@ -439,8 +440,7 @@ public class MySQLLexerTest extends TestCase {
         sut.nextToken();
         Assert.assertEquals(MySQLToken.EOF, sut.token());
 
-        sut = new MySQLLexer(
-                             "@@.  /*@@abc*/@@`abc''\"\\@@!%*&+_abcQ`//@@_1.  @@$#\n@@$var.-- @@a\t\n@@system_var:@@a`b`?");
+        sut = new MySQLLexer("@@.  /*@@abc*/@@`abc''\"\\@@!%*&+_abcQ`//@@_1.  @@$#\n@@$var.-- @@a\t\n@@system_var:@@a`b`?");
         Assert.assertEquals(MySQLToken.SYS_VAR, sut.token());
         Assert.assertEquals("", sut.stringValue());
         sut.nextToken();
@@ -992,8 +992,7 @@ public class MySQLLexerTest extends TestCase {
     }
 
     public void testNumber() throws SQLSyntaxErrorException {
-        MySQLLexer sut = new MySQLLexer(
-                                        " . 12e3/***/.12e3#/**\n.123ee123.1--  \r\t\n.12e/*a*//* !*/.12e_a/12e-- \r\t.12e-1");
+        MySQLLexer sut = new MySQLLexer(" . 12e3/***/.12e3#/**\n.123ee123.1--  \r\t\n.12e/*a*//* !*/.12e_a/12e-- \r\t.12e-1");
         Assert.assertEquals(MySQLToken.PUNC_DOT, sut.token());
         sut.nextToken();
         Assert.assertEquals(MySQLToken.LITERAL_NUM_MIX_DIGIT, sut.token());

@@ -48,7 +48,7 @@ public class Max extends AggregateFunction {
 
     public Map<String, Object> getResult(IFunction f) {
         Map<String, Object> resMap = new HashMap<String, Object>();
-        resMap.put(f.getName(), max);
+        resMap.put(f.getColumnName(), max);
         return resMap;
     }
 

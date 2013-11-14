@@ -61,7 +61,7 @@ public class Avg extends AggregateFunction {
                 avgRes = ((BigDecimal) total).divide(new BigDecimal(count));
             }
         }
-        this.result.put(f.getName(), avgRes);
+        this.result.put(f.getColumnName(), avgRes);
     }
 
     public void serverReduce(Object[] args, IFunction f) throws FunctionException {
@@ -82,14 +82,14 @@ public class Avg extends AggregateFunction {
             }
 
             this.total = ((Long) (this.total)) + (Long) total;
-            result.put(f.getName(), new BigDecimal(((Long) this.total) / (this.count + 0.0)));
+            result.put(f.getColumnName(), new BigDecimal(((Long) this.total) / (this.count + 0.0)));
         } catch (NumberFormatException ex) {
             try {
                 total = Double.parseDouble(totalString);
                 if (this.total == null) this.total = 0.0;
 
                 this.total = ((Double) (this.total)) + (Double) total;
-                result.put(f.getName(), new BigDecimal(((Double) this.total) / (this.count + 0.0)));
+                result.put(f.getColumnName(), new BigDecimal(((Double) this.total) / (this.count + 0.0)));
             } catch (NumberFormatException ex2) {
                 throw new FunctionException("不支持的Total类型：" + totalString);
             }
@@ -117,6 +117,19 @@ public class Avg extends AggregateFunction {
 
     public DATA_TYPE getMapReturnType(IFunction f) {
         return DATA_TYPE.STRING_VAL;
+    }
+
+    public String getDbFunction(IFunction func) {
+        // return "COUNT("+args[0]+"),"+"SUM("+args[0]+")";
+        return bulidAvgSql(func);
+    }
+
+    private String bulidAvgSql(IFunction func) {
+        String colName = func.getColumnName();
+        StringBuilder sb = new StringBuilder();
+        sb.append(colName.replace("AVG", "SUM"));
+        sb.append(",").append(colName.replace("AVG", "COUNT"));
+        return sb.toString();
     }
 
 }
