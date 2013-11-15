@@ -2,6 +2,7 @@ package com.taobao.tddl.optimizer.core.ast;
 
 import java.util.Map;
 
+import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.exceptions.QueryException;
@@ -12,7 +13,7 @@ import com.taobao.tddl.optimizer.exceptions.QueryException;
  * @author jianghang 2013-11-8 下午2:30:25
  * @since 5.1.0
  */
-public abstract class ASTNode<RT extends ASTNode> {
+public abstract class ASTNode<RT extends ASTNode> implements Comparable {
 
     protected String dataNode = null;
     protected Object extra;
@@ -56,6 +57,11 @@ public abstract class ASTNode<RT extends ASTNode> {
 
     public void setExtra(Object obj) {
         this.extra = obj;
+    }
+
+    public int compareTo(Object arg) {
+        // 主要是将自己包装为Comparable对象，可以和Number/string类型具有相同的父类，构建嵌套的查询树
+        throw new NotSupportException();
     }
 
     // ----------------- 复制 ----------------

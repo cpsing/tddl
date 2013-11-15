@@ -30,7 +30,7 @@ import com.taobao.tddl.optimizer.utils.OptimizerUtils;
  * @author jianghang 2013-11-8 下午2:33:51
  * @since 5.1.0
  */
-public abstract class QueryTreeNode<RT extends QueryTreeNode> extends ASTNode<RT> {
+public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
 
     public static enum FilterType {
         /**
@@ -310,6 +310,10 @@ public abstract class QueryTreeNode<RT extends QueryTreeNode> extends ASTNode<RT
         return this.children;
     }
 
+    public void addChild(ASTNode childNode) {
+        this.children.add(childNode);
+    }
+
     public List<ISelectable> getImplicitSelectable() {
         return implicitSelectable;
     }
@@ -409,9 +413,8 @@ public abstract class QueryTreeNode<RT extends QueryTreeNode> extends ASTNode<RT
      */
     public JoinNode join(QueryTreeNode o) {
         JoinNode joinNode = new JoinNode();
-        // TODO 后面完善
-        // joinNode.addChild(this);
-        // joinNode.addChild(o);
+        joinNode.addChild(this);
+        joinNode.addChild(o);
         return joinNode;
     }
 
@@ -479,10 +482,10 @@ public abstract class QueryTreeNode<RT extends QueryTreeNode> extends ASTNode<RT
         return this;
     }
 
-    public QueryTreeNode orderBy(ISelectable c, boolean b) {
+    public QueryTreeNode orderBy(ISelectable c, boolean asc) {
         IOrderBy orderBy = ASTNodeFactory.getInstance().createOrderBy();
         orderBy.setColumn(c);
-        orderBy.setDirection(b);
+        orderBy.setDirection(asc);
 
         if (!this.orderBys.contains(orderBy)) {
             this.orderBys.add(orderBy);
@@ -585,13 +588,6 @@ public abstract class QueryTreeNode<RT extends QueryTreeNode> extends ASTNode<RT
         return this.keyFilter != null;
     }
 
-    public void selectAColumn(ISelectable s) {
-        // TODO 该方法是否可以删除
-        if (!this.columnsSelected.contains(s)) {
-            columnsSelected.add(s);
-        }
-    }
-
     public void addColumnSelected(ISelectable selected) {
         if (!this.columnsSelected.contains(selected)) {
             ISelectable s = selected.copy();
@@ -618,6 +614,10 @@ public abstract class QueryTreeNode<RT extends QueryTreeNode> extends ASTNode<RT
 
     public LOCK_MODEL getLockModel() {
         return lockModel;
+    }
+
+    public boolean hasColumn(ISelectable c) {
+        return this.getBuilder().hasColumn(c);
     }
 
     // ==================== helper method =================

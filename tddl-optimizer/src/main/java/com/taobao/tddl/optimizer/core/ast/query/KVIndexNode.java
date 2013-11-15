@@ -10,6 +10,7 @@ import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.build.KVIndexNodeBuilder;
+import com.taobao.tddl.optimizer.core.ast.build.QueryTreeNodeBuilder;
 import com.taobao.tddl.optimizer.core.ast.dml.InsertNode;
 import com.taobao.tddl.optimizer.core.ast.dml.PutNode;
 import com.taobao.tddl.optimizer.core.ast.dml.UpdateNode;
@@ -43,6 +44,10 @@ public class KVIndexNode extends TableNode {
         this.setNeedBuild(true);
         this.resultFilter = f;
         return this;
+    }
+
+    public QueryTreeNodeBuilder getBuilder() {
+        return builder;
     }
 
     public IQuery toDataNodeExecutor() {

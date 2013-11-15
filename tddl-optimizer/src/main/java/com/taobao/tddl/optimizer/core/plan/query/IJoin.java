@@ -6,4 +6,7 @@ package com.taobao.tddl.optimizer.core.plan.query;
  */
 public interface IJoin extends IParallelizableQueryTree<IJoin> {
 
+    public enum JoinType {
+        HASH_JOIN, NEST_LOOP_JOIN, INDEX_NEST_LOOP, SORT_MERGE_JOIN;
+    }
 }

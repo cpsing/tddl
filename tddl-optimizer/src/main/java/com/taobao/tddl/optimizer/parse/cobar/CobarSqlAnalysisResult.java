@@ -28,7 +28,13 @@ import com.taobao.tddl.optimizer.core.ast.dml.DeleteNode;
 import com.taobao.tddl.optimizer.core.ast.dml.InsertNode;
 import com.taobao.tddl.optimizer.core.ast.dml.PutNode;
 import com.taobao.tddl.optimizer.core.ast.dml.UpdateNode;
+import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.parse.SqlAnalysisResult;
+import com.taobao.tddl.optimizer.parse.visitor.MySqlDeleteVisitor;
+import com.taobao.tddl.optimizer.parse.visitor.MySqlInsertVisitor;
+import com.taobao.tddl.optimizer.parse.visitor.MySqlReplaceIntoVisitor;
+import com.taobao.tddl.optimizer.parse.visitor.MySqlSelectVisitor;
+import com.taobao.tddl.optimizer.parse.visitor.MySqlUpdateVisitor;
 
 /**
  * 基于cobar构造的parse结果
@@ -49,44 +55,38 @@ public class CobarSqlAnalysisResult implements SqlAnalysisResult {
                 }
 
                 sqlType = SqlType.SELECT;
-                // visitor = new MySqlSelectVisitor(this, oc);
-                // statement.accept(visitor);
+                visitor = new MySqlSelectVisitor();
+                statement.accept(visitor);
             } else if (statement instanceof DMLUpdateStatement) {
                 sqlType = SqlType.UPDATE;
-                // visitor = new MySqlUpdateVisitor(this, oc);
-                // statement.accept(visitor);
+                visitor = new MySqlUpdateVisitor();
+                statement.accept(visitor);
             } else if (statement instanceof DMLDeleteStatement) {
                 sqlType = SqlType.DELETE;
-                // visitor = new MySqlDeleteVisitor(this, oc);
-                // statement.accept(visitor);
+                visitor = new MySqlDeleteVisitor();
+                statement.accept(visitor);
             } else if (statement instanceof DMLInsertStatement) {
                 sqlType = SqlType.INSERT;
-                // visitor = new MySqlInsertVisitor(this, oc);
-                // statement.accept(visitor);
+                visitor = new MySqlInsertVisitor();
+                statement.accept(visitor);
             } else if (statement instanceof DMLReplaceStatement) {
                 sqlType = SqlType.REPLACE;
-                // visitor = new MySqlReplaceIntoVisitor(this, oc);
-                // statement.accept(visitor);
+                visitor = new MySqlReplaceIntoVisitor();
+                statement.accept(visitor);
             } else if (statement instanceof DDLStatement) {
                 throw new IllegalArgumentException("tddl not support DDL statement:'" + sql + "'");
             } else if (statement instanceof ShowCreate) {
                 if (((ShowCreate) statement).getType() == Type.TABLE) {
-                    // dalQueryTreeNode = new TableNode(((ShowCreate)
-                    // statement).getId().getIdTextUpUnescape(),
-                    // this.getOptimizerContext());
+                    dalQueryTreeNode = new TableNode(((ShowCreate) statement).getId().getIdTextUpUnescape());
                     sqlType = SqlType.SHOW_WITH_TABLE;
                 } else {
                     sqlType = SqlType.SHOW_WITHOUT_TABLE;
                 }
             } else if (statement instanceof ShowColumns) {
-                // dalQueryTreeNode = new TableNode(((ShowColumns)
-                // statement).getTable().getIdTextUpUnescape(),
-                // this.getOptimizerContext());
+                dalQueryTreeNode = new TableNode(((ShowColumns) statement).getTable().getIdTextUpUnescape());
                 sqlType = SqlType.SHOW_WITH_TABLE;
             } else if (statement instanceof ShowIndex) {
-                // dalQueryTreeNode = new TableNode(((ShowIndex)
-                // statement).getTable().getIdTextUpUnescape(),
-                // this.getOptimizerContext());
+                dalQueryTreeNode = new TableNode(((ShowIndex) statement).getTable().getIdTextUpUnescape());
                 sqlType = SqlType.SHOW_WITH_TABLE;
             } else {
                 sqlType = SqlType.SHOW_WITHOUT_TABLE;
@@ -126,35 +126,26 @@ public class CobarSqlAnalysisResult implements SqlAnalysisResult {
 
     public QueryTreeNode getQueryTreeNode(Map<Integer, ParameterContext> parameterSettings) {
         if (dalQueryTreeNode == null) {
-            // return ((MySqlSelectVisitor) visitor).getTableNode();
-            return null;
+            return ((MySqlSelectVisitor) visitor).getTableNode();
         } else {
             return this.dalQueryTreeNode;
         }
     }
 
     public UpdateNode getUpdateNode(Map<Integer, ParameterContext> parameterSettings) {
-        // return (UpdateNode) ((MySqlUpdateVisitor)
-        // visitor).getUpdateNode().setParameterSettings(parameterSettings);
-        return null;
+        return (UpdateNode) ((MySqlUpdateVisitor) visitor).getUpdateNode().setParameterSettings(parameterSettings);
     }
 
     public InsertNode getInsertNode(Map<Integer, ParameterContext> parameterSettings) {
-        // return (InsertNode) ((MySqlInsertVisitor)
-        // visitor).getInsertNode().setParameterSettings(parameterSettings);
-        return null;
+        return (InsertNode) ((MySqlInsertVisitor) visitor).getInsertNode().setParameterSettings(parameterSettings);
     }
 
     public PutNode getReplaceNode(Map<Integer, ParameterContext> parameterSettings) {
-        // return (PutNode) ((MySqlReplaceIntoVisitor)
-        // visitor).getReplaceNode().setParameterSettings(parameterSettings);
-        return null;
+        return (PutNode) ((MySqlReplaceIntoVisitor) visitor).getReplaceNode().setParameterSettings(parameterSettings);
     }
 
     public DeleteNode getDeleteNode(Map<Integer, ParameterContext> parameterSettings) {
-        // return (DeleteNode) ((MySqlDeleteVisitor)
-        // visitor).getDeleteNode().setParameterSettings(parameterSettings);
-        return null;
+        return (DeleteNode) ((MySqlDeleteVisitor) visitor).getDeleteNode().setParameterSettings(parameterSettings);
     }
 
 }

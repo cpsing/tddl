@@ -272,6 +272,14 @@ public class OptimizerUtils {
         return c;
     }
 
+    public static IColumn columnMetaToIColumn(ColumnMeta m, String tableName) {
+        IColumn c = ASTNodeFactory.getInstance().createColumn();
+        c.setDataType(m.getDataType());
+        c.setColumnName(m.getName());
+        c.setTableName(tableName);
+        return c;
+    }
+
     // --------------------------- assignment --------------------------
 
     public static IFilter assignment(IFilter f, Map<Integer, ParameterContext> parameterSettings) {

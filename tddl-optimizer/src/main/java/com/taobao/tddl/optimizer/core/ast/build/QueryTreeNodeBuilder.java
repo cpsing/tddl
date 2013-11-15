@@ -2,7 +2,6 @@ package com.taobao.tddl.optimizer.core.ast.build;
 
 import java.util.List;
 
-import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.query.KVIndexNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
@@ -16,21 +15,11 @@ import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
 /**
- * @author jianghang 2013-11-12 下午3:20:39
  * @since 5.1.0
  */
 public abstract class QueryTreeNodeBuilder {
 
-    protected OptimizerContext oc = null;
-    protected QueryTreeNode    node;
-
-    public OptimizerContext getOptimizerContext() {
-        return oc;
-    }
-
-    public void setOptimizerContext(OptimizerContext oc) {
-        this.oc = oc;
-    }
+    protected QueryTreeNode node;
 
     public QueryTreeNodeBuilder(){
     }
@@ -38,21 +27,18 @@ public abstract class QueryTreeNodeBuilder {
     public abstract void build();
 
     protected void addSelectableToSelected(ISelectable c) {
-
         if (!node.getColumnsSelected().contains(c)) {
             node.getColumnsSelected().add(c);
         }
     }
 
-    protected void addSelectableToTempSelectable(ISelectable c) {
-
-        if (!node.getTempSelectable().contains(c)) {
-            node.getTempSelectable().add(c);
+    protected void addSelectableToImplicitSelectable(ISelectable c) {
+        if (!node.getImplicitSelectable().contains(c)) {
+            node.getImplicitSelectable().add(c);
         }
     }
 
     protected void buildWhere() {
-
         // sql语法中，where条件中的列不允许使用别名，所以无需从select中找列
         if (node.getKeyFilter() != null) {
             this.buildFilter(node.getKeyFilter(), false);
@@ -71,18 +57,18 @@ public abstract class QueryTreeNodeBuilder {
         }
     }
 
-    void buildFilter(IFilter filter, boolean findInSelectList) {
-        if (filter == null) return;
+    protected void buildFilter(IFilter filter, boolean findInSelectList) {
+        if (filter == null) {
+            return;
+        }
+
         if (filter instanceof ILogicalFilter) {
             for (IFilter sub : ((ILogicalFilter) filter).getSubFilter()) {
-
                 this.buildFilter(sub, findInSelectList);
             }
-            return;
         } else {
             buildBooleanFilter((IBooleanFilter) filter, findInSelectList);
         }
-
     }
 
     public ISelectable buildSelectable(ISelectable c) {
@@ -99,24 +85,23 @@ public abstract class QueryTreeNodeBuilder {
      * @return
      */
     public ISelectable buildSelectable(ISelectable c, boolean findInSelectList) {
-        if (c == null) return null;
-
-        if (!c.isNeedBuildSelectable()) {// 绑定变量 ，数值类，不需要填充
-            return c;
+        if (c == null) {
+            return null;
         }
 
         if (c.getTableName() != null) {
-            // 对于TableNode
-            // 如果别名存在别名
+            // 对于TableNode如果别名存在别名
             if (node instanceof TableNode && (!(node instanceof KVIndexNode))) {
                 if (!(c.getTableName().equals(node.getAlias()) || c.getTableName()
-                    .equals(((TableNode) node).getTableName()))) BuilderUtils.columnUnExisted(logger,
-                    c.getTableName() + "." + c.getColumnName(),
-                    this.getNode().getName());
+                    .equals(((TableNode) node).getTableName()))) {
+                    throw new IllegalArgumentException("column: " + c.getFullName() + " is not existed in either "
+                                                       + this.getNode().getName() + " or select clause");
+                }
 
                 c.setTableName(((TableNode) node).getTableName());
             }
         }
+
         ISelectable column = null;
         ISelectable columnFromMeta = null;
         // 临时列中也不存在，则新建一个临时列
@@ -130,14 +115,20 @@ public abstract class QueryTreeNodeBuilder {
 
         if (findInSelectList) {
             ISelectable columnFromSelected = getColumnFromSelecteList(c);
-
-            if (columnFromSelected != null) column = columnFromSelected;
+            if (columnFromSelected != null) {
+                column = columnFromSelected;
+            }
         }
 
-        if (column == null) BuilderUtils.columnUnExisted(logger, c.getFullName(), this.getNode().getName());
+        if (column == null) {
+            throw new IllegalArgumentException("column: " + c.getFullName() + " is not existed in either "
+                                               + this.getNode().getName() + " or select clause");
+        }
 
         if ((column instanceof IColumn) && !IColumn.STAR.equals(column.getColumnName())) {
-            if (!node.columnsRefered.contains(column)) node.columnsRefered.add(column);
+            if (!node.getColumnsRefered().contains(column)) {
+                node.getColumnsRefered().add(column);
+            }
         }
         if (column instanceof IFunction) {
             buildFunction((IFunction) column);
@@ -148,20 +139,13 @@ public abstract class QueryTreeNodeBuilder {
 
     private ISelectable getColumnFromSelecteList(ISelectable c) {
         ISelectable column = null;
-        boolean hasSameColumnName = false;
         for (ISelectable selected : this.getNode().getColumnsSelected()) {
             boolean isThis = false;
-            String selectedName = selected.getAlias() == null ? selected.getColumnName() : selected.getAlias();
-            String cName = c.getAlias() == null ? c.getColumnName() : c.getAlias();
 
-            if (selectedName.equals(cName)) {
-                hasSameColumnName = true;
-            }
             if (c.getTableName() != null && (!(node instanceof KVIndexNode))) {
                 if (!c.getTableName().equals(selected.getTableName())) {
                     continue;
                 }
-
             }
 
             if (selected.getColumnName().equals(c.getColumnName())) {
@@ -233,7 +217,9 @@ public abstract class QueryTreeNodeBuilder {
     }
 
     public void buildFunction(IFunction f) {
-        if (f.getArgs().size() == 0) return;
+        if (f.getArgs().size() == 0) {
+            return;
+        }
 
         List<Object> args = f.getArgs();
         for (int i = 0; i < args.size(); i++) {
@@ -243,18 +229,28 @@ public abstract class QueryTreeNodeBuilder {
         }
     }
 
-    public static ISelectable getColumnFromOtherNodeWithTableAlias(ISelectable c, QueryTreeNode other) {
-        if (c == null) return c;
+    public ISelectable getColumnFromOtherNodeWithTableAlias(ISelectable c, QueryTreeNode other) {
+        if (c == null) {
+            return c;
+        }
 
-        if (c instanceof IBooleanFilter && ((IBooleanFilter) c).getOperation().equals(OPERATION.CONSTANT)) return c;
+        if (c instanceof IBooleanFilter && ((IBooleanFilter) c).getOperation().equals(OPERATION.CONSTANT)) {
+            return c;
+        }
+
         ISelectable res = null;
         for (ISelectable selected : other.getColumnsSelected()) {
             boolean isThis = false;
             if (c.getTableName() != null) {
-                if (!(c.getTableName().equals(other.getAlias()) || c.getTableName().equals(selected.getTableName()))) continue;
+                if (!(c.getTableName().equals(other.getAlias()) || c.getTableName().equals(selected.getTableName()))) {
+                    continue;
+                }
             }
 
-            if (IColumn.STAR.equals(c.getColumnName())) return c;
+            if (IColumn.STAR.equals(c.getColumnName())) {
+                return c;
+            }
+
             // 若列别名存在，只比较别名
             if (selected.getAlias() != null) {
                 if (selected.getAlias().equals(c.getColumnName())) {
@@ -265,37 +261,51 @@ public abstract class QueryTreeNodeBuilder {
             }
 
             if (isThis) {
-                if (res != null) BuilderUtils.illegalArgements(logger, "Column '" + c.getColumnName()
-                                                                       + "' is ambiguous");
+                if (res != null) {
+                    throw new IllegalArgumentException("Column '" + c.getColumnName() + "' is ambiguous");
+                }
 
                 res = selected;
             }
         }
 
-        if (res == null) return res;
+        if (res == null) {
+            return res;
+        }
 
         if (c instanceof IColumn) {
             c.setDataType(res.getDataType());
             // 如果存在表别名，在这里将只是用表别名
-            if (other.getAlias() != null) c.setTableName(other.getAlias());
-            else c.setTableName(res.getTableName());
+            if (other.getAlias() != null) {
+                c.setTableName(other.getAlias());
+            } else {
+                c.setTableName(res.getTableName());
+            }
         }
 
         return c;
     }
 
     public static ISelectable getColumnFromOtherNode(ISelectable c, QueryTreeNode other) {
-        if (c == null) return c;
+        if (c == null) {
+            return c;
+        }
 
-        if (c instanceof IBooleanFilter && ((IBooleanFilter) c).getOperation().equals(OPERATION.CONSTANT)) return c;
+        if (c instanceof IBooleanFilter && ((IBooleanFilter) c).getOperation().equals(OPERATION.CONSTANT)) {
+            return c;
+        }
         ISelectable res = null;
         for (ISelectable selected : other.getColumnsSelected()) {
             boolean isThis = false;
             if (c.getTableName() != null) {
-                if (!(c.getTableName().equals(other.getAlias()) || c.getTableName().equals(selected.getTableName()))) continue;
+                if (!(c.getTableName().equals(other.getAlias()) || c.getTableName().equals(selected.getTableName()))) {
+                    continue;
+                }
             }
 
-            if (IColumn.STAR.equals(c.getColumnName())) return c;
+            if (IColumn.STAR.equals(c.getColumnName())) {
+                return c;
+            }
             // 若列别名存在，只比较别名
             if (selected.getAlias() != null) {
                 if (selected.getAlias().equals(c.getColumnName())) {
@@ -306,8 +316,9 @@ public abstract class QueryTreeNodeBuilder {
             }
 
             if (isThis) {
-                if (res != null) BuilderUtils.illegalArgements(logger, "Column '" + c.getColumnName()
-                                                                       + "' is ambiguous");
+                if (res != null) {
+                    throw new IllegalArgumentException("Column '" + c.getColumnName() + "' is ambiguous");
+                }
 
                 res = selected;
             }
@@ -317,9 +328,13 @@ public abstract class QueryTreeNodeBuilder {
     }
 
     public boolean hasColumn(ISelectable c) {
+        if (this.getColumnFromOtherNodeWithTableAlias(c, this.getNode()) != null) {
+            return true;
+        }
 
-        if (this.getColumnFromOtherNodeWithTableAlias(c, this.getNode()) != null) return true;
-        if (this.getSelectableFromChild(c) != null) return true;
+        if (this.getSelectableFromChild(c) != null) {
+            return true;
+        }
 
         return false;
     }

@@ -45,7 +45,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  * @author <a href="jianghang.loujh@taobao.com">jianghang</a>
  * @since 5.1.0
  */
-public class TableNode extends QueryTreeNode<TableNode> {
+public class TableNode extends QueryTreeNode {
 
     private static final Logger logger                = LoggerFactory.getLogger(TableNode.class);
     private TableNodeBuilder    builder;

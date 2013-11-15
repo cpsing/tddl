@@ -14,6 +14,10 @@ public interface IFunction<RT extends IFunction> extends ISelectable<RT> {
 
     public static interface BuiltInFunction {
 
+        final static String ADD           = "ADD";
+        final static String SUB           = "SUB";
+        final static String MUL           = "MYLTIPLY";
+        final static String DIV           = "Division";
         final static String AVG           = "AVG";
         final static String SUM           = "SUM";
         final static String COUNT         = "COUNT";
