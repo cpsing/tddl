@@ -30,7 +30,9 @@ public class UnitDeployProtect {
         UnitDeployProtect.unitDeployProtect(null);
     }
 
-    private static void unitDeployProtectWithCause(String sql, Map<Integer, ParameterContext> params) {
+    private static void unitDeployProtectWithCause(String sql, Map<Integer, ParameterContext> params)
+                                                                                                     throws UnitDeployInvalidException,
+                                                                                                     SQLException {
 
         delegate.unitDeployProtectWithCause(sql, params);
     }
@@ -50,9 +52,6 @@ public class UnitDeployProtect {
 
         delegate.clearUnitValidThreadLocal();
     }
-
-    public static final String VALID_COL   = "column";
-    public static final String VALID_VALUE = "value";
 
     public static Object getValidFromHint(String sql, Map<Integer, ParameterContext> params) throws SQLException {
         return delegate.getValidFromHint(sql, params);

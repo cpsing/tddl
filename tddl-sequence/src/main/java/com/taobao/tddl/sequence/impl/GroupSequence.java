@@ -6,11 +6,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.taobao.tddl.monitor.eagleeye.EagleeyeHelper;
 import com.taobao.tddl.sequence.Sequence;
 import com.taobao.tddl.sequence.SequenceDao;
 import com.taobao.tddl.sequence.SequenceRange;
 import com.taobao.tddl.sequence.exception.SequenceException;
-import com.taobao.tddl.sequence.temp.EagleEye;
 
 public class GroupSequence implements Sequence {
 
@@ -97,7 +97,7 @@ public class GroupSequence implements Sequence {
     }
 
     private boolean isTestSeq() {
-        String t = EagleEye.getUserData("t");
+        String t = EagleeyeHelper.getUserData("t");
         if (!StringUtils.isBlank(t) && t.equals("1")) {
             return true;
         } else {

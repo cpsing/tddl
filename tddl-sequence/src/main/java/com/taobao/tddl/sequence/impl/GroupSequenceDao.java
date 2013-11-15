@@ -27,11 +27,11 @@ import org.apache.commons.lang.StringUtils;
 
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
+import com.taobao.tddl.group.jdbc.TGroupDataSource;
+import com.taobao.tddl.monitor.eagleeye.EagleeyeHelper;
 import com.taobao.tddl.sequence.SequenceDao;
 import com.taobao.tddl.sequence.SequenceRange;
 import com.taobao.tddl.sequence.exception.SequenceException;
-import com.taobao.tddl.sequence.temp.EagleEye;
-import com.taobao.tddl.sequence.temp.TGroupDataSource;
 import com.taobao.tddl.sequence.util.RandomSequence;
 
 /**
@@ -683,7 +683,7 @@ public class GroupSequenceDao implements SequenceDao {
 
     public String getTableName() {
         // 全链路压测需求
-        String t = EagleEye.getUserData("t");
+        String t = EagleeyeHelper.getUserData("t");
         if (!StringUtils.isBlank(t) && t.equals("1")) {
             return testTableName;
         } else {
@@ -763,7 +763,7 @@ public class GroupSequenceDao implements SequenceDao {
     }
 
     public String getSwitchTempTable() {
-        String t = EagleEye.getUserData("t");
+        String t = EagleeyeHelper.getUserData("t");
         if (!StringUtils.isBlank(t) && t.equals("1")) {
             return testSwitchTempTable;
         } else {

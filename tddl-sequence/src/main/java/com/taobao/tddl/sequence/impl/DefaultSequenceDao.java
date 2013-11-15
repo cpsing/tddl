@@ -9,12 +9,11 @@ import java.sql.Timestamp;
 
 import javax.sql.DataSource;
 
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.sequence.SequenceDao;
 import com.taobao.tddl.sequence.SequenceRange;
 import com.taobao.tddl.sequence.exception.SequenceException;
-
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * 序列DAO默认实现，JDBC方式
