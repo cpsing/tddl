@@ -20,15 +20,7 @@ public interface IOrderBy extends CanVisit {
 
     public IOrderBy assignment(Map<Integer, ParameterContext> parameterSettings);
 
-    public String toStringWithInden(int inden);
-
     public IOrderBy setDirection(Boolean direction);
-
-    public IOrderBy deepCopy();
-
-    public IOrderBy getNewInstance();
-
-    public IOrderBy copy();
 
     public String getAlias();
 
@@ -41,5 +33,11 @@ public interface IOrderBy extends CanVisit {
     public String getColumnName();
 
     public DATA_TYPE getDataType();
+
+    public String toStringWithInden(int inden);
+
+    public IOrderBy deepCopy();
+
+    public IOrderBy copy();
 
 }

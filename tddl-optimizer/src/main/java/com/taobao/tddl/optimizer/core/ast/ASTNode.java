@@ -10,7 +10,6 @@ import com.taobao.tddl.optimizer.exceptions.QueryException;
 /**
  * 可优化的语法树
  * 
- * @author jianghang 2013-11-8 下午2:30:25
  * @since 5.1.0
  */
 public abstract class ASTNode<RT extends ASTNode> implements Comparable {

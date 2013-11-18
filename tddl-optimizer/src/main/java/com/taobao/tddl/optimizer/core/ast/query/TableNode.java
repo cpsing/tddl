@@ -23,19 +23,17 @@ import com.taobao.tddl.optimizer.core.ast.dml.DeleteNode;
 import com.taobao.tddl.optimizer.core.ast.dml.InsertNode;
 import com.taobao.tddl.optimizer.core.ast.dml.PutNode;
 import com.taobao.tddl.optimizer.core.ast.dml.UpdateNode;
+import com.taobao.tddl.optimizer.core.ast.query.strategy.IndexNestedLoopJoin;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
+import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.exceptions.QueryException;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
-
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * 查询某个具体的真实表的Node 允许使用这个node，根据查询条件进行树的构建
@@ -47,18 +45,22 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  */
 public class TableNode extends QueryTreeNode {
 
-    private static final Logger logger                = LoggerFactory.getLogger(TableNode.class);
-    private TableNodeBuilder    builder;
-    private String              schemaName;
-    private String              tableName;
-    private IFilter             indexQueryValueFilter = null;
-    boolean                     isUsed                = false;
-    private TableMeta           tableMeta;
-    protected IndexMeta         indexUsed             = null;                                    // 当前逻辑表的使用index
-    protected boolean           fullTableScan         = false;                                   // 是否需要全表扫描
+    private TableNodeBuilder builder;
+    private String           schemaName;
+    private String           tableName;
+    private IFilter          indexQueryValueFilter = null;
+    boolean                  isUsed                = false;
+    private TableMeta        tableMeta;
+    protected IndexMeta      indexUsed             = null; // 当前逻辑表的使用index
+    protected boolean        fullTableScan         = false; // 是否需要全表扫描
+
+    public TableNode(){
+        this(null);
+    }
 
     public TableNode(String tableName){
         this.tableName = tableName;
+        builder = new TableNodeBuilder(this);
     }
 
     public void build() {
@@ -74,7 +76,7 @@ public class TableNode extends QueryTreeNode {
         this.indexQueryValueFilter = OptimizerUtils.assignment(indexQueryValueFilter, parameterSettings);
     }
 
-    public IDataNodeExecutor toDataNodeExecutor() throws QueryException {
+    public IQueryTree toDataNodeExecutor() throws QueryException {
         return this.convertToJoinIfNeed().toDataNodeExecutor();
     }
 
@@ -209,7 +211,7 @@ public class TableNode extends QueryTreeNode {
                         .createColumn()
                         .setColumnName(keyColumn.getName())
                         .setTableName(pk.getName()));
-                    // join.addJoinFilter(eq);
+                    join.addJoinFilter(eq);
                 }
 
                 List<ISelectable> columns = new ArrayList<ISelectable>();
@@ -225,7 +227,8 @@ public class TableNode extends QueryTreeNode {
                         columns.add(a);
                     }
                 }
-                // TODO join.select(columns);
+
+                join.select(columns);
                 List<IOrderBy> orderBys = new ArrayList<IOrderBy>(this.getOrderBys().size());
                 for (IOrderBy o : this.getOrderBys()) {
                     IOrderBy newO = o.deepCopy();
@@ -237,8 +240,8 @@ public class TableNode extends QueryTreeNode {
                     }
                     orderBys.add(newO);
                 }
-                // TODO join.setOrderBys(orderBys);
 
+                join.setOrderBys(orderBys);
                 List<IOrderBy> groupBys = new ArrayList<IOrderBy>(this.getGroupBys().size());
                 for (IOrderBy group : this.getGroupBys()) {
                     IOrderBy newG = group.copy();
@@ -252,20 +255,18 @@ public class TableNode extends QueryTreeNode {
                     groupBys.add(newG);
                 }
 
-                // join.setUsedForIndexJoinPK(true);
-                // join.setGroupBys(groupBys);
-                // join.setLimitFrom(this.getLimitFrom());
-                // join.setLimitTo(this.getLimitTo());
-                // join.executeOn(this.getDataNode());
-                // join.setSubQuery(this.isSubQuery());
-                // // 回表是IndexNestedLoop
-                // join.setJoinStrategy(new
-                // IndexNestedLoopJoin(this.getOptimizerContext()));
-                // join.setAlias(this.getAlias());
-                // join.having(GeneralUtil.copyFilter(this.getHavingFilter()));
-                // join.setOtherJoinOnFilter(GeneralUtil.copyFilter(this.getOtherJoinOnFilter()));
-                // join.build();
-                // return join;
+                join.setUsedForIndexJoinPK(true);
+                join.setGroupBys(groupBys);
+                join.setLimitFrom(this.getLimitFrom());
+                join.setLimitTo(this.getLimitTo());
+                join.executeOn(this.getDataNode());
+                join.setSubQuery(this.isSubQuery());
+                // 回表是IndexNestedLoop
+                join.setJoinStrategy(new IndexNestedLoopJoin());
+                join.setAlias(this.getAlias());
+                join.having(OptimizerUtils.copyFilter(this.getHavingFilter()));
+                join.setOtherJoinOnFilter(OptimizerUtils.copyFilter(this.getOtherJoinOnFilter()));
+                join.build();
                 return null;
             }
         }
@@ -328,12 +329,11 @@ public class TableNode extends QueryTreeNode {
     // ============= insert/update/delete/put==================
 
     public InsertNode insert(List<ISelectable> columns, List<Comparable> values) {
-        // InsertNode insert = new InsertNode(this);
-        // insert.setColumns(columns);
-        // insert.setValues(values);
-        //
-        // return insert;
-        return null;
+        InsertNode insert = new InsertNode(this);
+        insert.setColumns(columns);
+        insert.setValues(values);
+
+        return insert;
     }
 
     public InsertNode insert(String columns, Comparable values[]) {
@@ -361,11 +361,10 @@ public class TableNode extends QueryTreeNode {
                                                + values.size());
         }
 
-        // PutNode put = new PutNode(this);
-        // put.setColumns(columns);
-        // put.setValues(values);
-        // return put;
-        return null;
+        PutNode put = new PutNode(this);
+        put.setColumns(columns);
+        put.setValues(values);
+        return put;
     }
 
     public PutNode put(String columns, Comparable values[]) {
@@ -390,11 +389,11 @@ public class TableNode extends QueryTreeNode {
                                                + " columns' size is " + columns.size() + ". values' size is "
                                                + values.size());
         }
-        // UpdateNode update = new UpdateNode(this);
-        // update.setUpdateValues(values);
-        // update.setUpdateColumns(columns);
-        // return update;
-        return null;
+
+        UpdateNode update = new UpdateNode(this);
+        update.setUpdateValues(values);
+        update.setUpdateColumns(columns);
+        return update;
     }
 
     public UpdateNode update(String columns, Comparable values[]) {
@@ -413,10 +412,9 @@ public class TableNode extends QueryTreeNode {
     }
 
     public DeleteNode delete() {
-        // DeleteNode delete = new DeleteNode(this);
-        // delete.setQuery(this);
-        // return delete;
-        return null;
+        DeleteNode delete = new DeleteNode(this);
+        delete.setQuery(this);
+        return delete;
     }
 
     // =============== copy =============

@@ -13,7 +13,7 @@ import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.build.QueryNodeBuilder;
 import com.taobao.tddl.optimizer.core.ast.build.QueryTreeNodeBuilder;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
-import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
+import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 import com.taobao.tddl.optimizer.exceptions.QueryException;
 
@@ -26,11 +26,11 @@ public class QueryNode extends QueryTreeNode {
     private QueryNodeBuilder builder;
 
     public QueryNode(QueryTreeNode child){
-        this.builder = new QueryNodeBuilder(this);
-        this.setChild(child);
+        this(child, null);
     }
 
-    public QueryNode(QueryTreeNode child, IFilter filter) throws QueryException{
+    public QueryNode(QueryTreeNode child, IFilter filter){
+        this.builder = new QueryNodeBuilder(this);
         this.whereFilter = filter;
         this.setChild(child);
     }
@@ -88,24 +88,24 @@ public class QueryNode extends QueryTreeNode {
         return this.getAlias();
     }
 
-    public IDataNodeExecutor toDataNodeExecutor() throws QueryException {
+    public IQueryTree toDataNodeExecutor() throws QueryException {
         IQuery query = ASTNodeFactory.getInstance().createQuery();
-        // query.setAlias(this.getAlias());
-        // query.setColumns(this.getColumnsSelected());
-        // query.setConsistent(this.getConsistent());
-        // query.setGroupBys(this.getGroupBys());
-        //
-        // query.setKeyFilter(this.getKeyFilter());
-        // query.setValueFilter(this.getResultFilter());
-        //
-        // query.setLimitFrom(this.getLimitFrom());
-        // query.setLimitTo(this.getLimitTo());
-        // query.setLockModel(this.getLockModel());
-        // query.setOrderBy(this.getOrderBys());
-        // query.setSubQuery(this.getChild().toDataNodeExecutor());
-        // query.executeOn(this.getDataNode());
-        // query.setSql(this.getSql());
-        // query.setIsSubQuery(this.isSubQuery());
+        query.setAlias(this.getAlias());
+        query.setColumns(this.getColumnsSelected());
+        query.setConsistent(this.getConsistent());
+        query.setGroupBys(this.getGroupBys());
+
+        query.setKeyFilter(this.getKeyFilter());
+        query.setValueFilter(this.getResultFilter());
+
+        query.setLimitFrom(this.getLimitFrom());
+        query.setLimitTo(this.getLimitTo());
+        query.setLockModel(this.getLockModel());
+        query.setOrderBys(this.getOrderBys());
+        query.setSubQuery(this.getChild().toDataNodeExecutor());
+        query.executeOn(this.getDataNode());
+        query.setSql(this.getSql());
+        query.setIsSubQuery(this.isSubQuery());
         return query;
     }
 
@@ -157,7 +157,7 @@ public class QueryNode extends QueryTreeNode {
 
         if (this.getChild() != null) {
             appendln(sb, tabContent + "from:");
-            sb.append(this.getChild().toString(inden + 1));
+            sb.append(this.getChild().toString(inden + 2));
         }
         return sb.toString();
     }

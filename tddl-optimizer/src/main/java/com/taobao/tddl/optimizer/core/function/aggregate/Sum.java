@@ -11,7 +11,6 @@ import com.taobao.tddl.optimizer.core.function.AggregateFunction;
 import com.taobao.tddl.optimizer.exceptions.FunctionException;
 
 /**
- * @author jianghang 2013-11-8 下午3:45:49
  * @since 5.1.0
  */
 public class Sum extends AggregateFunction {

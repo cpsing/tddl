@@ -6,7 +6,9 @@ import com.taobao.tddl.optimizer.core.ast.DMLNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
+import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.dml.IDelete;
+import com.taobao.tddl.optimizer.exceptions.QueryException;
 
 public class DeleteNode extends DMLNode<DeleteNode> {
 
@@ -14,26 +16,29 @@ public class DeleteNode extends DMLNode<DeleteNode> {
         super(qtn);
     }
 
-    public TableNode getQueryTreeNode() {
+    public TableNode getNode() {
         return (TableNode) this.qtn;
     }
 
     public TableMeta getTableMeta() {
-        return this.getQueryTreeNode().getTableMeta();
+        return this.getNode().getTableMeta();
     }
 
-    public IDataNodeExecutor toDataNodeExecutor() {
+    public IDataNodeExecutor toDataNodeExecutor() throws QueryException {
         IDelete delete = ASTNodeFactory.getInstance().createDelete();
-        // delete.setConsistent(true);
-        // delete.executeOn(this.getDataNode());
-        // delete.setQueryCommon(this.getNode().toDataNodeExecutor());
-        // // FIX by shenxun :没有使用真实表名
-        //
-        // delete.setDbName(((TableNode) this.getNode()).getDbName());
-        // delete.setIndexName(((TableNode)
-        // this.getNode()).getIndexUsed().getName());
-        //
+        delete.setConsistent(true);
+        delete.executeOn(this.getDataNode());
+        delete.setQueryTree((IQueryTree) this.getNode().toDataNodeExecutor());
+        // FIX by shenxun :没有使用真实表名
+        delete.setSchemaName(((TableNode) this.getNode()).getSchemaName());
+        delete.setIndexName(((TableNode) this.getNode()).getIndexUsed().getName());
+
         return delete;
+    }
+
+    public DeleteNode setQuery(TableNode query) {
+        this.qtn = query;
+        return this;
     }
 
     public DeleteNode deepCopy() {

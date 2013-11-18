@@ -14,7 +14,6 @@ import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.utils.OptimizerToString;
 
 /**
- * @author jianghang 2013-11-13 下午6:06:48
  * @since 5.1.0
  */
 public class BooleanFilter extends Function<IBooleanFilter> implements IBooleanFilter {

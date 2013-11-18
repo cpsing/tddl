@@ -23,6 +23,10 @@ public class CobarSqlParseManager implements SqlParseManager {
                                                                     .expireAfterWrite(30000, TimeUnit.MILLISECONDS)
                                                                     .build();
 
+    public SqlAnalysisResult parse(String sql) throws SqlParserException {
+        return parse(sql, true);
+    }
+
     public SqlAnalysisResult parse(final String sql, boolean cached) throws SqlParserException {
         CobarSqlAnalysisResult result = null;
         try {

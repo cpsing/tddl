@@ -24,7 +24,7 @@ import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
+import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.exceptions.QueryException;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
@@ -202,7 +202,7 @@ public class JoinNode extends QueryTreeNode {
 
     }
 
-    public IDataNodeExecutor toDataNodeExecutor() throws QueryException {
+    public IQueryTree toDataNodeExecutor() throws QueryException {
         return this.getJoinStrategy().getQuery(this, null);
     }
 
@@ -481,7 +481,7 @@ public class JoinNode extends QueryTreeNode {
             appendField(sb, "type", "outer join", tabContent);
         }
 
-        appendField(sb, "valueFilter", printFilterString(this.getResultFilter()), tabContent);
+        appendField(sb, "resultFilter", printFilterString(this.getResultFilter()), tabContent);
         appendField(sb, "whereFilter", printFilterString(this.getWhereFilter()), tabContent);
         appendField(sb, "allWhereFilter", printFilterString(this.getAllWhereFilter()), tabContent);
         appendField(sb, "having", printFilterString(this.getHavingFilter()), tabContent);
@@ -502,9 +502,9 @@ public class JoinNode extends QueryTreeNode {
         appendField(sb, "executeOn", this.getDataNode(), tabContent);
 
         appendln(sb, tabContent + "left:");
-        sb.append(this.getLeftNode().toString(inden + 1));
+        sb.append(this.getLeftNode().toString(inden + 2));
         appendln(sb, tabContent + "right:");
-        sb.append(this.getRightNode().toString(inden + 1));
+        sb.append(this.getRightNode().toString(inden + 2));
         return sb.toString();
     }
 }

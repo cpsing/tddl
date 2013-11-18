@@ -23,7 +23,6 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
 /**
  * DML操作树
  * 
- * @author jianghang 2013-11-8 下午2:34:39
  * @since 5.1.0
  */
 public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
@@ -44,11 +43,11 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
         return this;
     }
 
-    public QueryTreeNode getQueryTreeNode() {
+    public QueryTreeNode getNode() {
         return this.qtn;
     }
 
-    public DMLNode setQueryTreeNode(QueryTreeNode qtn) {
+    public DMLNode setNode(QueryTreeNode qtn) {
         this.qtn = qtn;
         return this;
     }
@@ -175,7 +174,7 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
     }
 
     public void assignment(Map<Integer, ParameterContext> parameterSettings) {
-        QueryTreeNode qct = getQueryTreeNode();
+        QueryTreeNode qct = getNode();
 
         if (qct != null) {
             qct.assignment(parameterSettings);
@@ -228,10 +227,14 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
         OptimizerToString.appendField(sb, "columns", this.getColumns(), tabContent);
         OptimizerToString.appendField(sb, "values", this.getValues(), tabContent);
 
-        if (this.getQueryTreeNode() != null) {
+        if (this.getNode() != null) {
             OptimizerToString.appendln(sb, tabContent + "query:");
-            sb.append(this.getQueryTreeNode().toString(inden + 1));
+            sb.append(this.getNode().toString(inden + 1));
         }
         return sb.toString();
+    }
+
+    public String toString() {
+        return this.toString(0);
     }
 }

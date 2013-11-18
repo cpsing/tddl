@@ -17,7 +17,7 @@ import com.taobao.tddl.optimizer.utils.OptimizerUtils;
  * @author jianghang 2013-11-13 下午12:57:23
  * @since 5.1.0
  */
-public abstract class TableNodeBuilder extends QueryTreeNodeBuilder {
+public class TableNodeBuilder extends QueryTreeNodeBuilder {
 
     public TableNodeBuilder(TableNode tableNode){
         this.setNode(tableNode);

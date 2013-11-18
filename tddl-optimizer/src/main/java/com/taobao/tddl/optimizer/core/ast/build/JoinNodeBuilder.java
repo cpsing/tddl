@@ -81,19 +81,27 @@ public class JoinNodeBuilder extends QueryTreeNodeBuilder {
         for (IBooleanFilter f : this.getNode().getJoinFilter()) {
 
             ISelectable leftKey = null;
-            if (f.getColumn() != null && f.getColumn() instanceof ISelectable) leftKey = this.getColumnFromOtherNodeWithTableAlias((ISelectable) f.getColumn(),
-                this.getNode().getLeftNode());
+            if (f.getColumn() != null && f.getColumn() instanceof ISelectable) {
+                leftKey = this.getColumnFromOtherNodeWithTableAlias((ISelectable) f.getColumn(), this.getNode()
+                    .getLeftNode());
+            }
 
             ISelectable rightKey = null;
-            if (f.getValue() != null && f.getValue() instanceof ISelectable) rightKey = this.getColumnFromOtherNodeWithTableAlias((ISelectable) f.getValue(),
-                this.getNode().getRightNode());
+            if (f.getValue() != null && f.getValue() instanceof ISelectable) {
+                rightKey = this.getColumnFromOtherNodeWithTableAlias((ISelectable) f.getValue(), this.getNode()
+                    .getRightNode());
+            }
 
             if (leftKey == null || rightKey == null) {
-                if (f.getValue() != null && f.getValue() instanceof ISelectable) leftKey = this.getColumnFromOtherNodeWithTableAlias((ISelectable) f.getValue(),
-                    this.getNode().getLeftNode());
+                if (f.getValue() != null && f.getValue() instanceof ISelectable) {
+                    leftKey = this.getColumnFromOtherNodeWithTableAlias((ISelectable) f.getValue(), this.getNode()
+                        .getLeftNode());
+                }
 
-                if (f.getColumn() != null && f.getColumn() instanceof ISelectable) rightKey = this.getColumnFromOtherNodeWithTableAlias((ISelectable) f.getColumn(),
-                    this.getNode().getRightNode());
+                if (f.getColumn() != null && f.getColumn() instanceof ISelectable) {
+                    rightKey = this.getColumnFromOtherNodeWithTableAlias((ISelectable) f.getColumn(), this.getNode()
+                        .getRightNode());
+                }
             }
 
             if (leftKey == null || rightKey == null) {

@@ -20,7 +20,6 @@ import com.taobao.tddl.optimizer.core.function.ScalarFunction;
 import com.taobao.tddl.optimizer.core.function.scalar.Dummy;
 
 /**
- * @author jianghang 2013-11-13 下午5:25:35
  * @since 5.1.0
  */
 public class Function<RT extends IFunction> implements IFunction<RT> {

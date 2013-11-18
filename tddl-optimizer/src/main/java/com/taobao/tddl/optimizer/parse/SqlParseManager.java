@@ -10,5 +10,7 @@ import com.taobao.tddl.optimizer.exceptions.SqlParserException;
  */
 public interface SqlParseManager {
 
+    public SqlAnalysisResult parse(final String sql) throws SqlParserException;
+
     public SqlAnalysisResult parse(final String sql, boolean cached) throws SqlParserException;
 }

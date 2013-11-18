@@ -12,7 +12,6 @@ import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
 import com.taobao.tddl.optimizer.utils.OptimizerToString;
 
 /**
- * @author jianghang 2013-11-13 下午6:24:08
  * @since 5.1.0
  */
 public class LogicalFilter extends Function<ILogicalFilter> implements ILogicalFilter {

@@ -47,4 +47,8 @@ public abstract class AbstractJoinStrategy implements JoinStrategy {
         return join;
     }
 
+    public String toString() {
+        return getType().toString();
+    }
+
 }

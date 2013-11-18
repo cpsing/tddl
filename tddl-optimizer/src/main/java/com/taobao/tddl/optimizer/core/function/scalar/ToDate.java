@@ -10,7 +10,6 @@ import com.taobao.tddl.optimizer.core.function.ScalarFunction;
 import com.taobao.tddl.optimizer.exceptions.FunctionException;
 
 /**
- * @author jianghang 2013-11-8 下午4:42:27
  * @since 5.1.0
  */
 public class ToDate extends ScalarFunction {

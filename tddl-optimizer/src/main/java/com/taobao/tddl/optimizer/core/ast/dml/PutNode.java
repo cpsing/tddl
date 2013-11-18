@@ -14,22 +14,22 @@ public class PutNode extends DMLNode<PutNode> {
         super(qtn);
     }
 
-    public TableNode getQueryTreeNode() {
+    public TableNode getNode() {
         return (TableNode) this.qtn;
     }
 
     public TableMeta getTableMeta() {
-        return this.getQueryTreeNode().getTableMeta();
+        return this.getNode().getTableMeta();
     }
 
     public IDataNodeExecutor toDataNodeExecutor() {
         IReplace put = ASTNodeFactory.getInstance().createReplace();
-        // put.setDbName(this.getNode().getDbName());
-        // put.setIndexName(this.getNode().getIndexUsed().getName());
-        // put.setConsistent(true);
-        // put.setUpdateColumns(this.getColumns());
-        // put.setUpdateValues(this.getValues());
-        // put.executeOn(this.getDataNode());
+        put.setSchemaName(this.getNode().getSchemaName());
+        put.setIndexName(this.getNode().getIndexUsed().getName());
+        put.setConsistent(true);
+        put.setUpdateColumns(this.getColumns());
+        put.setUpdateValues(this.getValues());
+        put.executeOn(this.getDataNode());
         return put;
     }
 

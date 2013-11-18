@@ -8,7 +8,6 @@ import com.taobao.tddl.optimizer.core.CanVisit;
 /**
  * 描述执行计划
  * 
- * @author jianghang 2013-11-8 下午2:23:50
  * @since 5.1.0
  */
 public interface IDataNodeExecutor<RT extends IDataNodeExecutor> extends CanVisit {
@@ -106,21 +105,21 @@ public interface IDataNodeExecutor<RT extends IDataNodeExecutor> extends CanVisi
      * 
      * @param thread
      */
-    public void setThread(Integer thread);
+    public RT setThread(Integer thread);
 
     public RT assignment(Map<Integer, ParameterContext> parameterSettings);
 
     public Object getExtra();
 
-    public void setExtra(Object obj);
+    public RT setExtra(Object obj);
 
     public boolean isUseBIO();
 
-    public void setUseBIO(boolean useBIO);
+    public RT setUseBIO(boolean useBIO);
 
     public boolean isStreaming();
 
-    public void setStreaming(boolean streaming);
+    public RT setStreaming(boolean streaming);
 
     public String getSql();
 
@@ -129,6 +128,4 @@ public interface IDataNodeExecutor<RT extends IDataNodeExecutor> extends CanVisi
     // ------------------复制----------------
 
     public RT copy();
-
-    public RT getNewInstance();
 }

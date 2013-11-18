@@ -5,7 +5,6 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.function.ScalarFunction;
 
 /**
- * @author jianghang 2013-11-8 下午4:25:32
  * @since 5.1.0
  */
 public class Curdate extends ScalarFunction {

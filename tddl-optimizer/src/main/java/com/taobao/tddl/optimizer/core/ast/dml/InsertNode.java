@@ -15,25 +15,23 @@ public class InsertNode extends DMLNode<InsertNode> {
         super(qtn);
     }
 
-    public TableNode getQueryTreeNode() {
+    public TableNode getNode() {
         return (TableNode) this.qtn;
     }
 
     public TableMeta getTableMeta() {
-        return this.getQueryTreeNode().getTableMeta();
+        return this.getNode().getTableMeta();
     }
 
     public IDataNodeExecutor toDataNodeExecutor() {
         IInsert insert = ASTNodeFactory.getInstance().createInsert();
-        // TODO
-        // insert.setDbName(this.getNode().getDbName());
-        // insert.setIndexName((this.getNode()).getIndexUsed().getName());
-        //
-        // insert.setConsistent(true);
-        // insert.setUpdateColumns(this.getColumns());
-        // insert.setUpdateValues(this.getValues());
-        // insert.executeOn(this.getDataNode());
-        //
+        insert.setSchemaName(this.getNode().getSchemaName());
+        insert.setIndexName((this.getNode()).getIndexUsed().getName());
+
+        insert.setConsistent(true);
+        insert.setUpdateColumns(this.getColumns());
+        insert.setUpdateValues(this.getValues());
+        insert.executeOn(this.getDataNode());
         return insert;
     }
 

@@ -642,6 +642,9 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         } else if (ifilter instanceof ILogicalFilter) {
             ILogicalFilter ilf = (ILogicalFilter) ifilter;
             if (!ilf.getOperation().equals(OPERATION.AND)) {
+                // 比如出现 A.id = B.id And ( A.id = 1 or A.name = 3)
+                // 这里的or条件可直接做为other join filter
+                // 如果出现 A.id = B.id OR A.name = B.name，那就是一个未知情况了
                 joinNode.setOtherJoinOnFilter(ilf);
             } else {
                 List<IFilter> subFilter = ilf.getSubFilter();

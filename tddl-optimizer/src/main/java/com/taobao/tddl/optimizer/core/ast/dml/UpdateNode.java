@@ -6,6 +6,7 @@ import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.DMLNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
+import com.taobao.tddl.optimizer.core.ast.query.KVIndexNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
@@ -18,12 +19,12 @@ public class UpdateNode extends DMLNode<UpdateNode> {
         super(qtn);
     }
 
-    public TableNode getQueryTreeNode() {
+    public TableNode getNode() {
         return (TableNode) this.qtn;
     }
 
     public TableMeta getTableMeta() {
-        return this.getQueryTreeNode().getTableMeta();
+        return this.getNode().getTableMeta();
     }
 
     public UpdateNode setUpdateColumns(List<ISelectable> columns) {
@@ -45,8 +46,32 @@ public class UpdateNode extends DMLNode<UpdateNode> {
     }
 
     public IDataNodeExecutor toDataNodeExecutor() throws QueryException {
-        // TODO
+        convertTypeToSatifyColumnMeta(this.getUpdateColumns(), values);
         IUpdate update = ASTNodeFactory.getInstance().createUpdate();
+        for (ISelectable updateColumn : this.getColumns()) {
+
+            if (((TableNode) this.getNode()).getTableMeta().getPrimaryIndex().getPartitionColumns() != null) {
+                if (((TableNode) this.getNode()).getTableMeta()
+                    .getPrimaryIndex()
+                    .getPartitionColumns()
+                    .contains(updateColumn.getColumnName()))
+
+                throw new IllegalArgumentException("column :" + updateColumn.getColumnName() + " 是分库键，不允许修改");
+            }
+            if (((TableNode) this.getNode()).getTableMeta()
+                .getPrimaryKeyMap()
+                .containsKey(updateColumn.getColumnName())) {
+                throw new IllegalArgumentException("column :" + updateColumn.getColumnName() + " 是主键，不允许修改");
+            }
+        }
+
+        update.setConsistent(true);
+        update.executeOn(this.getNode().getDataNode());
+        update.setQueryTree(this.getNode().toDataNodeExecutor());
+        update.setUpdateColumns(this.getUpdateColumns());
+        update.setUpdateValues(values);
+        update.setSchemaName(((TableNode) this.getNode()).getSchemaName());
+        update.setIndexName(((KVIndexNode) this.getNode()).getIndexUsed().getName());
         return update;
     }
 

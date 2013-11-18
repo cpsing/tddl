@@ -19,8 +19,11 @@ import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
+import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree.LOCK_MODEL;
 import com.taobao.tddl.optimizer.core.plan.query.IParallelizableQueryTree.QUERY_CONCURRENCY;
+import com.taobao.tddl.optimizer.exceptions.QueryException;
+import com.taobao.tddl.optimizer.utils.FilterUtils;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
 
 /**
@@ -132,6 +135,8 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
      */
     public abstract List<IOrderBy> getImplicitOrderBys();
 
+    public abstract IQueryTree toDataNodeExecutor() throws QueryException;
+
     /**
      * 获取builder对象
      */
@@ -230,15 +235,8 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
     }
 
     public QueryTreeNode query(String where) {
-        where = where.toUpperCase();
-        // RestrictionParser parser = new RestrictionParserImpl(oc);
-        //
-        // try {
-        // return this.query(parser.parse(where));
-        // } catch (Exception e) {
-        // throw new RuntimeException(e);
-        // }
-        return null;
+        this.whereFilter = FilterUtils.createFilter(where);
+        return this;
     }
 
     public String getAlias() {
@@ -495,16 +493,14 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
     }
 
     public QueryTreeNode orderBy(String o) {
+        return orderBy(o, true);
+    }
+
+    public QueryTreeNode orderBy(String o, boolean asc) {
         String column;
         IOrderBy orderBy = ASTNodeFactory.getInstance().createOrderBy();
-        if (o.trim().startsWith("-")) {
-            column = o.split("-")[1];
-            orderBy.setDirection(false);
-        } else {
-            column = o;
-            orderBy.setDirection(true);
-        }
-
+        column = o;
+        orderBy.setDirection(asc);
         return this.orderBy(OptimizerUtils.createColumnFromString(column), orderBy.getDirection());
     }
 
@@ -600,16 +596,18 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         return otherJoinOnFilter;
     }
 
-    public void setOtherJoinOnFilter(IFilter otherJoinOnFilter) {
+    public QueryTreeNode setOtherJoinOnFilter(IFilter otherJoinOnFilter) {
         this.otherJoinOnFilter = otherJoinOnFilter;
+        return this;
     }
 
     public IFilter getAllWhereFilter() {
         return allWhereFilter;
     }
 
-    public void setAllWhereFilter(IFilter allWhereFilter) {
+    public QueryTreeNode setAllWhereFilter(IFilter allWhereFilter) {
         this.allWhereFilter = allWhereFilter;
+        return this;
     }
 
     public LOCK_MODEL getLockModel() {

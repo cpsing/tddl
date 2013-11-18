@@ -13,6 +13,14 @@ import com.taobao.tddl.optimizer.core.expression.bean.Column;
 import com.taobao.tddl.optimizer.core.expression.bean.Function;
 import com.taobao.tddl.optimizer.core.expression.bean.LogicalFilter;
 import com.taobao.tddl.optimizer.core.expression.bean.NullValue;
+import com.taobao.tddl.optimizer.core.expression.bean.OrderBy;
+import com.taobao.tddl.optimizer.core.plan.bean.Delete;
+import com.taobao.tddl.optimizer.core.plan.bean.Insert;
+import com.taobao.tddl.optimizer.core.plan.bean.Join;
+import com.taobao.tddl.optimizer.core.plan.bean.Merge;
+import com.taobao.tddl.optimizer.core.plan.bean.Query;
+import com.taobao.tddl.optimizer.core.plan.bean.Replace;
+import com.taobao.tddl.optimizer.core.plan.bean.Update;
 import com.taobao.tddl.optimizer.core.plan.dml.IDelete;
 import com.taobao.tddl.optimizer.core.plan.dml.IInsert;
 import com.taobao.tddl.optimizer.core.plan.dml.IReplace;
@@ -46,23 +54,23 @@ public class ASTNodeFactory {
     }
 
     public IQuery createQuery() {
-        return null;
+        return new Query();
     }
 
     public IReplace createReplace() {
-        return null;
+        return new Replace();
     }
 
     public IInsert createInsert() {
-        return null;
+        return new Insert();
     }
 
     public IDelete createDelete() {
-        return null;
+        return new Delete();
     }
 
     public IUpdate createUpdate() {
-        return null;
+        return new Update();
     }
 
     public IColumn createColumn() {
@@ -70,15 +78,15 @@ public class ASTNodeFactory {
     }
 
     public IOrderBy createOrderBy() {
-        return null;
+        return new OrderBy();
     }
 
     public IJoin createJoin() {
-        return null;
+        return new Join();
     }
 
     public IMerge createMerge() {
-        return null;
+        return new Merge();
     }
 
     public IBindVal createBindValue(int bind) {

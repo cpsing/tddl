@@ -13,7 +13,6 @@ import com.taobao.tddl.optimizer.exceptions.FunctionException;
 /**
  * Avg函数处理比较特殊，会将AVG转化为SUM + COUNT，拿到所有库的数据后再计算AVG
  * 
- * @author jianghang 2013-11-8 下午4:09:59
  * @since 5.1.0
  */
 public class Avg extends AggregateFunction {
