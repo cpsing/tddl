@@ -225,6 +225,21 @@ public class FilterUtils {
     }
 
     /**
+     * 根据column进行filter归类
+     */
+    public static Map<Comparable, List<IFilter>> toColumnFiltersMap(List<IFilter> DNFNode) {
+        Map<Comparable, List<IFilter>> columns = new HashMap(DNFNode.size());
+        for (IFilter boolNode : DNFNode) {
+            if (!columns.containsKey(((IBooleanFilter) boolNode).getColumn())) {
+                columns.put(((IBooleanFilter) boolNode).getColumn(), new LinkedList());
+            }
+
+            columns.get(((IBooleanFilter) boolNode).getColumn()).add(boolNode);
+        }
+        return columns;
+    }
+
+    /**
      * 非严格DNF检查，允许出现 Filter(A and B)
      */
     public static boolean isDNF(IFilter node) {

@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 
 import com.taobao.tddl.common.TddlConstants;
 import com.taobao.tddl.common.model.DBType;
-import com.taobao.tddl.common.utils.DataSourceType;
+import com.taobao.tddl.common.model.DataSourceType;
 import com.taobao.tddl.common.utils.mbean.TddlMBeanServer;
 import com.taobao.tddl.group.config.ConfigManager;
 import com.taobao.tddl.group.dbselector.DBSelector;

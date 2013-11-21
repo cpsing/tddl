@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -298,6 +299,18 @@ public class OptimizerUtils {
         }
 
         return (IColumn) column;
+    }
+
+    /**
+     * 将columnMeta转化为column列
+     */
+    public static List<ISelectable> columnMetaListToIColumnList(Collection<ColumnMeta> ms, String tableName) {
+        List<ISelectable> cs = new ArrayList(ms.size());
+        for (ColumnMeta m : ms) {
+            cs.add(columnMetaToIColumn(m, tableName));
+        }
+
+        return cs;
     }
 
     // --------------------------- assignment --------------------------

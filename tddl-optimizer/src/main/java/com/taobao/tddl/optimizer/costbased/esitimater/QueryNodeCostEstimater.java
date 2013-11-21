@@ -13,15 +13,16 @@ import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
-import com.taobao.tddl.optimizer.costbased.Cost;
 import com.taobao.tddl.optimizer.costbased.esitimater.stat.KVIndexStat;
 import com.taobao.tddl.optimizer.costbased.esitimater.stat.TableColumnStat;
 import com.taobao.tddl.optimizer.exceptions.StatisticsUnavailableException;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
 
+/**
+ * @author Dreamond
+ */
 public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
 
-    @Override
     public Cost estimate(QueryTreeNode q) throws StatisticsUnavailableException {
         QueryTreeNode query = (QueryTreeNode) q;
         Cost cost = new Cost();
@@ -30,13 +31,11 @@ public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
         long scanRowCount = 0;
 
         boolean isOnfly = false;
-
+        IndexMeta index = null;
         // step1.估算行数
         if (query instanceof QueryNode) {
             // 查询对象是另一个查询，说明数据是on fly的，根据子查询提供的行数来确定初始行数
-            Cost childCost = CostEsitimaterFactory.getCostEstimater(((QueryNode) query).getChild())
-                .estimate(((QueryNode) query).getChild());
-
+            Cost childCost = CostEsitimaterFactory.estimater(((QueryNode) query).getChild());
             initRowCount = childCost.getRowCount();
             isOnfly = true;
         } else if (query instanceof TableNode) {
@@ -47,6 +46,7 @@ public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
             // if (stat != null) {
             // initRowCount = stat.getTableRows();
             // } else {
+            index = ((TableNode) query).getIndexUsed();
             initRowCount = 1000;
             // throw new StatisticsUnavailableException();
             // }
@@ -63,40 +63,27 @@ public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
         // 主键是唯一的，如果在主键上进行了=操作，最后结果肯定不超过1
         // 对于唯一的列也是同理，但是现在还不支持
         // TODO:暂时没有考虑倒排索引
-        IndexMeta index = null;
-
         if (this.isAllEqualOrIS(keyFilters) && index != null && index.isPrimaryKeyIndex()) {
             rowCount = 1;
             scanRowCount = 1;
-
-        }
-
-        // 对于包含limit的查询，使用limit提供的结果
-        else if (query.getLimitFrom() != null
-                 && (query.getLimitFrom() instanceof Long || query.getLimitFrom() instanceof Long)
-                 && (Long) query.getLimitFrom() != 0 && query.getLimitTo() != null
-                 && (query.getLimitTo() instanceof Long || query.getLimitTo() instanceof Long)
-                 && (Long) query.getLimitTo() != 0) {
-
+        } else if (query.getLimitFrom() != null
+                   && (query.getLimitFrom() instanceof Long || query.getLimitFrom() instanceof Long)
+                   && (Long) query.getLimitFrom() != 0 && query.getLimitTo() != null
+                   && (query.getLimitTo() instanceof Long || query.getLimitTo() instanceof Long)
+                   && (Long) query.getLimitTo() != 0) {
+            // 对于包含limit的查询，使用limit提供的结果
             rowCount = (Long) query.getLimitTo() - (Long) query.getLimitFrom();
-
             scanRowCount = this.estimateRowCount(initRowCount, keyFilters, index, columnStat, indexStat);
-
             scanRowCount = rowCount;
         } else if (query.getLimitFrom() != null || query.getLimitTo() != null) {
             rowCount = this.estimateRowCount(initRowCount, keyFilters, index, columnStat, indexStat) / 2;
             scanRowCount = rowCount;
-
             rowCount = this.estimateRowCount(rowCount, valueFilters, index, columnStat, indexStat);
-        }
-        // 对于其他情况，则根据约束条件进行推算
-        else {
-
+        } else {
+            // 对于其他情况，则根据约束条件进行推算
             rowCount = this.estimateRowCount(initRowCount, keyFilters, index, columnStat, indexStat);
             scanRowCount = rowCount;
-
             rowCount = this.estimateRowCount(rowCount, valueFilters, index, columnStat, indexStat);
-
         }
 
         long networkCost = 0;
@@ -105,13 +92,11 @@ public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
             if (query.getDataNode() == null
                 || (query.getDataNode().equals(((QueryNode) query).getChild().getDataNode()))) {
                 // 如果当前的查询和子查询在一台机器上执行，则网络开销为0
-
                 networkCost = 0;
             } else {
                 // 如果当前的查询和子查询不在一台机器上，则需要将子查询的数据传输到当前查询的机器上
                 // 所以网络开销就为子查询结果的行数
                 // （目前只用行数作为开销的依据，没有考虑字段的大小等复杂因素）
-
                 networkCost = initRowCount;
             }
         } else {
@@ -138,10 +123,15 @@ public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
         return true;
     }
 
+    /**
+     * 估算查询的row行数
+     */
     private long estimateRowCount(long oldCount, List<IFilter> filters, IndexMeta index, TableColumnStat columnStat,
                                   KVIndexStat indexStat) {
         // indexMeta
-        if (filters == null || filters.isEmpty()) return oldCount;
+        if (filters == null || filters.isEmpty()) {
+            return oldCount;
+        }
 
         Map<String, Double> columnAndColumnCountItSelectivity = new HashMap();
         if (index != null && indexStat != null) {
@@ -174,7 +164,6 @@ public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
 
             count *= selectivity;
         }
-
         return count;
     }
 

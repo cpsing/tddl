@@ -1,7 +1,7 @@
 package com.taobao.tddl.atom;
 
 import com.taobao.tddl.atom.common.TAtomConstants;
-import com.taobao.tddl.common.utils.DataSourceType;
+import com.taobao.tddl.common.model.DataSourceType;
 
 /**
  * 数据库类型枚举类型

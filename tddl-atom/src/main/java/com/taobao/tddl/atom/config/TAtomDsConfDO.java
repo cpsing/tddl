@@ -6,7 +6,7 @@ import java.util.Map;
 import com.taobao.tddl.atom.TAtomDbStatusEnum;
 import com.taobao.tddl.atom.TAtomDbTypeEnum;
 import com.taobao.tddl.atom.common.TAtomConstants;
-import com.taobao.tddl.common.utils.DataSourceType;
+import com.taobao.tddl.common.model.DataSourceType;
 import com.taobao.tddl.common.utils.TStringUtil;
 
 /**

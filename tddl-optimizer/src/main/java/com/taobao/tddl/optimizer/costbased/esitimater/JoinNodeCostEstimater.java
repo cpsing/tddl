@@ -3,7 +3,6 @@ package com.taobao.tddl.optimizer.costbased.esitimater;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.query.JoinNode;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinType;
-import com.taobao.tddl.optimizer.costbased.Cost;
 import com.taobao.tddl.optimizer.exceptions.StatisticsUnavailableException;
 
 /**
@@ -14,8 +13,8 @@ public class JoinNodeCostEstimater implements QueryTreeCostEstimater {
     public Cost estimate(QueryTreeNode query) throws StatisticsUnavailableException {
         JoinNode join = (JoinNode) query;
 
-        Cost leftCost = CostEsitimaterFactory.getCostEstimater(join.getLeftNode()).estimate(join.getLeftNode());
-        Cost rightCost = CostEsitimaterFactory.getCostEstimater(join.getRightNode()).estimate(join.getRightNode());
+        Cost leftCost = CostEsitimaterFactory.estimater(join.getLeftNode());
+        Cost rightCost = CostEsitimaterFactory.estimater(join.getRightNode());
         Cost cost = new Cost();
         cost.setIsOnFly(true);
         long rowCount = 0;
@@ -51,15 +50,12 @@ public class JoinNodeCostEstimater implements QueryTreeCostEstimater {
         if (join.getJoinStrategy().getType() == JoinType.INDEX_NEST_LOOP) {
             cost.setDiskIO(leftCost.getRowCount());
             isOnFly = false;
-
-            scanRowCount = leftCost.getScanCount() + leftCost.getScanCount();
+            scanRowCount = leftCost.getScanCount() + rightCost.getScanCount();
         } else {
-
             // sort merge
             // 右边的先要拿出数据
             // 再要将符合的数据插到临时表
             // 所以等于是两次
-
             scanRowCount = leftCost.getScanCount() + rightCost.getScanCount() * 2 + rightCost.getRowCount();
         }
 
@@ -77,7 +73,6 @@ public class JoinNodeCostEstimater implements QueryTreeCostEstimater {
         cost.setRowCount(rowCount);
         cost.setIsOnFly(isOnFly);
         cost.setScanCount(scanRowCount);
-
         return cost;
     }
 }

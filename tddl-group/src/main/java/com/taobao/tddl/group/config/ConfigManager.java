@@ -24,7 +24,7 @@ import com.taobao.tddl.atom.TAtomDataSource;
 import com.taobao.tddl.atom.TAtomDbStatusEnum;
 import com.taobao.tddl.atom.TAtomDsStandard;
 import com.taobao.tddl.common.model.DBType;
-import com.taobao.tddl.common.utils.DataSourceType;
+import com.taobao.tddl.common.model.DataSourceType;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;

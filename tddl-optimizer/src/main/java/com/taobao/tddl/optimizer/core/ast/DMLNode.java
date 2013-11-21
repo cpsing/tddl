@@ -1,16 +1,12 @@
 package com.taobao.tddl.optimizer.core.ast;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
-import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
-import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.expression.IBindVal;
-import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.expression.bean.NullValue;
@@ -94,8 +90,8 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
         }
 
         if (columns == null || columns.isEmpty()) { // 如果字段为空，默认为所有的字段数据
-            columns = columnMetaListToIColumnList(this.getTableMeta().getAllColumns(), this.getTableMeta()
-                .getTableName());
+            columns = OptimizerUtils.columnMetaListToIColumnList(this.getTableMeta().getAllColumns(),
+                this.getTableMeta().getTableName());
         }
 
         if (columns.size() != values.size()) {
@@ -125,26 +121,6 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
         }
 
         convertTypeToSatifyColumnMeta(this.getColumns(), this.getValues());
-    }
-
-    /**
-     * 将columnMeta转化为column列
-     */
-    protected List<ISelectable> columnMetaListToIColumnList(Collection<ColumnMeta> ms, String tableName) {
-        List<ISelectable> cs = new ArrayList(ms.size());
-        for (ColumnMeta m : ms) {
-            cs.add(columnMetaToIColumn(m, tableName));
-        }
-
-        return cs;
-    }
-
-    protected IColumn columnMetaToIColumn(ColumnMeta m, String tableName) {
-        IColumn c = ASTNodeFactory.getInstance().createColumn();
-        c.setDataType(m.getDataType());
-        c.setColumnName(m.getName());
-        c.setTableName(tableName);
-        return c;
     }
 
     /**
