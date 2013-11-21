@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.model.sqljep;
+package com.taobao.tddl.rule.model.sqljep;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;

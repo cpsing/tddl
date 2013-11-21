@@ -4,9 +4,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 
-import com.taobao.tddl.common.model.sqljep.Comparative;
 import com.taobao.tddl.common.utils.thread.ThreadLocalMap;
 import com.taobao.tddl.rule.model.DateEnumerationParameter;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
 
 /**
  * 基于时间类型的枚举器

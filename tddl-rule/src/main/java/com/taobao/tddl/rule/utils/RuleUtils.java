@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.taobao.tddl.common.model.sqljep.Comparative;
 import com.taobao.tddl.rule.enumerator.Enumerator;
 import com.taobao.tddl.rule.enumerator.EnumeratorImp;
 import com.taobao.tddl.rule.model.AdvancedParameter;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
 
 public class RuleUtils {
 

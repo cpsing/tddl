@@ -16,5 +16,8 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE, ElementType.METHOD })
 public @interface Activate {
 
+    String name() default ""; // 可以为每个组件定义一个name，通过load的时候指定name即可匹配
+
     int order() default 0;
+
 }

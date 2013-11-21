@@ -10,12 +10,12 @@ import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 
-import com.taobao.tddl.common.model.sqljep.Comparative;
-import com.taobao.tddl.common.model.sqljep.ComparativeAND;
-import com.taobao.tddl.common.model.sqljep.ComparativeBaseList;
-import com.taobao.tddl.common.model.sqljep.ComparativeOR;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.rule.exceptions.TddlRuleException;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
+import com.taobao.tddl.rule.model.sqljep.ComparativeAND;
+import com.taobao.tddl.rule.model.sqljep.ComparativeBaseList;
+import com.taobao.tddl.rule.model.sqljep.ComparativeOR;
 
 /**
  * 提供一种机制，允许业务自定义condition，通过该解析类转化为Rule锁需要的{@linkplain Comparative}对象
@@ -106,7 +106,7 @@ public class ComparativeStringAnalyser {
         boolean containsIn = TStringUtil.contains(compValue, " in");
         Comparative comparative = null;
         if (!containsIn) {
-            int compEnum = Comparative.getComparisonByCompleteString(compValue);
+            int compEnum = Comparative.getComparisonByIdent(compValue);
             String splitor = Comparative.getComparisonName(compEnum);
             int size = splitor.length();
             int index = compValue.indexOf(splitor);
@@ -197,7 +197,7 @@ public class ComparativeStringAnalyser {
             String[] compValues = TStringUtil.twoPartSplit(compValue, " in");
             return compValues[0].trim();
         } else {
-            int value = Comparative.getComparisonByCompleteString(compValue);
+            int value = Comparative.getComparisonByIdent(compValue);
             String splitor = Comparative.getComparisonName(value);
             int index = compValue.indexOf(splitor);
             return TStringUtil.substring(compValue, 0, index).trim();

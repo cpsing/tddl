@@ -1,7 +1,7 @@
 package com.taobao.tddl.rule.enumerator;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
-import com.taobao.tddl.common.model.sqljep.Comparative;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
 
 public class EnumerationInterruptException extends TddlRuntimeException {
 

@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import com.taobao.tddl.common.model.sqljep.Comparative;
 import com.taobao.tddl.common.utils.TddlToStringStyle;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
 
 /**
  * 匹配结果对象

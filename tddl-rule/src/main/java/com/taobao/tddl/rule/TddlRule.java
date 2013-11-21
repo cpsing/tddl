@@ -7,13 +7,12 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
-import com.taobao.tddl.common.model.SqlType;
-import com.taobao.tddl.common.model.sqljep.Comparative;
-import com.taobao.tddl.common.model.sqljep.ComparativeMapChoicer;
 import com.taobao.tddl.rule.exceptions.RouteCompareDiffException;
 import com.taobao.tddl.rule.model.Field;
 import com.taobao.tddl.rule.model.MatcherResult;
 import com.taobao.tddl.rule.model.TargetDB;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
+import com.taobao.tddl.rule.model.sqljep.ComparativeMapChoicer;
 import com.taobao.tddl.rule.utils.ComparativeStringAnalyser;
 import com.taobao.tddl.rule.utils.MatchResultCompare;
 
@@ -75,7 +74,7 @@ public class TddlRule extends TddlRuleConfig implements TddlTableRule {
         }
     }
 
-    public MatcherResult routeMverAndCompare(SqlType sqlType, String vtab, ComparativeMapChoicer choicer,
+    public MatcherResult routeMverAndCompare(boolean isSelect, String vtab, ComparativeMapChoicer choicer,
                                              List<Object> args) throws RouteCompareDiffException {
         if (super.getAllVersions().size() == 0) {
             throw new RuntimeException("routeWithMulVersion method just support multy version rule,use route method instead or config with multy version style!");
@@ -93,7 +92,7 @@ public class TddlRule extends TddlRuleConfig implements TddlTableRule {
 
         // 第一个排位的为旧规则
         MatcherResult oldResult = route(vtab, choicer, args, super.getCurrentRule());
-        if (sqlType.equals(SqlType.SELECT) || sqlType.equals(SqlType.SELECT_FOR_UPDATE)) {
+        if (isSelect) {
             return oldResult;
         } else {
             // 第二个排位的为新规则

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.utils.TddlToStringStyle;
 
 /**
@@ -37,6 +38,16 @@ public class Matrix {
 
     public void setGroups(List<Group> groups) {
         this.groups = groups;
+    }
+
+    public Group getGroup(String groupName) {
+        for (Group group : groups) {
+            if (group.getName().equals(groupName)) {
+                return group;
+            }
+        }
+
+        throw new TddlRuntimeException("not found groupName : " + groupName);
     }
 
     public Map<String, String> getProperties() {

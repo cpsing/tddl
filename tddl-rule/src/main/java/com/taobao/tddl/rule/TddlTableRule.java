@@ -2,11 +2,10 @@ package com.taobao.tddl.rule;
 
 import java.util.List;
 
-import com.taobao.tddl.common.model.SqlType;
 import com.taobao.tddl.common.model.lifecycle.Lifecycle;
-import com.taobao.tddl.common.model.sqljep.ComparativeMapChoicer;
 import com.taobao.tddl.rule.exceptions.RouteCompareDiffException;
 import com.taobao.tddl.rule.model.MatcherResult;
+import com.taobao.tddl.rule.model.sqljep.ComparativeMapChoicer;
 
 /**
  * 基于tddl管理体系的table rule实现
@@ -70,7 +69,7 @@ public interface TddlTableRule extends Lifecycle {
      * @return
      * @throws RouteCompareDiffException
      */
-    public MatcherResult routeMverAndCompare(SqlType sqlType, String vtab, ComparativeMapChoicer choicer,
+    public MatcherResult routeMverAndCompare(boolean isSelect, String vtab, ComparativeMapChoicer choicer,
                                              List<Object> args) throws RouteCompareDiffException;
 
     // ==================== 以下方法可支持非jdbc协议使用rule =================

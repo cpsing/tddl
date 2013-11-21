@@ -14,8 +14,8 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.taobao.tddl.common.model.sqljep.Comparative;
 import com.taobao.tddl.rule.exceptions.TddlRuleException;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
 
 /**
  * 对默认的枚举器做测试

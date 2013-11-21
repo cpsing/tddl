@@ -6,7 +6,7 @@ import java.util.Date;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.taobao.tddl.common.model.sqljep.Comparative;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
 
 /**
  * @author <a href="junyu@taobao.com">junyu</a>

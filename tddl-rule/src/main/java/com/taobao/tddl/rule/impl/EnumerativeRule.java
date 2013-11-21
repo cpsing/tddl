@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.taobao.tddl.common.model.sqljep.Comparative;
 import com.taobao.tddl.rule.model.AdvancedParameter;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
 import com.taobao.tddl.rule.utils.AdvancedParameterParser;
 import com.taobao.tddl.rule.utils.RuleUtils;
 import com.taobao.tddl.rule.utils.sample.Samples;

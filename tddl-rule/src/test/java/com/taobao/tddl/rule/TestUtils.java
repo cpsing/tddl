@@ -9,9 +9,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.taobao.tddl.common.model.sqljep.Comparative;
-import com.taobao.tddl.common.model.sqljep.ComparativeAND;
-import com.taobao.tddl.common.model.sqljep.ComparativeOR;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
+import com.taobao.tddl.rule.model.sqljep.ComparativeAND;
+import com.taobao.tddl.rule.model.sqljep.ComparativeOR;
 
 public class TestUtils {
 

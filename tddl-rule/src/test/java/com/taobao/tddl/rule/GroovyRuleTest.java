@@ -12,10 +12,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
-import com.taobao.tddl.common.model.sqljep.Comparative;
 import com.taobao.tddl.rule.impl.GroovyRule;
 import com.taobao.tddl.rule.model.MatcherResult;
 import com.taobao.tddl.rule.model.TargetDB;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
 
 public class GroovyRuleTest extends BaseRuleTest {
 

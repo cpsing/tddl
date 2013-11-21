@@ -13,13 +13,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.google.common.collect.Lists;
-import com.taobao.tddl.common.model.SqlType;
-import com.taobao.tddl.common.model.sqljep.Comparative;
 import com.taobao.tddl.rule.BaseRuleTest.Choicer;
 import com.taobao.tddl.rule.exceptions.RouteCompareDiffException;
 import com.taobao.tddl.rule.exceptions.TddlRuleException;
 import com.taobao.tddl.rule.model.MatcherResult;
 import com.taobao.tddl.rule.model.TargetDB;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
 import com.taobao.tddl.rule.utils.MatchResultCompare;
 
 /**
@@ -156,7 +155,7 @@ public class LocalRuleTest {
         choicer.addComparative("MESSAGE_ID", new Comparative(Comparative.Equivalent, 1)); // 一定要大写
         MatcherResult result = null;
         try {
-            result = mvrRule.routeMverAndCompare(SqlType.UPDATE, "nserch", choicer, Lists.newArrayList());
+            result = mvrRule.routeMverAndCompare(false, "nserch", choicer, Lists.newArrayList());
         } catch (RouteCompareDiffException e) {
             Assert.fail(ExceptionUtils.getFullStackTrace(e));
         }

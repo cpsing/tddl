@@ -57,14 +57,14 @@ public class TableRule extends VirtualTableSupport implements VirtualTableRule {
     /** =================================================== **/
     /** == 原始的配置字符串 == **/
     /** =================================================== **/
-    protected String             dbNamePattern;              // item_{0000}_dbkey
-    protected String             tbNamePattern;              // item_{0000}
-    protected String[]           dbRules;                    // rule配置字符串
-    protected String[]           tbRules;                    // rule配置字符串
-    protected List<String>       extraPackages;              // 自定义用户包
+    protected String             dbNamePattern;               // item_{0000}_dbkey
+    protected String             tbNamePattern;               // item_{0000}
+    protected String[]           dbRules;                     // rule配置字符串
+    protected String[]           tbRules;                     // rule配置字符串
+    protected List<String>       extraPackages;               // 自定义用户包
 
-    protected boolean            allowReverseOutput;         // 是否允许反向输出
-    protected boolean            allowFullTableScan;         // 是否允许全表扫描
+    protected boolean            allowReverseOutput;          // 是否允许反向输出
+    protected boolean            allowFullTableScan;          // 是否允许全表扫描
     protected boolean            disableFullTableScan = true; // 是否关闭全表扫描
 
     /**
@@ -79,6 +79,16 @@ public class TableRule extends VirtualTableSupport implements VirtualTableRule {
     protected List<Rule<String>> dbShardRules;
     protected List<Rule<String>> tbShardRules;
     protected Object             outerContext;
+
+    /**
+     * 是否是个广播表，optimizer模块需要用他来标记某个表是否需要进行复制
+     */
+    protected boolean            broadcast            = false;
+
+    /**
+     * 相同的join group 应该具有相同的切分规则
+     */
+    protected String             joinGroup            = null;
 
     public void doInit() {
         // 初始化虚拟节点
@@ -381,10 +391,6 @@ public class TableRule extends VirtualTableSupport implements VirtualTableRule {
         return tbShardRules;
     }
 
-    public Map getActualTopology() {
-        return actualTopology;
-    }
-
     public Object getOuterContext() {
         return outerContext;
     }
@@ -431,5 +437,21 @@ public class TableRule extends VirtualTableSupport implements VirtualTableRule {
 
     public void setTableSlotKeyFormat(String tableSlotKeyFormat) {
         this.tableSlotKeyFormat = tableSlotKeyFormat;
+    }
+
+    public boolean isBroadcast() {
+        return broadcast;
+    }
+
+    public void setBroadcast(boolean broadcast) {
+        this.broadcast = broadcast;
+    }
+
+    public String getJoinGroup() {
+        return joinGroup;
+    }
+
+    public void setJoinGroup(String joinGroup) {
+        this.joinGroup = joinGroup;
     }
 }

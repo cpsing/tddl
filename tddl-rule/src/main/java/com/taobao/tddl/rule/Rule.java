@@ -3,7 +3,7 @@ package com.taobao.tddl.rule;
 import java.util.Map;
 import java.util.Set;
 
-import com.taobao.tddl.common.model.sqljep.Comparative;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
 
 /**
  * <pre>

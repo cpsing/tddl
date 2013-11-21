@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.taobao.tddl.common.model.sqljep.Comparative;
-import com.taobao.tddl.common.model.sqljep.ComparativeAND;
-import com.taobao.tddl.common.model.sqljep.ComparativeMapChoicer;
-import com.taobao.tddl.common.model.sqljep.ComparativeOR;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
+import com.taobao.tddl.rule.model.sqljep.ComparativeAND;
+import com.taobao.tddl.rule.model.sqljep.ComparativeMapChoicer;
+import com.taobao.tddl.rule.model.sqljep.ComparativeOR;
 
 public class BaseRuleTest {
 

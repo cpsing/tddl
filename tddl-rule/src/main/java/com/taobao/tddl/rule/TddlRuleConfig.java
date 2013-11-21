@@ -265,7 +265,7 @@ public class TddlRuleConfig extends AbstractLifecycle implements Lifecycle {
         try {
             Resource resource = new PathMatchingResourcePatternResolver().getResource(file);
             String ruleStr = StringUtils.join(IOUtils.readLines(resource.getInputStream()), SystemUtils.LINE_SEPARATOR);
-            return buildRuleByStr(ruleStr, version);
+            return buildRuleByStr(version, ruleStr);
         } catch (IOException e) {
             throw new TddlRuleException(e);
         }

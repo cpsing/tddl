@@ -36,13 +36,13 @@ public class EagleEyeRuleTest {
 
     @Test
     public void testNoitfy() {
-        MatcherResult target = rule.route("notify_msg", "message_id=1:int");
+        MatcherResult target = rule.route("notify_msg", "message_id in (8FABA2621386CA2924E0451F44D598A8):string");
         for (TargetDB db : target.getCalculationResult()) {
             System.out.println("--------------------------");
             System.out.println(db.getDbIndex() + " ---------> " + db.getTableNames());
         }
 
-        target = rule.route("notify_msg", "gmt_create_days=1:int");
+        target = rule.route("notify_msg", "gmt_create_days in (15970):int");
         for (TargetDB db : target.getCalculationResult()) {
             System.out.println("--------------------------");
             System.out.println(db.getDbIndex() + " ---------> " + db.getTableNames());

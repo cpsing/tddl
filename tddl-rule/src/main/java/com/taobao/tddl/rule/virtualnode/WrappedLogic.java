@@ -6,9 +6,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
-import com.taobao.tddl.common.model.sqljep.Comparative;
 import com.taobao.tddl.rule.enumerator.handler.CloseIntervalFieldsEnumeratorHandler;
 import com.taobao.tddl.rule.enumerator.handler.IntegerPartDiscontinousRangeEnumerator;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
 
 /**
  * @author <a href="junyu@taobao.com">junyu</a>

@@ -13,7 +13,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.google.common.collect.Lists;
-import com.taobao.tddl.common.model.SqlType;
 import com.taobao.tddl.rule.exceptions.RouteCompareDiffException;
 import com.taobao.tddl.rule.model.MatcherResult;
 import com.taobao.tddl.rule.model.TargetDB;
@@ -53,7 +52,7 @@ public class RemoteRuleIntegration extends BaseRuleTest {
 
         try {
             List<TargetDB> db = null;
-            MatcherResult result = rule.routeMverAndCompare(SqlType.SELECT,
+            MatcherResult result = rule.routeMverAndCompare(true,
                 "nserch",
                 new Choicer(ComparativeStringAnalyser.decodeComparativeString2Map(conditionStr)),
                 Lists.newArrayList());
@@ -82,7 +81,7 @@ public class RemoteRuleIntegration extends BaseRuleTest {
 
         try {
             List<TargetDB> db = null;
-            MatcherResult result = rule.routeMverAndCompare(SqlType.INSERT,
+            MatcherResult result = rule.routeMverAndCompare(true,
                 "nserch",
                 new Choicer(ComparativeStringAnalyser.decodeComparativeString2Map(conditionStr)),
                 Lists.newArrayList());

@@ -2,7 +2,7 @@ package com.taobao.tddl.rule.enumerator.handler;
 
 import java.util.Set;
 
-import com.taobao.tddl.common.model.sqljep.Comparative;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
 
 public interface CloseIntervalFieldsEnumeratorHandler {
 

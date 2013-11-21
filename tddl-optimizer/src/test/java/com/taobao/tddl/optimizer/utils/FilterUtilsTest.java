@@ -76,6 +76,21 @@ public class FilterUtilsTest {
 
     }
 
+    @Test
+    public void testCreateFilter() {
+        String where = "id > 1 and id <= 10";
+        IFilter filter = FilterUtils.createFilter(where);
+        System.out.println(filter);
+
+        where = "name = 'hello' and id in ('1','2')";
+        filter = FilterUtils.createFilter(where);
+        System.out.println(filter);
+
+        where = "gmt_create = '2013-11-11 11:11:11'";
+        filter = FilterUtils.createFilter(where);
+        System.out.println(filter);
+    }
+
     private IFilter filter(Comparable column) {
         IBooleanFilter booleanFilter = ASTNodeFactory.getInstance().createBooleanFilter();
         booleanFilter.setColumn(column).setValue(1).setOperation(OPERATION.EQ);

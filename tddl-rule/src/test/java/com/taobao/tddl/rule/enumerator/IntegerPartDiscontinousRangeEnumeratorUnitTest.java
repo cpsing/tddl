@@ -13,8 +13,8 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import com.taobao.tddl.common.model.sqljep.Comparative;
 import com.taobao.tddl.rule.TestUtils;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
 
 public class IntegerPartDiscontinousRangeEnumeratorUnitTest {
 

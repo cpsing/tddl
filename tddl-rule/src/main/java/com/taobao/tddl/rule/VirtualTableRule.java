@@ -56,4 +56,8 @@ public interface VirtualTableRule<D, T> {
     public String[] getDbRuleStrs();
 
     public String[] getTbRulesStrs();
+
+    public boolean isBroadcast();
+
+    public String getJoinGroup();
 }

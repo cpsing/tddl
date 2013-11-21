@@ -9,10 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.taobao.tddl.common.model.sqljep.Comparative;
-import com.taobao.tddl.common.model.sqljep.ComparativeAND;
-import com.taobao.tddl.common.model.sqljep.ComparativeBaseList;
-import com.taobao.tddl.common.model.sqljep.ComparativeOR;
 import com.taobao.tddl.rule.enumerator.handler.CloseIntervalFieldsEnumeratorHandler;
 import com.taobao.tddl.rule.enumerator.handler.DatePartDiscontinousRangeEnumerator;
 import com.taobao.tddl.rule.enumerator.handler.DefaultEnumerator;
@@ -20,6 +16,10 @@ import com.taobao.tddl.rule.enumerator.handler.IntegerPartDiscontinousRangeEnume
 import com.taobao.tddl.rule.enumerator.handler.LongPartDiscontinousRangeEnumerator;
 import com.taobao.tddl.rule.exceptions.TddlRuleException;
 import com.taobao.tddl.rule.model.AdvancedParameter;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
+import com.taobao.tddl.rule.model.sqljep.ComparativeAND;
+import com.taobao.tddl.rule.model.sqljep.ComparativeBaseList;
+import com.taobao.tddl.rule.model.sqljep.ComparativeOR;
 
 /**
  * 针对{@linkplain ComparativeBaseList}，基于{@linkplain AdvancedParameter}实现区间范围的枚举<br/>

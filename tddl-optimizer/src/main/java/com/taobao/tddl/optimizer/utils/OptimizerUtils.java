@@ -64,6 +64,7 @@ public class OptimizerUtils {
                 if (value != null && value instanceof Long) {
                     value = new Date((Long) value);
                 }
+
                 if (!(value instanceof Date)) {
                     value = null;
                     try {
@@ -278,6 +279,25 @@ public class OptimizerUtils {
         c.setColumnName(m.getName());
         c.setTableName(tableName);
         return c;
+    }
+
+    public static IColumn getColumn(Object column) {
+        return getIColumn(column);
+    }
+
+    public static IColumn getIColumn(Object column) {
+        if (column instanceof IFunction) {
+            return (IColumn) ASTNodeFactory.getInstance()
+                .createColumn()
+                .setTableName(((IFunction) column).getTableName())
+                .setColumnName(((IFunction) column).getColumnName())
+                .setAlias(((IFunction) column).getAlias())
+                .setDataType(((IFunction) column).getDataType());
+        } else if (!(column instanceof IColumn)) {
+            throw new IllegalArgumentException("column :" + column + " is not a icolumn");
+        }
+
+        return (IColumn) column;
     }
 
     // --------------------------- assignment --------------------------

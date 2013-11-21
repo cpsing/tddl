@@ -9,14 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.taobao.tddl.common.model.sqljep.Comparative;
-import com.taobao.tddl.common.model.sqljep.ComparativeMapChoicer;
 import com.taobao.tddl.rule.Rule.RuleColumn;
 import com.taobao.tddl.rule.impl.VirtualNodeGroovyRule;
 import com.taobao.tddl.rule.model.AdvancedParameter;
 import com.taobao.tddl.rule.model.Field;
 import com.taobao.tddl.rule.model.MatcherResult;
 import com.taobao.tddl.rule.model.TargetDB;
+import com.taobao.tddl.rule.model.sqljep.Comparative;
+import com.taobao.tddl.rule.model.sqljep.ComparativeMapChoicer;
 import com.taobao.tddl.rule.utils.RuleUtils;
 import com.taobao.tddl.rule.utils.sample.Samples;
 import com.taobao.tddl.rule.utils.sample.SamplesCtx;
@@ -274,11 +274,16 @@ public class VirtualTableRuleMatcher {
                                                        Rule<String> matchedTbRule,
                                                        Map<String, Comparative> matchedTbRuleArgs,
                                                        String[] commonColumn, Object outerCtx) {
-        SamplesCtx dbRuleCtx = null; // 对于表规则中与库规则列名相同而自增类型不同的列，将其表枚举结果加入库规则的枚举集
-        Set<AdvancedParameter> diifTypeInCommon = diifTypeInCommon(matchedDbRule, matchedTbRule, commonColumn);
-        if (diifTypeInCommon != null && !diifTypeInCommon.isEmpty()) {
+        SamplesCtx dbRuleCtx = null;
+        // 对于表规则中与库规则列名相同而自增类型不同的列，将其表枚举结果加入库规则的枚举集
+        Set<AdvancedParameter> mergeInCommon = diffTypeOrOptionalInCommon(matchedDbRule,
+            matchedTbRule,
+            commonColumn,
+            matchedDbRuleArgs,
+            matchedTbRuleArgs);
+        if (mergeInCommon != null && !mergeInCommon.isEmpty()) {
             // 公共列包含有枚举类型不同的列，例如库是1_month，表示1_day
-            Map<String, Set<Object>> tbTypes = RuleUtils.getSamplingField(matchedTbRuleArgs, diifTypeInCommon);
+            Map<String, Set<Object>> tbTypes = RuleUtils.getSamplingField(matchedTbRuleArgs, mergeInCommon);
             dbRuleCtx = new SamplesCtx(new Samples(tbTypes), SamplesCtx.merge);
         }
         Map<String, Samples> dbValues = RuleUtils.cast(matchedDbRule.calculate(matchedDbRuleArgs, dbRuleCtx, outerCtx));
@@ -297,10 +302,14 @@ public class VirtualTableRuleMatcher {
                                                                 Map<String, Comparative> matchedTbRuleArgs,
                                                                 String[] commonColumn, Object outerCtx) {
         SamplesCtx dbRuleCtx = null; // 对于表规则中与库规则列名相同而自增类型不同的列，将其表枚举结果加入库规则的枚举集
-        Set<AdvancedParameter> diifTypeInCommon = diifTypeInCommon(matchedDbRule, matchedTbRule, commonColumn);
-        if (diifTypeInCommon != null && !diifTypeInCommon.isEmpty()) {
+        Set<AdvancedParameter> mergeInCommon = diffTypeOrOptionalInCommon(matchedDbRule,
+            matchedTbRule,
+            commonColumn,
+            matchedDbRuleArgs,
+            matchedTbRuleArgs);
+        if (mergeInCommon != null && !mergeInCommon.isEmpty()) {
             // 公共列包含有枚举类型不同的列，例如库是1_month，表示1_day
-            Map<String, Set<Object>> tbTypes = RuleUtils.getSamplingField(matchedTbRuleArgs, diifTypeInCommon);
+            Map<String, Set<Object>> tbTypes = RuleUtils.getSamplingField(matchedTbRuleArgs, mergeInCommon);
             dbRuleCtx = new SamplesCtx(new Samples(tbTypes), SamplesCtx.merge);
         }
         Map<String, Samples> dbValues = RuleUtils.cast(matchedDbRule.calculate(matchedDbRuleArgs, dbRuleCtx, outerCtx));
@@ -325,11 +334,14 @@ public class VirtualTableRuleMatcher {
         Set<AdvancedParameter> dbParams = RuleUtils.cast(matchedDbRule.getRuleColumnSet());
         Set<AdvancedParameter> tbParams = RuleUtils.cast(matchedTbRule.getRuleColumnSet());
         Map<String, Set<Object>> dbEnumerates = RuleUtils.getSamplingField(matchedDbRuleArgs, dbParams);
-        Set<AdvancedParameter> diifTypeInCommon = diifTypeInCommon(matchedDbRule, matchedTbRule, commonColumn);
-        if (diifTypeInCommon != null && !diifTypeInCommon.isEmpty()) {
+        Set<AdvancedParameter> mergeInCommon = diffTypeOrOptionalInCommon(matchedDbRule,
+            matchedTbRule,
+            commonColumn,
+            matchedDbRuleArgs,
+            matchedTbRuleArgs);
+        if (mergeInCommon != null && !mergeInCommon.isEmpty()) {
             // 将自增类型不同的公共列的表枚举值加入库枚举值中
-            Map<String, Set<Object>> diifTypeTbEnumerates = RuleUtils.getSamplingField(matchedTbRuleArgs,
-                diifTypeInCommon);
+            Map<String, Set<Object>> diifTypeTbEnumerates = RuleUtils.getSamplingField(matchedTbRuleArgs, mergeInCommon);
             for (Map.Entry<String, Set<Object>> e : diifTypeTbEnumerates.entrySet()) {
                 dbEnumerates.get(e.getKey()).addAll(e.getValue());
             }
@@ -355,8 +367,11 @@ public class VirtualTableRuleMatcher {
             for (Map<String, Object> dbSample : new Samples(dbEnumerates)) { // 遍历库笛卡尔抽样
                 String dbIndex = matchedDbRule.eval(dbSample, outerCtx);
                 for (Map<String, Object> tbSample : tbSamples) { // 遍历表中单独列的笛卡尔抽样
-                    dbSample.putAll(tbSample);
-                    String tbName = matchedTbRule.eval(dbSample, outerCtx);
+                    // dbSample.putAll(tbSample);
+                    // String tbName = matchedTbRule.eval(dbSample, outerCtx);
+                    // modify by jianghang at 2013-11-18，应该是以dbSample为主构造枚举值才对
+                    tbSample.putAll(dbSample);
+                    String tbName = matchedTbRule.eval(tbSample, outerCtx);
                     addToTopology(dbIndex, tbName, topology);
                 }
             }
@@ -374,11 +389,14 @@ public class VirtualTableRuleMatcher {
         Set<AdvancedParameter> dbParams = RuleUtils.cast(matchedDbRule.getRuleColumnSet());
         Set<AdvancedParameter> tbParams = RuleUtils.cast(matchedTbRule.getRuleColumnSet());
         Map<String, Set<Object>> dbEnumerates = RuleUtils.getSamplingField(matchedDbRuleArgs, dbParams);
-        Set<AdvancedParameter> diifTypeInCommon = diifTypeInCommon(matchedDbRule, matchedTbRule, commonColumn);
-        if (diifTypeInCommon != null && !diifTypeInCommon.isEmpty()) {
+        Set<AdvancedParameter> mergeInCommon = diffTypeOrOptionalInCommon(matchedDbRule,
+            matchedTbRule,
+            commonColumn,
+            matchedDbRuleArgs,
+            matchedTbRuleArgs);
+        if (mergeInCommon != null && !mergeInCommon.isEmpty()) {
             // 将自增类型不同的公共列的表枚举值加入库枚举值中
-            Map<String, Set<Object>> diifTypeTbEnumerates = RuleUtils.getSamplingField(matchedTbRuleArgs,
-                diifTypeInCommon);
+            Map<String, Set<Object>> diifTypeTbEnumerates = RuleUtils.getSamplingField(matchedTbRuleArgs, mergeInCommon);
             for (Map.Entry<String, Set<Object>> e : diifTypeTbEnumerates.entrySet()) {
                 dbEnumerates.get(e.getKey()).addAll(e.getValue());
             }
@@ -404,8 +422,11 @@ public class VirtualTableRuleMatcher {
             for (Map<String, Object> dbSample : new Samples(dbEnumerates)) { // 遍历库笛卡尔抽样
                 String dbIndex = matchedDbRule.eval(dbSample, outerCtx);
                 for (Map<String, Object> tbSample : tbSamples) { // 遍历表中单独列的笛卡尔抽样
-                    dbSample.putAll(tbSample);
-                    String tbName = matchedTbRule.eval(dbSample, outerCtx);
+                    // dbSample.putAll(tbSample);
+                    // String tbName = matchedTbRule.eval(dbSample, outerCtx);
+                    // modify by jianghang at 2013-11-18，应该是以dbSample为主构造枚举值才对
+                    tbSample.putAll(dbSample);
+                    String tbName = matchedTbRule.eval(tbSample, outerCtx);
                     addToTopologyWithSource(dbIndex, tbName, topology, dbSample, tbParams);
                 }
             }
@@ -530,22 +551,31 @@ public class VirtualTableRuleMatcher {
     }
 
     /**
-     * @return tbRule中和dbRule列名相同而自增类型不用的AdvancedParameter对象
+     * <pre>
+     * 1.  dbRule中和tbRule中存在相同的列，并且当前处于optional状态
+     * 2.  tbRule中和dbRule列名相同而自增类型不用的AdvancedParameter对象
+     * </pre>
+     * 
+     * @return
      */
-    private static Set<AdvancedParameter> diifTypeInCommon(Rule<String> dbRule, Rule<String> tbRule,
-                                                           String[] commonColumn) {
-        Set<AdvancedParameter> diifTypeInCommon = null;
+    private static Set<AdvancedParameter> diffTypeOrOptionalInCommon(Rule<String> dbRule, Rule<String> tbRule,
+                                                                     String[] commonColumn,
+                                                                     Map<String, Comparative> matchedDbRuleArgs,
+                                                                     Map<String, Comparative> matchedTbRuleArgs) {
+        Set<AdvancedParameter> mergeInCommon = null;
         for (String common : commonColumn) {
             AdvancedParameter dbap = (AdvancedParameter) dbRule.getRuleColumns().get(common);
             AdvancedParameter tbap = (AdvancedParameter) tbRule.getRuleColumns().get(common);
-            if (dbap.atomicIncreateType != tbap.atomicIncreateType) {
-                if (diifTypeInCommon == null) {
-                    diifTypeInCommon = new HashSet<AdvancedParameter>(0);
+            boolean isOptional = matchedDbRuleArgs.containsKey(common) == false
+                                 && matchedTbRuleArgs.containsKey(common) == false;
+            if (dbap.atomicIncreateType != tbap.atomicIncreateType || isOptional) {
+                if (mergeInCommon == null) {
+                    mergeInCommon = new HashSet<AdvancedParameter>(0);
                 }
-                diifTypeInCommon.add(tbap);
+                mergeInCommon.add(tbap);
             }
         }
-        return diifTypeInCommon;
+        return mergeInCommon;
     }
 
     /**
@@ -623,6 +653,23 @@ public class VirtualTableRuleMatcher {
                 return r; // 第一个全是可选列的规则，并且args包含该规则的部分可选列
             }
         }
+
+        // add by jianghang at 2013-11-18
+        // 如果还没有匹配规则，则可能一种情况就是所有的Rule都不满足，最后再查找一次规则中所有列都为可选的进行返回，按规则顺序返回第一个
+        boolean isAllOptional = true;
+        for (Rule<T> r : rules) {
+            for (RuleColumn ruleColumn : r.getRuleColumns().values()) {
+                if (!ruleColumn.optional) {
+                    isAllOptional = false;
+                    break;// 如果当前规则有必选项，直接跳过,因为走到这里必选列已经不匹配了
+                }
+            }
+
+            if (isAllOptional) {
+                return r;
+            }
+        }
+
         return null;
     }
 

@@ -3,6 +3,7 @@ package com.taobao.tddl.common.utils.extension;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -40,7 +41,7 @@ public class ExtensionLoader<S> {
      * @throws ExtensionNotFoundException
      */
     public static <S> S load(Class<S> service, ClassLoader loader) throws ExtensionNotFoundException {
-        return loadFile(service, loader);
+        return loadFile(service, null, loader);
     }
 
     /**
@@ -51,7 +52,31 @@ public class ExtensionLoader<S> {
      * @throws ExtensionNotFoundException
      */
     public static <S> S load(Class<S> service) throws ExtensionNotFoundException {
-        return loadFile(service, findClassLoader());
+        return loadFile(service, null, findClassLoader());
+    }
+
+    /**
+     * 加载server provider
+     * 
+     * @param service
+     * @return
+     * @throws ExtensionNotFoundException
+     */
+    public static <S> S load(Class<S> service, String activateName) throws ExtensionNotFoundException {
+        return loadFile(service, activateName, findClassLoader());
+    }
+
+    /**
+     * 指定classloader加载server provider
+     * 
+     * @param service
+     * @param loader
+     * @return
+     * @throws ExtensionNotFoundException
+     */
+    public static <S> S load(Class<S> service, String activateName, ClassLoader loader)
+                                                                                       throws ExtensionNotFoundException {
+        return loadFile(service, activateName, loader);
     }
 
     /**
@@ -60,7 +85,7 @@ public class ExtensionLoader<S> {
      * @return
      */
     public static <S> List<Class> getAllExtendsionClass(Class<S> service) {
-        return findAllExtensionClass(service, findClassLoader());
+        return findAllExtensionClass(service, null, findClassLoader());
     }
 
     /**
@@ -69,16 +94,16 @@ public class ExtensionLoader<S> {
      * @return
      */
     public static <S> List<Class> getAllExtendsionClass(Class<S> service, ClassLoader loader) {
-        return findAllExtensionClass(service, loader);
+        return findAllExtensionClass(service, null, loader);
     }
 
-    private static <S> S loadFile(Class<S> service, ClassLoader loader) {
+    private static <S> S loadFile(Class<S> service, String activateName, ClassLoader loader) {
         Class<?> extension = providers.get(service);
         if (extension == null) {
             synchronized (service) {
                 extension = providers.get(service);
                 if (extension == null) {
-                    List<Class> extensions = findAllExtensionClass(service, loader);
+                    List<Class> extensions = findAllExtensionClass(service, activateName, loader);
                     if (extensions.isEmpty()) {
                         throw new ExtensionNotFoundException("not found service provider for : " + service.getName());
                     }
@@ -98,7 +123,7 @@ public class ExtensionLoader<S> {
         }
     }
 
-    private static <S> List<Class> findAllExtensionClass(Class<S> service, ClassLoader loader) {
+    private static <S> List<Class> findAllExtensionClass(Class<S> service, String activateName, ClassLoader loader) {
         List<Class> extensions = Lists.newArrayList();
         try {
             loadFile(service, SERVICES_DIRECTORY, loader, extensions);
@@ -133,7 +158,22 @@ public class ExtensionLoader<S> {
 
             }
         });
-        return extensions;
+
+        if (activateName != null) { // 如果有激活条件
+            for (int i = extensions.size() - 1; i >= 0; i--) {
+                Class clz = extensions.get(i);
+                Activate activate = (Activate) clz.getAnnotation(Activate.class);
+                if (activate != null && activateName.equals(activate.name())) {
+                    return Arrays.asList(clz);
+                }
+            }
+
+            throw new ExtensionNotFoundException("not found service provider for : " + service.getName()
+                                                 + " activateName : " + activateName);
+        } else {
+            return extensions;
+        }
+
     }
 
     private static void loadFile(Class<?> service, String dir, ClassLoader classLoader, List<Class> extensions)

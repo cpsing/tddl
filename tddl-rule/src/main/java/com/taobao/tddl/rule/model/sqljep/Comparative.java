@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.model.sqljep;
+package com.taobao.tddl.rule.model.sqljep;
 
 /**
  * 可比较的类 实际上是是两个东西的结合 符号+值 例如 [> 1] , [< 1] , [= 1]
@@ -10,11 +10,9 @@ public class Comparative implements Comparable, Cloneable {
     public static final int GreaterThan        = 1;
     public static final int GreaterThanOrEqual = 2;
     public static final int Equivalent         = 3;
-    public static final int Like               = 4;
-    public static final int NotLike            = 5;
-    public static final int NotEquivalent      = 6;
-    public static final int LessThan           = 7;
-    public static final int LessThanOrEqual    = 8;
+    public static final int NotEquivalent      = 4;
+    public static final int LessThan           = 5;
+    public static final int LessThanOrEqual    = 6;
 
     private Comparable      value;                 // 这有可能又是个Comparative，从而实质上表示一课树（比较树）
     private int             comparison;
@@ -34,7 +32,7 @@ public class Comparative implements Comparable, Cloneable {
      * @return
      */
     public static int reverseComparison(int function) {
-        return 9 - function;
+        return 7 - function;
     }
 
     /**
@@ -51,6 +49,7 @@ public class Comparative implements Comparable, Cloneable {
         } else if (function == LessThan) {
             return GreaterThan;
         }
+
         if (function == LessThanOrEqual) {
             return GreaterThanOrEqual;
         } else {
@@ -79,10 +78,6 @@ public class Comparative implements Comparable, Cloneable {
             return "<";
         } else if (function == NotEquivalent) {
             return "<>";
-        } else if (function == Like) {
-            return "LIKE";
-        } else if (function == NotLike) {
-            return "NOT LIKE";
         } else {
             return null;
         }
@@ -103,41 +98,6 @@ public class Comparative implements Comparable, Cloneable {
             return NotEquivalent;
         } else if ("<>".equals(ident)) {
             return NotEquivalent;
-        } else if ("like".equalsIgnoreCase(ident)) {
-            return Like;
-        } else {
-            return -1;
-        }
-    }
-
-    /**
-     * contains顺序按字符从多到少排列，否则逻辑不对，这里 先这样处理。
-     * 
-     * @param completeStr
-     * @return
-     */
-    public static int getComparisonByCompleteString(String completeStr) {
-        if (completeStr != null) {
-            String ident = completeStr.toLowerCase();
-            if (ident.contains(">=")) {
-                return GreaterThanOrEqual;
-            } else if (ident.contains("<=")) {
-                return LessThanOrEqual;
-            } else if (ident.contains("!=")) {
-                return NotEquivalent;
-            } else if (ident.contains("<>")) {
-                return NotEquivalent;
-            } else if (ident.contains("=")) {
-                return Equivalent;
-            } else if (ident.contains(">")) {
-                return GreaterThan;
-            } else if (ident.contains("<")) {
-                return LessThan;
-            } else if (ident.contains("like")) {
-                return Like;
-            } else {
-                return -1;
-            }
         } else {
             return -1;
         }
