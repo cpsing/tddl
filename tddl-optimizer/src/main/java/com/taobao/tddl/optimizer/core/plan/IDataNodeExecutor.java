@@ -28,7 +28,7 @@ public interface IDataNodeExecutor<RT extends IDataNodeExecutor> extends CanVisi
     String getDataNode();
 
     /**
-     * 设定当前节点是要求一个时时一致性读取。
+     * 设定当前节点是要求一个实时一致性读写读取。
      * 
      * @param consistent
      * @return
@@ -36,7 +36,7 @@ public interface IDataNodeExecutor<RT extends IDataNodeExecutor> extends CanVisi
     RT setConsistent(boolean consistent);
 
     /**
-     * 当前查询是否要求是一个时时一致性读写请求。
+     * 当前查询是否要求是一个实时一致性读写请求。
      * 
      * @return
      */

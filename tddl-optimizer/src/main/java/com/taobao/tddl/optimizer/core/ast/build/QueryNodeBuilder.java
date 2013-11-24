@@ -28,6 +28,7 @@ public class QueryNodeBuilder extends QueryTreeNodeBuilder {
         for (ASTNode sub : this.getNode().getChildren()) {
             sub.build();
         }
+
         if (!(this.getNode().getChild() instanceof QueryTreeNode)) {
             return;
         }

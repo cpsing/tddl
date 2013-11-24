@@ -12,7 +12,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  */
 public class ThreadLocalMap {
 
-    private static final Logger                             log           = LoggerFactory.getLogger(ThreadLocalMap.class);
+    private static final Logger                             logger           = LoggerFactory.getLogger(ThreadLocalMap.class);
     protected final static ThreadLocal<Map<Object, Object>> threadContext = new MapThreadLocal();
 
     public static void put(Object key, Object value) {
@@ -39,11 +39,11 @@ public class ThreadLocalMap {
                 private static final long serialVersionUID = 3637958959138295593L;
 
                 public Object put(Object key, Object value) {
-                    if (log.isDebugEnabled()) {
+                    if (logger.isDebugEnabled()) {
                         if (containsKey(key)) {
-                            log.debug("Overwritten attribute to thread context: " + key + " = " + value);
+                            logger.debug("Overwritten attribute to thread context: " + key + " = " + value);
                         } else {
-                            log.debug("Added attribute to thread context: " + key + " = " + value);
+                            logger.debug("Added attribute to thread context: " + key + " = " + value);
                         }
                     }
 

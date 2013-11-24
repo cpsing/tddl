@@ -413,7 +413,6 @@ public class TableNode extends QueryTreeNode {
 
     public DeleteNode delete() {
         DeleteNode delete = new DeleteNode(this);
-        delete.setQuery(this);
         return delete;
     }
 

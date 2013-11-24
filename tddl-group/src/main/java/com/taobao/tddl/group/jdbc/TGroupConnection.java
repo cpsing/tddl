@@ -23,7 +23,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import com.taobao.tddl.common.utils.TExceptionUtils;
+import com.taobao.tddl.common.jdbc.TExceptionUtils;
+
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.group.config.GroupIndex;

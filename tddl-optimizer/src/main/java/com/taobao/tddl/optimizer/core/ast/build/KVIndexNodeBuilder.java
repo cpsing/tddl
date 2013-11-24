@@ -3,7 +3,9 @@ package com.taobao.tddl.optimizer.core.ast.build;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
+import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.query.KVIndexNode;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
@@ -12,7 +14,6 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
 
 /**
- * @author jianghang 2013-11-14 下午3:18:34
  * @since 5.1.0
  */
 public class KVIndexNodeBuilder extends QueryTreeNodeBuilder {
@@ -98,16 +99,14 @@ public class KVIndexNodeBuilder extends QueryTreeNodeBuilder {
         String kvIndexName = getNode().getKvIndexName();
 
         if (kvIndexName != null) {
-            // TODO
-            // IndexMeta index =
-            // this.getOptimizerContext().getIndexManager().getIndexByName(kvIndexName);
-            // if (index == null) {
-            // throw new RuntimeException("index :" + kvIndexName +
-            // " is not found");
-            // }
-            // getNode().setIndex(index);
-            // getNode().setTable(this.getOptimizerContext().getTableManager().getTable(index.getTableName()));
-            // } else if (getNode().getIndex() == null) {
+            IndexMeta index = OptimizerContext.getContext().getIndexManager().getIndexByName(kvIndexName);
+            if (index == null) {
+                throw new RuntimeException("index :" + kvIndexName + " is not found");
+            }
+
+            getNode().setIndex(index);
+            getNode().setTableMeta(OptimizerContext.getContext().getSchemaManager().getTable(index.getTableName()));
+        } else if (getNode().getIndex() == null) {
             throw new IllegalArgumentException("index is null");
         }
 

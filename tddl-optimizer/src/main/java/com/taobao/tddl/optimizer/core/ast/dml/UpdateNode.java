@@ -2,11 +2,8 @@ package com.taobao.tddl.optimizer.core.ast.dml;
 
 import java.util.List;
 
-import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.DMLNode;
-import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
-import com.taobao.tddl.optimizer.core.ast.query.KVIndexNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
@@ -15,16 +12,8 @@ import com.taobao.tddl.optimizer.exceptions.QueryException;
 
 public class UpdateNode extends DMLNode<UpdateNode> {
 
-    public UpdateNode(QueryTreeNode qtn){
-        super(qtn);
-    }
-
-    public TableNode getNode() {
-        return (TableNode) this.qtn;
-    }
-
-    public TableMeta getTableMeta() {
-        return this.getNode().getTableMeta();
+    public UpdateNode(TableNode table){
+        super(table);
     }
 
     public UpdateNode setUpdateColumns(List<ISelectable> columns) {
@@ -49,18 +38,11 @@ public class UpdateNode extends DMLNode<UpdateNode> {
         convertTypeToSatifyColumnMeta(this.getUpdateColumns(), values);
         IUpdate update = ASTNodeFactory.getInstance().createUpdate();
         for (ISelectable updateColumn : this.getColumns()) {
-
-            if (((TableNode) this.getNode()).getTableMeta().getPrimaryIndex().getPartitionColumns() != null) {
-                if (((TableNode) this.getNode()).getTableMeta()
-                    .getPrimaryIndex()
-                    .getPartitionColumns()
-                    .contains(updateColumn.getColumnName()))
-
+            if (this.getNode().getTableMeta().getPrimaryIndex().getPartitionColumns().contains(updateColumn)) {
                 throw new IllegalArgumentException("column :" + updateColumn.getColumnName() + " 是分库键，不允许修改");
             }
-            if (((TableNode) this.getNode()).getTableMeta()
-                .getPrimaryKeyMap()
-                .containsKey(updateColumn.getColumnName())) {
+
+            if (this.getNode().getTableMeta().getPrimaryKeyMap().containsKey(updateColumn.getColumnName())) {
                 throw new IllegalArgumentException("column :" + updateColumn.getColumnName() + " 是主键，不允许修改");
             }
         }
@@ -70,8 +52,8 @@ public class UpdateNode extends DMLNode<UpdateNode> {
         update.setQueryTree(this.getNode().toDataNodeExecutor());
         update.setUpdateColumns(this.getUpdateColumns());
         update.setUpdateValues(values);
-        update.setSchemaName(((TableNode) this.getNode()).getSchemaName());
-        update.setIndexName(((KVIndexNode) this.getNode()).getIndexUsed().getName());
+        update.setSchemaName(this.getNode().getSchemaName());
+        update.setIndexName(this.getNode().getIndexUsed().getName());
         return update;
     }
 

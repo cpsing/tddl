@@ -14,18 +14,27 @@ import com.taobao.tddl.optimizer.exceptions.QueryException;
  */
 public abstract class ASTNode<RT extends ASTNode> implements Comparable {
 
-    protected String dataNode = null;
+    protected String dataNode = null; // 数据处理节点,比如group name
     protected Object extra;
     // TODO 该属性待定
     protected String sql;
 
+    /**
+     * <pre>
+     * 1. 结合table meta信息构建结构树中完整的column字段
+     * 2. 处理join/merge的下推处理
+     * </pre>
+     */
     public abstract void build();
 
     /**
-     * 构造执行计划
+     * 需要预先执行build.构造执行计划
      */
     public abstract IDataNodeExecutor toDataNodeExecutor() throws QueryException;
 
+    /**
+     * 处理bind val
+     */
     public abstract void assignment(Map<Integer, ParameterContext> parameterSettings);
 
     public abstract boolean isNeedBuild();
@@ -48,8 +57,6 @@ public abstract class ASTNode<RT extends ASTNode> implements Comparable {
         return (RT) this;
     }
 
-    public abstract String toString(int inden);
-
     public Object getExtra() {
         return this.extra;
     }
@@ -62,6 +69,8 @@ public abstract class ASTNode<RT extends ASTNode> implements Comparable {
         // 主要是将自己包装为Comparable对象，可以和Number/string类型具有相同的父类，构建嵌套的查询树
         throw new NotSupportException();
     }
+
+    public abstract String toString(int inden);
 
     // ----------------- 复制 ----------------
 

@@ -1,25 +1,15 @@
 package com.taobao.tddl.optimizer.core.ast.dml;
 
-import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.DMLNode;
-import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.dml.IReplace;
 
 public class PutNode extends DMLNode<PutNode> {
 
-    public PutNode(QueryTreeNode qtn){
-        super(qtn);
-    }
-
-    public TableNode getNode() {
-        return (TableNode) this.qtn;
-    }
-
-    public TableMeta getTableMeta() {
-        return this.getNode().getTableMeta();
+    public PutNode(TableNode table){
+        super(table);
     }
 
     public IDataNodeExecutor toDataNodeExecutor() {

@@ -18,7 +18,6 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
 
 /**
- * @author jianghang 2013-11-14 下午5:33:10
  * @since 5.1.0
  */
 public class JoinNodeBuilder extends QueryTreeNodeBuilder {

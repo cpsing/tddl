@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
@@ -14,7 +15,6 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
 
 /**
- * @author jianghang 2013-11-13 下午12:57:23
  * @since 5.1.0
  */
 public class TableNodeBuilder extends QueryTreeNodeBuilder {
@@ -48,10 +48,7 @@ public class TableNodeBuilder extends QueryTreeNodeBuilder {
             throw new IllegalArgumentException("tableName is null");
         }
 
-        TableMeta ts = null;
-        // TableMeta ts =
-        // this.getOptimizerContext().getTableManager().getTable(tableName);
-
+        TableMeta ts = OptimizerContext.getContext().getSchemaManager().getTable(tableName);
         if (ts == null) {
             throw new IllegalArgumentException("table :" + tableName + " is not found");
         }

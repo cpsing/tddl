@@ -58,7 +58,7 @@ public class IndexMeta implements Serializable, Cloneable {
     /**
      * 该索引的拆分键
      */
-    List<ColumnMeta>                partitionColumns     = new ArrayList();
+    private List<ColumnMeta>        partitionColumns     = new ArrayList();
     private List<String>            dbNames              = new ArrayList();
     private TableMeta               tableMeta            = null;
     private String                  nameWithOutDot;

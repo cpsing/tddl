@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.utils.jdbc.sort;
+package com.taobao.tddl.common.jdbc.sort;
 
 /*
  * JBoss, Home of Professional Open Source.

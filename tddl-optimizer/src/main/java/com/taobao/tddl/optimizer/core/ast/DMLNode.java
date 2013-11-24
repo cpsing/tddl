@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
+import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.core.expression.IBindVal;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
@@ -26,12 +27,12 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
     protected static final Logger            logger            = LoggerFactory.getLogger(DMLNode.class);
     protected List<ISelectable>              columns;
     protected List<Comparable>               values;
-    protected QueryTreeNode                  qtn               = null;
+    protected TableNode                      table             = null;
     protected Map<Integer, ParameterContext> parameterSettings = null;
     protected boolean                        needBuild         = true;
 
-    public DMLNode(QueryTreeNode qtn){
-        this.qtn = qtn;
+    public DMLNode(TableNode table){
+        this.table = table;
     }
 
     public DMLNode setParameterSettings(Map<Integer, ParameterContext> parameterSettings) {
@@ -39,12 +40,12 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
         return this;
     }
 
-    public QueryTreeNode getNode() {
-        return this.qtn;
+    public TableNode getNode() {
+        return this.table;
     }
 
-    public DMLNode setNode(QueryTreeNode qtn) {
-        this.qtn = qtn;
+    public DMLNode setNode(TableNode table) {
+        this.table = table;
         return this;
     }
 
@@ -68,7 +69,7 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
     }
 
     public TableMeta getTableMeta() {
-        return null;
+        return getNode().getTableMeta();
     }
 
     public boolean isNeedBuild() {
@@ -80,8 +81,8 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
     }
 
     public void build() {
-        if (this.qtn != null) {
-            qtn.build();
+        if (this.table != null) {
+            table.build();
         }
 
         if ((this.getColumns() == null || this.getColumns().isEmpty())
@@ -105,7 +106,7 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
 
         for (ISelectable s : this.getColumns()) {
             ISelectable res = null;
-            for (Object obj : qtn.getColumnsReferedForParent()) {
+            for (Object obj : table.getColumnsReferedForParent()) {
                 ISelectable querySelected = (ISelectable) obj;
                 if ((querySelected.getAlias() != null && s.getColumnName().equals(querySelected.getAlias()))
                     || s.getColumnName().equals(querySelected.getColumnName())) { // 尝试查找对应的字段信息
@@ -116,7 +117,7 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
 
             if (res == null) {
                 throw new IllegalArgumentException("column: " + s.getColumnName() + " is not existed in either "
-                                                   + qtn.getName() + " or select clause");
+                                                   + table.getName() + " or select clause");
             }
         }
 
@@ -176,7 +177,7 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
     protected void copySelfTo(DMLNode to) {
         to.columns = this.columns;
         to.values = this.values;
-        to.qtn = this.qtn;
+        to.table = this.table;
     }
 
     protected void deepCopySelfTo(DMLNode to) {
@@ -191,7 +192,7 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
             }
         }
 
-        to.qtn = (QueryTreeNode) this.qtn.deepCopy();
+        to.table = (TableNode) this.table.deepCopy();
     }
 
     public String toString(int inden) {

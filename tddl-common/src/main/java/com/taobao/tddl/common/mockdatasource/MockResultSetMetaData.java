@@ -5,119 +5,121 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MockResultSetMetaData implements ResultSetMetaData{
-	private String tableName;
-	public final Map<String/*ÁÐÃû*/,Integer/*ÁÐÐòºÅ*/> columnName2Index;
-	public final Map<Integer/*ÁÐÐòºÅ*/,String/*ÁÐÃû*/> columnIndex2Name;
+public class MockResultSetMetaData implements ResultSetMetaData {
 
-	public MockResultSetMetaData(Map<String,Integer> columns){
-		this.columnName2Index = columns;
-		this.columnIndex2Name = new HashMap<Integer,String>(columns.size());
-		for(Map.Entry<String,Integer> e : columns.entrySet()){
-			columnIndex2Name.put(e.getValue(), e.getKey());
-		}
-	}
-	public String getCatalogName(int column) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    private String                                     tableName;
+    public final Map<String/* åˆ—å */, Integer/* åˆ—åºå· */> columnName2Index;
+    public final Map<Integer/* åˆ—åºå· */, String/* åˆ—å */> columnIndex2Name;
 
-	public String getColumnClassName(int column) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public MockResultSetMetaData(Map<String, Integer> columns){
+        this.columnName2Index = columns;
+        this.columnIndex2Name = new HashMap<Integer, String>(columns.size());
+        for (Map.Entry<String, Integer> e : columns.entrySet()) {
+            columnIndex2Name.put(e.getValue(), e.getKey());
+        }
+    }
 
-	public int getColumnCount() throws SQLException {
-		return columnName2Index.size();
-	}
+    public String getCatalogName(int column) throws SQLException {
 
-	public int getColumnDisplaySize(int column) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+        return null;
+    }
 
-	public String getColumnLabel(int column) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public String getColumnClassName(int column) throws SQLException {
 
-	public String getColumnName(int column) throws SQLException {
-		// TODO Auto-generated method stub
-		return columnIndex2Name.get(column-1);//column´Ó1¿ªÊ¼
-	}
+        return null;
+    }
 
-	public int getColumnType(int column) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    public int getColumnCount() throws SQLException {
+        return columnName2Index.size();
+    }
 
-	public String getColumnTypeName(int column) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public int getColumnDisplaySize(int column) throws SQLException {
 
-	public int getPrecision(int column) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+        return 0;
+    }
 
-	public int getScale(int column) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    public String getColumnLabel(int column) throws SQLException {
 
-	public String getSchemaName(int column) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        return null;
+    }
 
-	public String getTableName(int column) throws SQLException {
-		return this.tableName;
-	}
+    public String getColumnName(int column) throws SQLException {
 
-	public boolean isAutoIncrement(int column) throws SQLException {
-		return false;
-	}
+        return columnIndex2Name.get(column - 1);// columnä»Ž1å¼€å§‹
+    }
 
-	public boolean isCaseSensitive(int column) throws SQLException {
-		return false;
-	}
+    public int getColumnType(int column) throws SQLException {
 
-	public boolean isCurrency(int column) throws SQLException {
-		return false;
-	}
+        return 0;
+    }
 
-	public boolean isDefinitelyWritable(int column) throws SQLException {
-		return false;
-	}
+    public String getColumnTypeName(int column) throws SQLException {
 
-	public int isNullable(int column) throws SQLException {
-		return ResultSetMetaData.columnNoNulls;
-	}
+        return null;
+    }
 
-	public boolean isReadOnly(int column) throws SQLException {
-		return false;
-	}
+    public int getPrecision(int column) throws SQLException {
 
-	public boolean isSearchable(int column) throws SQLException {
-		return false;
-	}
+        return 0;
+    }
 
-	public boolean isSigned(int column) throws SQLException {
-		return false;
-	}
+    public int getScale(int column) throws SQLException {
 
-	public boolean isWritable(int column) throws SQLException {
-		return false;
-	}
-	public <T> T unwrap(Class<T> iface) throws SQLException
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-	public boolean isWrapperFor(Class<?> iface) throws SQLException
-	{
-		// TODO Auto-generated method stub
-		return false;
-	}
+        return 0;
+    }
+
+    public String getSchemaName(int column) throws SQLException {
+
+        return null;
+    }
+
+    public String getTableName(int column) throws SQLException {
+        return this.tableName;
+    }
+
+    public boolean isAutoIncrement(int column) throws SQLException {
+        return false;
+    }
+
+    public boolean isCaseSensitive(int column) throws SQLException {
+        return false;
+    }
+
+    public boolean isCurrency(int column) throws SQLException {
+        return false;
+    }
+
+    public boolean isDefinitelyWritable(int column) throws SQLException {
+        return false;
+    }
+
+    public int isNullable(int column) throws SQLException {
+        return ResultSetMetaData.columnNoNulls;
+    }
+
+    public boolean isReadOnly(int column) throws SQLException {
+        return false;
+    }
+
+    public boolean isSearchable(int column) throws SQLException {
+        return false;
+    }
+
+    public boolean isSigned(int column) throws SQLException {
+        return false;
+    }
+
+    public boolean isWritable(int column) throws SQLException {
+        return false;
+    }
+
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+
+        return null;
+    }
+
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+
+        return false;
+    }
 }

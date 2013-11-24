@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.utils;
+package com.taobao.tddl.common.jdbc;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -9,7 +9,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.taobao.tddl.common.jdbc.ParameterContext;
 
 public class TExceptionUtils {
 

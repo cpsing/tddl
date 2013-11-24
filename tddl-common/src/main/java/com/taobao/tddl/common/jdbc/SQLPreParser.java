@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.utils;
+package com.taobao.tddl.common.jdbc;
 
 import java.io.IOException;
 import java.util.ArrayList;
