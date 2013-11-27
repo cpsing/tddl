@@ -4,6 +4,7 @@ import com.taobao.tddl.common.utils.thread.ThreadLocalMap;
 import com.taobao.tddl.optimizer.config.Matrix;
 import com.taobao.tddl.optimizer.config.table.IndexManager;
 import com.taobao.tddl.optimizer.config.table.SchemaManager;
+import com.taobao.tddl.optimizer.rule.OptimizerRule;
 
 /**
  * 优化器上下文，主要解决一些共享上下文对象，因为不考虑spring进行IOC控制，所以一些对象/工具之间的依赖就很蛋疼，就搞了这么一个上下文
@@ -22,6 +23,7 @@ public class OptimizerContext {
     private Matrix              matrix;
     private SchemaManager       schemaManager;
     private IndexManager        indexManager;
+    private OptimizerRule       rule;
 
     public static OptimizerContext getContext() {
         return (OptimizerContext) ThreadLocalMap.get(OPTIMIZER_CONTEXT_KEY);
@@ -53,6 +55,14 @@ public class OptimizerContext {
 
     public void setIndexManager(IndexManager indexManager) {
         this.indexManager = indexManager;
+    }
+
+    public OptimizerRule getRule() {
+        return rule;
+    }
+
+    public void setRule(OptimizerRule rule) {
+        this.rule = rule;
     }
 
 }

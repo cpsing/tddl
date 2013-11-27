@@ -81,31 +81,27 @@ public class JoinNodeBuilder extends QueryTreeNodeBuilder {
 
             ISelectable leftKey = null;
             if (f.getColumn() != null && f.getColumn() instanceof ISelectable) {
-                leftKey = this.getColumnFromOtherNodeWithTableAlias((ISelectable) f.getColumn(), this.getNode()
-                    .getLeftNode());
+                leftKey = this.getColumnFromOtherNode((ISelectable) f.getColumn(), this.getNode().getLeftNode());
             }
 
             ISelectable rightKey = null;
             if (f.getValue() != null && f.getValue() instanceof ISelectable) {
-                rightKey = this.getColumnFromOtherNodeWithTableAlias((ISelectable) f.getValue(), this.getNode()
-                    .getRightNode());
+                rightKey = this.getColumnFromOtherNode((ISelectable) f.getValue(), this.getNode().getRightNode());
             }
 
             if (leftKey == null || rightKey == null) {
                 if (f.getValue() != null && f.getValue() instanceof ISelectable) {
-                    leftKey = this.getColumnFromOtherNodeWithTableAlias((ISelectable) f.getValue(), this.getNode()
-                        .getLeftNode());
+                    leftKey = this.getColumnFromOtherNode((ISelectable) f.getValue(), this.getNode().getLeftNode());
                 }
 
                 if (f.getColumn() != null && f.getColumn() instanceof ISelectable) {
-                    rightKey = this.getColumnFromOtherNodeWithTableAlias((ISelectable) f.getColumn(), this.getNode()
-                        .getRightNode());
+                    rightKey = this.getColumnFromOtherNode((ISelectable) f.getColumn(), this.getNode().getRightNode());
                 }
             }
 
             if (leftKey == null || rightKey == null) {
                 // 可能有以下情况
-                // id=1,s.id=s.id
+                // id=1,s.id=s.key_id
                 IFilter otherJoinOnFilter = this.getNode().getOtherJoinOnFilter();
                 otherJoinOnFilter = FilterUtils.and(otherJoinOnFilter, f);
                 this.getNode().setOtherJoinOnFilter(otherJoinOnFilter);
@@ -126,11 +122,10 @@ public class JoinNodeBuilder extends QueryTreeNodeBuilder {
 
         this.getNode().getJoinFilter().removeAll(otherJoinOnFilters);
         this.buildFilter(this.getNode().getOtherJoinOnFilter(), false);
-
     }
 
     /**
-     * 構建列信息
+     * 构建列信息
      * 
      * @param indexNode
      */
@@ -168,8 +163,9 @@ public class JoinNodeBuilder extends QueryTreeNodeBuilder {
                     // select *,id这样的语法最后会有两个id列，mysql是这样的
                     for (ASTNode child : this.getNode().getChildren()) {
                         for (ISelectable selectedFromChild : ((QueryTreeNode) child).getColumnsSelectedForParent()) {
-                            if (selected.getTableName() != null) {
-                                if (!selected.getTableName().equals(selectedFromChild.getTableName())) break;
+                            if (selected.getTableName() != null
+                                && !selected.getTableName().equals(selectedFromChild.getTableName())) {
+                                break;
                             }
 
                             IColumn newS = ASTNodeFactory.getInstance().createColumn();
@@ -217,22 +213,20 @@ public class JoinNodeBuilder extends QueryTreeNodeBuilder {
         QueryTreeNode right = this.getNode().getRightNode();
         ISelectable resFromLeft = null;
         ISelectable resFromRight = null;
-        if (left.hasColumn(c)) {
-            resFromLeft = this.getColumnFromOtherNodeWithTableAlias(c, left);
-
-            if (resFromLeft == null) {
-                left.addColumnSelected(c);
+        if (left.hasColumn(c)) {// 可能在select/from中
+            resFromLeft = this.getColumnFromOtherNode(c, left);
+            if (resFromLeft == null) {// 如果不在select中，添加到select进行join传递
+                left.addColumnsSelected(c);
             }
-            resFromLeft = this.getColumnFromOtherNodeWithTableAlias(c, left);
+            resFromLeft = this.getColumnFromOtherNode(c, left);
         }
 
-        if (right.hasColumn(c)) {
-            resFromRight = this.getColumnFromOtherNodeWithTableAlias(c, right);
-
-            if (resFromRight == null) {
-                right.addColumnSelected(c);
+        if (right.hasColumn(c)) {// 可能在select/from中
+            resFromRight = this.getColumnFromOtherNode(c, right);
+            if (resFromRight == null) {// 如果不在select中，添加到select进行join传递
+                right.addColumnsSelected(c);
             }
-            resFromRight = this.getColumnFromOtherNodeWithTableAlias(c, right);
+            resFromRight = this.getColumnFromOtherNode(c, right);
         }
 
         if (resFromLeft != null && resFromRight != null) {

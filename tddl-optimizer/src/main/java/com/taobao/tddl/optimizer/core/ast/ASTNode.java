@@ -16,7 +16,6 @@ public abstract class ASTNode<RT extends ASTNode> implements Comparable {
 
     protected String dataNode = null; // 数据处理节点,比如group name
     protected Object extra;
-    // TODO 该属性待定
     protected String sql;
 
     /**

@@ -106,15 +106,6 @@ public class TableNodeBuilder extends QueryTreeNodeBuilder {
 
     }
 
-    public ISelectable getSelectableFromChild(String name) {
-        ColumnMeta res = getNode().getTableMeta().getColumn(name);
-        if (res == null) {
-            return null;
-        }
-
-        return OptimizerUtils.columnMetaToIColumn(res, getNode().getTableName());
-    }
-
     public ISelectable getSelectableFromChild(ISelectable c) {
         if (c.getTableName() != null && !c.getTableName().equals(this.getNode().getTableName())
             && !c.getTableName().equals(this.getNode().getAlias())) {
@@ -135,5 +126,14 @@ public class TableNodeBuilder extends QueryTreeNodeBuilder {
             rs.setDistinct(c.isDistinct());
         }
         return rs;
+    }
+
+    public ISelectable getSelectableFromChild(String name) {
+        ColumnMeta res = getNode().getTableMeta().getColumn(name);
+        if (res == null) {
+            return null;
+        }
+
+        return OptimizerUtils.columnMetaToIColumn(res, getNode().getTableName());
     }
 }

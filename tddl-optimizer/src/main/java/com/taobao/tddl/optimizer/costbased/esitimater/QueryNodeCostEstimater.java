@@ -35,7 +35,7 @@ public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
         // step1.估算行数
         if (query instanceof QueryNode) {
             // 查询对象是另一个查询，说明数据是on fly的，根据子查询提供的行数来确定初始行数
-            Cost childCost = CostEsitimaterFactory.estimater(((QueryNode) query).getChild());
+            Cost childCost = CostEsitimaterFactory.estimate(((QueryNode) query).getChild());
             initRowCount = childCost.getRowCount();
             isOnfly = true;
         } else if (query instanceof TableNode) {
@@ -159,7 +159,7 @@ public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
             }
 
             if (selectivity == null) {
-                selectivity = getSelectivity(filter.getOperation());
+                selectivity = CostEsitimaterFactory.selectivity(filter.getOperation());
             }
 
             count *= selectivity;
@@ -167,37 +167,4 @@ public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
         return count;
     }
 
-    private double getSelectivity(OPERATION operator) {
-        if (operator == OPERATION.EQ) {
-            return 0.1;
-        }
-        if (operator == OPERATION.GT || operator == OPERATION.GT_EQ) {
-            return 0.33;
-        }
-
-        if (operator == OPERATION.LT || operator == OPERATION.LT_EQ) {
-            return 0.33;
-        }
-
-        if (operator == OPERATION.NOT_EQ) {
-            return 0.9;
-        }
-
-        if (operator == OPERATION.IS_NULL) {
-            return 0.1;
-        }
-
-        if (operator == OPERATION.IS_NOT_NULL) {
-            return 0.9;
-        }
-
-        if (operator == OPERATION.LIKE) {
-            return 0.9;
-        }
-        if (operator == OPERATION.IN) {
-            return 0.2;
-        }
-
-        return 0.5;
-    }
 }

@@ -125,6 +125,11 @@ public class OptimizerRule {
         throw new IllegalArgumentException("can't find any target db. table is " + logicTable + ". ");
     }
 
+    public String getDefaultGroup() {
+        VirtualTableRoot root = tddlRule.getCurrentRule();
+        return root.getDefaultDbIndex();
+    }
+
     public boolean isSameRule(String t1, String t2) {
         String t1Rule = getJoinGroup(t1);
         String t2Rule = getJoinGroup(t2);

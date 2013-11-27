@@ -42,16 +42,15 @@ public class KVIndexNodeBuilder extends QueryTreeNodeBuilder {
     public void buildSelected() {
         this.getNode().getImplicitSelectable().clear();
         buildSelectedFromSelectableObject();
-        // buildFunction();
     }
 
     private void buildSelectedFromSelectableObject() {
-
         if (this.getNode().getColumnsSelected().isEmpty()) {
             this.getNode()
                 .getColumnsSelected()
                 .add(ASTNodeFactory.getInstance().createColumn().setColumnName(IColumn.STAR));
         }
+
         // 如果有 * ，最后需要把*删掉
         List<ISelectable> delete = new LinkedList();
 
@@ -91,13 +90,12 @@ public class KVIndexNodeBuilder extends QueryTreeNodeBuilder {
     }
 
     /**
-     * 構建索引信息
+     * 构建索引信息
      * 
      * @param getNode ()
      */
     public void buildIndex() {
         String kvIndexName = getNode().getKvIndexName();
-
         if (kvIndexName != null) {
             IndexMeta index = OptimizerContext.getContext().getIndexManager().getIndexByName(kvIndexName);
             if (index == null) {
@@ -113,9 +111,7 @@ public class KVIndexNodeBuilder extends QueryTreeNodeBuilder {
     }
 
     public ISelectable getSelectableFromChild(ISelectable c) {
-
         if (c.getTableName() != null) {
-
             if ((!c.getTableName().equals(this.getNode().getIndexName()))
                 && (!c.getTableName().equals(this.getNode().getAlias()))
                 && (!c.getTableName().equals(this.getNode().getTableName()))) {
@@ -124,7 +120,6 @@ public class KVIndexNodeBuilder extends QueryTreeNodeBuilder {
             }
         }
         if (IColumn.STAR.equals(c.getColumnName())) {
-            // c.setTableName(this.getNode().getIndexName());
             return c;
         }
         if (c instanceof IFunction) {
@@ -133,8 +128,9 @@ public class KVIndexNodeBuilder extends QueryTreeNodeBuilder {
         }
 
         ISelectable rs = this.getSelectableFromChild(c.getColumnName());
-        if (rs != null) rs.setDistinct(c.isDistinct());
-
+        if (rs != null) {
+            rs.setDistinct(c.isDistinct());
+        }
         return rs;
     }
 
@@ -143,6 +139,7 @@ public class KVIndexNodeBuilder extends QueryTreeNodeBuilder {
         if (cm == null) {
             return null;
         }
+
         return OptimizerUtils.columnMetaToIColumn(cm, getNode().getIndexName());
     }
 }

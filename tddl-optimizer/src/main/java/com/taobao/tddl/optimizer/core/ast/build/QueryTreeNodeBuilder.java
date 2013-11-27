@@ -24,6 +24,14 @@ public abstract class QueryTreeNodeBuilder {
     public QueryTreeNodeBuilder(){
     }
 
+    public QueryTreeNode getNode() {
+        return node;
+    }
+
+    public void setNode(QueryTreeNode node) {
+        this.node = node;
+    }
+
     public abstract void build();
 
     protected void addSelectableToSelected(ISelectable c) {
@@ -38,23 +46,18 @@ public abstract class QueryTreeNodeBuilder {
         }
     }
 
+    protected void addSelectableToRefered(ISelectable c) {
+        if (!node.getColumnsRefered().contains(c)) {
+            node.getColumnsRefered().add(c);
+        }
+    }
+
     protected void buildWhere() {
         // sql语法中，where条件中的列不允许使用别名，所以无需从select中找列
-        if (node.getKeyFilter() != null) {
-            this.buildFilter(node.getKeyFilter(), false);
-        }
-
-        if (node.getWhereFilter() != null) {
-            this.buildFilter(node.getWhereFilter(), false);
-        }
-
-        if (node.getResultFilter() != null) {
-            this.buildFilter(node.getResultFilter(), false);
-        }
-
-        if (node.getOtherJoinOnFilter() != null) {
-            this.buildFilter(node.getOtherJoinOnFilter(), false);
-        }
+        this.buildFilter(node.getKeyFilter(), false);
+        this.buildFilter(node.getWhereFilter(), false);
+        this.buildFilter(node.getResultFilter(), false);
+        this.buildFilter(node.getOtherJoinOnFilter(), false);
     }
 
     protected void buildFilter(IFilter filter, boolean findInSelectList) {
@@ -71,6 +74,20 @@ public abstract class QueryTreeNodeBuilder {
         }
     }
 
+    protected void buildBooleanFilter(IBooleanFilter filter, boolean findInSelectList) {
+        if (filter == null) {
+            return;
+        }
+        if (filter.getColumn() instanceof ISelectable) {
+            filter.setColumn(this.buildSelectable((ISelectable) filter.getColumn(), findInSelectList));
+        }
+
+        if (filter.getValue() instanceof ISelectable) {
+            filter.setValue(this.buildSelectable((ISelectable) filter.getValue(), findInSelectList));
+        }
+
+    }
+
     public ISelectable buildSelectable(ISelectable c) {
         return this.buildSelectable(c, false);
     }
@@ -78,10 +95,18 @@ public abstract class QueryTreeNodeBuilder {
     /**
      * 用于标记当前节点是否需要根据meta信息填充信息
      * 
+     * <pre>
+     * SQL. 
+     *  a. select id + 2 as id , id from test where id = 2 having id = 4;
+     *  b. select id + 2 as id , id from test where id = 2 order by count(id)
+     * 
+     * 解释：
+     * 1.  COLUMN/WHERE/JOIN中列，是取自FROM的表字段
+     * 2.  HAVING/ORDER BY/GROUP BY中的列，是取自SELECT中返回的字段，获取对应别名数据
+     * </pre>
+     * 
      * @param c
-     * @param findInSelectList 如果在from的meta中找不到，是否继续在select中寻找 比如select name as
-     * name1 from table1 order by name1 name1并不在meta中，而在select中 类似的还有order by
-     * count(id)
+     * @param findInSelectList 如果在from的meta中找不到，是否继续在select中寻找
      * @return
      */
     public ISelectable buildSelectable(ISelectable c, boolean findInSelectList) {
@@ -106,7 +131,6 @@ public abstract class QueryTreeNodeBuilder {
         ISelectable columnFromMeta = null;
         // 临时列中也不存在，则新建一个临时列
         columnFromMeta = this.getSelectableFromChild(c);
-
         if (columnFromMeta != null) {
             column = columnFromMeta;
             column.setAlias(c.getAlias());
@@ -126,10 +150,9 @@ public abstract class QueryTreeNodeBuilder {
         }
 
         if ((column instanceof IColumn) && !IColumn.STAR.equals(column.getColumnName())) {
-            if (!node.getColumnsRefered().contains(column)) {
-                node.getColumnsRefered().add(column);
-            }
+            addSelectableToRefered(column);
         }
+
         if (column instanceof IFunction) {
             buildFunction((IFunction) column);
         }
@@ -137,6 +160,9 @@ public abstract class QueryTreeNodeBuilder {
         return column;
     }
 
+    /**
+     * 从select列表中查找
+     */
     private ISelectable getColumnFromSelecteList(ISelectable c) {
         ISelectable column = null;
         for (ISelectable selected : this.getNode().getColumnsSelected()) {
@@ -148,12 +174,7 @@ public abstract class QueryTreeNodeBuilder {
                 }
             }
 
-            if (selected.getColumnName().equals(c.getColumnName())) {
-                isThis = true;
-            } else if (selected.getAlias() != null && selected.getAlias().equals(c.getColumnName())) {
-                isThis = true;
-            }
-
+            isThis = c.isSameName(selected);
             if (isThis) {
                 column = selected;
                 return column;
@@ -164,26 +185,6 @@ public abstract class QueryTreeNodeBuilder {
     }
 
     public abstract ISelectable getSelectableFromChild(ISelectable c);
-
-    void buildBooleanFilter(IBooleanFilter filter, boolean findInSelectList) {
-        if (filter == null) return;
-        if (filter.getColumn() instanceof ISelectable) {
-            filter.setColumn(this.buildSelectable((ISelectable) filter.getColumn(), findInSelectList));
-        }
-
-        if (filter.getValue() instanceof ISelectable) {
-            filter.setValue(this.buildSelectable((ISelectable) filter.getValue(), findInSelectList));
-        }
-
-    }
-
-    public QueryTreeNode getNode() {
-        return node;
-    }
-
-    public void setNode(QueryTreeNode node) {
-        this.node = node;
-    }
 
     public void buildOrderBy() {
         for (IOrderBy order : node.getOrderBys()) {
@@ -202,10 +203,8 @@ public abstract class QueryTreeNodeBuilder {
     }
 
     public void buildHaving() {
-        if (this.getNode().getHavingFilter() != null) {
-            // having是允许使用select中的列的，如 havaing count(id)>1
-            this.buildFilter(this.getNode().getHavingFilter(), true);
-        }
+        // having是允许使用select中的列的，如 havaing count(id)>1
+        this.buildFilter(this.getNode().getHavingFilter(), true);
     }
 
     public void buildFunction() {
@@ -229,7 +228,19 @@ public abstract class QueryTreeNodeBuilder {
         }
     }
 
-    public ISelectable getColumnFromOtherNodeWithTableAlias(ISelectable c, QueryTreeNode other) {
+    public boolean hasColumn(ISelectable c) {
+        if (this.getColumnFromOtherNode(c, this.getNode()) != null) {
+            return true;
+        }
+
+        if (this.getSelectableFromChild(c) != null) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public ISelectable getColumnFromOtherNode(ISelectable c, QueryTreeNode other) {
         if (c == null) {
             return c;
         }
@@ -252,20 +263,11 @@ public abstract class QueryTreeNodeBuilder {
             }
 
             // 若列别名存在，只比较别名
-            if (selected.getAlias() != null) {
-                if (selected.getAlias().equals(c.getColumnName())) {
-                    isThis = true;
-                }
-            } else if (selected.getColumnName().equals(c.getColumnName())) {
-                isThis = true;
-            }
+            isThis = c.isSameName(selected);
 
             if (isThis) {
-                if (res != null) {
-                    throw new IllegalArgumentException("Column '" + c.getColumnName() + "' is ambiguous");
-                }
-
                 res = selected;
+                break;
             }
         }
 
@@ -273,6 +275,7 @@ public abstract class QueryTreeNodeBuilder {
             return res;
         }
 
+        // TODO 列的tableName的信息更新，放在另外一个函数调用更合适
         if (c instanceof IColumn) {
             c.setDataType(res.getDataType());
             // 如果存在表别名，在这里将只是用表别名
@@ -284,59 +287,6 @@ public abstract class QueryTreeNodeBuilder {
         }
 
         return c;
-    }
-
-    public static ISelectable getColumnFromOtherNode(ISelectable c, QueryTreeNode other) {
-        if (c == null) {
-            return c;
-        }
-
-        if (c instanceof IBooleanFilter && ((IBooleanFilter) c).getOperation().equals(OPERATION.CONSTANT)) {
-            return c;
-        }
-        ISelectable res = null;
-        for (ISelectable selected : other.getColumnsSelected()) {
-            boolean isThis = false;
-            if (c.getTableName() != null) {
-                if (!(c.getTableName().equals(other.getAlias()) || c.getTableName().equals(selected.getTableName()))) {
-                    continue;
-                }
-            }
-
-            if (IColumn.STAR.equals(c.getColumnName())) {
-                return c;
-            }
-            // 若列别名存在，只比较别名
-            if (selected.getAlias() != null) {
-                if (selected.getAlias().equals(c.getColumnName())) {
-                    isThis = true;
-                }
-            } else if (selected.getColumnName().equals(c.getColumnName())) {
-                isThis = true;
-            }
-
-            if (isThis) {
-                if (res != null) {
-                    throw new IllegalArgumentException("Column '" + c.getColumnName() + "' is ambiguous");
-                }
-
-                res = selected;
-            }
-        }
-
-        return res;
-    }
-
-    public boolean hasColumn(ISelectable c) {
-        if (this.getColumnFromOtherNodeWithTableAlias(c, this.getNode()) != null) {
-            return true;
-        }
-
-        if (this.getSelectableFromChild(c) != null) {
-            return true;
-        }
-
-        return false;
     }
 
 }

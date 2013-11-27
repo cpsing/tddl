@@ -24,7 +24,7 @@ public class MergeNodeCostEstimater implements QueryTreeCostEstimater {
         }
 
         for (ASTNode sub : merge.getChildren()) {
-            Cost subCost = CostEsitimaterFactory.estimater((QueryTreeNode) sub);
+            Cost subCost = CostEsitimaterFactory.estimate((QueryTreeNode) sub);
             rowCount += subCost.getRowCount();
             scanRowCount += subCost.getScanCount();
             // 如果两个不在一个节点上，就会产生网络开销，需要把sub的数据传送到merge节点上

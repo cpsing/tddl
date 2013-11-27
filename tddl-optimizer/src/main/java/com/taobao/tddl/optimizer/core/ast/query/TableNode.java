@@ -49,10 +49,9 @@ public class TableNode extends QueryTreeNode {
     private String           schemaName;
     private String           tableName;
     private IFilter          indexQueryValueFilter = null;
-    boolean                  isUsed                = false;
     private TableMeta        tableMeta;
-    protected IndexMeta      indexUsed             = null; // 当前逻辑表的使用index
-    protected boolean        fullTableScan         = false; // 是否需要全表扫描
+    private IndexMeta        indexUsed             = null; // 当前逻辑表的使用index
+    private boolean          fullTableScan         = false; // 是否需要全表扫描
 
     public TableNode(){
         this(null);
@@ -100,11 +99,11 @@ public class TableNode extends QueryTreeNode {
             KVIndexNode keyIndexQuery = new KVIndexNode(this.getTableMeta().getPrimaryKeyIndexs().get(0).getName());
             // 如果有别名，用别名，否则，用逻辑表名替代索引名
             keyIndexQuery.alias(this.getName());
-            keyIndexQuery.select(this.getColumnsSelected());
             keyIndexQuery.setLimitFrom(this.getLimitFrom());
             keyIndexQuery.setLimitTo(this.getLimitTo());
-            keyIndexQuery.setGroupBys(this.getGroupBys());
-            keyIndexQuery.setOrderBys(this.getOrderBys());
+            keyIndexQuery.select(OptimizerUtils.copySelectables(this.getColumnsSelected()));
+            keyIndexQuery.setGroupBys(OptimizerUtils.copyOrderBys(this.getGroupBys()));
+            keyIndexQuery.setOrderBys(OptimizerUtils.copyOrderBys(this.getOrderBys()));
             keyIndexQuery.having(OptimizerUtils.copyFilter(this.getHavingFilter()));
             keyIndexQuery.setOtherJoinOnFilter(OptimizerUtils.copyFilter(this.getOtherJoinOnFilter()));
             keyIndexQuery.keyQuery(OptimizerUtils.copyFilter(this.getKeyFilter()));
@@ -143,15 +142,15 @@ public class TableNode extends QueryTreeNode {
             indexQuery.select(indexQuerySelected);
             // 索引覆盖的情况下，只需要返回索引查询
             if (isIndexCover) {
-                indexQuery.select(this.getColumnsSelected());
-                indexQuery.setOrderBys(this.getOrderBys());
-                indexQuery.setGroupBys(this.getGroupBys());
-                indexQuery.having(OptimizerUtils.copyFilter(this.getHavingFilter()));
+                indexQuery.select(OptimizerUtils.copySelectables(this.getColumnsSelected()));
+                indexQuery.setOrderBys(OptimizerUtils.copyOrderBys(this.getOrderBys()));
+                indexQuery.setGroupBys(OptimizerUtils.copyOrderBys(this.getGroupBys()));
                 indexQuery.setLimitFrom(this.getLimitFrom());
                 indexQuery.setLimitTo(this.getLimitTo());
                 indexQuery.executeOn(this.getDataNode());
                 indexQuery.alias(this.getName());
                 indexQuery.setSubQuery(this.isSubQuery());
+                indexQuery.having(OptimizerUtils.copyFilter(this.getHavingFilter()));
                 indexQuery.valueQuery(FilterUtils.and(OptimizerUtils.copyFilter(this.getIndexQueryValueFilter()),
                     OptimizerUtils.copyFilter(this.getResultFilter())));
                 indexQuery.setOtherJoinOnFilter(OptimizerUtils.copyFilter(this.getOtherJoinOnFilter()));
@@ -174,7 +173,7 @@ public class TableNode extends QueryTreeNode {
                         allColumnsRefered.add(ASTNodeFactory.getInstance()
                             .createColumn()
                             .setColumnName(keyColumn.getName()));
-                        indexQuery.getColumnsSelected().add(ASTNodeFactory.getInstance()
+                        indexQuery.addColumnsSelected(ASTNodeFactory.getInstance()
                             .createColumn()
                             .setColumnName(keyColumn.getName()));
                     }
@@ -198,7 +197,6 @@ public class TableNode extends QueryTreeNode {
                 keyQuery.valueQuery(OptimizerUtils.copyFilter(this.getResultFilter()));
 
                 JoinNode join = indexQuery.join(keyQuery);
-
                 // 按照PK进行join
                 for (ColumnMeta keyColumn : pk.getKeyColumns()) {
                     IBooleanFilter eq = ASTNodeFactory.getInstance().createBooleanFilter();
@@ -216,12 +214,12 @@ public class TableNode extends QueryTreeNode {
 
                 List<ISelectable> columns = new ArrayList<ISelectable>();
                 if (this.getAlias() == null) {
-                    columns = this.getColumnsSelected();
+                    columns = OptimizerUtils.copySelectables(this.getColumnsSelected());
                 } else {
                     for (ISelectable s : this.getColumnsSelected()) {
                         ISelectable a = s.copy().setTableName(this.getAlias());
                         if (a instanceof IFunction && this.getAlias() != null) {
-                            this.findColumnInFunctionArgAndSetTableNameAsAlias((IFunction) a);
+                            this.findColumnInFunctionArgAndSetTableNameAsAlias((IFunction) a.copy());
                         }
 
                         columns.add(a);
@@ -267,7 +265,7 @@ public class TableNode extends QueryTreeNode {
                 join.having(OptimizerUtils.copyFilter(this.getHavingFilter()));
                 join.setOtherJoinOnFilter(OptimizerUtils.copyFilter(this.getOtherJoinOnFilter()));
                 join.build();
-                return null;
+                return join;
             }
         }
     }

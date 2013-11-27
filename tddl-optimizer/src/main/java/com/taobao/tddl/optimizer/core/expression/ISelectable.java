@@ -10,7 +10,6 @@ import com.taobao.tddl.optimizer.core.IRowSet;
  * 描述一个列信息，可能会是字段列，函数列，常量列<br>
  * 使用RT泛型解决子类流式API需要的返回结果为子类
  * 
- * @author jianghang 2013-11-8 上午11:40:50
  * @since 5.1.0
  */
 public interface ISelectable<RT extends ISelectable> extends CanVisit, Comparable {
@@ -81,6 +80,11 @@ public interface ISelectable<RT extends ISelectable> extends CanVisit, Comparabl
     public RT setTableName(String tableName);
 
     public RT setColumnName(String columnName);
+
+    /**
+     * 是否为相同的名字，如果目标的alias name存在则对比alias name，否则对比column name
+     */
+    public boolean isSameName(ISelectable select);
 
     /**
      * @return tableName + name

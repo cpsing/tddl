@@ -19,9 +19,7 @@ import com.taobao.tddl.optimizer.core.ast.query.strategy.BlockNestedLoopJoin;
 import com.taobao.tddl.optimizer.core.ast.query.strategy.IndexNestedLoopJoin;
 import com.taobao.tddl.optimizer.core.ast.query.strategy.JoinStrategy;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
-import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
-import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
@@ -49,11 +47,11 @@ public class JoinNode extends QueryTreeNode {
      *      leftOuter=false && rightOuter=false
      * </pre>
      */
-    boolean                      leftOuter             = true;
-    boolean                      rightOuter            = true;
+    private boolean              leftOuter             = true;
+    private boolean              rightOuter            = true;
 
-    boolean                      isCrossJoin           = false;
-    boolean                      usedForIndexJoinPK    = false;
+    private boolean              isCrossJoin           = false;
+    private boolean              usedForIndexJoinPK    = false;
     private List<IBooleanFilter> joinFilter            = new ArrayList();
 
     private boolean              needOptimizeJoinOrder = true;
@@ -85,8 +83,8 @@ public class JoinNode extends QueryTreeNode {
     }
 
     public JoinNode addJoinKeys(String leftKey, String rightKey) {
-        return this.addJoinKeys(OptimizerUtils.createColumnFromString(leftKey.toUpperCase()),
-            OptimizerUtils.createColumnFromString(rightKey.toUpperCase()));
+        return this.addJoinKeys(OptimizerUtils.createColumnFromString(leftKey),
+            OptimizerUtils.createColumnFromString(rightKey));
     }
 
     public void addJoinFilter(IBooleanFilter filter) {
@@ -132,8 +130,9 @@ public class JoinNode extends QueryTreeNode {
     }
 
     public List<ASTNode> getChildren() {
-        super.getChildren().remove(null);
-        return super.getChildren();
+        List<ASTNode> childs = super.getChildren();
+        childs.remove(null);// 删除left为null的情况
+        return childs;
     }
 
     public List<IOrderBy> getImplicitOrderBys() {
@@ -239,7 +238,7 @@ public class JoinNode extends QueryTreeNode {
             JoinNode leftJoinRightIndex = left.join(rightIndexQuery);
             leftJoinRightIndex.setJoinStrategy(new IndexNestedLoopJoin());
 
-            List<ISelectable> rightIndexJoinOnColumns = cloneColumnsList(this.getRightKeys());
+            List<ISelectable> rightIndexJoinOnColumns = OptimizerUtils.copySelectables(this.getRightKeys());
             if (rightIndexQuery.getAlias() != null) {
                 setColumnsTableName(rightIndexJoinOnColumns, rightIndexQuery.getAlias());
             }
@@ -251,18 +250,18 @@ public class JoinNode extends QueryTreeNode {
             leftJoinRightIndex.setLeftRightJoin(this.leftOuter, this.rightOuter);
             leftJoinRightIndex.executeOn(this.getDataNode());
             List<ISelectable> leftJoinRightIndexColumns = new LinkedList();
-            List<ISelectable> leftJoinColumns = cloneColumnsList(left.getColumnsSelected());
+            List<ISelectable> leftJoinColumns = OptimizerUtils.copySelectables(left.getColumnsSelected());
             if (left.getAlias() != null) {
                 setColumnsTableName(leftJoinColumns, left.getAlias());
             }
-            List<ISelectable> rightIndexColumns = cloneColumnsList(rightIndexQuery.getColumnsSelected());
+
+            List<ISelectable> rightIndexColumns = OptimizerUtils.copySelectables(rightIndexQuery.getColumnsSelected());
             if (rightIndexQuery.getAlias() != null) {
                 setColumnsTableName(rightIndexColumns, rightIndexQuery.getAlias());
             }
 
             leftJoinRightIndexColumns.addAll(leftJoinColumns);
             leftJoinRightIndexColumns.addAll(rightIndexColumns);
-
             leftJoinRightIndex.select(leftJoinRightIndexColumns);
             JoinNode leftJoinRightIndexJoinRightKey = leftJoinRightIndex.join(rightKeyQuery);
 
@@ -282,9 +281,9 @@ public class JoinNode extends QueryTreeNode {
             leftJoinRightIndexJoinRightKey.executeOn(this.getDataNode());
 
             if (this.isCrossJoin()) {
-                leftJoinRightIndexJoinRightKey.select(new ArrayList(0));
+                leftJoinRightIndexJoinRightKey.select(new ArrayList(0));// 查全表所有字段
             } else {
-                List<ISelectable> columns = cloneColumnsList(this.getColumnsSelected());
+                List<ISelectable> columns = OptimizerUtils.copySelectables(this.getColumnsSelected());
                 leftJoinRightIndexJoinRightKey.select(columns);
             }
             leftJoinRightIndexJoinRightKey.setGroupBys(this.getGroupBys());
@@ -299,25 +298,9 @@ public class JoinNode extends QueryTreeNode {
         }
     }
 
-    private List<ISelectable> cloneColumnsList(List<ISelectable> cs) {
-        List<ISelectable> newColumns = new ArrayList(cs.size());
-        for (ISelectable c : cs) {
-            if (c instanceof IColumn) {
-                newColumns.add(c.copy());
-            } else {
-                newColumns.add(c);
-            }
-        }
-        return newColumns;
-    }
-
     private List<ISelectable> setColumnsTableName(List<ISelectable> columns, String tablename) {
-        for (Object c : columns) {
-            if (c instanceof IColumn) {
-                ((IColumn) c).setTableName(tablename);
-            } else if (c instanceof IFunction) {
-                ((IFunction) c).setTableName(tablename);
-            }
+        for (ISelectable c : columns) {
+            c.setTableName(tablename);
         }
 
         return columns;

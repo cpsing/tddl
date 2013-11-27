@@ -35,7 +35,6 @@ public class UpdateNode extends DMLNode<UpdateNode> {
     }
 
     public IDataNodeExecutor toDataNodeExecutor() throws QueryException {
-        convertTypeToSatifyColumnMeta(this.getUpdateColumns(), values);
         IUpdate update = ASTNodeFactory.getInstance().createUpdate();
         for (ISelectable updateColumn : this.getColumns()) {
             if (this.getNode().getTableMeta().getPrimaryIndex().getPartitionColumns().contains(updateColumn)) {

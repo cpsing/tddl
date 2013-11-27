@@ -115,7 +115,6 @@ public class MergeNode extends QueryTreeNode {
         String tabTittle = GeneralUtil.getTab(inden);
         String tabContent = GeneralUtil.getTab(inden + 1);
         StringBuilder sb = new StringBuilder();
-
         if (this.getAlias() != null) {
             appendln(sb, tabTittle + (this.isUnion() ? "Union" : "Merge") + " as " + this.getAlias());
         } else {

@@ -46,11 +46,13 @@ public class QueryNode extends QueryTreeNode {
         if (child == null) {
             return;
         }
+
         if (this.getChildren().isEmpty()) {
             this.getChildren().add(child);
+        } else {
+            this.getChildren().set(0, child);
         }
 
-        this.getChildren().set(0, child);
         setNeedBuild(true);
     }
 
@@ -125,7 +127,7 @@ public class QueryNode extends QueryTreeNode {
     }
 
     public String toString(int inden) {
-        String tabTittle = getTab(inden);
+        String tabTittle = GeneralUtil.getTab(inden);
         String tabContent = GeneralUtil.getTab(inden + 1);
         StringBuilder sb = new StringBuilder();
 

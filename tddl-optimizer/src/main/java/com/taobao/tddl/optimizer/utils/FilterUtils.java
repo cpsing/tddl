@@ -240,6 +240,26 @@ public class FilterUtils {
     }
 
     /**
+     * 将一系列的boolean filter ，拼装成一个andFilter { boolFilter , boolFilter...}
+     * 的filter..
+     * 
+     * @param DNFNode
+     * @return
+     */
+    public static IFilter DNFNodeToBoolTree(List<IFilter> DNFNode) {
+        if (DNFNode == null || DNFNode.isEmpty()) {
+            return null;
+        }
+
+        IFilter rootNode = DNFNode.get(0);
+        for (int i = 1; i < DNFNode.size(); i++) {
+            rootNode = and(rootNode, DNFNode.get(i));
+        }
+
+        return rootNode;
+    }
+
+    /**
      * 非严格DNF检查，允许出现 Filter(A and B)
      */
     public static boolean isDNF(IFilter node) {

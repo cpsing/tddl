@@ -29,7 +29,7 @@ public class QueryNodeBuilder extends QueryTreeNodeBuilder {
             sub.build();
         }
 
-        if (!(this.getNode().getChild() instanceof QueryTreeNode)) {
+        if (!(this.getNode().getChild() instanceof QueryTreeNode)) {// 嵌套子类
             return;
         }
 
@@ -59,12 +59,13 @@ public class QueryNodeBuilder extends QueryTreeNodeBuilder {
             List<ISelectable> childSelected = ((QueryTreeNode) this.getNode().getChildren().get(0)).getColumnsSelectedForParent();
             this.getNode().select(childSelected);
         }
+
         if (this.getNode().getChildren() != null) {
             for (int i = 0; i < this.getNode().getChildren().size(); i++) {
                 QueryTreeNode child = (QueryTreeNode) this.getNode().getChildren().get(i);
                 // merge的子节点需要把临时列也选上
                 if (child.getImplicitSelectable() != null && !child.getImplicitSelectable().isEmpty()) {
-                    child.select(child.getColumnsRefered());
+                    child.select(child.getColumnsRefered());// 返回所有子列
                     child.build();
                 }
             }
@@ -88,7 +89,10 @@ public class QueryNodeBuilder extends QueryTreeNodeBuilder {
                 delete.add(selected);
             }
         }
-        if (!delete.isEmpty()) this.getNode().getColumnsSelected().removeAll(delete);
+
+        if (!delete.isEmpty()) {
+            this.getNode().getColumnsSelected().removeAll(delete);
+        }
 
         for (ISelectable selected : delete) {
             // 遇到*就把所有列再添加一遍
@@ -96,10 +100,9 @@ public class QueryNodeBuilder extends QueryTreeNodeBuilder {
             QueryTreeNode child = (QueryTreeNode) this.getNode().getChild();
 
             for (ISelectable selectedFromChild : child.getColumnsSelected()) {
-                if (selected.getTableName() != null) {
-                    if (!selected.getTableName().equals(selectedFromChild.getTableName())) {
-                        break;
-                    }
+                if (selected.getTableName() != null
+                    && !selected.getTableName().equals(selectedFromChild.getTableName())) {
+                    break;
                 }
 
                 IColumn newS = ASTNodeFactory.getInstance().createColumn();
@@ -116,21 +119,17 @@ public class QueryNodeBuilder extends QueryTreeNodeBuilder {
                     newS.setColumnName(selectedFromChild.getAlias());
                 }
 
-                getNode().getColumnsSelected().add(newS);
+                getNode().getColumnsSelected().add(newS);// 允许多列
             }
-
-            continue;
         }
 
         for (int i = 0; i < getNode().getColumnsSelected().size(); i++) {
-            // if (getNode().getColumnsSelected().get(i) instanceof IColumn)
             getNode().getColumnsSelected().set(i, this.buildSelectable(getNode().getColumnsSelected().get(i)));
         }
 
     }
 
     public ISelectable getSelectableFromChild(ISelectable c) {
-        QueryTreeNode child = (QueryTreeNode) this.getNode().getChild();
         if (IColumn.STAR.equals(c.getColumnName())) {
             return c;
         }
@@ -138,8 +137,7 @@ public class QueryNodeBuilder extends QueryTreeNodeBuilder {
         if (c instanceof IFunction) {
             return c;
         }
-        ISelectable s = this.getColumnFromOtherNodeWithTableAlias(c, child);
-        return s;
-    }
 
+        return this.getColumnFromOtherNode(c, this.getNode().getChild());
+    }
 }

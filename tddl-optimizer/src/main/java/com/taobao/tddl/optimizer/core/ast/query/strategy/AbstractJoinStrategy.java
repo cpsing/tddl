@@ -37,7 +37,7 @@ public abstract class AbstractJoinStrategy implements JoinStrategy {
         join.setIsSubQuery(joinNode.isSubQuery());
         join.setOtherJoinOnFilter(joinNode.getOtherJoinOnFilter());
         if (joinNode.isCrossJoin()) {
-            join.setColumns(new ArrayList(0));
+            join.setColumns(new ArrayList(0)); // 查询所有字段
         } else {
             join.setColumns((joinNode.getColumnsSelected()));
         }

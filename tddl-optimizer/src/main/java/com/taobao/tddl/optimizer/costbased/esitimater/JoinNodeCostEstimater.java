@@ -13,8 +13,8 @@ public class JoinNodeCostEstimater implements QueryTreeCostEstimater {
     public Cost estimate(QueryTreeNode query) throws StatisticsUnavailableException {
         JoinNode join = (JoinNode) query;
 
-        Cost leftCost = CostEsitimaterFactory.estimater(join.getLeftNode());
-        Cost rightCost = CostEsitimaterFactory.estimater(join.getRightNode());
+        Cost leftCost = CostEsitimaterFactory.estimate(join.getLeftNode());
+        Cost rightCost = CostEsitimaterFactory.estimate(join.getRightNode());
         Cost cost = new Cost();
         cost.setIsOnFly(true);
         long rowCount = 0;

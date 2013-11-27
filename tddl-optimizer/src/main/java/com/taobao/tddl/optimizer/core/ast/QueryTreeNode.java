@@ -185,13 +185,6 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         this.needBuild = needBuild;
     }
 
-    protected String getTab(int count) {
-        StringBuffer tab = new StringBuffer();
-        for (int i = 0; i < count; i++)
-            tab.append("\t");
-        return tab.toString();
-    }
-
     public String toString() {
         return this.toString(0);
     }
@@ -221,6 +214,12 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         }
 
         this.limitTo = limitTo;
+        return this;
+    }
+
+    public QueryTreeNode limit(long i, long j) {
+        this.setLimitFrom(i);
+        this.setLimitTo(j);
         return this;
     }
 
@@ -263,8 +262,8 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         return orderBys;
     }
 
-    public void setOrderBys(List<IOrderBy> explicitOrderBys) {
-        this.orderBys = explicitOrderBys;
+    public void setOrderBys(List<IOrderBy> orderBys) {
+        this.orderBys = orderBys;
         setNeedBuild(true);
     }
 
@@ -283,16 +282,17 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
             return;
         }
 
-        // 将自己做为一个Logical filter的子条件
-        if (!(this.resultFilter instanceof ILogicalFilter)) {
+        if (this.resultFilter instanceof ILogicalFilter) {
+            // 添加为子节点
+            ((ILogicalFilter) resultFilter).addSubFilter(filter);
+            setNeedBuild(true);
+        } else {
+            // 将自己做为一个Logical filter的子条件
             IFilter sub = this.resultFilter;
             resultFilter = ASTNodeFactory.getInstance().createLogicalFilter();
             resultFilter.setOperation(OPERATION.AND);
             ((ILogicalFilter) resultFilter).addSubFilter(sub);
         }
-
-        ((ILogicalFilter) resultFilter).addSubFilter(filter);
-        setNeedBuild(true);
     }
 
     public IFilter getKeyFilter() {
@@ -320,6 +320,30 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         this.implicitSelectable = implicitSelectable;
     }
 
+    public void addImplicitSelectable(ISelectable selectable) {
+        if (!this.implicitSelectable.contains(selectable)) {
+            this.implicitSelectable.add(selectable);
+        }
+    }
+
+    public List<ISelectable> getColumnsSelected() {
+        return columnsSelected;
+    }
+
+    public QueryTreeNode setColumnsSelected(List<ISelectable> columnsSelected) {
+        this.columnsSelected = columnsSelected;
+        return this;
+    }
+
+    public void addColumnsSelected(ISelectable selected) {
+        if (!this.columnsSelected.contains(selected)) {
+            columnsSelected.add(selected);
+            // ISelectable s = selected.copy();
+            // s = this.getBuilder().buildSelectable(s);
+            // this.getColumnsSelected().add(s);
+        }
+    }
+
     public QueryTreeNode select(List<ISelectable> columnSelected) {
         this.columnsSelected = columnSelected;
         setNeedBuild(true);
@@ -331,20 +355,8 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         return this;
     }
 
-    public List<ISelectable> getColumnsSelected() {
-        return columnsSelected;
-    }
-
     public List<ISelectable> getColumnsRefered() {
-        // TODO 为啥不是直接addAll
         return this.columnsRefered;
-        // List<ISelectable> res = new ArrayList<ISelectable>(this
-        // .getColumnsSelected().size() + this.getTempSelectable().size());
-        // res.addAll(this.getColumnsSelected());
-        // return res;
-
-        // res.addAll(this.getTempSelectable());
-
     }
 
     public void setColumnsRefered(List<ISelectable> columnsRefered) {
@@ -359,9 +371,11 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
     public List<ISelectable> getColumnsSelectedForParent() {
         List<ISelectable> res = new ArrayList<ISelectable>(this.getColumnsSelected().size());
         for (ISelectable s : this.getColumnsSelected()) {
-            ISelectable a = null;
-            a = s.copy();
-            if (this.getAlias() != null) a.setTableName(this.getAlias());
+            ISelectable a = s.copy();
+            if (this.getAlias() != null) {
+                a.setTableName(this.getAlias());
+            }
+
             if (s.getAlias() != null) {
                 a.setColumnName(s.getAlias()); // 设置为alias name
                 a.setAlias(null);
@@ -382,7 +396,16 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         } else {
             List<ISelectable> res = new ArrayList<ISelectable>(this.getColumnsRefered().size());
             for (ISelectable s : this.getColumnsRefered()) {
-                res.add(s.copy().setTableName(this.getAlias()));
+                ISelectable a = s.copy();
+                if (this.getAlias() != null) {
+                    a.setTableName(this.getAlias());
+                }
+
+                if (s.getAlias() != null) {
+                    a.setColumnName(s.getAlias()); // 设置为alias name
+                    a.setAlias(null);
+                }
+                res.add(a);
             }
             return res;
         }
@@ -497,13 +520,15 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
     }
 
     public QueryTreeNode orderBy(String o, boolean asc) {
-        String column;
         IOrderBy orderBy = ASTNodeFactory.getInstance().createOrderBy();
-        column = o;
+        String column = o;
         orderBy.setDirection(asc);
         return this.orderBy(OptimizerUtils.createColumnFromString(column), orderBy.getDirection());
     }
 
+    /**
+     * 多个列时，允许逗号分隔
+     */
     public QueryTreeNode select(String s) {
         s = s.toUpperCase();
         List<ISelectable> ss = new ArrayList();
@@ -517,14 +542,11 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         return this.query(where).select(select);
     }
 
+    /**
+     * 设置别名，表级别
+     */
     public QueryTreeNode setAlias(String string) {
         this.alias(string);
-        return this;
-    }
-
-    public QueryTreeNode limit(long i, long j) {
-        this.setLimitFrom(i);
-        this.setLimitTo(j);
         return this;
     }
 
@@ -584,14 +606,6 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         return this.keyFilter != null;
     }
 
-    public void addColumnSelected(ISelectable selected) {
-        if (!this.columnsSelected.contains(selected)) {
-            ISelectable s = selected.copy();
-            s = this.getBuilder().buildSelectable(s);
-            this.getColumnsSelected().add(s);
-        }
-    }
-
     public IFilter getOtherJoinOnFilter() {
         return otherJoinOnFilter;
     }
@@ -644,7 +658,7 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
                 }
 
                 for (int i = this.getOrderBys().size(); i < this.getGroupBys().size(); i++) {
-                    orderByCombineWithGroupBy.add(this.getGroupBys().get(i));
+                    orderByCombineWithGroupBy.add(this.getGroupBys().get(i).deepCopy());
                 }
 
                 return orderByCombineWithGroupBy;

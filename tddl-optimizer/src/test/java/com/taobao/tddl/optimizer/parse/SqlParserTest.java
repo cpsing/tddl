@@ -661,7 +661,7 @@ public class SqlParserTest {
 
         TableNode table1 = new TableNode("TABLE1");
         UpdateNode unExpected = table1.update("NAME", new Comparable[] { 2 });
-        unExpected.setNode(table1.query("ID>=5 AND ID<=5"));
+        table1.query("ID>=5 AND ID<=5");
 
         Assert.assertEquals(unExpected.toString(), un.toString());
     }
@@ -673,7 +673,7 @@ public class SqlParserTest {
 
         TableNode table1 = new TableNode("TABLE1");
         DeleteNode dnExpected = table1.delete();
-        dnExpected.setNode(table1.query("ID>=5 AND ID<=5"));
+        table1.query("ID>=5 AND ID<=5");
 
         Assert.assertEquals(dnExpected.toString(), dn.toString());
     }
@@ -796,7 +796,7 @@ public class SqlParserTest {
 
         TableNode table1 = new TableNode("TABLE1");
         UpdateNode unExpected = table1.update("ID", new Comparable[] { 2 });
-        unExpected.setNode(table1.query("ID>=3 AND ID<=5"));
+        table1.query("ID>=3 AND ID<=5");
 
         Assert.assertEquals(unExpected.toString(), un.toString());
     }
@@ -816,7 +816,7 @@ public class SqlParserTest {
         dn.assignment(parameterSettings);
         TableNode table1 = new TableNode("TABLE1");
         DeleteNode dnExpected = table1.delete();
-        dnExpected.setNode(table1.query("ID>=3 AND ID<=5"));
+        table1.query("ID>=3 AND ID<=5");
         Assert.assertEquals(dnExpected.toString(), dn.toString());
     }
 

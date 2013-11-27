@@ -90,7 +90,7 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
             return;
         }
 
-        if (columns == null || columns.isEmpty()) { // 如果字段为空，默认为所有的字段数据
+        if (columns == null || columns.isEmpty()) { // 如果字段为空，默认为所有的字段数据的,比如insert所有字段
             columns = OptimizerUtils.columnMetaListToIColumnList(this.getTableMeta().getAllColumns(),
                 this.getTableMeta().getTableName());
         }
@@ -108,8 +108,7 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
             ISelectable res = null;
             for (Object obj : table.getColumnsReferedForParent()) {
                 ISelectable querySelected = (ISelectable) obj;
-                if ((querySelected.getAlias() != null && s.getColumnName().equals(querySelected.getAlias()))
-                    || s.getColumnName().equals(querySelected.getColumnName())) { // 尝试查找对应的字段信息
+                if (s.isSameName(querySelected)) { // 尝试查找对应的字段信息
                     res = querySelected;
                     break;
                 }

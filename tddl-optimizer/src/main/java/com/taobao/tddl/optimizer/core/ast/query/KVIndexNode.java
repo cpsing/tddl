@@ -11,10 +11,6 @@ import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.build.KVIndexNodeBuilder;
 import com.taobao.tddl.optimizer.core.ast.build.QueryTreeNodeBuilder;
-import com.taobao.tddl.optimizer.core.ast.dml.InsertNode;
-import com.taobao.tddl.optimizer.core.ast.dml.PutNode;
-import com.taobao.tddl.optimizer.core.ast.dml.UpdateNode;
-import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
@@ -28,9 +24,8 @@ public class KVIndexNode extends TableNode {
 
     private KVIndexNodeBuilder builder;
 
-    public KVIndexNode(String tableName){
-        super(tableName);
-
+    public KVIndexNode(String kvIndexName){
+        this.kvIndexName = kvIndexName;
         builder = new KVIndexNodeBuilder(this);
     }
 
@@ -52,31 +47,31 @@ public class KVIndexNode extends TableNode {
 
     public IQuery toDataNodeExecutor() {
         IQuery query = ASTNodeFactory.getInstance().createQuery();
-        // query.setAlias(this.getAlias());
-        // query.setColumns(this.getColumnsSelected());
-        // query.setConsistent(this.getConsistent());
-        // query.setGroupBys(this.getGroupBys());
-        // String dbName = null;
-        // if (this.getDbName() != null) {
-        // dbName = this.getDbName();
-        // } else if (this.getIndex() != null) {
-        // dbName = this.getIndex().getName();
-        // }
-        // query.setActualTableName(dbName);
-        // query.setIndexName(this.getIndex() == null ? null :
-        // this.getIndex().getName());
-        // query.setKeyFilter(this.getKeyFilter());
-        // query.setValueFilter(this.getResultFilter());
-        // query.setLimitFrom(this.getLimitFrom());
-        // query.setLimitTo(this.getLimitTo());
-        // query.setLockModel(this.getLockModel());
-        // query.setOrderBy(this.getOrderBys());
-        // query.setSubQuery(null);
-        // query.executeOn(this.getDataNode());
-        // query.setSql(this.getSql());
-        // query.setIsSubQuery(this.isSubQuery());
-        // query.setExtra(this.getExtra());
-        // query.having(this.getHavingFilter());
+        query.setAlias(this.getAlias());
+        query.setColumns(this.getColumnsSelected());
+        query.setConsistent(this.getConsistent());
+        query.setGroupBys(this.getGroupBys());
+        String tableName = null;
+        if (this.getIndexName() != null) {
+            tableName = this.getIndexName();
+        } else if (this.getIndex() != null) {
+            tableName = this.getIndex().getName();
+        }
+
+        query.setTableName(tableName);
+        query.setIndexName(this.getIndex() == null ? null : this.getIndex().getName());
+        query.setKeyFilter(this.getKeyFilter());
+        query.setValueFilter(this.getResultFilter());
+        query.setLimitFrom(this.getLimitFrom());
+        query.setLimitTo(this.getLimitTo());
+        query.setLockModel(this.getLockModel());
+        query.setOrderBys(this.getOrderBys());
+        query.setSubQuery(null);
+        query.executeOn(this.getDataNode());
+        query.setSql(this.getSql());
+        query.setIsSubQuery(this.isSubQuery());
+        query.setExtra(this.getExtra());
+        query.having(this.getHavingFilter());
         return query;
     }
 
@@ -88,23 +83,6 @@ public class KVIndexNode extends TableNode {
         setNeedBuild(false);
     }
 
-    // public KVIndexNodeBuilder getBuilder() {
-    // TODO return this.builder;
-    // return null;
-    // }
-
-    public InsertNode insert(List<ISelectable> columns, List<Comparable> values) {
-        return super.insert(OptimizerUtils.copySelectables(columns), values);
-    }
-
-    public UpdateNode update(List<ISelectable> columns, List<Comparable> values) {
-        return super.update(OptimizerUtils.copySelectables(columns), values);
-    }
-
-    public PutNode put(List<ISelectable> columns, List<Comparable> values) {
-        return super.put(OptimizerUtils.copySelectables(columns), values);
-    }
-
     // ================ setter / getter ===============
 
     public String getTableName() {
@@ -112,7 +90,10 @@ public class KVIndexNode extends TableNode {
     }
 
     public String getName() {
-        if (this.getAlias() != null) return this.getAlias();
+        if (this.getAlias() != null) {
+            return this.getAlias();
+        }
+
         return this.getIndexName();
     }
 
@@ -138,46 +119,6 @@ public class KVIndexNode extends TableNode {
 
     public void setKvIndexName(String kvIndexName) {
         this.kvIndexName = kvIndexName;
-    }
-
-    public void setIndexQueryValueFilter(IFilter indexValueFilter) {
-        super.setIndexQueryValueFilter(OptimizerUtils.copyFilter(indexValueFilter));
-    }
-
-    public void setOrderBys(List<IOrderBy> explicitOrderBys) {
-        super.setOrderBys(OptimizerUtils.copyOrderBys(explicitOrderBys));
-    }
-
-    public QueryTreeNode query(IFilter whereFilter) {
-        return super.query(OptimizerUtils.copyFilter(whereFilter));
-    }
-
-    public QueryTreeNode setGroupBys(List<IOrderBy> groups) {
-        return super.setGroupBys(OptimizerUtils.copyOrderBys(groups));
-    }
-
-    public QueryTreeNode select(List<ISelectable> columnSelected) {
-        return super.select(OptimizerUtils.copySelectables(columnSelected));
-    }
-
-    public void addResultFilter(IBooleanFilter filter) {
-        super.addResultFilter((IBooleanFilter) OptimizerUtils.copyFilter(filter));
-    }
-
-    public void setKeyFilter(IFilter f) {
-        super.setKeyFilter(OptimizerUtils.copyFilter(f));
-    }
-
-    public void setResultFilter(IFilter f) {
-        super.setResultFilter(OptimizerUtils.copyFilter(f));
-    }
-
-    public void setImplicitSelectable(List<ISelectable> implicitSelectable) {
-        super.setImplicitSelectable(OptimizerUtils.copySelectables(implicitSelectable));
-    }
-
-    public QueryTreeNode orderBy(ISelectable c, boolean b) {
-        return super.orderBy(c.copy(), b);
     }
 
     public KVIndexNode copy() {
@@ -236,29 +177,11 @@ public class KVIndexNode extends TableNode {
     }
 
     public String getSchemaName() {
-        if (super.getSchemaName() == null) {
-            return this.getIndexName();
-        }
-
-        return super.getSchemaName();
+        return this.getIndexName();
     }
 
     public List<ISelectable> getColumnsRefered() {
         throw new NotSupportException("KVIndexNode的getColumnsRefered不应被调用");
-
     }
 
-    public void selectAColumn(ISelectable s) {
-        if (s.getTableName() != null) {
-            if (!(s.getTableName().equals(this.getTableName()) || s.getTableName().equals(this.getAlias()))) {
-                return;
-            }
-        }
-        if (this.columnsSelected == null) {
-            this.columnsSelected = new ArrayList();
-        }
-        if (!this.columnsSelected.contains(s)) {
-            columnsSelected.add(s);
-        }
-    }
 }

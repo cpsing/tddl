@@ -72,8 +72,8 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
         for (ASTNode child : this.getNode().getChildren()) {
             ((QueryTreeNode) child).getColumnsSelected().removeAll(toRemove);// 干掉查询的min(id)+max(id)函数
             for (ISelectable f : aggregateInScalar) {
-                ((QueryTreeNode) child).addColumnSelected(f); // 只添加min(id) ,
-                                                              // max(id)的独立函数
+                // 只添加min(id) ,max(id)的独立函数
+                ((QueryTreeNode) child).addColumnsSelected(f);
             }
         }
 
@@ -142,7 +142,7 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
             List<IOrderBy> orderByAndGroupBy = new ArrayList(((QueryTreeNode) child).getOrderBys());
             orderByAndGroupBy.addAll(((QueryTreeNode) child).getGroupBys());
             for (IOrderBy order : orderByAndGroupBy) {
-                ((QueryTreeNode) child).addColumnSelected(order.getColumn());
+                ((QueryTreeNode) child).addColumnsSelected(order.getColumn());
             }
         }
 
@@ -204,7 +204,7 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
     }
 
     /**
-     * 構建列信息
+     * 构建列信息
      * 
      * @param indexNode
      */
@@ -244,7 +244,9 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
 
             for (ISelectable selectedFromChild : child.getColumnsSelected()) {
                 if (selected.getTableName() != null) {
-                    if (!selected.getTableName().equals(selectedFromChild.getTableName())) break;
+                    if (!selected.getTableName().equals(selectedFromChild.getTableName())) {
+                        break;
+                    }
                 }
 
                 IColumn newS = ASTNodeFactory.getInstance().createColumn();
@@ -263,8 +265,6 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
 
                 getNode().getColumnsSelected().add(newS);
             }
-
-            continue;
         }
 
     }
@@ -279,15 +279,15 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
             return c;
         }
 
-        ISelectable s = this.getColumnFromOtherNodeWithTableAlias(c, child);
+        ISelectable s = this.getColumnFromOtherNode(c, child);
         if (s == null) {
             for (int i = 0; i < this.getNode().getChildren().size(); i++) {
                 QueryTreeNode sub = (QueryTreeNode) this.getNode().getChildren().get(i);
-                sub.addColumnSelected(c);
+                sub.addColumnsSelected(c);
             }
         }
 
-        s = this.getColumnFromOtherNodeWithTableAlias(c, child);
+        s = this.getColumnFromOtherNode(c, child);
         return s;
     }
 
@@ -296,7 +296,7 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
             if (arg instanceof IFunction) {
                 this.buildSelectable((ISelectable) arg);
             } else if (arg instanceof ISelectable) {
-                if (((ISelectable) arg).isDistinct()) {
+                if (((ISelectable) arg).isDistinct()) {// 比如count(distinct id)
                     this.buildSelectable((ISelectable) arg);
                 }
             }

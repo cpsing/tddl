@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
+import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.IRowSet;
 import com.taobao.tddl.optimizer.core.PlanVisitor;
@@ -80,6 +81,20 @@ public class Function<RT extends IFunction> implements IFunction<RT> {
     public RT setColumnName(String columnName) {
         this.columnName = columnName;
         return (RT) this;
+    }
+
+    public boolean isSameName(ISelectable select) {
+        String cn1 = this.getColumnName();
+        if (TStringUtil.isNotEmpty(this.getAlias())) {
+            cn1 = this.getAlias();
+        }
+
+        String cn2 = select.getColumnName();
+        if (TStringUtil.isNotEmpty(select.getAlias())) {
+            cn2 = select.getAlias();
+        }
+
+        return TStringUtil.equals(cn1, cn2);
     }
 
     public String getFullName() {

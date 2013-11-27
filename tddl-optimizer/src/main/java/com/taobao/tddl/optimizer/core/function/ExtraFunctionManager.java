@@ -43,6 +43,17 @@ public class ExtraFunctionManager {
      * @return
      */
     public static IExtraFunction getExtraFunction(String functionName) {
+        return getExtraFunction(functionName, false);
+    }
+
+    /**
+     * 查找对应名字的函数类，忽略大小写
+     * 
+     * @param functionName
+     * @param notExistReturnNull 如果不存在function,则返回null
+     * @return
+     */
+    public static IExtraFunction getExtraFunction(String functionName, boolean notExistReturnNull) {
         String name = buildKey(functionName);
         IExtraFunction result = instanceCaches.get(name);
         if (result == null || !result.isSingleton()) {
@@ -57,7 +68,7 @@ public class ExtraFunctionManager {
             }
         }
 
-        if (result == null) {
+        if (result == null && !notExistReturnNull) {
             throw new FunctionException("not found Function : " + functionName);
         }
 
