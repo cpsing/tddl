@@ -51,7 +51,7 @@ public class UpdateNode extends DMLNode<UpdateNode> {
         update.setQueryTree(this.getNode().toDataNodeExecutor());
         update.setUpdateColumns(this.getUpdateColumns());
         update.setUpdateValues(values);
-        update.setSchemaName(this.getNode().getSchemaName());
+        update.setTableName(this.getNode().getTableName());
         update.setIndexName(this.getNode().getIndexUsed().getName());
         return update;
     }

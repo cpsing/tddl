@@ -457,7 +457,7 @@ public class VirtualTableRuleMatcher {
             tbNames.put(tbName, f);
         }
         for (AdvancedParameter ap : tbParams) {
-            Set<Object> set = f.sourceKeys.get(ap.key);
+            Set<Object> set = f.getSourceKeys().get(ap.key);
             if (set == null) {
                 set = new HashSet<Object>();
             }
@@ -469,7 +469,7 @@ public class VirtualTableRuleMatcher {
         Map<String, Field> res = new HashMap<String, Field>(values.size());
         for (Map.Entry<String, Samples> e : values.entrySet()) {
             Field f = new Field(e.getValue().size());
-            f.sourceKeys = e.getValue().getColumnEnumerates();
+            f.setSourceKeys(e.getValue().getColumnEnumerates());
             res.put(e.getKey(), f);
         }
         return res;

@@ -14,7 +14,7 @@ public class PutNode extends DMLNode<PutNode> {
 
     public IDataNodeExecutor toDataNodeExecutor() {
         IReplace put = ASTNodeFactory.getInstance().createReplace();
-        put.setSchemaName(this.getNode().getSchemaName());
+        put.setTableName(this.getNode().getTableName());
         put.setIndexName(this.getNode().getIndexUsed().getName());
         put.setConsistent(true);
         put.setUpdateColumns(this.getColumns());

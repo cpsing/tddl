@@ -18,7 +18,7 @@ public class DeleteNode extends DMLNode<DeleteNode> {
         delete.setConsistent(true);
         delete.executeOn(this.getDataNode());
         delete.setQueryTree(this.getNode().toDataNodeExecutor());
-        delete.setSchemaName(this.getNode().getSchemaName());
+        delete.setTableName(this.getNode().getTableName());
         delete.setIndexName(this.getNode().getIndexUsed().getName());
         return delete;
     }

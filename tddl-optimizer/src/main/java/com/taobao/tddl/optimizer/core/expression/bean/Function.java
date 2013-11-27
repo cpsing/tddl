@@ -236,6 +236,10 @@ public class Function<RT extends IFunction> implements IFunction<RT> {
         return getExtraFunction().getResult(this);
     }
 
+    public void setExtraFunction(IExtraFunction extraFunction) {
+        this.extraFunction = extraFunction;
+    }
+
     public void serverMap(IRowSet kvPair) throws Exception {
         // 当前function需要的args 有些可能是函数，也有些是其他的一些数据
         List<Object> argsArr = getArgs();

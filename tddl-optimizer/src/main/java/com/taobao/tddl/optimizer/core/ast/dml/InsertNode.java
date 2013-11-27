@@ -16,7 +16,7 @@ public class InsertNode extends DMLNode<InsertNode> {
 
     public IDataNodeExecutor toDataNodeExecutor() {
         IInsert insert = ASTNodeFactory.getInstance().createInsert();
-        insert.setSchemaName(this.getNode().getSchemaName());
+        insert.setTableName(this.getNode().getTableName());
         insert.setIndexName((this.getNode()).getIndexUsed().getName());
         insert.setConsistent(true);
         insert.setUpdateColumns(this.getColumns());

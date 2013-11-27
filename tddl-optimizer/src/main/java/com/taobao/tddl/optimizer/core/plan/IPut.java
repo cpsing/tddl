@@ -36,9 +36,9 @@ public interface IPut<RT extends IPut> extends IDataNodeExecutor<RT> {
      * 
      * @param indexName
      */
-    RT setSchemaName(String indexName);
+    RT setTableName(String indexName);
 
-    String getSchemaName();
+    String getTableName();
 
     RT setIndexName(String indexName);
 

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
-import com.taobao.tddl.optimizer.RelationQueryOptimizer;
 import com.taobao.tddl.optimizer.core.ast.ASTNode;
 import com.taobao.tddl.optimizer.core.ast.DMLNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
@@ -15,6 +14,7 @@ import com.taobao.tddl.optimizer.core.ast.query.JoinNode;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
+import com.taobao.tddl.optimizer.costbased.after.RelationQueryOptimizer;
 import com.taobao.tddl.optimizer.exceptions.QueryException;
 
 /**

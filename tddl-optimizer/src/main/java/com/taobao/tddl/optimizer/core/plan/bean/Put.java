@@ -26,8 +26,8 @@ public class Put<RT extends IPut> extends DataNodeExecutor<RT> implements IPut<R
     protected List<ISelectable>      columns;
     protected List<Comparable>       values;
     protected PUT_TYPE               putType;
-    protected String                 schemaName;
-    protected String                 indexName;
+    protected String                 tableName;     // 真实表名
+    protected String                 indexName;     // 逻辑索引信息
     protected boolean                ignore = false;
     protected List<List<Comparable>> multiValues;
     protected boolean                isMutiValues;
@@ -54,13 +54,13 @@ public class Put<RT extends IPut> extends DataNodeExecutor<RT> implements IPut<R
         return columns;
     }
 
-    public RT setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
+    public RT setTableName(String tableName) {
+        this.tableName = tableName;
         return (RT) this;
     }
 
-    public String getSchemaName() {
-        return schemaName;
+    public String getTableName() {
+        return tableName;
     }
 
     public RT setUpdateValues(List<Comparable> values) {
@@ -183,7 +183,7 @@ public class Put<RT extends IPut> extends DataNodeExecutor<RT> implements IPut<R
         String tabContent = OptimizerToString.getTab(inden + 1);
         StringBuilder sb = new StringBuilder();
         appendln(sb, tabTittle + "Put:" + this.getPutType());
-        appendField(sb, "schemaName", this.getSchemaName(), tabContent);
+        appendField(sb, "tableName", this.getTableName(), tabContent);
         appendField(sb, "indexName", this.getIndexName(), tabContent);
         appendField(sb, "columns", this.getUpdateColumns(), tabContent);
         appendField(sb, "values", this.getUpdateValues(), tabContent);

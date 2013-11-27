@@ -24,6 +24,7 @@ public class OptimizerContext {
     private SchemaManager       schemaManager;
     private IndexManager        indexManager;
     private OptimizerRule       rule;
+    private DataNodeChooser     dataNodeChooser;
 
     public static OptimizerContext getContext() {
         return (OptimizerContext) ThreadLocalMap.get(OPTIMIZER_CONTEXT_KEY);
@@ -63,6 +64,14 @@ public class OptimizerContext {
 
     public void setRule(OptimizerRule rule) {
         this.rule = rule;
+    }
+
+    public DataNodeChooser getDataNodeChooser() {
+        return dataNodeChooser;
+    }
+
+    public void setDataNodeChooser(DataNodeChooser dataNodeChooser) {
+        this.dataNodeChooser = dataNodeChooser;
     }
 
 }

@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.taobao.ustore.common.inner.bean.Function;
-import com.taobao.ustore.common.inner.bean.IDataNodeExecutor;
-import com.taobao.ustore.common.inner.bean.IFunction;
-import com.taobao.ustore.common.inner.bean.IJoin;
-import com.taobao.ustore.common.inner.bean.IMerge;
-import com.taobao.ustore.common.inner.bean.IQuery;
-import com.taobao.ustore.common.inner.bean.IQueryCommon;
-import com.taobao.ustore.common.inner.bean.ISelectable;
-import com.taobao.ustore.common.inner.bean.ParameterContext;
-import com.taobao.ustore.common.inner.bean.IFunction.FunctionType;
-import com.taobao.ustore.optimizer.QueryPlanOptimizer;
+import com.taobao.tddl.common.jdbc.ParameterContext;
+import com.taobao.tddl.optimizer.core.expression.IFunction;
+import com.taobao.tddl.optimizer.core.expression.IFunction.FunctionType;
+import com.taobao.tddl.optimizer.core.expression.ISelectable;
+import com.taobao.tddl.optimizer.core.expression.bean.Function;
+import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
+import com.taobao.tddl.optimizer.core.plan.IQueryTree;
+import com.taobao.tddl.optimizer.core.plan.query.IJoin;
+import com.taobao.tddl.optimizer.core.plan.query.IMerge;
+import com.taobao.tddl.optimizer.core.plan.query.IQuery;
+import com.taobao.tddl.optimizer.costbased.before.QueryPlanOptimizer;
 
 /**
  * avg变成count + sum 要改变columns结构
@@ -32,12 +32,11 @@ public class FuckAvgOptimizer implements QueryPlanOptimizer {
     @Override
     public IDataNodeExecutor optimize(IDataNodeExecutor dne, Map<Integer, ParameterContext> parameterSettings,
                                       Map<String, Comparable> extraCmd) {
-
         if (dne instanceof IMerge && ((IMerge) dne).getSubNode().size() > 1) {
             boolean hasAvg = false;
             for (IDataNodeExecutor sub : ((IMerge) dne).getSubNode()) {
                 if (sub instanceof IQuery || sub instanceof IJoin) {
-                    for (ISelectable s : ((IQueryCommon) sub).getColumns()) {
+                    for (Object s : ((IQueryTree) sub).getColumns()) {
                         if (s instanceof IFunction) {
                             if (((IFunction) s).getFunctionName().startsWith("AVG")) {
                                 hasAvg = true;
@@ -55,17 +54,19 @@ public class FuckAvgOptimizer implements QueryPlanOptimizer {
                     if (sub instanceof IQuery || sub instanceof IJoin) {
                         List<ISelectable> add = new ArrayList();
                         List<ISelectable> remove = new ArrayList();
-                        for (ISelectable s : ((IQueryCommon) sub).getColumns()) {
+                        for (Object sel : ((IQueryTree) sub).getColumns()) {
+                            ISelectable s = (ISelectable) sel;
                             if (s instanceof IFunction) {
-                                if (FunctionType.Scalar.equals(((IFunction) s).getFunctionType())) remove.add(s);
-                                else if (s.getColumnName().startsWith("AVG(")) {
+                                if (FunctionType.Scalar.equals(((IFunction) s).getFunctionType())) {
+                                    remove.add(s);
+                                } else if (s.getColumnName().startsWith("AVG(")) {
                                     Function count = (Function) s.copy();
-                                    count.setiExtraFunctionCache(null);
+                                    count.setExtraFunction(null);
                                     count.setFunctionName("COUNT");
                                     count.setColumnName(s.getColumnName().replace("AVG(", "COUNT("));
 
                                     Function sum = (Function) s.copy();
-                                    sum.setiExtraFunctionCache(null);
+                                    sum.setExtraFunction(null);
                                     sum.setFunctionName("SUM");
                                     sum.setColumnName(s.getColumnName().replace("AVG(", "SUM("));
                                     add.add(count);
@@ -77,8 +78,8 @@ public class FuckAvgOptimizer implements QueryPlanOptimizer {
                         }
 
                         if (!remove.isEmpty()) {
-                            ((IQueryCommon) sub).getColumns().removeAll(remove);
-                            ((IQueryCommon) sub).getColumns().addAll(add);
+                            ((IQueryTree) sub).getColumns().removeAll(remove);
+                            ((IQueryTree) sub).getColumns().addAll(add);
                         }
                     }
                 }
@@ -88,8 +89,8 @@ public class FuckAvgOptimizer implements QueryPlanOptimizer {
             this.optimize(((IJoin) dne).getLeftNode(), parameterSettings, extraCmd);
             this.optimize(((IJoin) dne).getRightNode(), parameterSettings, extraCmd);
         }
-        if (dne instanceof IMerge) {
 
+        if (dne instanceof IMerge) {
             for (IDataNodeExecutor sub : ((IMerge) dne).getSubNode()) {
                 this.optimize(sub, parameterSettings, extraCmd);
             }

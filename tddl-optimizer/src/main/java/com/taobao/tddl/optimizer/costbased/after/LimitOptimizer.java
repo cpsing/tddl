@@ -2,13 +2,13 @@ package com.taobao.tddl.optimizer.costbased.after;
 
 import java.util.Map;
 
-import com.taobao.ustore.common.inner.bean.IDataNodeExecutor;
-import com.taobao.ustore.common.inner.bean.IJoin;
-import com.taobao.ustore.common.inner.bean.IMerge;
-import com.taobao.ustore.common.inner.bean.IQuery;
-import com.taobao.ustore.common.inner.bean.IQueryCommon;
-import com.taobao.ustore.common.inner.bean.ParameterContext;
-import com.taobao.ustore.optimizer.QueryPlanOptimizer;
+import com.taobao.tddl.common.jdbc.ParameterContext;
+import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
+import com.taobao.tddl.optimizer.core.plan.IQueryTree;
+import com.taobao.tddl.optimizer.core.plan.query.IJoin;
+import com.taobao.tddl.optimizer.core.plan.query.IMerge;
+import com.taobao.tddl.optimizer.core.plan.query.IQuery;
+import com.taobao.tddl.optimizer.costbased.before.QueryPlanOptimizer;
 
 /**
  * 遍历所有的节点，如果有merge的情况下，记录下merge的limit from to。 会修改所有merge节点下面的limit from to
@@ -27,7 +27,7 @@ public class LimitOptimizer implements QueryPlanOptimizer {
     public IDataNodeExecutor optimize(IDataNodeExecutor dne, Map<Integer, ParameterContext> parameterSettings,
                                       Map<String, Comparable> extraCmd) {
 
-        if (dne instanceof IQueryCommon) {
+        if (dne instanceof IQueryTree) {
             this.findMergeAndOptimizerLimit(dne);
         }
 
@@ -42,10 +42,9 @@ public class LimitOptimizer implements QueryPlanOptimizer {
             if (from instanceof Long && to instanceof Long) {
                 if ((from != null && (Long) from != -1) || (to != null && (Long) to != -1)) {
                     for (IDataNodeExecutor child : ((IMerge) dne).getSubNode()) {
-
-                        if (child instanceof IQueryCommon) {
-                            ((IQueryCommon) child).setLimitFrom(0L);
-                            ((IQueryCommon) child).setLimitTo((Long) from + (Long) to);
+                        if (child instanceof IQueryTree) {
+                            ((IQueryTree) child).setLimitFrom(0L);
+                            ((IQueryTree) child).setLimitTo((Long) from + (Long) to);
                         }
 
                         this.findMergeAndOptimizerLimit(child);

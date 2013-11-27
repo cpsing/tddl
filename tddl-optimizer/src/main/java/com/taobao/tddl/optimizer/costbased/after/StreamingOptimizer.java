@@ -2,14 +2,14 @@ package com.taobao.tddl.optimizer.costbased.after;
 
 import java.util.Map;
 
-import com.taobao.ustore.common.inner.bean.IBindVal;
-import com.taobao.ustore.common.inner.bean.IDataNodeExecutor;
-import com.taobao.ustore.common.inner.bean.IJoin;
-import com.taobao.ustore.common.inner.bean.IMerge;
-import com.taobao.ustore.common.inner.bean.IQuery;
-import com.taobao.ustore.common.inner.bean.IQueryCommon;
-import com.taobao.ustore.common.inner.bean.ParameterContext;
-import com.taobao.ustore.optimizer.QueryPlanOptimizer;
+import com.taobao.tddl.common.jdbc.ParameterContext;
+import com.taobao.tddl.optimizer.core.expression.IBindVal;
+import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
+import com.taobao.tddl.optimizer.core.plan.IQueryTree;
+import com.taobao.tddl.optimizer.core.plan.query.IJoin;
+import com.taobao.tddl.optimizer.core.plan.query.IMerge;
+import com.taobao.tddl.optimizer.core.plan.query.IQuery;
+import com.taobao.tddl.optimizer.costbased.before.QueryPlanOptimizer;
 
 /**
  * merge带limit的用streaming模式
@@ -25,7 +25,7 @@ public class StreamingOptimizer implements QueryPlanOptimizer {
     public IDataNodeExecutor optimize(IDataNodeExecutor dne, Map<Integer, ParameterContext> parameterSettings,
                                       Map<String, Comparable> extraCmd) {
 
-        if (dne instanceof IQueryCommon) {
+        if (dne instanceof IQueryTree) {
             this.findMergeAndOptimizeStreaming(dne);
         }
 
@@ -34,7 +34,6 @@ public class StreamingOptimizer implements QueryPlanOptimizer {
 
     void findMergeAndOptimizeStreaming(IDataNodeExecutor dne) {
         if (dne instanceof IMerge) {
-
             Comparable from = ((IMerge) dne).getLimitFrom();
             Comparable to = ((IMerge) dne).getLimitTo();
             boolean useStreaming = false;
@@ -48,8 +47,8 @@ public class StreamingOptimizer implements QueryPlanOptimizer {
 
             if (useStreaming) {
                 for (IDataNodeExecutor child : ((IMerge) dne).getSubNode()) {
-                    if (child instanceof IQueryCommon) {
-                        ((IQueryCommon) child).setStreaming(true);
+                    if (child instanceof IQueryTree) {
+                        ((IQueryTree) child).setStreaming(true);
                     }
                 }
             }
@@ -62,7 +61,6 @@ public class StreamingOptimizer implements QueryPlanOptimizer {
 
         if (dne instanceof IQuery && ((IQuery) dne).getSubQuery() != null) {
             this.findMergeAndOptimizeStreaming(((IQuery) dne).getSubQuery());
-
         }
 
     }

@@ -46,8 +46,8 @@ import com.taobao.tddl.optimizer.utils.OptimizerUtils;
 public class TableNode extends QueryTreeNode {
 
     private TableNodeBuilder builder;
-    private String           schemaName;
     private String           tableName;
+    private String           actualTableName;              // 比如存在水平分表时，tableName代表逻辑表名,actualTableName代表物理表名
     private IFilter          indexQueryValueFilter = null;
     private TableMeta        tableMeta;
     private IndexMeta        indexUsed             = null; // 当前逻辑表的使用index
@@ -481,14 +481,6 @@ public class TableNode extends QueryTreeNode {
         this.tableMeta = tableMeta;
     }
 
-    public String getSchemaName() {
-        return schemaName;
-    }
-
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
-    }
-
     public IFilter getIndexQueryValueFilter() {
         return indexQueryValueFilter;
     }
@@ -499,6 +491,14 @@ public class TableNode extends QueryTreeNode {
 
     public void setTableName(String tableName) {
         this.tableName = tableName;
+    }
+
+    public String getActualTableName() {
+        return actualTableName;
+    }
+
+    public void setActualTableName(String actualTableName) {
+        this.actualTableName = actualTableName;
     }
 
     public String toString(int inden) {
@@ -512,7 +512,7 @@ public class TableNode extends QueryTreeNode {
             appendln(sb, tabTittle + "Query from " + this.getTableName());
         }
 
-        appendField(sb, "schemaName", this.getSchemaName(), tabContent);
+        appendField(sb, "actualTableName", this.getActualTableName(), tabContent);
         appendField(sb, "keyFilter", printFilterString(this.getKeyFilter()), tabContent);
         appendField(sb, "resultFilter", printFilterString(this.getResultFilter()), tabContent);
         appendField(sb, "whereFilter", printFilterString(this.getWhereFilter()), tabContent);

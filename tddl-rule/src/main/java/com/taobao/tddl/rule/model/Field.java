@@ -18,8 +18,8 @@ import com.taobao.tddl.common.utils.TddlToStringStyle;
  */
 public class Field {
 
-    public static final Field                               EMPTY_FIELD = new Field(0);
-    public Map<String/* 列名 */, Set<Object>/* 得到该结果的描点值名 */> sourceKeys;
+    public static final Field                                EMPTY_FIELD = new Field(0);
+    private Map<String/* 列名 */, Set<Object>/* 得到该结果的描点值名 */> sourceKeys;
 
     public Field(int capacity){
         sourceKeys = new HashMap<String, Set<Object>>(capacity);
@@ -51,6 +51,14 @@ public class Field {
             }
         }
         return true;
+    }
+
+    public Map<String, Set<Object>> getSourceKeys() {
+        return sourceKeys;
+    }
+
+    public void setSourceKeys(Map<String, Set<Object>> sourceKeys) {
+        this.sourceKeys = sourceKeys;
     }
 
     @Override

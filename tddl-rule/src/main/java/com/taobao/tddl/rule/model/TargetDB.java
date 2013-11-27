@@ -68,9 +68,9 @@ public class TargetDB {
             if (inField == null) {
                 tableNames.put(table, field);
             } else {
-                if (field.sourceKeys != null) {
-                    for (Map.Entry<String, Set<Object>> entry : field.sourceKeys.entrySet()) {
-                        inField.sourceKeys.get(entry.getKey()).addAll(entry.getValue());
+                if (field.getSourceKeys() != null) {
+                    for (Map.Entry<String, Set<Object>> entry : field.getSourceKeys().entrySet()) {
+                        inField.getSourceKeys().get(entry.getKey()).addAll(entry.getValue());
                     }
                 }
             }

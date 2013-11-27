@@ -16,8 +16,6 @@ import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.optimizer.Optimizer;
 import com.taobao.tddl.optimizer.OptimizerContext;
-import com.taobao.tddl.optimizer.QueryPlanOptimizer;
-import com.taobao.tddl.optimizer.RelationQueryOptimizer;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
@@ -47,7 +45,16 @@ import com.taobao.tddl.optimizer.core.function.ExtraFunctionManager;
 import com.taobao.tddl.optimizer.core.function.IExtraFunction;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
+import com.taobao.tddl.optimizer.costbased.after.ChooseTreadOptimizer;
+import com.taobao.tddl.optimizer.costbased.after.FillRequestIDAndSubRequestID;
+import com.taobao.tddl.optimizer.costbased.after.FuckAvgOptimizer;
+import com.taobao.tddl.optimizer.costbased.after.LimitOptimizer;
+import com.taobao.tddl.optimizer.costbased.after.MergeConcurrentOptimizer;
+import com.taobao.tddl.optimizer.costbased.after.MergeJoinMergeOptimizer;
+import com.taobao.tddl.optimizer.costbased.after.RelationQueryOptimizer;
+import com.taobao.tddl.optimizer.costbased.after.StreamingOptimizer;
 import com.taobao.tddl.optimizer.costbased.before.BeforeOptimizerWalker;
+import com.taobao.tddl.optimizer.costbased.before.QueryPlanOptimizer;
 import com.taobao.tddl.optimizer.costbased.before.RemoveConstFilterProcessor;
 import com.taobao.tddl.optimizer.costbased.before.TypeConvertProcessor;
 import com.taobao.tddl.optimizer.costbased.esitimater.Cost;
@@ -119,10 +126,20 @@ public class CostBasedOptimizerImpl implements Optimizer {
     private List<QueryPlanOptimizer>             afterOptimizers  = new ArrayList();
 
     public CostBasedOptimizerImpl(){
+        // before处理
         BeforeOptimizerWalker walker = new BeforeOptimizerWalker();
         walker.add(new RemoveConstFilterProcessor());
         walker.add(new TypeConvertProcessor());
         beforeOptimizers.add(walker);
+
+        // after处理
+        afterOptimizers.add(new FuckAvgOptimizer());
+        afterOptimizers.add(new ChooseTreadOptimizer());
+        afterOptimizers.add(new FillRequestIDAndSubRequestID());
+        afterOptimizers.add(new LimitOptimizer());
+        afterOptimizers.add(new MergeJoinMergeOptimizer());
+        afterOptimizers.add(new MergeConcurrentOptimizer());
+        afterOptimizers.add(new StreamingOptimizer());
     }
 
     private class OptimizeResult {
@@ -195,13 +212,17 @@ public class CostBasedOptimizerImpl implements Optimizer {
         }
 
         // 分库，选择执行节点
-        // try {
-        // optimized = this.oc.getDataNodeChooser().shard(optimized,
-        // parameterSettings, extraCmd);
-        // } catch (Exception e) {
-        // if (e instanceof QueryException) throw (QueryException) e;
-        // throw new QueryException(e);
-        // }
+        try {
+            optimized = OptimizerContext.getContext()
+                .getDataNodeChooser()
+                .shard(optimized, parameterSettings, extraCmd);
+        } catch (Exception e) {
+            if (e instanceof QueryException) {
+                throw (QueryException) e;
+            } else {
+                throw new QueryException(e);
+            }
+        }
 
         optimized = this.createMergeForJoin(optimized, parameterSettings, extraCmd);
         optimized = this.optimizeDistinct(optimized);
