@@ -12,6 +12,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.TddlToStringStyle;
+import com.taobao.tddl.optimizer.config.table.parse.TableMetaParser;
 
 /**
  * 本地文件的schema manager实现
@@ -53,7 +54,7 @@ public class LocalSchemaManager extends AbstractLifecycle implements SchemaManag
         try {
             sis = new ByteArrayInputStream(data.getBytes());
             SchemaManager schemaManager = new LocalSchemaManager();
-            List<TableMeta> schemaList = TableMetaParser.parseAll(sis);
+            List<TableMeta> schemaList = TableMetaParser.parse(sis);
             for (TableMeta t : schemaList) {
                 schemaManager.putTable(t.getTableName(), t);
             }

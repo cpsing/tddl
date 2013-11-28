@@ -125,7 +125,7 @@ public class DataNodeChooserImpl implements DataNodeChooser {
         if (dne.getNode() instanceof KVIndexNode) {
             indexName = ((KVIndexNode) dne.getNode()).getIndexName();
         } else {
-            indexName = dne.getNode().getTableMeta().getPrimaryIndexName();
+            indexName = dne.getNode().getTableMeta().getPrimaryIndex().getName();
         }
 
         IFilter insertFilter = null;
@@ -220,7 +220,7 @@ public class DataNodeChooserImpl implements DataNodeChooser {
         if (dne.getNode() instanceof KVIndexNode) {
             indexName = ((KVIndexNode) dne.getNode()).getIndexName();
         } else {
-            indexName = dne.getNode().getTableMeta().getPrimaryIndexName();
+            indexName = dne.getNode().getTableMeta().getPrimaryIndex().getName();
         }
 
         IFilter insertFilter = null;

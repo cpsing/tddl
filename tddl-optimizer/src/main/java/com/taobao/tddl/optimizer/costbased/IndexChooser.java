@@ -1,6 +1,5 @@
 package com.taobao.tddl.optimizer.costbased;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,8 +51,8 @@ public class IndexChooser {
                 continue;
             }
 
-            List<ISelectable> indexColumns = OptimizerUtils.columnMetaListToIColumnList(Arrays.asList(indexs.get(i)
-                .getKeyColumns()), tablename);
+            List<ISelectable> indexColumns = OptimizerUtils.columnMetaListToIColumnList(indexs.get(i).getKeyColumns(),
+                tablename);
 
             for (int j = 0; j < indexColumns.size(); j++) {
                 if (columns.contains(indexColumns.get(j))) {
@@ -97,12 +96,12 @@ public class IndexChooser {
         int theLeastColumnsNumber = Integer.MAX_VALUE;
         List<ISelectable> queryColumns = qn.getColumnsRefered();
         for (int i = 0; i < indexs.size(); i++) {
-            List<ISelectable> indexColumns = OptimizerUtils.columnMetaListToIColumnList(Arrays.asList(indexs.get(i)
-                .getKeyColumns()), indexs.get(i).getTableName());
+            List<ISelectable> indexColumns = OptimizerUtils.columnMetaListToIColumnList(indexs.get(i).getKeyColumns(),
+                indexs.get(i).getTableName());
 
             if (indexColumns.containsAll(queryColumns)) {
-                if (theLeastColumnsNumber > indexs.get(i).getKeyColumns().length) {
-                    theLeastColumnsNumber = indexs.get(i).getKeyColumns().length;
+                if (theLeastColumnsNumber > indexs.get(i).getKeyColumns().size()) {
+                    theLeastColumnsNumber = indexs.get(i).getKeyColumns().size();
                     theIndexOfTheIndexWithLeastColumns = i;
                 }
             }
@@ -129,7 +128,7 @@ public class IndexChooser {
 
             if (indexStat != null) {
                 // 选择度越小，代表索引查找的代价更小，比如选择读为1时，即为精确查找，如果选择度趋向无穷大，即为全表扫描
-                Double columnCountEveryKeyColumnSelect = ((double) index.getKeyColumns().length)
+                Double columnCountEveryKeyColumnSelect = ((double) index.getKeyColumns().size())
                                                          * (1 / indexStat.getDistinct_keys());
                 for (ColumnMeta cm : index.getKeyColumns()) {
                     columnAndColumnCountItSelectivity.put(cm.getName(), columnCountEveryKeyColumnSelect);

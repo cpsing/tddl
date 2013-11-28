@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<matrix name="test_matrix" xmlns="https://github.com/alibaba/tamper/schema/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://github.com/alibaba/tamper/schema/mapping https://raw.github.com/alibaba/tamper/master/src/main/resources/META-INF/mapping.xsd">
+    
+	<group name="andor_group_0" type="bdb_je">
+		<atom name="andor_group_0_atom0">
+			<properties>
+				<property name="ip" value="localhost" />
+				<property name="port" value="9900" />
+				<property name="status" value="R10" />
+				<property name="channelTimeout" value="2000000" />
+			</properties>
+		</atom>
+		<atom name="andor_group_0_atom1">
+			<properties>
+				<property name="ip" value="localhost" />
+				<property name="port" value="9901" />
+				<property name="status" value="R10" />
+				<property name="channelTimeout" value="2000000" />
+			</properties>
+		</atom>
+		<atom name="andor_group_0_atom2">
+		<properties>
+				<property name="ip" value="localhost" />
+				<property name="port" value="9902" />
+				<property name="status" value="R10" />
+				<property name="channelTimeout" value="2000000" />
+			</properties>
+		</atom>
+	</group>
+
+	<group name="andor_group_1" type="bdb_je">
+		<atom name="andor_group_1_atom0">
+			<properties>
+				<property name="ip" value="localhost" />
+				<property name="port" value="9910" />
+				<property name="status" value="R10" />
+				<property name="channelTimeout" value="2000000" />
+			</properties>
+		</atom>
+		<atom name="andor_group_1_atom1">
+			<properties>
+				<property name="ip" value="localhost" />
+				<property name="port" value="9911" />
+				<property name="status" value="R10" />
+				<property name="channelTimeout" value="2000000" />
+			</properties>
+		</atom>
+		<atom name="andor_group_1_atom2">
+		<properties>
+				<property name="ip" value="localhost" />
+				<property name="port" value="9912" />
+				<property name="status" value="R10" />
+				<property name="channelTimeout" value="2000000" />
+			</properties>
+		</atom>
+	</group>
+	
+	<group name="andor_group_2" type="bdb_je">
+		<atom name="andor_group_2_atom0">
+			<properties>
+				<property name="ip" value="localhost" />
+				<property name="port" value="9920" />
+				<property name="status" value="R10" />
+				<property name="channelTimeout" value="2000000" />
+			</properties>
+		</atom>
+		<atom name="andor_group_2_atom1">
+			<properties>
+				<property name="ip" value="localhost" />
+				<property name="port" value="9921" />
+				<property name="status" value="R10" />
+				<property name="channelTimeout" value="2000000" />
+			</properties>
+		</atom>
+	</group>
+
+	<group name="andor_group_oneAtom" type="bdb_je">
+		<atom name="andor_group_atom">
+			<properties>
+				<property name="ip" value="localhost" />
+				<property name="port" value="9930" />
+				<property name="status" value="R10" />
+				<property name="channelTimeout" value="2000000" />
+			</properties>
+		</atom>
+	</group>
+
+	<group name="andor_mysql_group_0" type="mysql_jdbc">
+		<properties>
+			<property name="mysql_groupName" value="andor_mysql_group_0" />
+			<property name="mysql_appName" value="andor_mysql_qatest" />
+		</properties>
+	</group>
+
+	<group name="andor_mysql_group_1" type="mysql_jdbc">
+		<properties>
+			<property name="mysql_groupName" value="andor_mysql_group_1" />
+			<property name="mysql_appName" value="andor_mysql_qatest" />
+		</properties>
+	</group>
+	
+	<group name="andor_mysql_group_2" type="mysql_jdbc">
+		<properties>
+			<property name="mysql_groupName" value="andor_mysql_group_2" />
+			<property name="mysql_appName" value="andor_mysql_qatest" />
+		</properties>
+	</group>
+	
+	<group name="andor_mysql_group_oneAtom" type="mysql_jdbc">
+		<properties>
+			<property name="mysql_groupName" value="andor_mysql_group_0" />
+			<property name="mysql_appName" value="andor_mysql_qatest" />
+		</properties>
+	</group>
+
+	<!-- tdhs group -->
+	<group name="andor_tdhs_group_0" type="TDHS_CLIENT">
+		<properties>
+			<property name="mysql_groupName" value="andor_mysql_group_0" />
+			<property name="mysql_appName" value="andor_mysql_qatest" />
+		</properties>
+	</group>
+
+	<group name="andor_tdhs_group_1" type="TDHS_CLIENT">
+		<properties>
+			<property name="mysql_groupName" value="andor_mysql_group_1" />
+			<property name="mysql_appName" value="andor_mysql_qatest" />
+		</properties>
+	</group>
+
+	<group name="andor_tdhs_group_2" type="TDHS_CLIENT">
+		<properties>
+			<property name="mysql_groupName" value="andor_mysql_group_2" />
+			<property name="mysql_appName" value="andor_mysql_qatest" />
+		</properties>
+	</group>
+	
+	<group name="andor_tdhs_group_atom" type="TDHS_CLIENT">
+		<properties>
+			<property name="mysql_groupName" value="andor_tdhs_group_atom" />
+			<property name="mysql_appName" value="andor_mysql_qatest" />
+		</properties>
+	</group>
+	
+	<!-- hbase group -->
+	<group name="andor_hbase_group" type="HBASE_CLIENT">
+		<properties>
+			<property name="mysql_groupName" value="andor_hbase_group" />
+			<property name="mysql_appName" value="andor_hbase_qatest" />
+			<property name="hbase.zookeeper.quorum" value="10.20.144.51" />
+			<property name="hbase.zookeeper.property.clientPort" value="2181" />
+			<property name="zookeeper.znode.parent" value="/hbase_tesla" />
+		</properties>
+	</group>
+
+	<group name="andor_hbase_group2" type="HBASE_CLIENT">
+		<properties>
+			<property name="mysql_groupName" value="andor_hbase_group2" />
+			<property name="mysql_appName" value="andor_hbase_qatest" />
+			<property name="hbase.zookeeper.quorum" value="10.232.98.74,10.232.98.75,10.232.98.76,10.232.98.77,10.232.98.7" />
+			<property name="hbase.zookeeper.property.clientPort" value="2181" />
+			<property name="zookeeper.znode.parent" value="/hbase-rd-test-0.94" />
+		</properties>
+	</group>
+</matrix>

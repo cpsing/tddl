@@ -6,12 +6,6 @@ package com.taobao.tddl.optimizer.config.table;
  * 
  * @author jianxing <jianxing.qx@taobao.com>
  */
-public interface Relationship {
-
-    int NONE         = 0;
-    int ONE_TO_ONE   = 3;
-    int MANY_TO_ONE  = 4;
-    int ONE_TO_MANY  = 5;
-    int MANY_TO_MANY = 6;
-
+public enum Relationship {
+    NONE, ONE_TO_ONE, MANY_TO_ONE, ONE_TO_MANY, MANY_TO_MANY;
 }

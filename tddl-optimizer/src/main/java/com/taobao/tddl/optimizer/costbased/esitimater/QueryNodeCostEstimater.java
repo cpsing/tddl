@@ -135,7 +135,7 @@ public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
 
         Map<String, Double> columnAndColumnCountItSelectivity = new HashMap();
         if (index != null && indexStat != null) {
-            Double columnCountEveryKeyColumnSelect = ((double) index.getKeyColumns().length)
+            Double columnCountEveryKeyColumnSelect = ((double) index.getKeyColumns().size())
                                                      * (1 / indexStat.getDistinct_keys());
             for (ColumnMeta cm : index.getKeyColumns()) {
                 columnAndColumnCountItSelectivity.put(cm.getName(), columnCountEveryKeyColumnSelect);

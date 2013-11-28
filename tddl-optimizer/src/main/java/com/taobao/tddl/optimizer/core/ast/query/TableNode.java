@@ -94,9 +94,9 @@ public class TableNode extends QueryTreeNode {
      * </pre>
      */
     public QueryTreeNode convertToJoinIfNeed() {
-        if (this.getIndexUsed() == null || this.getTableMeta().getPrimaryKeyIndexs().contains(this.getIndexUsed())) {
+        if (this.getIndexUsed() == null || this.getIndexUsed().isPrimaryKeyIndex()) {
             // 若不包含索引，则扫描主表即可或者使用主键索引
-            KVIndexNode keyIndexQuery = new KVIndexNode(this.getTableMeta().getPrimaryKeyIndexs().get(0).getName());
+            KVIndexNode keyIndexQuery = new KVIndexNode(this.getTableMeta().getPrimaryIndex().getName());
             // 如果有别名，用别名，否则，用逻辑表名替代索引名
             keyIndexQuery.alias(this.getName());
             keyIndexQuery.setLimitFrom(this.getLimitFrom());
@@ -119,7 +119,7 @@ public class TableNode extends QueryTreeNode {
             List<ISelectable> indexQuerySelected = new ArrayList<ISelectable>();
 
             KVIndexNode indexQuery = new KVIndexNode(this.getIndexUsed().getName());
-            indexQuery.alias(indexUsed.getNameWithOutDot());
+            // indexQuery.alias(indexUsed.getNameWithOutDot());
             indexQuery.keyQuery(OptimizerUtils.copyFilter(this.getKeyFilter()));
             indexQuery.valueQuery(OptimizerUtils.copyFilter(this.getIndexQueryValueFilter()));
             // 索引是否都包含在查询字段中

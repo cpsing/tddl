@@ -121,24 +121,6 @@ public class OptimizerUtils {
         throw new ParseException("Unable to parse the date: " + str, -1);
     }
 
-    public static ColumnMeta[] uniq(ColumnMeta[] s) {
-        if (s == null) return null;
-        Set<ColumnMeta> t = new HashSet<ColumnMeta>();
-        List<ColumnMeta> uniqList = new ArrayList<ColumnMeta>(s.length);
-
-        for (ColumnMeta cm : s) {
-            if (!t.contains(cm)) {
-                uniqList.add(cm);
-                t.add(cm);
-            }
-        }
-        ColumnMeta uniqArray[] = new ColumnMeta[uniqList.size()];
-        for (int i = 0; i < uniqArray.length; i++) {
-            uniqArray[i] = uniqList.get(i);
-        }
-        return uniqArray;
-    }
-
     public static IFilter copyFilter(IFilter f) {
         return (IFilter) (f == null ? null : f.copy());
     }

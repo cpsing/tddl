@@ -81,9 +81,8 @@ public class FilterSpliter {
         List<ISelectable> indexKeyColumns = new ArrayList(0);
         List<ISelectable> indexValueColumns = new ArrayList(0);
         if (index != null) {
-            indexKeyColumns = OptimizerUtils.columnMetaListToIColumnList(Arrays.asList(index.getKeyColumns()),
-                table.getTableName());
-            indexValueColumns = OptimizerUtils.columnMetaListToIColumnList(Arrays.asList(index.getValueColumns()),
+            indexKeyColumns = OptimizerUtils.columnMetaListToIColumnList(index.getKeyColumns(), table.getTableName());
+            indexValueColumns = OptimizerUtils.columnMetaListToIColumnList(index.getValueColumns(),
                 table.getTableName());
         }
 

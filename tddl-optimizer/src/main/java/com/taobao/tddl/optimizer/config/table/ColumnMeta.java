@@ -2,9 +2,9 @@ package com.taobao.tddl.optimizer.config.table;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.StringUtils;
 
-import com.taobao.tddl.common.utils.TddlToStringStyle;
+import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 
 /**
@@ -41,19 +41,11 @@ public class ColumnMeta implements Serializable {
      */
     protected final boolean   nullable;
 
-    public ColumnMeta(String tableName, String name, DATA_TYPE dataType, String alias){
-        this(tableName, name, dataType, alias, true);
-    }
-
-    public ColumnMeta(String tableName, String name, DATA_TYPE dataType){
-        this(tableName, name, dataType, null, true);
-    }
-
     public ColumnMeta(String tableName, String name, DATA_TYPE dataType, String alias, boolean nullable){
-        this.tableName = tableName;
-        this.name = name;
+        this.tableName = StringUtils.upperCase(tableName);
+        this.name = StringUtils.upperCase(name);
+        this.alias = StringUtils.upperCase(alias);
         this.dataType = dataType;
-        this.alias = alias;
         this.nullable = nullable;
     }
 
@@ -113,21 +105,19 @@ public class ColumnMeta implements Serializable {
         return hash;
     }
 
-    public String toStringWithInden(String parentTableName) {
+    public String toStringWithInden(int inden) {
         StringBuilder sb = new StringBuilder();
-
-        sb.append(tableName).append(".");
-
+        String tabTittle = GeneralUtil.getTab(inden);
+        sb.append(tabTittle).append(tableName).append(".");
         sb.append(name);
         if (alias != null) {
             sb.append(" as ").append(alias);
         }
-
         return sb.toString();
     }
 
     public String toString() {
-        return ToStringBuilder.reflectionToString(this, TddlToStringStyle.DEFAULT_STYLE);
+        return toStringWithInden(0);
     }
 
 }
