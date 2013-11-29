@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="https://github.com/alibaba/tamper/schema/mapping"
-	xmlns="https://github.com/alibaba/tamper/schema/mapping" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+<xs:schema targetNamespace="https://github.com/tddl/tddl/schema/matrix"
+	xmlns="https://github.com/tddl/tddl/schema/matrix" xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified">
 
     <xs:element name="matrix">
@@ -9,8 +9,8 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:choice maxOccurs="unbounded">
-				<xs:element ref="group" maxOccurs="unbounded" />
-				<xs:element ref="properties" maxOccurs="1" />
+				<xs:element ref="group" minOccurs="0" maxOccurs="unbounded" />
+				<xs:element ref="properties" minOccurs="0" maxOccurs="1" />
 			</xs:choice>
 			
 			<xs:attribute name="name" type="xs:string" use="required">
@@ -27,8 +27,8 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:choice maxOccurs="unbounded">
-				<xs:element ref="atom" maxOccurs="unbounded" />
-				<xs:element ref="properties" maxOccurs="1" />
+				<xs:element ref="atom" minOccurs="0" maxOccurs="unbounded" />
+				<xs:element ref="properties" minOccurs="0" maxOccurs="1" />
 			</xs:choice>
 
 			<xs:attribute name="name" type="xs:string" use="required">
@@ -51,7 +51,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:choice maxOccurs="unbounded">
-				<xs:element ref="properties" maxOccurs="1" />
+				<xs:element ref="properties" minOccurs="0" maxOccurs="1" />
 			</xs:choice>
 
 			<xs:attribute name="name" type="xs:string" use="required">
@@ -68,7 +68,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:choice maxOccurs="unbounded">
-				<xs:element ref="property" maxOccurs="unbounded" />
+				<xs:element ref="property" minOccurs="0" maxOccurs="unbounded" />
 			</xs:choice>
 		</xs:complexType>
 	</xs:element>

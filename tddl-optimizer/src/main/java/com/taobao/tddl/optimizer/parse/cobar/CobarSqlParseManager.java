@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.optimizer.exceptions.SqlParserException;
 import com.taobao.tddl.optimizer.parse.SqlAnalysisResult;
 import com.taobao.tddl.optimizer.parse.SqlParseManager;
@@ -15,13 +16,23 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
 /**
  * 基于cobar解析器实现parse
  */
-public class CobarSqlParseManager implements SqlParseManager {
+public class CobarSqlParseManager extends AbstractLifecycle implements SqlParseManager {
 
-    private static final Logger                          logger = LoggerFactory.getLogger(CobarSqlParseManager.class);
-    private static Cache<String, CobarSqlAnalysisResult> cache  = CacheBuilder.newBuilder()
-                                                                    .maximumSize(1000)
-                                                                    .expireAfterWrite(30000, TimeUnit.MILLISECONDS)
-                                                                    .build();
+    private static final Logger                          logger     = LoggerFactory.getLogger(CobarSqlParseManager.class);
+    private int                                          cacheSize  = 1000;
+    private int                                          expireTime = 30000;
+    private static Cache<String, CobarSqlAnalysisResult> cache      = null;
+
+    protected void doInit() {
+        cache = CacheBuilder.newBuilder()
+            .maximumSize(cacheSize)
+            .expireAfterWrite(expireTime, TimeUnit.MILLISECONDS)
+            .build();
+    }
+
+    protected void doDestory() {
+        cache.invalidateAll();
+    }
 
     public SqlAnalysisResult parse(String sql) throws SqlParserException {
         return parse(sql, true);
@@ -56,6 +67,14 @@ public class CobarSqlParseManager implements SqlParseManager {
 
         return result;
 
+    }
+
+    public void setCacheSize(int cacheSize) {
+        this.cacheSize = cacheSize;
+    }
+
+    public void setExpireTime(int expireTime) {
+        this.expireTime = expireTime;
     }
 
 }

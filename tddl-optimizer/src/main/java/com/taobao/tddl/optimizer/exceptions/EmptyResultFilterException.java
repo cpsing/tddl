@@ -6,7 +6,7 @@ package com.taobao.tddl.optimizer.exceptions;
  * @author jianghang 2013-11-13 下午4:05:45
  * @since 5.1.0
  */
-public class EmptyResultFilterException extends QueryException {
+public class EmptyResultFilterException extends OptimizerException {
 
     private static final long serialVersionUID = -7525463650321091760L;
 

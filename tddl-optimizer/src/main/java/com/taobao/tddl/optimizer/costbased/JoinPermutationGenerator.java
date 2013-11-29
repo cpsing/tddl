@@ -15,6 +15,7 @@ import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
+import com.taobao.tddl.optimizer.utils.PermutationGenerator;
 
 /**
  * 用生成Join顺序的全排列 不会反回无法Join的顺序

@@ -98,7 +98,7 @@ public class IndexMeta implements Serializable, Cloneable {
 
     private String buildName(String tableName, List<ColumnMeta> columns) {
         StringBuilder sb = new StringBuilder();
-        sb.append(tableName).append("$");
+        sb.append(tableName).append(".");
         for (ColumnMeta column : columns) {
             sb.append("_" + column.getName());
         }
@@ -143,6 +143,10 @@ public class IndexMeta implements Serializable, Cloneable {
 
     public String getTableName() {
         return tableName;
+    }
+
+    public String getNameWithOutDot() {
+        return name.replace(".", "$");
     }
 
     public String toString() {

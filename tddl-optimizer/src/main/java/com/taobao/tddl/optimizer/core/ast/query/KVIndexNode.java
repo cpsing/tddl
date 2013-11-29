@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
@@ -13,7 +12,6 @@ import com.taobao.tddl.optimizer.core.ast.build.KVIndexNodeBuilder;
 import com.taobao.tddl.optimizer.core.ast.build.QueryTreeNodeBuilder;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
-import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
 
@@ -178,10 +176,6 @@ public class KVIndexNode extends TableNode {
 
     public String getSchemaName() {
         return this.getIndexName();
-    }
-
-    public List<ISelectable> getColumnsRefered() {
-        throw new NotSupportException("KVIndexNode的getColumnsRefered不应被调用");
     }
 
 }

@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 
@@ -19,6 +21,7 @@ import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
+import com.taobao.tddl.optimizer.core.ast.query.KVIndexNode;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
@@ -35,10 +38,27 @@ import com.taobao.tddl.rule.exceptions.TddlRuleException;
  */
 public class OptimizerUtils {
 
-    private static final String[] DATE_FORMATS = new String[] { "yyyy-MM-dd", "HH:mm:ss", "yyyy-MM-dd HH:mm:ss",
+    private static final String[] DATE_FORMATS  = new String[] { "yyyy-MM-dd", "HH:mm:ss", "yyyy-MM-dd HH:mm:ss",
             "yyyy-MM-dd hh:mm:ss.S", "EEE MMM dd HH:mm:ss zzz yyyy", DateFormatUtils.ISO_DATETIME_FORMAT.getPattern(),
             DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.getPattern(),
             DateFormatUtils.SMTP_DATETIME_FORMAT.getPattern(), };
+    /**
+     * 提取字符串最后的数字
+     */
+    private static Pattern        suffixPattern = Pattern.compile("\\d+$");
+
+    /**
+     * @param child
+     * @return group名加上表名的编号
+     */
+    public static String getGroupAndIdentifierOfTablePattern(KVIndexNode child) {
+        Matcher matcher = suffixPattern.matcher(child.getActualTableName());
+        if (matcher.find()) {
+            return (child.getDataNode() + matcher.group());
+        } else {
+            return child.getDataNode();
+        }
+    }
 
     public static Comparable convertType(Comparable value, DATA_TYPE type) {
         if (value == null) {
@@ -293,6 +313,19 @@ public class OptimizerUtils {
         }
 
         return cs;
+    }
+
+    public static List<IColumn> convertColumnMetaToIColumn(List<ColumnMeta> targetColumn) {
+        List<IColumn> icolumns = new ArrayList<IColumn>(targetColumn.size());
+        for (ColumnMeta cm : targetColumn) {
+            IColumn c = ASTNodeFactory.getInstance().createColumn();
+            c.setDataType(cm.getDataType());
+            c.setColumnName(cm.getName());
+            c.setTableName(cm.getTableName());
+            c.setAlias(cm.getAlias());
+            icolumns.add(c);
+        }
+        return icolumns;
     }
 
     // --------------------------- assignment --------------------------

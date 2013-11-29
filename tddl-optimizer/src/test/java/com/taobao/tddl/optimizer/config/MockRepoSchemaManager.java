@@ -4,8 +4,12 @@ import com.taobao.tddl.common.utils.extension.Activate;
 import com.taobao.tddl.optimizer.config.table.RepoSchemaManager;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 
-@Activate(name = "mock")
+@Activate(name = "MYSQL_JDBC")
 public class MockRepoSchemaManager extends RepoSchemaManager {
+
+    protected void doInit() {
+        // DO NOTHGING
+    }
 
     protected TableMeta getTable0(String tableName) {
         return super.getTable0(tableName);

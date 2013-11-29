@@ -450,6 +450,7 @@ public class JoinNode extends QueryTreeNode {
         }
 
         appendField(sb, "joinFilter:", this.getJoinFilter(), tabContent);
+        appendField(sb, "otherJoinOnFilter:", this.getOtherJoinOnFilter(), tabContent);
 
         if (this.leftOuter && this.rightOuter) {
             appendField(sb, "type", "inner join", tabContent);

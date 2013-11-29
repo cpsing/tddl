@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.taobao.tddl.optimizer.utils.PermutationGenerator;
+
 public class PermutationGeneratorTest {
 
     @Test

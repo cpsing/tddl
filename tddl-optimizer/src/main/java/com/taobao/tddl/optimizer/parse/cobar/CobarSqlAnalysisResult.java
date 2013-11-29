@@ -21,8 +21,10 @@ import com.alibaba.cobar.parser.ast.stmt.dml.DMLUpdateStatement;
 import com.alibaba.cobar.parser.recognizer.SQLParserDelegate;
 import com.alibaba.cobar.parser.util.Pair;
 import com.alibaba.cobar.parser.visitor.SQLASTVisitor;
+import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.SqlType;
+import com.taobao.tddl.optimizer.core.ast.ASTNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.dml.DeleteNode;
 import com.taobao.tddl.optimizer.core.ast.dml.InsertNode;
@@ -146,6 +148,22 @@ public class CobarSqlAnalysisResult implements SqlAnalysisResult {
 
     public DeleteNode getDeleteNode(Map<Integer, ParameterContext> parameterSettings) {
         return (DeleteNode) ((MySqlDeleteVisitor) visitor).getDeleteNode().setParameterSettings(parameterSettings);
+    }
+
+    public ASTNode getAstNode(Map<Integer, ParameterContext> parameterSettings) {
+        if (sqlType == SqlType.SELECT || sqlType == SqlType.SHOW_WITH_TABLE) {
+            return getQueryTreeNode(parameterSettings);
+        } else if (sqlType == SqlType.UPDATE) {
+            return getUpdateNode(parameterSettings);
+        } else if (sqlType == SqlType.INSERT) {
+            return getInsertNode(parameterSettings);
+        } else if (sqlType == SqlType.REPLACE) {
+            return getReplaceNode(parameterSettings);
+        } else if (sqlType == SqlType.DELETE) {
+            return getDeleteNode(parameterSettings);
+        }
+
+        throw new NotSupportException(sqlType.toString());
     }
 
 }

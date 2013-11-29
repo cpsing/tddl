@@ -69,7 +69,7 @@ public class TableMetaParser {
         Node nameNode = node.getAttributes().getNamedItem("name");
         String tableName = null;
         if (nameNode != null) {
-            tableName = nameNode.getNodeValue();
+            tableName = nameNode.getNodeValue().toUpperCase(); // 转化为大写
         }
 
         String[] primaryKeys = new String[0];

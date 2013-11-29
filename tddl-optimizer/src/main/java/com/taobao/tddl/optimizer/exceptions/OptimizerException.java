@@ -1,6 +1,8 @@
 package com.taobao.tddl.optimizer.exceptions;
 
-public class OptimizerException extends QueryException {
+import com.taobao.tddl.common.exception.TddlRuntimeException;
+
+public class OptimizerException extends TddlRuntimeException {
 
     private static final long serialVersionUID = 4520487604630799374L;
 

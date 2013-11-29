@@ -20,11 +20,11 @@ import com.taobao.tddl.optimizer.rule.OptimizerRule;
 public class OptimizerContext {
 
     private static final String OPTIMIZER_CONTEXT_KEY = "_optimizer_context_";
+    // 配置信息
     private Matrix              matrix;
     private SchemaManager       schemaManager;
     private IndexManager        indexManager;
     private OptimizerRule       rule;
-    private DataNodeChooser     dataNodeChooser;
 
     public static OptimizerContext getContext() {
         return (OptimizerContext) ThreadLocalMap.get(OPTIMIZER_CONTEXT_KEY);
@@ -64,14 +64,6 @@ public class OptimizerContext {
 
     public void setRule(OptimizerRule rule) {
         this.rule = rule;
-    }
-
-    public DataNodeChooser getDataNodeChooser() {
-        return dataNodeChooser;
-    }
-
-    public void setDataNodeChooser(DataNodeChooser dataNodeChooser) {
-        this.dataNodeChooser = dataNodeChooser;
     }
 
 }

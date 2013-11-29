@@ -207,6 +207,10 @@ public class FilterUtils {
      */
     public static List<IFilter> toDNFNode(IFilter node) {
         List<IFilter> DNFNode = Lists.newLinkedList();
+        if (node == null) {
+            return DNFNode;
+        }
+
         if (!isLogicalNode(node)) {
             DNFNode.add(node);
             return DNFNode;

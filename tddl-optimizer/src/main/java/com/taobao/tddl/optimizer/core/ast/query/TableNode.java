@@ -119,7 +119,7 @@ public class TableNode extends QueryTreeNode {
             List<ISelectable> indexQuerySelected = new ArrayList<ISelectable>();
 
             KVIndexNode indexQuery = new KVIndexNode(this.getIndexUsed().getName());
-            // indexQuery.alias(indexUsed.getNameWithOutDot());
+            indexQuery.alias(indexUsed.getNameWithOutDot());
             indexQuery.keyQuery(OptimizerUtils.copyFilter(this.getKeyFilter()));
             indexQuery.valueQuery(OptimizerUtils.copyFilter(this.getIndexQueryValueFilter()));
             // 索引是否都包含在查询字段中
@@ -517,6 +517,7 @@ public class TableNode extends QueryTreeNode {
         appendField(sb, "resultFilter", printFilterString(this.getResultFilter()), tabContent);
         appendField(sb, "whereFilter", printFilterString(this.getWhereFilter()), tabContent);
         appendField(sb, "indexQueryValueFilter", printFilterString(this.getIndexQueryValueFilter()), tabContent);
+        appendField(sb, "otherJoinOnFilter", printFilterString(this.getOtherJoinOnFilter()), tabContent);
         appendField(sb, "having", printFilterString(this.getHavingFilter()), tabContent);
         appendField(sb, "indexUsed", this.getIndexUsed(), tabContent);
         if (!(this.getLimitFrom() != null && this.getLimitFrom().equals(0L) && this.getLimitTo() != null && this.getLimitTo()

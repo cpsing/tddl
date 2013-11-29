@@ -1,15 +1,17 @@
 package com.taobao.tddl.optimizer.config.table;
 
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.extension.ExtensionLoader;
 import com.taobao.tddl.optimizer.config.Group;
+import com.taobao.tddl.optimizer.exceptions.OptimizerException;
 
 /**
  * 基于repo的{@linkplain SchemaManager}的委托实现
@@ -19,26 +21,30 @@ import com.taobao.tddl.optimizer.config.Group;
  */
 public class RepoSchemaManager extends AbstractLifecycle implements SchemaManager {
 
-    private RepoSchemaManager        delegate;
-    private LocalSchemaManager       local;
-    private Group                    group;
-    private Cache<String, TableMeta> cache = null;
-    private boolean                  useCache;
+    private RepoSchemaManager               delegate;
+    private boolean                         isDelegate;
+    private LocalSchemaManager              local;
+    private Group                           group;
+    private LoadingCache<String, TableMeta> cache = null;
+    private boolean                         useCache;
 
     protected void doInit() {
-        delegate = ExtensionLoader.load(RepoSchemaManager.class, group.getType().name());
-        delegate.setGroup(group);
-        delegate.init();
+        if (!isDelegate) {
+            delegate = ExtensionLoader.load(RepoSchemaManager.class, group.getType().name());
+            delegate.setGroup(group);
+            delegate.setIsDelegate(true);
+            delegate.init();
 
-        cache = CacheBuilder.newBuilder()
-            .maximumSize(1000)
-            .expireAfterWrite(30000, TimeUnit.MILLISECONDS)
-            .build(new CacheLoader<String, TableMeta>() {
+            cache = CacheBuilder.newBuilder()
+                .maximumSize(1000)
+                .expireAfterWrite(30000, TimeUnit.MILLISECONDS)
+                .build(new CacheLoader<String, TableMeta>() {
 
-                public TableMeta load(String tableName) throws Exception {
-                    return delegate.getTable0(tableName);
-                }
-            });
+                    public TableMeta load(String tableName) throws Exception {
+                        return delegate.getTable0(tableName);
+                    }
+                });
+        }
     }
 
     public final TableMeta getTable(String tableName) {
@@ -49,7 +55,11 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
 
         if (meta == null) {// 本地没有
             if (useCache) {
-                return cache.getIfPresent(tableName);
+                try {
+                    return cache.get(tableName);
+                } catch (ExecutionException e) {
+                    throw new OptimizerException(e);
+                }
             } else {
                 return delegate.getTable0(tableName);
             }
@@ -86,8 +96,10 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
     }
 
     protected void doDestory() {
-        delegate.destory();
-        cache.invalidateAll();
+        if (!isDelegate) {
+            delegate.destory();
+            cache.invalidateAll();
+        }
     }
 
     public void setUseCache(boolean useCache) {
@@ -104,6 +116,10 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
 
     public void setLocal(LocalSchemaManager local) {
         this.local = local;
+    }
+
+    public void setIsDelegate(boolean isDelegate) {
+        this.isDelegate = isDelegate;
     }
 
 }

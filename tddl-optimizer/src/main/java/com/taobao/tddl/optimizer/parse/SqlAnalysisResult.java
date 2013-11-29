@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.SqlType;
+import com.taobao.tddl.optimizer.core.ast.ASTNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.dml.DeleteNode;
 import com.taobao.tddl.optimizer.core.ast.dml.InsertNode;
@@ -16,6 +17,8 @@ import com.taobao.tddl.optimizer.core.ast.dml.UpdateNode;
 public interface SqlAnalysisResult {
 
     public SqlType getSqlType();
+
+    public ASTNode getAstNode(Map<Integer, ParameterContext> parameterSettings);
 
     public QueryTreeNode getQueryTreeNode(Map<Integer, ParameterContext> parameterSettings);
 

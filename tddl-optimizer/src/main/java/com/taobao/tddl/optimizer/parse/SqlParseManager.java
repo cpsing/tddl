@@ -1,5 +1,6 @@
 package com.taobao.tddl.optimizer.parse;
 
+import com.taobao.tddl.common.model.lifecycle.Lifecycle;
 import com.taobao.tddl.optimizer.exceptions.SqlParserException;
 
 /**
@@ -8,7 +9,7 @@ import com.taobao.tddl.optimizer.exceptions.SqlParserException;
  * @author jianghang 2013-11-12 下午2:30:20
  * @since 5.1.0
  */
-public interface SqlParseManager {
+public interface SqlParseManager extends Lifecycle {
 
     public SqlAnalysisResult parse(final String sql) throws SqlParserException;
 
