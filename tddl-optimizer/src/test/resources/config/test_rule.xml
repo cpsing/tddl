@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="vtabroot" class="com.taobao.tddl.rule.VirtualTableRoot" init-method="init">
+		<property name="dbType" value="MYSQL" />
+		<property name="tableRules">
+			<map>
+				<entry key="STUDENT" value-ref="STUDENT" />
+				<entry key="STUDENT._ID" value-ref="STUDENT._ID" />
+				<entry key="STUDENT._NAME" value-ref="STUDENT._NAME" />
+				<entry key="STUDENT._SCHOOL" value-ref="STUDENT._SCHOOL" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="STUDENT" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_group_{0}" />
+		<property name="dbRuleArray">
+			<value>Math.abs(Long.valueOf(#id,1,4#) %4).intdiv(2)</value>
+		</property>
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,4#)) % 4" /> 
+		<property name="tbNamePattern" value="student{00}" />
+	</bean>
+	
+	<bean id="STUDENT._ID" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_group_{0}" />
+		<property name="dbRuleArray">
+			<value>Math.abs(Long.valueOf(#id,1,4#) %4).intdiv(2)</value>
+		</property>
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,4#)) % 4" /> 
+		<property name="tbNamePattern" value="student._id{00}" />
+	</bean>
+	
+	<bean id="STUDENT._NAME" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_group_{0}" />
+		<property name="dbRuleArray">
+			<value>Math.abs(Long.valueOf(#id,1,4#) %4).intdiv(2)</value>
+		</property>
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,4#)) % 4" /> 
+		<property name="tbNamePattern" value="student._name_{00}" />
+	</bean>
+	
+	<bean id="STUDENT._SCHOOL" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_group_{0}" />
+		<property name="dbRuleArray">
+			<value>Math.abs(Long.valueOf(#id,1,4#) %4).intdiv(2)</value>
+		</property>
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,4#)) % 4" /> 
+		<property name="tbNamePattern" value="studentschool{00}" />
+	</bean>
+</beans>
+
+
