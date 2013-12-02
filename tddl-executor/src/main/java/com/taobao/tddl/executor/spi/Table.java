@@ -1,0 +1,75 @@
+package com.taobao.tddl.executor.spi;
+
+import java.sql.SQLException;
+
+import com.taobao.tddl.executor.cursor.ISchematicCursor;
+import com.taobao.tddl.optimizer.config.table.IndexMeta;
+import com.taobao.tddl.optimizer.config.table.TableMeta;
+import com.taobao.tddl.optimizer.core.plan.query.IQuery;
+
+/**
+ * 表操作
+ * 
+ * @author mengshi.sunmengshi 2013-11-27 下午3:59:42
+ * @since 5.1.0
+ */
+public interface Table {
+
+    /**
+     * 获取表的描述信息数据。
+     * 
+     * @return
+     */
+    TableMeta getSchema();
+
+    /**
+     * 核心写接口
+     * 
+     * @param txn
+     * @param key
+     * @param value
+     * @throws Exception
+     */
+    void put(Transaction txn, CloneableRecord key, CloneableRecord value, IndexMeta indexMeta, String dbName)
+                                                                                                             throws Exception;
+
+    /**
+     * 关闭table
+     */
+    void close();
+
+    /**
+     * 删除一行数据
+     * 
+     * @param txn
+     * @param key
+     * @throws Exception
+     */
+    void delete(Transaction txn, CloneableRecord key, IndexMeta indexMeta, String dbName) throws Exception;
+
+    /**
+     * 获取一行数据。
+     * 
+     * @param txn
+     * @param key
+     * @return
+     */
+    CloneableRecord get(Transaction txn, CloneableRecord key, IndexMeta indexMeta, String dbName);
+
+    /**
+     * 根据meta 源信息，获取一个表数据指针。这个指针应该是delegate的，这个方法不应该耗费太多资源。 cursor的隔离性
+     * 
+     * @param txn
+     * @param meta
+     * @param isolation
+     * @param iQuery
+     * @return
+     * @throws FetchException
+     * @throws SQLException
+     */
+    ISchematicCursor getCursor(Transaction txn, IndexMeta meta, String isolation, IQuery iQuery) throws FetchException,
+                                                                                                SQLException;
+
+    public ISchematicCursor getCursor(Transaction txn, IndexMeta indexMeta, String isolation, String indexMetaName)
+                                                                                                                   throws FetchException;
+}

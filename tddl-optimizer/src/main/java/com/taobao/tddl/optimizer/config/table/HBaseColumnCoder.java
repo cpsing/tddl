@@ -2,6 +2,10 @@ package com.taobao.tddl.optimizer.config.table;
 
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 
+/**
+ * @author mengshi.sunmengshi 2013-11-21 下午5:19:16
+ * @since 5.1.0
+ */
 public interface HBaseColumnCoder {
 
     /**

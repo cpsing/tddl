@@ -117,4 +117,14 @@ public class GeneralUtil {
             return null;
         }
     }
+
+    public static void checkInterrupted() throws InterruptedException {
+        if (Thread.interrupted()) {
+            throw new InterruptedException();
+        }
+    }
+
+    public static void printlnToStringBuilder(StringBuilder sb, String v) {
+        sb.append(v).append("\n");
+    }
 }

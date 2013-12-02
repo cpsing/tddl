@@ -18,11 +18,15 @@ import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
 
+import com.taobao.tddl.executor.TExecutor;
+
 /**
  * @author mengshi.sunmengshi 2013-11-22 下午3:26:06
  * @since 5.1.0
  */
 public class TConnection implements Connection {
+
+    TExecutor executor = null;
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
