@@ -5,7 +5,7 @@ import java.util.List;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.cursor.IIndexNestLoopCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
-import com.taobao.tddl.optimizer.core.IRowSet;
+import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 
 /**

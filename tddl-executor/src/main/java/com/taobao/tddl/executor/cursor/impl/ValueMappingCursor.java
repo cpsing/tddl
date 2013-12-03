@@ -5,9 +5,9 @@ import java.util.Map;
 
 import com.taobao.tddl.executor.common.CloneableRecord;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
-import com.taobao.tddl.executor.cursor.ICursorMeta;
+import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
-import com.taobao.tddl.optimizer.core.IRowSet;
+import com.taobao.tddl.executor.rowset.IRowSet;
 
 public class ValueMappingCursor extends SchematicCursor {
 

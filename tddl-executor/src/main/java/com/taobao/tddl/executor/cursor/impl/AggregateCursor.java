@@ -11,13 +11,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.IAggregateCursor;
-import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
+import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
-import com.taobao.tddl.optimizer.core.IRowSet;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IFunction.FunctionType;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;

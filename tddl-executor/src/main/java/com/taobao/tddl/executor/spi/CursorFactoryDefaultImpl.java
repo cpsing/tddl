@@ -8,11 +8,11 @@ import org.codehaus.groovy.util.StringUtil;
 
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.cursor.IANDCursor;
 import com.taobao.tddl.executor.cursor.IAggregateCursor;
 import com.taobao.tddl.executor.cursor.IColumnAliasCursor;
-import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.IInCursor;
 import com.taobao.tddl.executor.cursor.IIndexNestLoopCursor;
 import com.taobao.tddl.executor.cursor.ILimitFromToCursor;

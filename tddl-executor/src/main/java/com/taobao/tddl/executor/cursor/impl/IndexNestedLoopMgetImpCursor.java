@@ -12,8 +12,8 @@ import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.executor.cursor.IIndexNestLoopCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
+import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
-import com.taobao.tddl.optimizer.core.IRowSet;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin;
 
 /**

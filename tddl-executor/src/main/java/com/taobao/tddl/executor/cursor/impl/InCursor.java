@@ -13,7 +13,7 @@ import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.executor.common.RecordCodec;
 import com.taobao.tddl.executor.cursor.IInCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
-import com.taobao.tddl.optimizer.core.IRowSet;
+import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;

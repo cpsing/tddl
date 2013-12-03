@@ -3,8 +3,7 @@ package com.taobao.tddl.executor.rowset;
 import java.util.Arrays;
 import java.util.List;
 
-import com.taobao.tddl.executor.cursor.ICursorMeta;
-import com.taobao.tddl.optimizer.core.IRowSet;
+import com.taobao.tddl.executor.common.ICursorMeta;
 
 /**
  * 基于数组的结果集。是最基本的一行数据的形式，效率最快。

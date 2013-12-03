@@ -6,8 +6,8 @@ import java.util.Map;
 import com.taobao.tddl.executor.common.CloneableRecord;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.common.KVPair;
+import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
-import com.taobao.tddl.optimizer.core.IRowSet;
 
 /**
  * @author jianxing <jianxing.qx@taobao.com> 注解添加by danchen

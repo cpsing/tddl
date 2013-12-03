@@ -6,7 +6,7 @@ import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.cursor.IReverseOrderCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
-import com.taobao.tddl.optimizer.core.IRowSet;
+import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 
 /**

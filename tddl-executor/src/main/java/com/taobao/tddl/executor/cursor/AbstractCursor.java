@@ -8,8 +8,8 @@ import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.common.CloneableRecord;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.common.KVPair;
+import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
-import com.taobao.tddl.optimizer.core.IRowSet;
 
 /**
  * @author mengshi.sunmengshi 2013-11-29 下午2:39:33

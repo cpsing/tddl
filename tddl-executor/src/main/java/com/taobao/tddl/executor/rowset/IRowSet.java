@@ -1,4 +1,4 @@
-package com.taobao.tddl.optimizer.core;
+package com.taobao.tddl.executor.rowset;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -57,5 +57,5 @@ public interface IRowSet {
 
     public void setTimestamp(int index, Timestamp timestamp);
 
-    // ICursorMeta getParentCursorMeta();
+    ICursorMeta getParentCursorMeta();
 }

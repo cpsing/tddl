@@ -3,9 +3,8 @@ package com.taobao.tddl.executor.rowset;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.taobao.tddl.executor.cursor.ICursorMeta;
+import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
-import com.taobao.tddl.optimizer.core.IRowSet;
 
 /**
  * @author mengshi.sunmengshi 2013-12-3 上午11:05:48

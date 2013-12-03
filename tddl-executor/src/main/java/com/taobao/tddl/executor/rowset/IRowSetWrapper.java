@@ -4,8 +4,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
-import com.taobao.tddl.executor.cursor.ICursorMeta;
-import com.taobao.tddl.optimizer.core.IRowSet;
+import com.taobao.tddl.executor.common.ICursorMeta;
 
 /**
  * @author mengshi.sunmengshi 2013-12-3 上午11:05:57

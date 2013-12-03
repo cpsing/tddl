@@ -3,13 +3,13 @@ package com.taobao.tddl.executor.spi;
 import java.util.List;
 import java.util.Map;
 
+import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.cursor.IANDCursor;
 import com.taobao.tddl.executor.cursor.IANDDupValuesCursor;
 import com.taobao.tddl.executor.cursor.IAffectRowCursor;
 import com.taobao.tddl.executor.cursor.IAggregateCursor;
 import com.taobao.tddl.executor.cursor.IColumnAliasCursor;
-import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.IInCursor;
 import com.taobao.tddl.executor.cursor.IIndexNestLoopCursor;
 import com.taobao.tddl.executor.cursor.ILimitFromToCursor;

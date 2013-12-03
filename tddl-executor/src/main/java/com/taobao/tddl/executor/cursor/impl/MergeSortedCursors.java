@@ -9,7 +9,7 @@ import com.taobao.tddl.executor.common.CloneableRecord;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.cursor.IORCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
-import com.taobao.tddl.optimizer.core.IRowSet;
+import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 
 /**

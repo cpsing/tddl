@@ -3,7 +3,7 @@ package com.taobao.tddl.executor.cursor.impl;
 import java.util.List;
 
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.executor.cursor.ICursorMeta;
+import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISetOrderCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;

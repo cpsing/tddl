@@ -2,9 +2,9 @@ package com.taobao.tddl.executor.cursor.impl;
 
 import java.util.Map;
 
-import com.taobao.tddl.executor.cursor.ICursorMeta;
+import com.taobao.tddl.executor.common.ICursorMeta;
+import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.rowset.IRowSetWrapper;
-import com.taobao.tddl.optimizer.core.IRowSet;
 
 public class ValueMappingRowSet extends IRowSetWrapper {
 
