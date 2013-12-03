@@ -3,7 +3,7 @@ package com.taobao.tddl.executor.cursor;
 import java.util.Iterator;
 import java.util.List;
 
-import com.taobao.tddl.optimizer.core.IRowSet;
+import com.taobao.tddl.executor.IRowSet;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
 /**

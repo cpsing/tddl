@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.executor.IRowSet;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
-import com.taobao.tddl.optimizer.core.IRowSet;
 
 /**
  * @author mengshi.sunmengshi 2013-11-29 下午2:39:33

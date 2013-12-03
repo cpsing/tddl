@@ -23,8 +23,6 @@ public class Column implements IColumn {
     protected String    tableName;
     protected DATA_TYPE dataType;
     protected boolean   distinct;
-
-    private Object      value = null;
     private boolean     isNot = false;
 
     public Column(){
@@ -129,15 +127,6 @@ public class Column implements IColumn {
 
     public int compareTo(Object o) {
         throw new NotSupportException();
-    }
-
-    public Object getResult() {
-        return value;
-    }
-
-    public IColumn setResult(Object value) {
-        this.value = value;
-        return this;
     }
 
     public void accept(PlanVisitor visitor) {

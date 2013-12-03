@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.optimizer.core.IRowSet;
+import com.taobao.tddl.executor.IRowSet;
 
 /**
  * @author mengshi.sunmengshi 2013-11-29 下午1:38:39

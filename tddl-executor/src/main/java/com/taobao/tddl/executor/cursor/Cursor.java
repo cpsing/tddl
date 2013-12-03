@@ -7,8 +7,8 @@ package com.taobao.tddl.executor.cursor;
 import java.util.List;
 import java.util.Map;
 
+import com.taobao.tddl.executor.IRowSet;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
-import com.taobao.tddl.optimizer.core.IRowSet;
 
 /**
  * @author jianxing <jianxing.qx@taobao.com> 注解添加by danchen

@@ -31,11 +31,6 @@ public interface ISelectable<RT extends ISelectable> extends CanVisit, Comparabl
 
     public DATA_TYPE getDataType();
 
-    /**
-     * 获取column/function的结果
-     */
-    public Object getResult();
-
     // --------------- name相关信息 ----------------------
 
     /**

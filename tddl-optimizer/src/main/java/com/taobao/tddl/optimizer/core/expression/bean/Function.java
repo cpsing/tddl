@@ -235,8 +235,4 @@ public class Function<RT extends IFunction> implements IFunction<RT> {
     public DATA_TYPE getDataType() {
         return getExtraFunction().getReturnType();
     }
-
-    public Object getResult() {
-        return getExtraFunction().getResult();
-    }
 }
