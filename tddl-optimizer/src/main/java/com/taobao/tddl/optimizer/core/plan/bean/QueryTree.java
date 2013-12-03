@@ -219,4 +219,9 @@ public abstract class QueryTree extends DataNodeExecutor<IQueryTree> implements 
         o.executeOn(this.getDataNode());
     }
 
+    @Override
+    public String toString() {
+        return toStringWithInden(0);
+    }
+
 }

@@ -61,7 +61,7 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
         }
 
         List<ISelectable> toRemove = new ArrayList();
-        for (ISelectable s : this.getNode().getChild().getColumnsSelected()) {
+        for (ISelectable s : ((QueryTreeNode) this.getNode().getChild()).getColumnsSelected()) {
             if (s instanceof IFunction && IFunction.FunctionType.Scalar.equals(((IFunction) s).getFunctionType())) {
                 if (!this.findAggregateFunctionsInScalar((IFunction) s).isEmpty()) {
                     toRemove.add(s);
@@ -108,7 +108,7 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
             }
         }
 
-        replaceAliasInFilter(this.getNode().getHavingFilter(), this.getNode().getChild().getAlias());
+        replaceAliasInFilter(this.getNode().getHavingFilter(), ((QueryTreeNode) this.getNode().getChild()).getAlias());
     }
 
     private void replaceAliasInFilter(Object filter, String alias) {

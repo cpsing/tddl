@@ -42,8 +42,6 @@ import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-import com.taobao.tddl.optimizer.core.function.ExtraFunctionManager;
-import com.taobao.tddl.optimizer.core.function.IExtraFunction;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.costbased.after.ChooseTreadOptimizer;
@@ -240,11 +238,6 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
             this.mergeRestriction(optimized);
         }
 
-        // 预处理函数计算
-        if (optimized instanceof QueryTreeNode) {
-            this.findAndProcessEveryFunctionInTheQueryTree((QueryTreeNode) optimized, (QueryTreeNode) optimized);
-        }
-
         // 分库，选择执行节点
         try {
             optimized = DataNodeChooser.shard(optimized, parameterSettings, extraCmd);
@@ -283,16 +276,6 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
         ASTNode optimized = null;
         if (node instanceof QueryTreeNode) {
             optimized = this.optimizeQuery((QueryTreeNode) node, parameterSettings, extraCmd);
-        } else if (node instanceof DMLNode) {
-            List<Comparable> values = ((DMLNode) node).getValues();
-            if (values != null) {
-                for (int i = 0; i < values.size(); i++) {
-                    if (values.get(i) instanceof IFunction) {
-                        values.set(i, (Comparable) this.processAFunction((IFunction) values.get(i), null, null));
-                    }
-                }
-            }
-            ((DMLNode) node).setValues(values);
         }
 
         if (node instanceof InsertNode) {
@@ -314,8 +297,8 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
         return optimized;
     }
 
-    public QueryTreeNode optimizeQuery(QueryTreeNode qn, Map<Integer, ParameterContext> parameterSettings,
-                                       Map<String, Comparable> extraCmd) throws QueryException {
+    private QueryTreeNode optimizeQuery(QueryTreeNode qn, Map<Integer, ParameterContext> parameterSettings,
+                                        Map<String, Comparable> extraCmd) throws QueryException {
 
         findAndChangeRightJoinToLeftJoin(qn);
 
@@ -348,8 +331,8 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
         return qn;
     }
 
-    public ASTNode optimizeUpdate(UpdateNode update, Map<Integer, ParameterContext> parameterSettings,
-                                  Map<String, Comparable> extraCmd) throws QueryException {
+    private ASTNode optimizeUpdate(UpdateNode update, Map<Integer, ParameterContext> parameterSettings,
+                                   Map<String, Comparable> extraCmd) throws QueryException {
         update.build();
         if (extraCmd == null) extraCmd = new HashMap();
         // update暂不允许使用索引
@@ -361,21 +344,21 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
 
     }
 
-    public ASTNode optimizeInsert(InsertNode insert, Map<Integer, ParameterContext> parameterSettings,
-                                  Map<String, Comparable> extraCmd) throws QueryException {
+    private ASTNode optimizeInsert(InsertNode insert, Map<Integer, ParameterContext> parameterSettings,
+                                   Map<String, Comparable> extraCmd) throws QueryException {
         insert.setNode((TableNode) insert.getNode().convertToJoinIfNeed());
         return insert;
     }
 
-    public ASTNode optimizeDelete(DeleteNode delete, Map<Integer, ParameterContext> parameterSettings,
-                                  Map<String, Comparable> extraCmd) throws QueryException {
+    private ASTNode optimizeDelete(DeleteNode delete, Map<Integer, ParameterContext> parameterSettings,
+                                   Map<String, Comparable> extraCmd) throws QueryException {
         QueryTreeNode queryCommon = this.optimizeQuery(delete.getNode(), parameterSettings, extraCmd);
         delete.setNode((TableNode) queryCommon);
         return delete;
     }
 
-    public ASTNode optimizePut(PutNode put, Map<Integer, ParameterContext> parameterSettings,
-                               Map<String, Comparable> extraCmd) throws QueryException {
+    private ASTNode optimizePut(PutNode put, Map<Integer, ParameterContext> parameterSettings,
+                                Map<String, Comparable> extraCmd) throws QueryException {
         return put;
     }
 
@@ -710,7 +693,7 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
                 return;
             }
             if (merge.isUnion()) {
-                List<IOrderBy> standardOrder = merge.getChild().getImplicitOrderBys();
+                List<IOrderBy> standardOrder = ((QueryTreeNode) merge.getChild()).getImplicitOrderBys();
                 for (ASTNode child : merge.getChildren()) {
                     ((QueryTreeNode) child).setOrderBys(new ArrayList(0));
 
@@ -764,7 +747,6 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
 
     private ASTNode createMergeForJoin(ASTNode dne, Map<Integer, ParameterContext> parameterSettings,
                                        Map<String, Comparable> extraCmd) {
-
         if (dne instanceof MergeNode) {
             for (ASTNode sub : ((MergeNode) dne).getChildren()) {
                 this.createMergeForJoin(sub, parameterSettings, extraCmd);
@@ -1295,96 +1277,6 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
         }
 
         return null;
-    }
-
-    /**
-     * 找到所有函数，进行处理
-     */
-    private void findAndProcessEveryFunctionInTheQueryTree(QueryTreeNode node, QueryTreeNode wholeQueryTree)
-                                                                                                            throws QueryException {
-        for (ASTNode child : node.getChildren()) {
-            this.findAndProcessEveryFunctionInTheQueryTree((QueryTreeNode) child, wholeQueryTree);
-        }
-
-        // 遍历所有用户指定的列 select [column,column,...] 里面的函数
-        for (ISelectable o : node.getColumnsSelected()) {
-            if (o instanceof IFunction) {
-                this.processAFunction((IFunction) o, node, wholeQueryTree);
-            }
-        }
-
-        // 遍历所有用户未指定，但不得不增加的列。比如在order by里面的列，比如在group by里面的列，虽然用户没有选择，但不得不放到里面。
-        for (ISelectable o : node.getImplicitSelectable()) {
-            if (o instanceof IFunction) {
-                this.processAFunction((IFunction) o, node, wholeQueryTree);
-            }
-        }
-
-        // 遍历所有group by条件里面的函数
-        for (IOrderBy o : node.getGroupBys()) {
-            if (o.getColumn() instanceof IFunction) {
-                this.processAFunction((IFunction) o.getColumn(), node, wholeQueryTree);
-            }
-        }
-
-        // order by中也有函数
-        if (node.getOrderBys() != null) {
-            for (IOrderBy order : node.getOrderBys()) {
-                if (order.getColumn() instanceof IFunction) {
-                    order.setColumn((IFunction) this.processAFunction((IFunction) order.getColumn(),
-                        node,
-                        wholeQueryTree));
-                }
-            }
-        }
-
-        // 遍历where条件中的函数
-        this.findAndProcessEveryFunctionInTheFilter(node.getWhereFilter(), node, wholeQueryTree);
-        this.findAndProcessEveryFunctionInTheFilter(node.getKeyFilter(), node, wholeQueryTree);
-        this.findAndProcessEveryFunctionInTheFilter(node.getResultFilter(), node, wholeQueryTree);
-        this.findAndProcessEveryFunctionInTheFilter(node.getHavingFilter(), node, wholeQueryTree);
-        this.findAndProcessEveryFunctionInTheFilter(node.getOtherJoinOnFilter(), node, wholeQueryTree);
-    }
-
-    /**
-     * 遍历所有在filter中的函数
-     */
-    private void findAndProcessEveryFunctionInTheFilter(IFilter filter, QueryTreeNode node, QueryTreeNode wholeQueryTree)
-                                                                                                                         throws QueryException {
-        // and or条件，遍历下面的filter
-        if (filter instanceof ILogicalFilter) {
-            for (IFilter f : ((ILogicalFilter) filter).getSubFilter()) {
-                this.findAndProcessEveryFunctionInTheFilter(f, node, wholeQueryTree);
-            }
-        }
-        // bool filter 查找列和函数，做函数处理
-        if (filter instanceof IBooleanFilter) {
-            if (((IBooleanFilter) filter).getColumn() instanceof IFunction) {
-                ((IBooleanFilter) filter).setColumn(this.processAFunction((IFunction) ((IBooleanFilter) filter).getColumn(),
-                    node,
-                    wholeQueryTree));
-            }
-
-            if (((IBooleanFilter) filter).getValue() instanceof IFunction) {
-                ((IBooleanFilter) filter).setValue((Comparable) this.processAFunction((IFunction) ((IBooleanFilter) filter).getValue(),
-                    node,
-                    wholeQueryTree));
-            }
-        }
-    }
-
-    /**
-     * 提前计算一下function函数，便于rule计算，比如Curdate()函数等
-     */
-    private Comparable processAFunction(IFunction f, QueryTreeNode node, QueryTreeNode wholeQueryTree)
-                                                                                                      throws QueryException {
-        IExtraFunction extraFunction = ExtraFunctionManager.getExtraFunction(f.getFunctionName(), true);
-        if (extraFunction == null) {
-            return f;
-        } else {
-            // 预处理下函数计算
-            return extraFunction.clientCompute(f.getArgs().toArray(), f);
-        }
     }
 
     public boolean isOptimizeJoinOrder() {

@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.optimizer.core.CanVisit;
-import com.taobao.tddl.optimizer.core.IRowSet;
 
 /**
  * 描述一个列信息，可能会是字段列，函数列，常量列<br>
@@ -13,31 +12,6 @@ import com.taobao.tddl.optimizer.core.IRowSet;
  * @since 5.1.0
  */
 public interface ISelectable<RT extends ISelectable> extends CanVisit, Comparable {
-
-    // --------------- map/reduce计算支持------------------
-    /**
-     * 就是给一行数据，他给你一个结果，对于列来说就是直接返回该列，对于行来说就是返回该行
-     * 
-     * <pre>
-     * 场景：
-     * 1. scalar函数计算，比如substring(column)，给定一个参数列，返回一个值
-     * 2. 分布式场景，比如sum请求，会先发送map请求到所有数据节点，每个数据节点本地进行reduce的sum计算，并返回单一结果
-     *    最后由客户端收集所有数据节点的结果，再进行reduce运算，得出sum的最终结果
-     * </pre>
-     */
-    public void serverMap(IRowSet kvPair) throws Exception;
-
-    /**
-     * 就是给一批数据，他只给你特定的一条结果
-     * 
-     * <pre>
-     * 场景：
-     * 1. aggregate函数计算，比如count(*)，给定一个参数列，返回一个聚合值
-     * 2. 分布式场景，比如sum请求，会先发送map请求到所有数据节点，每个数据节点本地进行reduce的sum计算，并返回单一结果
-     *    最后由客户端收集所有数据节点的结果，再进行reduce运算，得出sum的最终结果
-     * </pre>
-     */
-    public void serverReduce(IRowSet kvPair) throws Exception;
 
     /**
      * 参数赋值，计算过程获取parameter参数获取?对应的数据
@@ -48,8 +22,6 @@ public interface ISelectable<RT extends ISelectable> extends CanVisit, Comparabl
      */
     public RT assignment(Map<Integer, ParameterContext> parameterSettings);
 
-    // ----------------- data_type -----------------
-
     public static enum DATA_TYPE {
         BYTES_VAL, LONG_VAL, SHORT_VAL, BOOLEAN_VAL, CHAR_VAL, STRING_VAL, FLOAT_VAL, DOUBLE_VAL, INT_VAL, BIND_VAL,
         DATE_VAL, TIMESTAMP, BLOB
@@ -58,11 +30,6 @@ public interface ISelectable<RT extends ISelectable> extends CanVisit, Comparabl
     public RT setDataType(DATA_TYPE dataType);
 
     public DATA_TYPE getDataType();
-
-    /**
-     * 获取column/function的结果
-     */
-    public Object getResult();
 
     // --------------- name相关信息 ----------------------
 

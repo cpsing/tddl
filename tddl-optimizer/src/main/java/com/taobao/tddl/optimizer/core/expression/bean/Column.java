@@ -6,7 +6,6 @@ import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
-import com.taobao.tddl.optimizer.core.IRowSet;
 import com.taobao.tddl.optimizer.core.PlanVisitor;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
@@ -24,8 +23,6 @@ public class Column implements IColumn {
     protected String    tableName;
     protected DATA_TYPE dataType;
     protected boolean   distinct;
-
-    private Object      value = null;
     private boolean     isNot = false;
 
     public Column(){
@@ -35,20 +32,6 @@ public class Column implements IColumn {
         this.columName = columName;
         this.alias = alias;
         this.dataType = dataType;
-    }
-
-    public void serverMap(IRowSet kvPair) throws Exception {
-        if (kvPair == null) {
-            return;
-        }
-        // TODO
-        Object val = null;
-        // Object val = GeneralUtil.getValueByIColumn(kvPair, this);
-        this.value = val;
-    }
-
-    public void serverReduce(IRowSet kvPair) throws Exception {
-        serverMap(kvPair);
     }
 
     public IColumn assignment(Map<Integer, ParameterContext> parameterSettings) {
@@ -137,16 +120,13 @@ public class Column implements IColumn {
             .setAlias(alias)
             .setDataType(dataType)
             .setTableName(tableName)
-            .setDistinct(isDistinct());
+            .setDistinct(isDistinct())
+            .setIsNot(isNot);
         return newColumn;
     }
 
     public int compareTo(Object o) {
         throw new NotSupportException();
-    }
-
-    public Object getResult() {
-        return value;
     }
 
     public void accept(PlanVisitor visitor) {

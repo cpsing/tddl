@@ -2,8 +2,6 @@ package com.taobao.tddl.optimizer.core.expression;
 
 import java.util.List;
 
-import com.taobao.tddl.optimizer.core.function.IExtraFunction;
-
 /**
  * 代表一个函数列，比如max(id)
  * 
@@ -37,32 +35,27 @@ public interface IFunction<RT extends IFunction> extends ISelectable<RT> {
         Scalar;
     }
 
-    public FunctionType getFunctionType();
-
     public String getFunctionName();
 
+    public FunctionType getFunctionType();
+
     public IFunction setFunctionName(String funcName);
-
-    // TODO 不知道这些参数怎么用，做到后面查询树构造再来看看
-    public List getMapArgs();
-
-    public List getReduceArgs();
 
     public List getArgs();
 
     public RT setArgs(List objs);
-
-    public int getExtraFuncArgSize();
-
-    public IExtraFunction getExtraFunction();
 
     public boolean isNeedDistinctArg();
 
     public RT setNeedDistinctArg(boolean b);
 
     /**
-     * 清除函数计算的中间结果，group by时使用
+     * 获取执行函数实现
      */
-    public void clear();
+    public IExtraFunction getExtraFunction();
 
+    /**
+     * 设置执行函数
+     */
+    public RT setExtraFunction(IExtraFunction function);
 }

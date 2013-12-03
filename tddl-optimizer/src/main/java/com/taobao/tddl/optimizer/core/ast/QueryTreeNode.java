@@ -308,6 +308,13 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         return this.children;
     }
 
+    public ASTNode getChild() {
+        if (this.getChildren().isEmpty()) {
+            return null;
+        }
+        return (ASTNode) this.getChildren().get(0);
+    }
+
     public void addChild(ASTNode childNode) {
         this.children.add(childNode);
     }
@@ -320,6 +327,9 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         this.implicitSelectable = implicitSelectable;
     }
 
+    /**
+     * 添加一个不存在的字段
+     */
     public void addImplicitSelectable(ISelectable selectable) {
         if (!this.implicitSelectable.contains(selectable)) {
             this.implicitSelectable.add(selectable);
@@ -335,12 +345,21 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         return this;
     }
 
+    /**
+     * 添加一个不存在的字段
+     */
     public void addColumnsSelected(ISelectable selected) {
         if (!this.columnsSelected.contains(selected)) {
             columnsSelected.add(selected);
-            // ISelectable s = selected.copy();
-            // s = this.getBuilder().buildSelectable(s);
-            // this.getColumnsSelected().add(s);
+        }
+    }
+
+    /**
+     * 添加一个不存在的字段
+     */
+    public void addColumnsRefered(ISelectable selected) {
+        if (!this.columnsRefered.contains(selected)) {
+            columnsRefered.add(selected);
         }
     }
 
@@ -470,7 +489,6 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         MergeNode m = new MergeNode();
         m.addChild(this);
         m.getChildren().addAll(os);
-
         return m;
     }
 

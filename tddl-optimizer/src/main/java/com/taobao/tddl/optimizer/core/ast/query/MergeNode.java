@@ -32,6 +32,16 @@ public class MergeNode extends QueryTreeNode {
         this.builder.build();
     }
 
+    public MergeNode merge(ASTNode o) {
+        this.addChild(o);
+        return this;
+    }
+
+    public MergeNode merge(List<ASTNode> os) {
+        this.getChildren().addAll(os);
+        return this;
+    }
+
     public IQueryTree toDataNodeExecutor() throws QueryException {
         IMerge merge = ASTNodeFactory.getInstance().createMerge();
         merge.setLimitFrom(this.getLimitFrom());
@@ -86,13 +96,6 @@ public class MergeNode extends QueryTreeNode {
 
     public void setUnion(boolean union) {
         this.union = union;
-    }
-
-    public QueryTreeNode getChild() {
-        if (this.getChildren().isEmpty()) {
-            return null;
-        }
-        return (QueryTreeNode) this.getChildren().get(0);
     }
 
     public MergeNode copy() {

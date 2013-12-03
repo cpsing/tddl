@@ -284,6 +284,14 @@ public class OptimizerUtils {
         return c;
     }
 
+    public static IColumn columnMetaToIColumn(ColumnMeta m) {
+        IColumn c = ASTNodeFactory.getInstance().createColumn();
+        c.setDataType(m.getDataType());
+        c.setColumnName(m.getName());
+        c.setTableName(m.getTableName());
+        return c;
+    }
+
     public static IColumn getColumn(Object column) {
         return getIColumn(column);
     }
@@ -315,17 +323,13 @@ public class OptimizerUtils {
         return cs;
     }
 
-    public static List<IColumn> convertColumnMetaToIColumn(List<ColumnMeta> targetColumn) {
-        List<IColumn> icolumns = new ArrayList<IColumn>(targetColumn.size());
-        for (ColumnMeta cm : targetColumn) {
-            IColumn c = ASTNodeFactory.getInstance().createColumn();
-            c.setDataType(cm.getDataType());
-            c.setColumnName(cm.getName());
-            c.setTableName(cm.getTableName());
-            c.setAlias(cm.getAlias());
-            icolumns.add(c);
+    public static List<ISelectable> columnMetaListToIColumnList(Collection<ColumnMeta> ms) {
+        List<ISelectable> cs = new ArrayList(ms.size());
+        for (ColumnMeta m : ms) {
+            cs.add(columnMetaToIColumn(m));
         }
-        return icolumns;
+
+        return cs;
     }
 
     // --------------------------- assignment --------------------------

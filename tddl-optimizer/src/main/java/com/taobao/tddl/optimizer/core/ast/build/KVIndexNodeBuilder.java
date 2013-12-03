@@ -68,24 +68,18 @@ public class KVIndexNodeBuilder extends QueryTreeNodeBuilder {
             for (ColumnMeta cm : this.getNode().getIndex().getKeyColumns()) {
                 this.getNode()
                     .getColumnsSelected()
-                    .add(ASTNodeFactory.getInstance()
-                        .createColumn()
-                        .setColumnName(cm.getName())
-                        .setDataType(cm.getDataType()));
+                    .add(OptimizerUtils.columnMetaToIColumn(cm, this.getNode().getIndexName()));
             }
 
             for (ColumnMeta cm : this.getNode().getIndex().getValueColumns()) {
                 this.getNode()
                     .getColumnsSelected()
-                    .add(ASTNodeFactory.getInstance()
-                        .createColumn()
-                        .setColumnName(cm.getName())
-                        .setDataType(cm.getDataType()));
+                    .add(OptimizerUtils.columnMetaToIColumn(cm, this.getNode().getIndexName()));
             }
         }
 
         for (int i = 0; i < getNode().getColumnsSelected().size(); i++) {
-            this.getNode().getColumnsSelected().get(i).setTableName(this.getNode().getIndexName());
+            this.getNode().getColumnsSelected().set(i, this.buildSelectable(getNode().getColumnsSelected().get(i)));
         }
     }
 
@@ -122,6 +116,7 @@ public class KVIndexNodeBuilder extends QueryTreeNodeBuilder {
         if (IColumn.STAR.equals(c.getColumnName())) {
             return c;
         }
+
         if (c instanceof IFunction) {
             c.setTableName(this.getNode().getIndexName());
             return c;

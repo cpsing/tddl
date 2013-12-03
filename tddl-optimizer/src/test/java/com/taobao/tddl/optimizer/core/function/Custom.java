@@ -1,9 +1,9 @@
 package com.taobao.tddl.optimizer.core.function;
 
+import com.taobao.tddl.optimizer.core.expression.IExtraFunction;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IFunction.FunctionType;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
-import com.taobao.tddl.optimizer.exceptions.FunctionException;
 
 /**
  * 只是一个mock实例
@@ -13,37 +13,8 @@ import com.taobao.tddl.optimizer.exceptions.FunctionException;
  */
 public class Custom implements IExtraFunction {
 
-    public Comparable clientCompute(Object[] args, IFunction f) throws FunctionException {
+    public void setFunction(IFunction function) {
 
-        return null;
-    }
-
-    public void serverMap(Object[] args, IFunction f) throws FunctionException {
-
-    }
-
-    public void serverReduce(Object[] args, IFunction f) throws FunctionException {
-
-    }
-
-    public int getArgSize() {
-
-        return 0;
-    }
-
-    public String getFunctionName() {
-
-        return null;
-    }
-
-    public boolean isSingleton() {
-
-        return false;
-    }
-
-    public Object getResult(IFunction f) {
-
-        return null;
     }
 
     public FunctionType getFunctionType() {
@@ -51,22 +22,23 @@ public class Custom implements IExtraFunction {
         return null;
     }
 
-    public DATA_TYPE getReturnType(IFunction f) {
+    public DATA_TYPE getMapReturnType() {
 
         return null;
     }
 
-    public DATA_TYPE getMapReturnType(IFunction f) {
+    public DATA_TYPE getReturnType() {
+
+        return null;
+    }
+
+    public Object getResult() {
 
         return null;
     }
 
     public void clear() {
 
-    }
-
-    public String getDbFunction(IFunction func) {
-        return null;
     }
 
 }

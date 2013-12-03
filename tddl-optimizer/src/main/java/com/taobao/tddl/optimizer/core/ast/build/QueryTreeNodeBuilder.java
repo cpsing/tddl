@@ -34,24 +34,6 @@ public abstract class QueryTreeNodeBuilder {
 
     public abstract void build();
 
-    protected void addSelectableToSelected(ISelectable c) {
-        if (!node.getColumnsSelected().contains(c)) {
-            node.getColumnsSelected().add(c);
-        }
-    }
-
-    protected void addSelectableToImplicitSelectable(ISelectable c) {
-        if (!node.getImplicitSelectable().contains(c)) {
-            node.getImplicitSelectable().add(c);
-        }
-    }
-
-    protected void addSelectableToRefered(ISelectable c) {
-        if (!node.getColumnsRefered().contains(c)) {
-            node.getColumnsRefered().add(c);
-        }
-    }
-
     protected void buildWhere() {
         // sql语法中，where条件中的列不允许使用别名，所以无需从select中找列
         this.buildFilter(node.getKeyFilter(), false);
@@ -150,7 +132,7 @@ public abstract class QueryTreeNodeBuilder {
         }
 
         if ((column instanceof IColumn) && !IColumn.STAR.equals(column.getColumnName())) {
-            addSelectableToRefered(column);
+            node.addColumnsRefered(c); // refered不需要重复字段,select添加允许重复
         }
 
         if (column instanceof IFunction) {

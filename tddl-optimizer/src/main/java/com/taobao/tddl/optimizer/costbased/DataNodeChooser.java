@@ -25,7 +25,6 @@ import com.taobao.tddl.optimizer.core.ast.query.MergeNode;
 import com.taobao.tddl.optimizer.core.ast.query.QueryNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
-import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
@@ -35,6 +34,7 @@ import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinType;
 import com.taobao.tddl.optimizer.costbased.esitimater.Cost;
 import com.taobao.tddl.optimizer.costbased.esitimater.CostEsitimaterFactory;
 import com.taobao.tddl.optimizer.exceptions.EmptyResultFilterException;
+import com.taobao.tddl.optimizer.exceptions.OptimizerException;
 import com.taobao.tddl.optimizer.exceptions.QueryException;
 import com.taobao.tddl.optimizer.exceptions.StatisticsUnavailableException;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
@@ -100,7 +100,7 @@ public class DataNodeChooser {
             Object inColumn = null;
             IFilter f = FilterUtils.and(q.getKeyFilter(), q.getResultFilter());
             f = FilterUtils.and(f, q.getOtherJoinOnFilter());
-            // TODO shenxun : 这里的最后一个isWrite的属性，目前还未实现，所以，在切换时要全部停摆。
+            // shenxun : 这里的最后一个isWrite的属性，目前还未实现，所以，在切换时要全部停摆。
             List<TargetDB> dataNodeChoosed = null;
             boolean isTraceSource = true;
             // 只有当需要全表扫描时，才可能出现or关系
@@ -131,43 +131,44 @@ public class DataNodeChooser {
 
             if ("true".equalsIgnoreCase(joinMergeJoinJudgeByRule)) {
                 if (right instanceof KVIndexNode) {
-
                     if (((KVIndexNode) right).getIndex().getPartitionColumns() == null
-                        || ((KVIndexNode) right).getIndex().getPartitionColumns().isEmpty()) throw new RuntimeException("请在schema中配置"
-                                                                                                                        + ((KVIndexNode) right).getTableName()
-                                                                                                                        + "的分库键");
+                        || ((KVIndexNode) right).getIndex().getPartitionColumns().isEmpty()) {
+                        throw new OptimizerException("请在schema中配置" + ((KVIndexNode) right).getTableName() + "的分库键");
+                    }
 
-                    List<IColumn> rightPartitionColumns = OptimizerUtils.convertColumnMetaToIColumn(((KVIndexNode) right).getIndex()
+                    List<ISelectable> rightPartitionColumns = OptimizerUtils.columnMetaListToIColumnList(((KVIndexNode) right).getIndex()
                         .getPartitionColumns());
 
                     // 将partitionColumn中的别名表名做下替换
                     replaceTableNameAndAlias(rightPartitionColumns, right);
-                    List<IColumn> leftPartitionColumns = null;
                     boolean isRuleEquals = false;
+                    List<ISelectable> leftPartitionColumns = null;
                     if (left instanceof KVIndexNode) {
                         if (((KVIndexNode) left).getIndex().getPartitionColumns() == null
-                            || ((KVIndexNode) left).getIndex().getPartitionColumns().isEmpty()) throw new RuntimeException("请在schema中配置"
-                                                                                                                           + ((KVIndexNode) left).getTableName()
-                                                                                                                           + "的分库键");
+                            || ((KVIndexNode) left).getIndex().getPartitionColumns().isEmpty()) {
+                            throw new OptimizerException("请在schema中配置" + ((KVIndexNode) left).getTableName() + "的分库键");
+                        }
 
-                        leftPartitionColumns = OptimizerUtils.convertColumnMetaToIColumn(((KVIndexNode) left).getIndex()
-                            .getPartitionColumns());
-
+                        leftPartitionColumns = OptimizerUtils.columnMetaListToIColumnList(((KVIndexNode) left).getIndex()
+                            .getPartitionColumns(),
+                            ((KVIndexNode) left).getIndex().getTableName());
                         replaceTableNameAndAlias(leftPartitionColumns, left);
                         isRuleEquals = OptimizerContext.getContext()
                             .getRule()
                             .isSameRule(((KVIndexNode) right).getIndexName(), ((KVIndexNode) left).getIndexName());
                     } else if (left instanceof JoinNode) {
                         if (((JoinNode) left).getRightNode() instanceof KVIndexNode) {
-                            leftPartitionColumns = OptimizerUtils.convertColumnMetaToIColumn(((KVIndexNode) ((JoinNode) left).getRightNode()).getIndex()
+                            leftPartitionColumns = OptimizerUtils.columnMetaListToIColumnList(((KVIndexNode) ((JoinNode) left).getRightNode()).getIndex()
                                 .getPartitionColumns());
 
                             if (((KVIndexNode) ((JoinNode) left).getRightNode()).getIndex().getPartitionColumns() == null
                                 || ((KVIndexNode) ((JoinNode) left).getRightNode()).getIndex()
                                     .getPartitionColumns()
-                                    .isEmpty()) throw new RuntimeException("请在schema中配置"
-                                                                           + ((KVIndexNode) ((JoinNode) left).getRightNode()).getTableName()
-                                                                           + "的分库键");
+                                    .isEmpty()) {
+                                throw new OptimizerException("请在schema中配置"
+                                                             + ((KVIndexNode) ((JoinNode) left).getRightNode()).getTableName()
+                                                             + "的分库键");
+                            }
 
                             replaceTableNameAndAlias(leftPartitionColumns,
                                 ((KVIndexNode) ((JoinNode) left).getRightNode()));
@@ -176,13 +177,19 @@ public class DataNodeChooser {
                             for (IBooleanFilter joinFilter : j.getJoinFilter()) {
                                 ISelectable leftColumn = (ISelectable) joinFilter.getColumn();
                                 if (((JoinNode) left).isInnerJoin()) {
-                                    if (((JoinNode) left).getRightNode().hasColumn(leftColumn)) continue;
+                                    if (((JoinNode) left).getRightNode().hasColumn(leftColumn)) {
+                                        continue;
+                                    }
 
                                     for (IBooleanFilter leftJoinFilter : ((JoinNode) left).getJoinFilter()) {
                                         if (leftJoinFilter.getColumn().equals(leftColumn)) {
                                             ISelectable c = ((ISelectable) leftJoinFilter.getValue()).copy();
-                                            if (left.getAlias() != null) c.setTableName(left.getAlias());
-                                            if (c.getAlias() != null) c.setColumnName(c.getAlias()).setAlias(null);
+                                            if (left.getAlias() != null) {
+                                                c.setTableName(left.getAlias());
+                                            }
+                                            if (c.getAlias() != null) {
+                                                c.setColumnName(c.getAlias()).setAlias(null);
+                                            }
                                             joinFilter.setColumn(c);
                                         }
                                     }
@@ -199,22 +206,21 @@ public class DataNodeChooser {
                     } else {
                         throw new RuntimeException("这不可能");
                     }
+
                     if (isRuleEquals) {
                         int countOfPartitionColumnInJoinFilter = 0;
                         for (int i = 0; i < j.getJoinFilter().size(); i++) {
                             ISelectable leftColumnFromJoinFilter = (ISelectable) j.getJoinFilter().get(i).getColumn();
                             ISelectable rightColumnFromJoinFilter = (ISelectable) j.getJoinFilter().get(i).getValue();
-
                             int rightPartitionColumnIndex = rightPartitionColumns.indexOf(rightColumnFromJoinFilter);
-
-                            if (rightPartitionColumnIndex < 0) continue;
+                            if (rightPartitionColumnIndex < 0) {
+                                continue;
+                            }
 
                             int leftPartitionColumnIndex = leftPartitionColumns.indexOf(leftColumnFromJoinFilter);
-
-                            if (leftPartitionColumnIndex < 0) continue;
-
-                            IColumn leftPartitionColumn = leftPartitionColumns.get(leftPartitionColumnIndex);
-                            IColumn rightPartitionColumn = rightPartitionColumns.get(rightPartitionColumnIndex);
+                            if (leftPartitionColumnIndex < 0) {
+                                continue;
+                            }
 
                             if (rightPartitionColumnIndex == leftPartitionColumnIndex) {
                                 countOfPartitionColumnInJoinFilter++;
@@ -229,34 +235,34 @@ public class DataNodeChooser {
                     isPartitionOnPartition = false;
                 }
             }
+
             left = shardQuery(left, parameterSettings, extraCmd);
             right = shardQuery(right, parameterSettings, extraCmd);
-
             String joinMergeJoin = GeneralUtil.getExtraCmd(extraCmd, ExtraCmd.OptimizerExtraCmd.JoinMergeJoin);
-
-            if ("true".equalsIgnoreCase(joinMergeJoin)) isPartitionOnPartition = true;
+            if ("true".equalsIgnoreCase(joinMergeJoin)) {
+                isPartitionOnPartition = true;
+            }
 
             /*
              * 如果是分库键join分库键，并且规则相同，则优化成join merge join
              */
             if (isPartitionOnPartition) {
                 // 根据表名的后缀来判断两个表是不是对应的表
-                // //由于是左树，所以右节点肯定是一个逻辑表的查询
+                // 由于是左树，所以右节点肯定是一个逻辑表的查询
                 // 右节中如果是join（或者join的merge），则代表使用了索引
                 // 这里先不要配索引，使右节点是KVIndexNode或者是KVIndexNode的merge
                 // 左节点是join，则取左节点的右节点的后缀作为后缀
                 Map<String, QueryTreeNode> lefts = new HashMap();
-                Map<String, QueryTreeNode> rightDSToQuery = new HashMap();
-
                 if (left instanceof MergeNode) {
                     for (ASTNode child : left.getChildren()) {
                         String groupAndIdentifierOfTablePattern = null;
                         if (!(child instanceof KVIndexNode)) {
-
                             if (child instanceof JoinNode) {
                                 if (((JoinNode) child).getRightNode() instanceof KVIndexNode) {
                                     groupAndIdentifierOfTablePattern = OptimizerUtils.getGroupAndIdentifierOfTablePattern((KVIndexNode) ((JoinNode) child).getRightNode());
-                                } else throw new RuntimeException("这里应该是KVIndexNode");
+                                } else {
+                                    throw new RuntimeException("这里应该是KVIndexNode");
+                                }
                             } else {
                                 throw new RuntimeException("这里不应该是MergeNode");
                             }
@@ -272,7 +278,9 @@ public class DataNodeChooser {
                         if (left instanceof JoinNode) {
                             if (((JoinNode) left).getRightNode() instanceof KVIndexNode) {
                                 groupAndIdentifierOfTablePattern = OptimizerUtils.getGroupAndIdentifierOfTablePattern((KVIndexNode) ((JoinNode) left).getRightNode());
-                            } else throw new RuntimeException("这里应该是KVIndexNode");
+                            } else {
+                                throw new RuntimeException("这里应该是KVIndexNode");
+                            }
                         } else {
                             throw new RuntimeException("这里不应该是MergeNode");
                         }
@@ -284,9 +292,7 @@ public class DataNodeChooser {
                 }
 
                 List<JoinNode> joins = new ArrayList();
-
                 List<QueryTreeNode> rights = new ArrayList();
-
                 if (right instanceof MergeNode) {
                     for (ASTNode child : right.getChildren()) {
                         if (!(child instanceof KVIndexNode)) {
@@ -308,35 +314,35 @@ public class DataNodeChooser {
                 // 根据后缀，找到匹配的表，生成join
                 for (QueryTreeNode r : rights) {
                     QueryTreeNode l = lefts.get(r.getExtra());
-                    if (l == null) continue;
-
+                    if (l == null) {
+                        continue;
+                    }
                     JoinNode newj = j.copy();
                     newj.setLeftNode(l);
                     newj.setRightNode(r);
                     newj.executeOn(l.getDataNode());
-
                     joins.add(newj);
                 }
 
                 if (joins.size() > 1) {
                     MergeNode merge = new MergeNode();
-                    for (JoinNode join : joins)
+                    for (JoinNode join : joins) {
                         merge.merge(join);
+                    }
+
                     merge.executeOn(joins.get(0).getDataNode()).setExtra(joins.get(0).getExtra());
                     merge.build();
                     return merge;
-
                 } else if (joins.size() == 1) {
                     return joins.get(0);
                 } else if (joins.isEmpty()) {
                     // 左右两表在不同的库上
-                    throw new EmptyResultFilterException("");
+                    throw new EmptyResultFilterException("空结果");
 
                 }
             }
 
             j.setLeftNode(left);
-
             // NestedLoop情况下
             // 如果右边是多个表，则分库需要再执行层根据左边的结果做
             if (!(right instanceof MergeNode && (j.getJoinStrategy().getType().equals(JoinType.INDEX_NEST_LOOP) || j.getJoinStrategy()
@@ -344,8 +350,9 @@ public class DataNodeChooser {
                 .equals(JoinType.NEST_LOOP_JOIN)))) {
                 j.setRightNode(right);
             } else {
-                if (right.isSubQuery()) j.setRightNode(right);
-                else {
+                if (right.isSubQuery()) {
+                    j.setRightNode(right);
+                } else {
                     right = (QueryTreeNode) new MergeNode();
                     ((MergeNode) right).merge(j.getRightNode());
                     ((MergeNode) right).setSharded(false);
@@ -357,7 +364,6 @@ public class DataNodeChooser {
             }
 
             String dataNode = j.getLeftNode().getDataNode();
-
             // 对于未决的IndexNestedLoop，join应该在左节点执行
             if (right instanceof MergeNode && !((MergeNode) right).isSharded()) {
                 dataNode = j.getLeftNode().getDataNode();
@@ -368,29 +374,24 @@ public class DataNodeChooser {
                     Cost leftCost;
                     leftCost = CostEsitimaterFactory.estimate(left);
                     Cost rightCost = CostEsitimaterFactory.estimate(right);
-
                     dataNode = leftCost.getRowCount() > rightCost.getRowCount() ? j.getLeftNode().getDataNode() : j.getRightNode()
                         .getDataNode();
-
                     j.executeOn(dataNode);
-
                 } catch (StatisticsUnavailableException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    throw new OptimizerException(e);
                 }
             }
 
             return j;
-        } else if (dne instanceof MergeNode)
-        // 为merge选择执行节点
-        // 很多方案...
-        // 两路归并?
-        // 都发到一台机器上？
-        // 目前的方案是都发到一台机器上
-        // 对Merge的每个子节点的rowCount进行排序
-        // 找出rowCount最大的子节点
-        // merge应该在该机器上执行，其他机器的数据都发送给它
-        {
+        } else if (dne instanceof MergeNode) {
+            // 为merge选择执行节点
+            // 很多方案...
+            // 两路归并?
+            // 都发到一台机器上？
+            // 目前的方案是都发到一台机器上
+            // 对Merge的每个子节点的rowCount进行排序
+            // 找出rowCount最大的子节点
+            // merge应该在该机器上执行，其他机器的数据都发送给它
             MergeNode m = (MergeNode) dne;
             List<ASTNode> subNodes = m.getChildren();
             m = new MergeNode();
@@ -401,7 +402,6 @@ public class DataNodeChooser {
                 QueryTreeNode child = (QueryTreeNode) subNodes.get(i);
                 child = shardQuery(child, parameterSettings, extraCmd);
                 subNodes.set(i, child);
-
                 try {
                     Cost childCost;
                     childCost = CostEsitimaterFactory.estimate(child);
@@ -410,16 +410,16 @@ public class DataNodeChooser {
                         maxRowCountDataNode = child.getDataNode();
                     }
                 } catch (StatisticsUnavailableException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    throw new OptimizerException(e);
                 }
 
             }
 
-            if (maxRowCountDataNode == null) maxRowCountDataNode = subNodes.get(0).getDataNode();
+            if (maxRowCountDataNode == null) {
+                maxRowCountDataNode = subNodes.get(0).getDataNode();
+            }
 
             m.executeOn(maxRowCountDataNode);
-
             m.merge(subNodes);
             m.setSharded(true);
             m.build();
@@ -429,19 +429,16 @@ public class DataNodeChooser {
         return dne;
     }
 
-    private static void replaceTableNameAndAlias(List<IColumn> columns, QueryTreeNode node) {
+    private static void replaceTableNameAndAlias(List<ISelectable> columns, QueryTreeNode node) {
         List<ISelectable> rightSelected = node.getColumnsSelected();
-        for (IColumn rightPartitionColumn : columns) {
-
+        for (ISelectable rightPartitionColumn : columns) {
             if (node.getAlias() != null) {
                 rightPartitionColumn.setTableName(node.getAlias());
             }
 
             int index = rightSelected.indexOf(rightPartitionColumn);
-
             if (index > -1) {
                 ISelectable rightPartitionColumnFromRightSelected = rightSelected.get(index);
-
                 if (rightPartitionColumnFromRightSelected.getAlias() != null) {
                     rightPartitionColumn.setColumnName(rightPartitionColumnFromRightSelected.getAlias());
                 }
@@ -525,7 +522,6 @@ public class DataNodeChooser {
 
     private static ASTNode shardDelete(DeleteNode dne, Map<Integer, ParameterContext> parameterSettings,
                                        Map<String, Comparable> extraCmd) throws QueryException {
-
         QueryTreeNode qtn = shardQuery(dne.getNode(), parameterSettings, extraCmd);
         List<ASTNode> subs = new ArrayList();
         if (qtn instanceof MergeNode) {
@@ -562,7 +558,6 @@ public class DataNodeChooser {
             f.setColumn(dne.getColumns().get(0));
             f.setValue(dne.getValues().get(0));
             insertFilter = f;
-
         } else {
             ILogicalFilter and = ASTNodeFactory.getInstance().createLogicalFilter();
             and.setOperation(OPERATION.AND);
@@ -708,7 +703,7 @@ public class DataNodeChooser {
                 sub = q;
             }
 
-            // TODO tddl的traceSource在分库不分表，和全表扫描时无法使用
+            // tddl的traceSource在分库不分表，和全表扫描时无法使用
             // 等待TDDL修改 mengshi
             if (tabMap.get(targetTable) != null && tabMap.get(targetTable).getSourceKeys() != null) {
                 // 这里仅仅对In做traceSource
@@ -726,7 +721,7 @@ public class DataNodeChooser {
             }
 
             sub.select(sub.getColumnsSelected());
-            // sub.setDbName(targetTable);
+            sub.setActualTableName(targetTable);
             sub.executeOn(executeOn);
 
             try {

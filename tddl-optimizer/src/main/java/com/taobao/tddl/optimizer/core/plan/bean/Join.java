@@ -229,10 +229,10 @@ public class Join extends QueryTree implements IJoin {
         // this.getSubRequestID(), tabContent);
 
         appendln(sb, tabContent + "left:");
-        sb.append(this.getLeftNode().toStringWithInden(inden + 1));
+        sb.append(this.getLeftNode().toStringWithInden(inden + 2));
 
         appendln(sb, tabContent + "right:");
-        sb.append(this.getRightNode().toStringWithInden(inden + 1));
+        sb.append(this.getRightNode().toStringWithInden(inden + 2));
 
         return sb.toString();
     }

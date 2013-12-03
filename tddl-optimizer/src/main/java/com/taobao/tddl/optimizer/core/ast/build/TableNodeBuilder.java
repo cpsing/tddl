@@ -82,7 +82,7 @@ public class TableNodeBuilder extends QueryTreeNodeBuilder {
             }
         }
 
-        // 把星号替换成列
+        // 把星号替换成列，允许存在多个*，或则多个相同字段的列
         if (!delete.isEmpty()) {
             List<ISelectable> columnsWithOutStar = new ArrayList();
             for (int i = 0; i < this.getNode().getColumnsSelected().size(); i++) {
