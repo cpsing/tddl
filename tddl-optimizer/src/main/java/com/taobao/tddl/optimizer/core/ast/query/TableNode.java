@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
@@ -366,7 +368,7 @@ public class TableNode extends QueryTreeNode {
     }
 
     public PutNode put(String columns, Comparable values[]) {
-        return put(columns.split(" "), values);
+        return put(StringUtils.split(columns, ' '), values);
     }
 
     public PutNode put(String columns[], Comparable values[]) {
@@ -416,7 +418,7 @@ public class TableNode extends QueryTreeNode {
 
     // =============== copy =============
     public TableNode copy() {
-        TableNode newTableNode = new TableNode(this.getTableName());
+        TableNode newTableNode = new TableNode(null);
         this.copySelfTo(newTableNode);
         return newTableNode;
     }
@@ -426,12 +428,14 @@ public class TableNode extends QueryTreeNode {
         TableNode toTable = (TableNode) to;
         toTable.setFullTableScan(this.isFullTableScan());
         toTable.setIndexQueryValueFilter((IFilter) (indexQueryValueFilter == null ? null : indexQueryValueFilter.copy()));
+        toTable.tableName = this.tableName;
+        toTable.actualTableName = this.actualTableName;
         toTable.setTableMeta(this.getTableMeta());
         toTable.useIndex(this.getIndexUsed());
     }
 
     public TableNode deepCopy() {
-        TableNode newTableNode = new TableNode(this.getTableName());
+        TableNode newTableNode = new TableNode(null);
         this.deepCopySelfTo(newTableNode);
         return newTableNode;
     }
@@ -442,8 +446,9 @@ public class TableNode extends QueryTreeNode {
         toTable.setFullTableScan(this.isFullTableScan());
         toTable.setIndexQueryValueFilter((IFilter) (indexQueryValueFilter == null ? null : indexQueryValueFilter.copy()));
         toTable.tableName = this.tableName;
+        toTable.actualTableName = this.actualTableName;
         toTable.setTableMeta(this.getTableMeta());
-        toTable.useIndex(null);
+        toTable.useIndex(this.getIndexUsed());
     }
 
     // ============== setter / getter==================
@@ -470,7 +475,11 @@ public class TableNode extends QueryTreeNode {
     }
 
     public String getTableName() {
-        return this.tableName;
+        if (StringUtils.isNotEmpty(actualTableName)) {
+            return this.actualTableName; // 存在分库分表时，真实表名会改写
+        } else {
+            return this.tableName;
+        }
     }
 
     public TableMeta getTableMeta() {

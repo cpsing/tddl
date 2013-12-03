@@ -174,13 +174,12 @@ public class JoinNodeBuilder extends QueryTreeNodeBuilder {
                                 newS.setTableName(((QueryTreeNode) child).getAlias());
                             } else {
                                 newS.setTableName(selectedFromChild.getTableName());
-
                             }
 
-                            if (selectedFromChild.getAlias() == null) {
-                                newS.setColumnName(selectedFromChild.getColumnName());
-                            } else {
+                            if (selectedFromChild.getAlias() != null) {
                                 newS.setColumnName(selectedFromChild.getAlias());
+                            } else {
+                                newS.setColumnName(selectedFromChild.getColumnName());
                             }
 
                             columnsWithOutStar.add(newS);

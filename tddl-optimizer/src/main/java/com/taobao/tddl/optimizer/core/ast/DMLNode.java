@@ -27,6 +27,7 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
     protected static final Logger            logger            = LoggerFactory.getLogger(DMLNode.class);
     protected List<ISelectable>              columns;
     protected List<Comparable>               values;
+    // 直接依赖为tableNode，如果涉及多库操作，会是一个Merge下面挂多个DML
     protected TableNode                      table             = null;
     protected Map<Integer, ParameterContext> parameterSettings = null;
     protected boolean                        needBuild         = true;
