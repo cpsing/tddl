@@ -1,18 +1,16 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package com.taobao.ustore.common.inner;
+package com.taobao.tddl.executor.cursor;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.taobao.ustore.common.config.schema.internal.ColumnMeta;
-import com.taobao.ustore.common.inner.bean.CloneableRecord;
-import com.taobao.ustore.common.inner.bean.IOrderBy;
-import com.taobao.ustore.common.util.GeneralUtil;
-import com.taobao.ustore.spi.cursor.common.DuplicateKVPair;
+import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.executor.common.CloneableRecord;
+import com.taobao.tddl.executor.common.DuplicateKVPair;
+import com.taobao.tddl.executor.common.KVPair;
+import com.taobao.tddl.optimizer.config.table.ColumnMeta;
+import com.taobao.tddl.optimizer.core.IRowSet;
+import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 
 /**
  * @author jianxing <jianxing.qx@taobao.com>

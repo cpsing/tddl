@@ -1,9 +1,9 @@
-package com.taobao.tddl.executor.cursor;
+package com.taobao.tddl.executor.common;
 
 import java.util.Iterator;
 import java.util.List;
 
-import com.taobao.tddl.executor.common.ColMetaAndIndex;
+import com.taobao.tddl.executor.cursor.IRowsValueScaner;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 

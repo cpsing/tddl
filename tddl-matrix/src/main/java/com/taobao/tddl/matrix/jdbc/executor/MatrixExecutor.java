@@ -26,7 +26,7 @@ public class MatrixExecutor implements ITransactionAsyncExecutor, ITransactionEx
     }
 
     @Override
-    public ResultCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext) {
+    public ResultCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext) throws Exception {
         ResultCursor cursor = null;
         ISchematicCursor iSchematicCursor = null;
 

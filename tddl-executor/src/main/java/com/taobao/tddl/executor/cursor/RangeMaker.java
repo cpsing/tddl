@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.executor.common.ColMetaAndIndex;
+import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.IRowSet;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;

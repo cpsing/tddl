@@ -30,7 +30,7 @@ public class GroupExecutor implements ITransactionAsyncExecutor, ITransactionExe
     }
 
     @Override
-    public ResultCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext) {
+    public ResultCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext) throws Exception {
         // ResultCursor rc = executeOnOthers(context, command,
         // executionContext);
         getTransaction(executionContext, qc);
@@ -39,7 +39,7 @@ public class GroupExecutor implements ITransactionAsyncExecutor, ITransactionExe
 
         returnCursor = executeInner(qc, executionContext);
 
-        return returnCursor;
+        return wrapResultCursor(qc, returnCursor, executionContext);
     }
 
     public ISchematicCursor executeInner(IDataNodeExecutor executor, ExecutionContext executionContext)
@@ -99,22 +99,21 @@ public class GroupExecutor implements ITransactionAsyncExecutor, ITransactionExe
         }
     }
 
-    protected ResultCursor wrapResultCursor(IDataNodeExecutor command, ISchematicCursor iSchematicCursor)
-                                                                                                         throws Exception {
+    protected ResultCursor wrapResultCursor(IDataNodeExecutor command, ISchematicCursor iSchematicCursor,
+                                            ExecutionContext context) throws Exception {
         ResultCursor cursor;
         // 包装为可以传输的ResultCursor
         if (command instanceof IQueryTree) {
             if (!(iSchematicCursor instanceof ResultCursor)) {
-                // cursor = new ResultCursor(iSchematicCursor, context,
-                // ((IQueryCommon) command).getColumns());
-                cursor = new ResultCursor(iSchematicCursor, context);
+
+                cursor = new ResultCursor(iSchematicCursor, context.getExtraCmds());
             } else {
                 cursor = (ResultCursor) iSchematicCursor;
             }
 
         } else {
             if (!(iSchematicCursor instanceof ResultCursor)) {
-                cursor = new ResultCursor(iSchematicCursor, context);
+                cursor = new ResultCursor(iSchematicCursor, context.getExtraCmds());
             } else {
                 cursor = (ResultCursor) iSchematicCursor;
             }

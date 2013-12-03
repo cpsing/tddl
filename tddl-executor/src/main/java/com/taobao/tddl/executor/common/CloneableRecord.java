@@ -1,8 +1,10 @@
-package com.taobao.tddl.executor.cursor;
+package com.taobao.tddl.executor.common;
 
 import java.util.Collections;
 
 import org.omg.IOP.CodecFactory;
+
+import com.taobao.tddl.executor.cursor.IRecord;
 
 /**
  * @author mengshi.sunmengshi 2013-11-29 下午2:41:09

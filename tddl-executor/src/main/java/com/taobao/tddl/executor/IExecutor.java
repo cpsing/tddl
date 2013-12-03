@@ -20,6 +20,7 @@ public interface IExecutor {
      * @param qc
      * @param args
      * @return
+     * @throws Exception
      */
-    public ResultCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext);
+    public ResultCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext) throws Exception;
 }

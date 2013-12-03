@@ -2,6 +2,8 @@ package com.taobao.tddl.executor.spi;
 
 import java.sql.SQLException;
 
+import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.executor.common.CloneableRecord;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
@@ -20,7 +22,7 @@ public interface Table {
      * 
      * @return
      */
-    TableMeta getSchema();
+    TableMeta getSchema() throws TddlException;
 
     /**
      * 核心写接口
@@ -31,12 +33,12 @@ public interface Table {
      * @throws Exception
      */
     void put(Transaction txn, CloneableRecord key, CloneableRecord value, IndexMeta indexMeta, String dbName)
-                                                                                                             throws Exception;
+                                                                                                             throws TddlException;
 
     /**
      * 关闭table
      */
-    void close();
+    void close() throws TddlException;
 
     /**
      * 删除一行数据
@@ -45,7 +47,7 @@ public interface Table {
      * @param key
      * @throws Exception
      */
-    void delete(Transaction txn, CloneableRecord key, IndexMeta indexMeta, String dbName) throws Exception;
+    void delete(Transaction txn, CloneableRecord key, IndexMeta indexMeta, String dbName) throws TddlException;
 
     /**
      * 获取一行数据。
@@ -54,7 +56,7 @@ public interface Table {
      * @param key
      * @return
      */
-    CloneableRecord get(Transaction txn, CloneableRecord key, IndexMeta indexMeta, String dbName);
+    CloneableRecord get(Transaction txn, CloneableRecord key, IndexMeta indexMeta, String dbName) throws TddlException;
 
     /**
      * 根据meta 源信息，获取一个表数据指针。这个指针应该是delegate的，这个方法不应该耗费太多资源。 cursor的隔离性
@@ -67,9 +69,8 @@ public interface Table {
      * @throws FetchException
      * @throws SQLException
      */
-    ISchematicCursor getCursor(Transaction txn, IndexMeta meta, String isolation, IQuery iQuery) throws FetchException,
-                                                                                                SQLException;
+    ISchematicCursor getCursor(Transaction txn, IndexMeta meta, String isolation, IQuery iQuery) throws TddlException;
 
     public ISchematicCursor getCursor(Transaction txn, IndexMeta indexMeta, String isolation, String indexMetaName)
-                                                                                                                   throws FetchException;
+                                                                                                                   throws TddlException;
 }

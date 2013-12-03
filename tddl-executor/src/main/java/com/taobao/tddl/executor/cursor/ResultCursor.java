@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.utils.ExceptionErrorCodeUtils;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.optimizer.core.IRowSet;
 
@@ -282,7 +284,7 @@ public class ResultCursor extends SchematicCursor {
     }
 
     public String getException(Exception e, ResultCursor cursor) {
-        if (e instanceof UstoreException) {
+        if (e instanceof TddlException) {
             // 已知异常，UstoreException是有状态码的，定义过处理逻辑。
             return e.getMessage();
         }

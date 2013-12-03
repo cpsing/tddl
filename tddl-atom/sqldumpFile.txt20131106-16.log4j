@@ -1,0 +1,1203 @@
+16:01:04,197  INFO LoggerFactory:? - using logger: com.taobao.tddl.common.utils.logger.log4j.Log4jLoggerAdapter
+16:01:04,531  INFO DruidDataSource:633 - {dataSource-1} inited
+16:01:04,691  WARN Monitor:72 -  [TDDL] 不指定TDDL以外的appName则不订阅, tddl version: 5.1.0
+16:01:04,691  INFO TAtomDataSource:47 -  [TDDL] create new TAtomDsConfHandle dbName : atom.dbkey.DRUID_APP^druid_atom_0, tddl version: 5.1.0
+16:01:04,752 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:01:04,768 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:01:04,775  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:01:04,775  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:01:04,776  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:01:04,776  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: druid_atom_0, tddl version: 5.1.0
+16:01:05,111 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:51:12,536  INFO LoggerFactory:? - using logger: com.taobao.tddl.common.utils.logger.log4j.Log4jLoggerAdapter
+16:51:12,785  INFO DruidDataSource:633 - {dataSource-1} inited
+16:51:12,881  WARN Monitor:72 -  [TDDL] 不指定TDDL以外的appName则不订阅, tddl version: 5.1.0
+16:51:12,882  INFO TAtomDataSource:47 -  [TDDL] create new TAtomDsConfHandle dbName : atom.dbkey.DRUID_APP^druid_atom_0, tddl version: 5.1.0
+16:51:12,934 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:51:12,952 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:51:12,961  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:51:12,961  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:51:12,962  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:51:12,962  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: druid_atom_0, tddl version: 5.1.0
+16:51:13,291 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:51:13,309  INFO DruidDataSource:633 - {dataSource-2} inited
+16:51:13,309  INFO TAtomDataSource:47 -  [TDDL] create new TAtomDsConfHandle dbName : atom.dbkey.DRUID_APP^unitTestDb-mysql, tddl version: 5.1.0
+16:51:13,309 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:51:13,309 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:51:13,310  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:51:13,310  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:51:13,312  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:51:13,312  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-mysql, tddl version: 5.1.0
+16:51:13,356 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:51:13,367  INFO DruidDataSource:633 - {dataSource-3} inited
+16:51:13,367  INFO TAtomDataSource:47 -  [TDDL] create new TAtomDsConfHandle dbName : atom.dbkey.DRUID_APP^unitTestDb-testMsqlChange_切换DbName, tddl version: 5.1.0
+16:51:13,368 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:51:13,368 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:51:13,368  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:51:13,369  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:51:13,369  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:51:13,369  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-testMsqlChange_切换DbName, tddl version: 5.1.0
+16:51:13,414 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:51:13,425  INFO DruidDataSource:633 - {dataSource-4} inited
+16:51:13,425  INFO TAtomDataSource:47 -  [TDDL] create new TAtomDsConfHandle dbName : atom.dbkey.DRUID_APP^unitTestDb-testMysqlChange_切换Port, tddl version: 5.1.0
+16:51:13,425 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:51:13,425 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:51:13,426  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:51:13,426  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:51:13,426  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:51:13,426  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-testMysqlChange_切换Port, tddl version: 5.1.0
+16:51:13,477 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:51:13,486  INFO DruidDataSource:633 - {dataSource-5} inited
+16:51:13,487  INFO TAtomDataSource:47 -  [TDDL] create new TAtomDsConfHandle dbName : atom.dbkey.DRUID_APP^unitTestDb-testMysqlChange_切换Ip, tddl version: 5.1.0
+16:51:13,487 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:51:13,487 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:51:13,487  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:51:13,487  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:51:13,488  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:51:13,488  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-testMysqlChange_切换Ip, tddl version: 5.1.0
+16:51:13,536 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:51:13,546  INFO DruidDataSource:633 - {dataSource-6} inited
+16:51:13,547  INFO TAtomDataSource:47 -  [TDDL] create new TAtomDsConfHandle dbName : atom.dbkey.DRUID_APP^unitTestDb-testMysqlChange_切换userName, tddl version: 5.1.0
+16:51:13,547 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:51:13,547 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:51:13,548  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:51:13,548  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:51:13,548  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:51:13,548  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-testMysqlChange_切换userName, tddl version: 5.1.0
+16:51:13,592 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:53:48,220  INFO LoggerFactory:? - using logger: com.taobao.tddl.common.utils.logger.log4j.Log4jLoggerAdapter
+16:53:48,441  INFO DruidDataSource:633 - {dataSource-1} inited
+16:53:48,565  WARN Monitor:72 -  [TDDL] 不指定TDDL以外的appName则不订阅, tddl version: 5.1.0
+16:53:48,566  INFO TAtomDataSource:47 -  [TDDL] create new TAtomDsConfHandle dbName : atom.dbkey.DRUID_APP^druid_atom_0, tddl version: 5.1.0
+16:53:48,613 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:53:48,624 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:53:48,631  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:53:48,631  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:53:48,632  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:53:48,632  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: druid_atom_0, tddl version: 5.1.0
+16:53:49,007 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:53:49,010  WARN TAtomDsConfHandle:797 -  [TDDL] [DataSource Stop] Start!, tddl version: 5.1.0
+16:53:49,014  INFO DruidDataSource:1242 - {dataSource-1} closed
+16:53:49,014  WARN TAtomDsConfHandle:805 -  [TDDL] [DataSource Stop] End!, tddl version: 5.1.0
+16:53:57,553  INFO LoggerFactory:? - using logger: com.taobao.tddl.common.utils.logger.log4j.Log4jLoggerAdapter
+16:53:57,809  INFO DruidDataSource:633 - {dataSource-1} inited
+16:53:57,903  WARN Monitor:72 -  [TDDL] 不指定TDDL以外的appName则不订阅, tddl version: 5.1.0
+16:53:57,904  INFO TAtomDataSource:47 -  [TDDL] create new TAtomDsConfHandle dbName : atom.dbkey.DRUID_APP^druid_atom_0, tddl version: 5.1.0
+16:53:57,948 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:53:57,961 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:53:57,968  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:53:57,968  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:53:57,968  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:53:57,969  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: druid_atom_0, tddl version: 5.1.0
+16:53:58,288 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:53:58,291  WARN TAtomDsConfHandle:797 -  [TDDL] [DataSource Stop] Start!, tddl version: 5.1.0
+16:53:58,295  INFO DruidDataSource:1242 - {dataSource-1} closed
+16:53:58,297  WARN TAtomDsConfHandle:805 -  [TDDL] [DataSource Stop] End!, tddl version: 5.1.0
+16:53:58,319  INFO DruidDataSource:633 - {dataSource-2} inited
+16:53:58,319  INFO TAtomDataSource:47 -  [TDDL] create new TAtomDsConfHandle dbName : atom.dbkey.DRUID_APP^unitTestDb-mysql, tddl version: 5.1.0
+16:53:58,320 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:53:58,323 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:53:58,324  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:53:58,324  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:53:58,324  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:53:58,324  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-mysql, tddl version: 5.1.0
+16:53:58,366 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:53:59,568 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:53:59,568 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:53:59,574 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:53:59,594  INFO DruidDataSource:633 - {dataSource-3} inited
+16:53:59,594  INFO TAtomDataSource:47 -  [TDDL] create new TAtomDsConfHandle dbName : atom.dbkey.DRUID_APP^unitTestDb-testMsqlChange_切换DbName, tddl version: 5.1.0
+16:53:59,594 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:53:59,595 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:53:59,595  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:53:59,595  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:53:59,595  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:53:59,595  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-testMsqlChange_切换DbName, tddl version: 5.1.0
+16:53:59,647 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:54:00,547 ERROR TAtomDsConfHandle:249 -  [TDDL] [DRUID GlobaConf HandleData] dataId : com.taobao.tddl.atom.global.unitTestDb-testMsqlChange_切换DbName data: port=3306
+dbName=tddl_sample_1
+dbStatus=RW
+dbType=mysql
+ip=10.232.31.154
+, tddl version: 5.1.0
+16:54:00,550 ERROR DruidDataSourceStatManager:154 - register mbean error
+javax.management.InstanceAlreadyExistsException: com.alibaba.druid:type=DruidDataSource,id=unitTestDb-testMsqlChange_切换DbName
+	at com.sun.jmx.mbeanserver.Repository.addMBean(Unknown Source)
+	at com.sun.jmx.interceptor.DefaultMBeanServerInterceptor.internal_addObject(Unknown Source)
+	at com.sun.jmx.interceptor.DefaultMBeanServerInterceptor.registerDynamicMBean(Unknown Source)
+	at com.sun.jmx.interceptor.DefaultMBeanServerInterceptor.registerObject(Unknown Source)
+	at com.sun.jmx.interceptor.DefaultMBeanServerInterceptor.registerMBean(Unknown Source)
+	at com.sun.jmx.mbeanserver.JmxMBeanServer.registerMBean(Unknown Source)
+	at com.alibaba.druid.stat.DruidDataSourceStatManager.addDataSource(DruidDataSourceStatManager.java:152)
+	at com.alibaba.druid.pool.DruidDataSource.init(DruidDataSource.java:617)
+	at com.taobao.tddl.atom.config.TAtomDsConfHandle$2.onDataRecieved(TAtomDsConfHandle.java:322)
+	at com.taobao.tddl.config.diamond.DiamondConfigDataHandler$2.receiveConfigInfo0(DiamondConfigDataHandler.java:169)
+	at com.taobao.diamond.manager.SkipInitialCallbackListener.receiveConfigInfo(SkipInitialCallbackListener.java:48)
+	at com.taobao.diamond.client.impl.CacheData$1.run(CacheData.java:126)
+	at com.taobao.diamond.client.impl.CacheData.safeNotifyListener(CacheData.java:140)
+	at com.taobao.diamond.client.impl.CacheData.checkListenerMd5(CacheData.java:113)
+	at com.taobao.diamond.client.impl.ClientWorker.checkListenerMd5(ClientWorker.java:260)
+	at com.taobao.diamond.client.impl.ClientWorker.checkServerConfigInfo(ClientWorker.java:154)
+	at com.taobao.diamond.client.impl.ClientWorker.checkServerConfigInfo(ClientWorker.java:134)
+	at com.taobao.diamond.client.impl.ClientWorker$2.run(ClientWorker.java:281)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRunAndReset(Unknown Source)
+	at java.util.concurrent.FutureTask.runAndReset(Unknown Source)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$101(Unknown Source)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.runPeriodic(Unknown Source)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+16:54:00,553  INFO DruidDataSource:633 - {dataSource-4} inited
+16:54:00,554  INFO DruidDataSource:1242 - {dataSource-3} closed
+16:54:00,555  WARN TAtomDsConfHandle:327 -  [TDDL] [DRUID CONFIG CHANGE STATUS] Always ReCreate DataSource !, tddl version: 5.1.0
+16:54:02,648 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:54:02,648 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:54:02,648  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:54:02,648  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:54:02,649  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:54:02,649  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-testMsqlChange_切换DbName, tddl version: 5.1.0
+16:54:02,689 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:54:02,811  INFO XmlBeanDefinitionReader:323 - Loading XML bean definitions from class path resource [org/springframework/jdbc/support/sql-error-codes.xml]
+16:54:02,849 DEBUG DefaultDocumentLoader:72 - Using JAXP provider [com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl]
+16:54:02,918 DEBUG BeansDtdResolver:72 - Found beans DTD [http://www.springframework.org/dtd/spring-beans-2.0.dtd] in classpath: spring-beans-2.0.dtd
+16:54:02,973 DEBUG DefaultBeanDefinitionDocumentReader:86 - Loading bean definitions
+16:54:03,051 DEBUG DefaultListableBeanFactory:214 - Creating shared instance of singleton bean 'DB2'
+16:54:03,053 DEBUG DefaultListableBeanFactory:383 - Creating instance of bean 'DB2'
+16:54:03,074 DEBUG DefaultListableBeanFactory:459 - Eagerly caching bean 'DB2' to allow for resolving potential circular references
+16:54:03,119 DEBUG DefaultListableBeanFactory:411 - Finished creating instance of bean 'DB2'
+16:54:03,119 DEBUG DefaultListableBeanFactory:214 - Creating shared instance of singleton bean 'Derby'
+16:54:03,119 DEBUG DefaultListableBeanFactory:383 - Creating instance of bean 'Derby'
+16:54:03,120 DEBUG DefaultListableBeanFactory:459 - Eagerly caching bean 'Derby' to allow for resolving potential circular references
+16:54:03,121 DEBUG DefaultListableBeanFactory:411 - Finished creating instance of bean 'Derby'
+16:54:03,121 DEBUG DefaultListableBeanFactory:214 - Creating shared instance of singleton bean 'H2'
+16:54:03,121 DEBUG DefaultListableBeanFactory:383 - Creating instance of bean 'H2'
+16:54:03,122 DEBUG DefaultListableBeanFactory:459 - Eagerly caching bean 'H2' to allow for resolving potential circular references
+16:54:03,123 DEBUG DefaultListableBeanFactory:411 - Finished creating instance of bean 'H2'
+16:54:03,123 DEBUG DefaultListableBeanFactory:214 - Creating shared instance of singleton bean 'HSQL'
+16:54:03,123 DEBUG DefaultListableBeanFactory:383 - Creating instance of bean 'HSQL'
+16:54:03,124 DEBUG DefaultListableBeanFactory:459 - Eagerly caching bean 'HSQL' to allow for resolving potential circular references
+16:54:03,125 DEBUG DefaultListableBeanFactory:411 - Finished creating instance of bean 'HSQL'
+16:54:03,125 DEBUG DefaultListableBeanFactory:214 - Creating shared instance of singleton bean 'Informix'
+16:54:03,125 DEBUG DefaultListableBeanFactory:383 - Creating instance of bean 'Informix'
+16:54:03,126 DEBUG DefaultListableBeanFactory:459 - Eagerly caching bean 'Informix' to allow for resolving potential circular references
+16:54:03,126 DEBUG DefaultListableBeanFactory:411 - Finished creating instance of bean 'Informix'
+16:54:03,127 DEBUG DefaultListableBeanFactory:214 - Creating shared instance of singleton bean 'MS-SQL'
+16:54:03,127 DEBUG DefaultListableBeanFactory:383 - Creating instance of bean 'MS-SQL'
+16:54:03,127 DEBUG DefaultListableBeanFactory:459 - Eagerly caching bean 'MS-SQL' to allow for resolving potential circular references
+16:54:03,128 DEBUG DefaultListableBeanFactory:411 - Finished creating instance of bean 'MS-SQL'
+16:54:03,128 DEBUG DefaultListableBeanFactory:214 - Creating shared instance of singleton bean 'MySQL'
+16:54:03,128 DEBUG DefaultListableBeanFactory:383 - Creating instance of bean 'MySQL'
+16:54:03,129 DEBUG DefaultListableBeanFactory:459 - Eagerly caching bean 'MySQL' to allow for resolving potential circular references
+16:54:03,129 DEBUG DefaultListableBeanFactory:411 - Finished creating instance of bean 'MySQL'
+16:54:03,130 DEBUG DefaultListableBeanFactory:214 - Creating shared instance of singleton bean 'Oracle'
+16:54:03,130 DEBUG DefaultListableBeanFactory:383 - Creating instance of bean 'Oracle'
+16:54:03,130 DEBUG DefaultListableBeanFactory:459 - Eagerly caching bean 'Oracle' to allow for resolving potential circular references
+16:54:03,131 DEBUG DefaultListableBeanFactory:411 - Finished creating instance of bean 'Oracle'
+16:54:03,131 DEBUG DefaultListableBeanFactory:214 - Creating shared instance of singleton bean 'PostgreSQL'
+16:54:03,132 DEBUG DefaultListableBeanFactory:383 - Creating instance of bean 'PostgreSQL'
+16:54:03,132 DEBUG DefaultListableBeanFactory:459 - Eagerly caching bean 'PostgreSQL' to allow for resolving potential circular references
+16:54:03,133 DEBUG DefaultListableBeanFactory:411 - Finished creating instance of bean 'PostgreSQL'
+16:54:03,133 DEBUG DefaultListableBeanFactory:214 - Creating shared instance of singleton bean 'Sybase'
+16:54:03,133 DEBUG DefaultListableBeanFactory:383 - Creating instance of bean 'Sybase'
+16:54:03,134 DEBUG DefaultListableBeanFactory:459 - Eagerly caching bean 'Sybase' to allow for resolving potential circular references
+16:54:03,135 DEBUG DefaultListableBeanFactory:411 - Finished creating instance of bean 'Sybase'
+16:54:03,135  INFO SQLErrorCodesFactory:128 - SQLErrorCodes loaded: [DB2, Derby, H2, HSQL, Informix, MS-SQL, MySQL, Oracle, PostgreSQL, Sybase]
+16:54:03,136 DEBUG SQLErrorCodesFactory:201 - Looking up default SQLErrorCodes for DataSource [com.taobao.tddl.atom.TAtomDataSource@3cecb67f]
+16:54:03,137 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:54:03,141 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:54:03,141 DEBUG SQLErrorCodesFactory:220 - Database product name cached for DataSource [com.taobao.tddl.atom.TAtomDataSource@3cecb67f]: name is 'MySQL'
+16:54:03,142 DEBUG SQLErrorCodesFactory:177 - SQL error codes for 'MySQL' found
+16:54:03,142 DEBUG SQLErrorCodeSQLExceptionTranslator:382 - Translating SQLException with SQL state '42S02', error code '1146', message [Table 'tddl_sample_1.druid_0000' doesn't exist]; SQL was [select 1 from druid_0000] for task [StatementCallback]
+16:54:03,558 ERROR TAtomDsConfHandle:249 -  [TDDL] [DRUID GlobaConf HandleData] dataId : com.taobao.tddl.atom.global.unitTestDb-testMsqlChange_切换DbName data: port=3306
+dbName=tddl_sample_0
+dbStatus=RW
+dbType=mysql
+ip=10.232.31.154
+, tddl version: 5.1.0
+16:54:03,560  INFO DruidDataSource:633 - {dataSource-5} inited
+16:54:03,562  INFO DruidDataSource:1242 - {dataSource-4} closed
+16:54:03,562  WARN TAtomDsConfHandle:327 -  [TDDL] [DRUID CONFIG CHANGE STATUS] Always ReCreate DataSource !, tddl version: 5.1.0
+16:54:06,144 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:54:06,144 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:54:06,144  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:54:06,144  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:54:06,145  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:54:06,145  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-testMsqlChange_切换DbName, tddl version: 5.1.0
+16:54:06,189 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:54:06,190  WARN TAtomDsConfHandle:797 -  [TDDL] [DataSource Stop] Start!, tddl version: 5.1.0
+16:54:06,190  INFO DruidDataSource:1242 - {dataSource-5} closed
+16:54:06,191  WARN TAtomDsConfHandle:805 -  [TDDL] [DataSource Stop] End!, tddl version: 5.1.0
+16:54:06,198  INFO DruidDataSource:633 - {dataSource-6} inited
+16:54:06,198  INFO TAtomDataSource:47 -  [TDDL] create new TAtomDsConfHandle dbName : atom.dbkey.DRUID_APP^unitTestDb-testMysqlChange_切换Port, tddl version: 5.1.0
+16:54:06,198 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:54:06,198 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:54:06,199  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:54:06,199  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:54:06,199  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:54:06,199  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-testMysqlChange_切换Port, tddl version: 5.1.0
+16:54:06,254 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:54:06,565 ERROR TAtomDsConfHandle:249 -  [TDDL] [DRUID GlobaConf HandleData] dataId : com.taobao.tddl.atom.global.unitTestDb-testMysqlChange_切换Port data: port=1234
+dbName=tddl_sample_0
+dbStatus=RW
+dbType=mysql
+ip=10.232.31.154
+, tddl version: 5.1.0
+16:54:06,568 ERROR DruidDataSourceStatManager:154 - register mbean error
+javax.management.InstanceAlreadyExistsException: com.alibaba.druid:type=DruidDataSource,id=unitTestDb-testMysqlChange_切换Port
+	at com.sun.jmx.mbeanserver.Repository.addMBean(Unknown Source)
+	at com.sun.jmx.interceptor.DefaultMBeanServerInterceptor.internal_addObject(Unknown Source)
+	at com.sun.jmx.interceptor.DefaultMBeanServerInterceptor.registerDynamicMBean(Unknown Source)
+	at com.sun.jmx.interceptor.DefaultMBeanServerInterceptor.registerObject(Unknown Source)
+	at com.sun.jmx.interceptor.DefaultMBeanServerInterceptor.registerMBean(Unknown Source)
+	at com.sun.jmx.mbeanserver.JmxMBeanServer.registerMBean(Unknown Source)
+	at com.alibaba.druid.stat.DruidDataSourceStatManager.addDataSource(DruidDataSourceStatManager.java:152)
+	at com.alibaba.druid.pool.DruidDataSource.init(DruidDataSource.java:617)
+	at com.taobao.tddl.atom.config.TAtomDsConfHandle$2.onDataRecieved(TAtomDsConfHandle.java:322)
+	at com.taobao.tddl.config.diamond.DiamondConfigDataHandler$2.receiveConfigInfo0(DiamondConfigDataHandler.java:169)
+	at com.taobao.diamond.manager.SkipInitialCallbackListener.receiveConfigInfo(SkipInitialCallbackListener.java:48)
+	at com.taobao.diamond.client.impl.CacheData$1.run(CacheData.java:126)
+	at com.taobao.diamond.client.impl.CacheData.safeNotifyListener(CacheData.java:140)
+	at com.taobao.diamond.client.impl.CacheData.checkListenerMd5(CacheData.java:113)
+	at com.taobao.diamond.client.impl.ClientWorker.checkListenerMd5(ClientWorker.java:260)
+	at com.taobao.diamond.client.impl.ClientWorker.checkServerConfigInfo(ClientWorker.java:154)
+	at com.taobao.diamond.client.impl.ClientWorker.checkServerConfigInfo(ClientWorker.java:134)
+	at com.taobao.diamond.client.impl.ClientWorker$2.run(ClientWorker.java:281)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRunAndReset(Unknown Source)
+	at java.util.concurrent.FutureTask.runAndReset(Unknown Source)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$101(Unknown Source)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.runPeriodic(Unknown Source)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+16:54:06,569  INFO DruidDataSource:633 - {dataSource-7} inited
+16:54:06,570  INFO DruidDataSource:1242 - {dataSource-6} closed
+16:54:06,570  WARN TAtomDsConfHandle:327 -  [TDDL] [DRUID CONFIG CHANGE STATUS] Always ReCreate DataSource !, tddl version: 5.1.0
+16:54:09,255 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:54:09,255 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:54:09,255  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:54:09,256  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:54:09,256  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:54:09,256  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-testMysqlChange_切换Port, tddl version: 5.1.0
+16:54:10,261 ERROR DruidDataSource:1578 - create connection error
+com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure
+
+Last packet sent to the server was 1 ms ago.
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:1074)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2103)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+Caused by: java.net.ConnectException: Connection refused: connect
+	at java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.net.PlainSocketImpl.doConnect(Unknown Source)
+	at java.net.PlainSocketImpl.connectToAddress(Unknown Source)
+	at java.net.PlainSocketImpl.connect(Unknown Source)
+	at java.net.SocksSocketImpl.connect(Unknown Source)
+	at java.net.Socket.connect(Unknown Source)
+	at java.net.Socket.connect(Unknown Source)
+	at java.net.Socket.<init>(Unknown Source)
+	at java.net.Socket.<init>(Unknown Source)
+	at com.mysql.jdbc.StandardSocketFactory.connect(StandardSocketFactory.java:253)
+	at com.mysql.jdbc.MysqlIO.<init>(MysqlIO.java:280)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2026)
+	... 12 more
+16:54:12,574 ERROR TAtomDsConfHandle:249 -  [TDDL] [DRUID GlobaConf HandleData] dataId : com.taobao.tddl.atom.global.unitTestDb-testMysqlChange_切换Port data: port=3306
+dbName=tddl_sample_0
+dbStatus=RW
+dbType=mysql
+ip=10.232.31.154
+, tddl version: 5.1.0
+16:54:12,577  INFO DruidDataSource:633 - {dataSource-8} inited
+16:54:12,577  INFO DruidDataSource:1242 - {dataSource-7} closed
+16:54:12,578  WARN TAtomDsConfHandle:327 -  [TDDL] [DRUID CONFIG CHANGE STATUS] Always ReCreate DataSource !, tddl version: 5.1.0
+16:54:13,258 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:54:13,258 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:54:13,259  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:54:13,259  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:54:13,259  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:54:13,259  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-testMysqlChange_切换Port, tddl version: 5.1.0
+16:54:13,305 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:54:13,305  WARN TAtomDsConfHandle:797 -  [TDDL] [DataSource Stop] Start!, tddl version: 5.1.0
+16:54:13,306  INFO DruidDataSource:1242 - {dataSource-8} closed
+16:54:13,307  WARN TAtomDsConfHandle:805 -  [TDDL] [DataSource Stop] End!, tddl version: 5.1.0
+16:54:13,320  INFO DruidDataSource:633 - {dataSource-9} inited
+16:54:13,320  INFO TAtomDataSource:47 -  [TDDL] create new TAtomDsConfHandle dbName : atom.dbkey.DRUID_APP^unitTestDb-testMysqlChange_切换Ip, tddl version: 5.1.0
+16:54:13,320 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:54:13,321 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:54:13,321  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:54:13,321  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:54:13,322  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:54:13,322  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-testMysqlChange_切换Ip, tddl version: 5.1.0
+16:54:13,361 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:54:15,588 ERROR TAtomDsConfHandle:249 -  [TDDL] [DRUID GlobaConf HandleData] dataId : com.taobao.tddl.atom.global.unitTestDb-testMysqlChange_切换Ip data: port=3306
+dbName=tddl_sample_0
+dbStatus=RW
+dbType=mysql
+ip=127.0.0.1
+, tddl version: 5.1.0
+16:54:15,625 ERROR DruidDataSourceStatManager:154 - register mbean error
+javax.management.InstanceAlreadyExistsException: com.alibaba.druid:type=DruidDataSource,id=unitTestDb-testMysqlChange_切换Ip
+	at com.sun.jmx.mbeanserver.Repository.addMBean(Unknown Source)
+	at com.sun.jmx.interceptor.DefaultMBeanServerInterceptor.internal_addObject(Unknown Source)
+	at com.sun.jmx.interceptor.DefaultMBeanServerInterceptor.registerDynamicMBean(Unknown Source)
+	at com.sun.jmx.interceptor.DefaultMBeanServerInterceptor.registerObject(Unknown Source)
+	at com.sun.jmx.interceptor.DefaultMBeanServerInterceptor.registerMBean(Unknown Source)
+	at com.sun.jmx.mbeanserver.JmxMBeanServer.registerMBean(Unknown Source)
+	at com.alibaba.druid.stat.DruidDataSourceStatManager.addDataSource(DruidDataSourceStatManager.java:152)
+	at com.alibaba.druid.pool.DruidDataSource.init(DruidDataSource.java:617)
+	at com.taobao.tddl.atom.config.TAtomDsConfHandle$2.onDataRecieved(TAtomDsConfHandle.java:322)
+	at com.taobao.tddl.config.diamond.DiamondConfigDataHandler$2.receiveConfigInfo0(DiamondConfigDataHandler.java:169)
+	at com.taobao.diamond.manager.SkipInitialCallbackListener.receiveConfigInfo(SkipInitialCallbackListener.java:48)
+	at com.taobao.diamond.client.impl.CacheData$1.run(CacheData.java:126)
+	at com.taobao.diamond.client.impl.CacheData.safeNotifyListener(CacheData.java:140)
+	at com.taobao.diamond.client.impl.CacheData.checkListenerMd5(CacheData.java:113)
+	at com.taobao.diamond.client.impl.ClientWorker.checkListenerMd5(ClientWorker.java:260)
+	at com.taobao.diamond.client.impl.ClientWorker.checkServerConfigInfo(ClientWorker.java:154)
+	at com.taobao.diamond.client.impl.ClientWorker.checkServerConfigInfo(ClientWorker.java:134)
+	at com.taobao.diamond.client.impl.ClientWorker$2.run(ClientWorker.java:281)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRunAndReset(Unknown Source)
+	at java.util.concurrent.FutureTask.runAndReset(Unknown Source)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$101(Unknown Source)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.runPeriodic(Unknown Source)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+16:54:15,626  INFO DruidDataSource:633 - {dataSource-10} inited
+16:54:15,628  INFO DruidDataSource:1242 - {dataSource-9} closed
+16:54:15,628  WARN TAtomDsConfHandle:327 -  [TDDL] [DRUID CONFIG CHANGE STATUS] Always ReCreate DataSource !, tddl version: 5.1.0
+16:54:16,363 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:54:16,363 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:54:16,363  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:54:16,364  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:54:16,364  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:54:16,364  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-testMysqlChange_切换Ip, tddl version: 5.1.0
+16:54:17,360 ERROR DruidDataSource:1578 - create connection error
+com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure
+
+Last packet sent to the server was 0 ms ago.
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:1074)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2103)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+Caused by: java.net.ConnectException: Connection refused: connect
+	at java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.net.PlainSocketImpl.doConnect(Unknown Source)
+	at java.net.PlainSocketImpl.connectToAddress(Unknown Source)
+	at java.net.PlainSocketImpl.connect(Unknown Source)
+	at java.net.SocksSocketImpl.connect(Unknown Source)
+	at java.net.Socket.connect(Unknown Source)
+	at java.net.Socket.connect(Unknown Source)
+	at java.net.Socket.<init>(Unknown Source)
+	at java.net.Socket.<init>(Unknown Source)
+	at com.mysql.jdbc.StandardSocketFactory.connect(StandardSocketFactory.java:253)
+	at com.mysql.jdbc.MysqlIO.<init>(MysqlIO.java:280)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2026)
+	... 12 more
+16:54:18,364 ERROR DruidDataSource:1578 - create connection error
+com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure
+
+Last packet sent to the server was 0 ms ago.
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:1074)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2103)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+Caused by: java.net.ConnectException: Connection refused: connect
+	at java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.net.PlainSocketImpl.doConnect(Unknown Source)
+	at java.net.PlainSocketImpl.connectToAddress(Unknown Source)
+	at java.net.PlainSocketImpl.connect(Unknown Source)
+	at java.net.SocksSocketImpl.connect(Unknown Source)
+	at java.net.Socket.connect(Unknown Source)
+	at java.net.Socket.connect(Unknown Source)
+	at java.net.Socket.<init>(Unknown Source)
+	at java.net.Socket.<init>(Unknown Source)
+	at com.mysql.jdbc.StandardSocketFactory.connect(StandardSocketFactory.java:253)
+	at com.mysql.jdbc.MysqlIO.<init>(MysqlIO.java:280)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2026)
+	... 12 more
+16:54:18,633 ERROR TAtomDsConfHandle:249 -  [TDDL] [DRUID GlobaConf HandleData] dataId : com.taobao.tddl.atom.global.unitTestDb-testMysqlChange_切换Ip data: port=3306
+dbName=tddl_sample_0
+dbStatus=RW
+dbType=mysql
+ip=10.232.31.154
+, tddl version: 5.1.0
+16:54:18,635  INFO DruidDataSource:633 - {dataSource-11} inited
+16:54:18,635  INFO DruidDataSource:1242 - {dataSource-10} closed
+16:54:18,635  WARN TAtomDsConfHandle:327 -  [TDDL] [DRUID CONFIG CHANGE STATUS] Always ReCreate DataSource !, tddl version: 5.1.0
+16:54:20,366 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:54:20,366 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:54:20,366  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:54:20,366  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:54:20,367  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:54:20,367  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-testMysqlChange_切换Ip, tddl version: 5.1.0
+16:54:20,438 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:54:20,439  WARN TAtomDsConfHandle:797 -  [TDDL] [DataSource Stop] Start!, tddl version: 5.1.0
+16:54:20,440  INFO DruidDataSource:1242 - {dataSource-11} closed
+16:54:20,441  WARN TAtomDsConfHandle:805 -  [TDDL] [DataSource Stop] End!, tddl version: 5.1.0
+16:54:20,450  INFO DruidDataSource:633 - {dataSource-12} inited
+16:54:20,451  INFO TAtomDataSource:47 -  [TDDL] create new TAtomDsConfHandle dbName : atom.dbkey.DRUID_APP^unitTestDb-testMysqlChange_切换userName, tddl version: 5.1.0
+16:54:20,451 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:54:20,451 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:54:20,451  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:54:20,452  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:54:20,452  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:54:20,452  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-testMysqlChange_切换userName, tddl version: 5.1.0
+16:54:20,492 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:54:21,640 ERROR TAtomDsConfHandle:382 -  [TDDL] [DRUID AppConf HandleData] dataId : com.taobao.tddl.atom.app.DRUID_APP.unitTestDb-testMysqlChange_切换userName data: connectionProperties=characterEncoding=gbk
+preparedStatementCacheSize=15
+idleTimeout=10
+blockingTimeout=1000
+maxPoolSize=2
+userName=test1
+minPoolSize=1
+, tddl version: 5.1.0
+16:54:21,642  INFO DruidDataSource:1242 - {dataSource-12} closed
+16:54:21,642  WARN TAtomDsConfHandle:434 -  [TDDL] [DRUID destroy OldDataSource] dataId : com.taobao.tddl.atom.app.DRUID_APP.unitTestDb-testMysqlChange_切换userName, tddl version: 5.1.0
+16:54:21,644  INFO DruidDataSource:633 - {dataSource-13} inited
+16:54:21,645  WARN TAtomDsConfHandle:437 -  [TDDL] [DRUID create newDataSource] dataId : com.taobao.tddl.atom.app.DRUID_APP.unitTestDb-testMysqlChange_切换userName, tddl version: 5.1.0
+16:54:23,493 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:54:23,493 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:54:23,493  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:54:23,496  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:54:23,496  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:54:23,496  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-testMysqlChange_切换userName, tddl version: 5.1.0
+16:54:23,507 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,517 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,528 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,539 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,551 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,577 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,588 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,599 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,612 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,622 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,634 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,646 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,663 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,684 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,698 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,711 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,724 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,739 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,762 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,800 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,815 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,832 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,846 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,856 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,866 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,877 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,891 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,904 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,917 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,926 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:23,937 ERROR DruidDataSource:1578 - create connection error
+java.sql.SQLException: Access denied for user 'test1'@'10.73.17.108' (using password: YES)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3491)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3423)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:910)
+	at com.mysql.jdbc.MysqlIO.secureAuth411(MysqlIO.java:3923)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1273)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2031)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:718)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:46)
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:302)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:282)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1350)
+	at com.alibaba.druid.pool.DruidAbstractDataSource.createPhysicalConnection(DruidAbstractDataSource.java:1406)
+	at com.alibaba.druid.pool.DruidDataSource$CreateConnectionThread.run(DruidDataSource.java:1576)
+16:54:24,647 ERROR TAtomDsConfHandle:382 -  [TDDL] [DRUID AppConf HandleData] dataId : com.taobao.tddl.atom.app.DRUID_APP.unitTestDb-testMysqlChange_切换userName data: connectionProperties=characterEncoding=gbk
+preparedStatementCacheSize=15
+idleTimeout=10
+blockingTimeout=1000
+maxPoolSize=2
+userName=tddl
+minPoolSize=1
+, tddl version: 5.1.0
+16:54:24,648  INFO DruidDataSource:1242 - {dataSource-13} closed
+16:54:24,648  WARN TAtomDsConfHandle:434 -  [TDDL] [DRUID destroy OldDataSource] dataId : com.taobao.tddl.atom.app.DRUID_APP.unitTestDb-testMysqlChange_切换userName, tddl version: 5.1.0
+16:54:24,650  INFO DruidDataSource:633 - {dataSource-14} inited
+16:54:24,650  WARN TAtomDsConfHandle:437 -  [TDDL] [DRUID create newDataSource] dataId : com.taobao.tddl.atom.app.DRUID_APP.unitTestDb-testMysqlChange_切换userName, tddl version: 5.1.0
+16:54:27,498 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:54:27,498 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:54:27,498  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:54:27,498  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:54:27,499  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:54:27,499  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-testMysqlChange_切换userName, tddl version: 5.1.0
+16:54:27,547 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:54:27,547  WARN TAtomDsConfHandle:797 -  [TDDL] [DataSource Stop] Start!, tddl version: 5.1.0
+16:54:27,548  INFO DruidDataSource:1242 - {dataSource-14} closed
+16:54:27,549  WARN TAtomDsConfHandle:805 -  [TDDL] [DataSource Stop] End!, tddl version: 5.1.0
+16:56:33,712  INFO LoggerFactory:? - using logger: com.taobao.tddl.common.utils.logger.log4j.Log4jLoggerAdapter
+16:56:33,935  INFO DruidDataSource:633 - {dataSource-1} inited
+16:56:34,035  WARN Monitor:72 -  [TDDL] 不指定TDDL以外的appName则不订阅, tddl version: 5.1.0
+16:56:34,035  INFO TAtomDataSource:47 -  [TDDL] create new TAtomDsConfHandle dbName : atom.dbkey.DRUID_APP^unitTestDb-mysql, tddl version: 5.1.0
+16:56:34,086 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:56:34,099 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:56:34,107  WARN TDataSourceWrapper:155 - set thread count restrict 0
+16:56:34,108  WARN TDataSourceWrapper:168 - set maxConcurrentReadRestrict 0
+16:56:34,108  WARN TDataSourceWrapper:171 - set maxConcurrentWriteRestrict 0
+16:56:34,108  WARN TAtomDsConfHandle:776 -  [TDDL] set datasource key: unitTestDb-mysql, tddl version: 5.1.0
+16:56:34,457 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource
+16:56:35,664 DEBUG JdbcTemplate:436 - Executing SQL query [select 1 from druid_0000]
+16:56:35,664 DEBUG DataSourceUtils:112 - Fetching JDBC Connection from DataSource
+16:56:35,669 DEBUG DataSourceUtils:312 - Returning JDBC Connection to DataSource

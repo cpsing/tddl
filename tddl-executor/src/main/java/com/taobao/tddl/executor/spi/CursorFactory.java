@@ -22,6 +22,7 @@ import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.ISetOrderCursor;
 import com.taobao.tddl.executor.cursor.ITempTableSortCursor;
 import com.taobao.tddl.executor.cursor.IValueFilterCursor;
+import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;

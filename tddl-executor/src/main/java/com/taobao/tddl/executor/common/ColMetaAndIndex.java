@@ -1,4 +1,4 @@
-package com.taobao.tddl.executor.cursor;
+package com.taobao.tddl.executor.common;
 
 
 public class ColMetaAndIndex {

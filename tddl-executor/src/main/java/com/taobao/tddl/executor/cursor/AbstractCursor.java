@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.executor.common.CloneableRecord;
+import com.taobao.tddl.executor.common.DuplicateKVPair;
+import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.IRowSet;
 

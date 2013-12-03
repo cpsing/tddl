@@ -10,7 +10,6 @@ import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.cursor.IANDCursor;
-import com.taobao.tddl.executor.cursor.IANDDupValuesCursor;
 import com.taobao.tddl.executor.cursor.IAggregateCursor;
 import com.taobao.tddl.executor.cursor.IColumnAliasCursor;
 import com.taobao.tddl.executor.cursor.ICursorMeta;
@@ -25,6 +24,22 @@ import com.taobao.tddl.executor.cursor.IReverseOrderCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.ISetOrderCursor;
 import com.taobao.tddl.executor.cursor.ITempTableSortCursor;
+import com.taobao.tddl.executor.cursor.ResultCursor;
+import com.taobao.tddl.executor.cursor.SchematicCursor;
+import com.taobao.tddl.executor.cursor.impl.AffectRowCursor;
+import com.taobao.tddl.executor.cursor.impl.AggregateCursor;
+import com.taobao.tddl.executor.cursor.impl.BlockNestedtLoopCursor;
+import com.taobao.tddl.executor.cursor.impl.ColumnAliasCursor;
+import com.taobao.tddl.executor.cursor.impl.InCursor;
+import com.taobao.tddl.executor.cursor.impl.IndexNestedLoopMgetImpCursor;
+import com.taobao.tddl.executor.cursor.impl.LimitFromToCursor;
+import com.taobao.tddl.executor.cursor.impl.MergeSortedCursors;
+import com.taobao.tddl.executor.cursor.impl.RangeCursor1;
+import com.taobao.tddl.executor.cursor.impl.ReverseOrderCursor;
+import com.taobao.tddl.executor.cursor.impl.SetOrderByCursor;
+import com.taobao.tddl.executor.cursor.impl.SortMergeJoinCursor1;
+import com.taobao.tddl.executor.cursor.impl.TempTableSortCursor;
+import com.taobao.tddl.executor.cursor.impl.ValueFilterCursor;
 import com.taobao.tddl.optimizer.config.Group;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
@@ -104,19 +119,6 @@ public class CursorFactoryDefaultImpl implements CursorFactory {
         }
     }
 
-    public IANDDupValuesCursor andDupValuesCursor(IRangeCursor... cursors) {
-        try {
-            return new ANDDupValuesCursor(cursors);
-        } catch (RuntimeException e) {
-            if (cursors != null) {
-                for (IRangeCursor cursor : cursors) {
-                    closeParentCursor(cursor);
-                }
-            }
-            throw e;
-        }
-    }
-
     @Override
     public ValueFilterCursor valueFilterCursor(ISchematicCursor cursor, IFilter filter,
                                                ExecutionContext executionContext) {
@@ -124,18 +126,6 @@ public class CursorFactoryDefaultImpl implements CursorFactory {
             return new ValueFilterCursor(cursor, filter, null);
         } catch (RuntimeException e) {
             closeParentCursor(cursor);
-            throw e;
-        }
-    }
-
-    @Override
-    public IORCursor mergeSortedCursor(ISchematicCursor left_cursor, ISchematicCursor right_cursor, boolean duplicated)
-                                                                                                                       throws Exception {
-        try {
-            return new MergeSortedCursor(left_cursor, right_cursor, duplicated);
-        } catch (Exception e) {
-            closeParentCursor(left_cursor);
-            closeParentCursor(right_cursor);
             throw e;
         }
     }
@@ -150,17 +140,6 @@ public class CursorFactoryDefaultImpl implements CursorFactory {
                 closeParentCursor(cursor);
             }
 
-            throw e;
-        }
-    }
-
-    @Override
-    public IORCursor mergeSortedCursor(ISchematicCursor left_cursor, ISchematicCursor right_cursor) throws Exception {
-        try {
-            return new MergeSortedCursor(left_cursor, right_cursor);
-        } catch (Exception e) {
-            closeParentCursor(left_cursor);
-            closeParentCursor(right_cursor);
             throw e;
         }
     }
@@ -212,21 +191,6 @@ public class CursorFactoryDefaultImpl implements CursorFactory {
             closeParentCursor(cursor);
             throw e;
         }
-    }
-
-    @Override
-    public IANDDupValuesCursor andDupValuesCursor(List<IRangeCursor> cursors) {
-        // try {
-        // return new ANDDupValuesCursor((cursors).toArray(new RangeCursor[0]));
-        // } catch (RuntimeException e) {
-        // if (cursors != null) {
-        // for (IRangeCursor iRangeCursor : cursors) {
-        // closeParentCursor(iRangeCursor);
-        // }
-        // }
-        // throw e;
-        // }
-        throw new UnsupportedOperationException();
     }
 
     // @Override
