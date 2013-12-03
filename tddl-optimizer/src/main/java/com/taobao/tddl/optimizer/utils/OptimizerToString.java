@@ -12,7 +12,7 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
 /**
  * {@linkplain IFilter}的toString()方法
  * 
- * @author Dreamond
+ * @author mengshi.sunmengshi
  * @author <a href="jianghang.loujh@taobao.com">jianghang</a>
  */
 public class OptimizerToString {
