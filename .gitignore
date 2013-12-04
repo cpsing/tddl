@@ -10,3 +10,6 @@ temp
 *.log
 .idea/
 *.iml
+bin/
+sqldump.txt
+sqldumpFile.txt
