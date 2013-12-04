@@ -10,13 +10,14 @@ import java.util.regex.Pattern;
 
 import org.codehaus.groovy.util.StringUtil;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.executor.common.CloneableRecord;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.IValueFilterCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
+import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.spi.ExecutionContext;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
@@ -100,7 +101,7 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
     }
 
     @SuppressWarnings("unchecked")
-    boolean allow(IFilter f, IRowSet iRowSet) throws FetchException {
+    boolean allow(IFilter f, IRowSet iRowSet) throws TddlException {
 
         if (f == null) {
             return true;

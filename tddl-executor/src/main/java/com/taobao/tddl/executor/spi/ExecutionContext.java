@@ -15,40 +15,40 @@ public class ExecutionContext {
     /**
      * 当前的事务的事务全局ID
      */
-    private Long                  transactionSequence;
+    private Long                   transactionSequence;
 
     /**
      * 当前运行时的存储对象
      */
-    private Repository            currentRepository;
+    private Repository             currentRepository;
     /**
      * 是否创建事务
      */
-    private boolean               createTxn;
+    private boolean                createTxn;
 
     /**
      * 是否自动关闭结果集。目前这个东西已经基本无效。除了在update等查询中有使用
      */
-    private boolean               closeResultSet;
+    private boolean                closeResultSet;
     /**
      * 当前事务
      */
-    private Transaction           transaction;
+    private Transaction            transaction;
     /**
      * 当前查询所使用的IndexMeta/这个放这里不是非常明确，他其实和生命周期无关。只是为了统一返回值，所以放在一起。
      */
-    private IndexMeta             meta;
+    private IndexMeta              meta;
     /**
      * 当前查询所使用的table
      */
-    private Table                 table;
+    private Table                  table;
 
-    String                        actualTable;
+    String                         actualTable;
 
-    TopologyHandler               topology  = null;
+    TopologyHandler                topology  = null;
 
-    Map<String, Comparable>       extraCmds = null;
-    Map<String, ParameterContext> params    = null;
+    Map<String, Comparable>        extraCmds = null;
+    Map<Integer, ParameterContext> params    = null;
 
     public ExecutionContext(){
 
@@ -134,11 +134,11 @@ public class ExecutionContext {
         this.extraCmds = extraCmds;
     }
 
-    public Map<String, ParameterContext> getParams() {
+    public Map<Integer, ParameterContext> getParams() {
         return params;
     }
 
-    public void setParams(Map<String, ParameterContext> params) {
+    public void setParams(Map<Integer, ParameterContext> params) {
         this.params = params;
     }
 

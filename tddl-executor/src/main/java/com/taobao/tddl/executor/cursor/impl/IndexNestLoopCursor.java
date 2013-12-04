@@ -6,6 +6,7 @@ import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.cursor.IIndexNestLoopCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 
 /**
@@ -123,8 +124,8 @@ public class IndexNestLoopCursor extends SortMergeJoinCursor1 implements IIndexN
     }
 
     protected IRowSet getOneLeftCursor(boolean forward) throws Exception {
-        if (forward) left = GeneralUtil.fromIRowSetToArrayRowSet(left_cursor.next());
-        else left = GeneralUtil.fromIRowSetToArrayRowSet(left_cursor.prev());
+        if (forward) left = ExecUtils.fromIRowSetToArrayRowSet(left_cursor.next());
+        else left = ExecUtils.fromIRowSetToArrayRowSet(left_cursor.prev());
         return left;
     }
 
@@ -135,9 +136,9 @@ public class IndexNestLoopCursor extends SortMergeJoinCursor1 implements IIndexN
         right_key = rightCodec.newEmptyRecord();
         for (int k = 0; k < leftJoinOnColumns.size(); k++) {
 
-            Object v = GeneralUtil.getValueByIColumn(left, (IColumn) leftJoinOnColumns.get(k));
+            Object v = ExecUtils.getValueByIColumn(left, (IColumn) leftJoinOnColumns.get(k));
 
-            right_key.put(GeneralUtil.getColumn(rightJoinOnColumns.get(k)).getColumnName(), v);
+            right_key.put(ExecUtils.getColumn(rightJoinOnColumns.get(k)).getColumnName(), v);
         }
     }
 

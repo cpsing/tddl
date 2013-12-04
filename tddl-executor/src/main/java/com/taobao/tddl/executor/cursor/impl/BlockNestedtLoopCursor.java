@@ -5,16 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.executor.common.CloneableRecord;
+import com.taobao.tddl.executor.codec.CodecFactory;
+import com.taobao.tddl.executor.common.CursorMetaImp;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.IValueFilterCursor;
+import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.spi.CursorFactory;
 import com.taobao.tddl.executor.spi.ExecutionContext;
+import com.taobao.tddl.executor.utils.ExecUtils;
+import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
@@ -38,10 +41,10 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor {
         super(leftCursor, rightCursor, leftColumns, rightColumns, columns, leftRetColumns, rightRetColumns, join);
         this.cursorFactory = cursorFactory;
         this.leftCodec = CodecFactory.getInstance(CodecFactory.FIXED_LENGTH)
-            .getCodec(ExecUtil.getColumnMetas(rightColumns));
+            .getCodec(ExecUtils.getColumnMetas(rightColumns));
         this.left_key = leftCodec.newEmptyRecord();
         this.executionContext = executionContext;
-        rightCursorMeta = CursorMetaImp.buildNew(GeneralUtil.convertISelectablesToColumnMeta(this.rightColumns,
+        rightCursorMeta = CursorMetaImp.buildNew(ExecUtils.convertISelectablesToColumnMeta(this.rightColumns,
             join.getRightNode().getAlias(),
             join.isSubQuery()));
         this.join = join;
@@ -66,7 +69,7 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor {
     protected Map<CloneableRecord, DuplicateKVPair> getRecordFromRightByValueFilter(List<CloneableRecord> leftJoinOnColumnCache)
                                                                                                                                 throws Exception {
         right_cursor.beforeFirst();
-        IBooleanFilter filter = new PBBooleanFilterAdapter();
+        IBooleanFilter filter = ASTNodeFactory.getInstance().createBooleanFilter();
 
         List<Comparable> values = new ArrayList<Comparable>();
         for (CloneableRecord record : leftJoinOnColumnCache) {
@@ -117,11 +120,11 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor {
             tempMap.put(comp, record);
         }
 
-        IRowSet kv = GeneralUtil.fromIRowSetToArrayRowSet(vfc.next());
+        IRowSet kv = ExecUtils.fromIRowSetToArrayRowSet(vfc.next());
         if (kv != null) {
             do {
-                kv = GeneralUtil.fromIRowSetToArrayRowSet(kv);
-                Object rightValue = GeneralUtil.getValueByIColumn(kv, rightColumn);
+                kv = ExecUtils.fromIRowSetToArrayRowSet(kv);
+                Object rightValue = ExecUtils.getValueByIColumn(kv, rightColumn);
                 if (leftMap.containsKey(rightValue)) {
                     tempMap.remove(rightValue);
                     CloneableRecord record = leftMap.get(rightValue);
@@ -142,8 +145,8 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor {
                                                                                                            throws Exception {
         IRowSet kv = null;
         while ((kv = vfc.next()) != null) {
-            kv = GeneralUtil.fromIRowSetToArrayRowSet(kv);
-            Object rightValue = GeneralUtil.getValueByIColumn(kv, rightColumn);
+            kv = ExecUtils.fromIRowSetToArrayRowSet(kv);
+            Object rightValue = ExecUtils.getValueByIColumn(kv, rightColumn);
             for (CloneableRecord record : leftJoinOnColumnCache) {
                 Map<String, Object> recordMap = record.getMap();
                 Comparable comp = (Comparable) record.getMap().values().iterator().next();

@@ -4,6 +4,8 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
+import com.taobao.tddl.executor.common.ICursorMeta;
+
 /**
  * 数据的核心接口，类似ResultSet一样的接口。下面有可能有join的实现，也可能有普通query或Merge实现。
  * 

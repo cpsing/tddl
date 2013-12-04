@@ -1,6 +1,8 @@
 package com.taobao.tddl.common.utils;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -127,4 +129,50 @@ public class GeneralUtil {
     public static void printlnToStringBuilder(StringBuilder sb, String v) {
         sb.append(v).append("\n");
     }
+
+    public static void printAFieldToStringBuilder(StringBuilder sb, String field, Object v, String inden) {
+        if (v == null || v.toString().equals("") || v.toString().equals("[]") || v.toString().equals("SEQUENTIAL")
+            || v.toString().equals("SHARED_LOCK")) return;
+
+        printlnToStringBuilder(sb, inden + field + ":" + v);
+    }
+
+    public static StackTraceElement split = new StackTraceElement("------- one sql exceptions-----", "", "", 0);
+
+    public static Exception mergeException(List<Exception> exceptions) {
+        // return new OneToManySQLExceptionsWrapper(exceptions);
+        Exception first = exceptions.get(0);
+        List<StackTraceElement> stes = new ArrayList<StackTraceElement>(30 * exceptions.size());
+        // stes.addAll(Arrays.asList(first.getStackTrace()));
+        boolean hasSplit = false;
+        for (StackTraceElement ste : first.getStackTrace()) {
+            stes.add(ste);
+            if (ste == split) {
+                hasSplit = true;
+            }
+        }
+        if (!hasSplit) {
+            stes.add(split);
+        }
+        Exception current = first;
+        for (int i = 1, n = exceptions.size(); i < n; i++) {
+
+            current = exceptions.get(i);
+
+            hasSplit = false;
+            for (StackTraceElement ste : current.getStackTrace()) {
+                stes.add(ste);
+                if (ste == split) {
+                    hasSplit = true;
+                }
+            }
+            if (!hasSplit) {
+                stes.add(split);
+            }
+        }
+
+        first.setStackTrace(stes.toArray(new StackTraceElement[stes.size()]));
+        return first;
+    }
+
 }

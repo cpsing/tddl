@@ -7,9 +7,11 @@ import java.util.List;
 
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.common.ColMetaAndIndex;
+import com.taobao.tddl.executor.common.CursorMetaImp;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.optimizer.config.table.ColumnMessage;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;

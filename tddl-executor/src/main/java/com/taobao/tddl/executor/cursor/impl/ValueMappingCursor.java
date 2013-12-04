@@ -3,12 +3,17 @@ package com.taobao.tddl.executor.cursor.impl;
 import java.util.List;
 import java.util.Map;
 
-import com.taobao.tddl.executor.common.CloneableRecord;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.common.ICursorMeta;
+import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
+import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 
+/**
+ * @author mengshi.sunmengshi 2013-12-3 下午2:50:43
+ * @since 5.1.0
+ */
 public class ValueMappingCursor extends SchematicCursor {
 
     public ValueMappingCursor(Cursor cursor, ICursorMeta meta,

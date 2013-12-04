@@ -2,8 +2,8 @@ package com.taobao.tddl.executor;
 
 import java.util.concurrent.Future;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.cursor.ResultCursor;
-import com.taobao.tddl.executor.exception.DataAccessException;
 import com.taobao.tddl.executor.spi.ExecutionContext;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 
@@ -25,6 +25,6 @@ public interface IAsyncExecutor {
      * @return
      */
     public Future<ResultCursor> execByExecPlanNodeFuture(IDataNodeExecutor qc, ExecutionContext executionContext)
-                                                                                                                 throws DataAccessException;
+                                                                                                                 throws TddlException;
 
 }

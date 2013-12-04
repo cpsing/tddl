@@ -2,6 +2,7 @@ package com.taobao.tddl.matrix.jdbc.executor;
 
 import java.util.concurrent.Future;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.ITransactionAsyncExecutor;
 import com.taobao.tddl.executor.ITransactionExecutor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -30,7 +31,8 @@ public class GroupExecutor implements ITransactionAsyncExecutor, ITransactionExe
     }
 
     @Override
-    public ResultCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext) throws Exception {
+    public ResultCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext)
+                                                                                                   throws TddlException {
         // ResultCursor rc = executeOnOthers(context, command,
         // executionContext);
         getTransaction(executionContext, qc);
@@ -43,7 +45,7 @@ public class GroupExecutor implements ITransactionAsyncExecutor, ITransactionExe
     }
 
     public ISchematicCursor executeInner(IDataNodeExecutor executor, ExecutionContext executionContext)
-                                                                                                       throws Exception {
+                                                                                                       throws TddlException {
 
         // 允许远程执行。在cursor里面所依赖的执行器，从本地的换为远程的。并要注意远程事务处理过程中的兼容。
         // 目前的处理方式是，走到这里的远程执行，不允许出现事务。。。出现就丢异常
@@ -55,26 +57,27 @@ public class GroupExecutor implements ITransactionAsyncExecutor, ITransactionExe
     }
 
     @Override
-    public void commit(ExecutionContext executionContext) throws DataAccessException {
+    public void commit(ExecutionContext executionContext) throws TddlException {
 
     }
 
     @Override
-    public void rollback(ExecutionContext executionContext) throws DataAccessException {
+    public void rollback(ExecutionContext executionContext) throws TddlException {
 
     }
 
     @Override
-    public Future<ResultCursor> commitFuture() throws DataAccessException {
+    public Future<ResultCursor> commitFuture(ExecutionContext executionContext) throws TddlException {
         return null;
     }
 
     @Override
-    public Future<ResultCursor> rollbackFuture() throws DataAccessException {
+    public Future<ResultCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException {
         return null;
     }
 
-    public void getTransaction(ExecutionContext executionContext, IDataNodeExecutor targetExecutor) throws Exception {
+    public void getTransaction(ExecutionContext executionContext, IDataNodeExecutor targetExecutor)
+                                                                                                   throws TddlException {
         if (executionContext.getTransaction() != null) {
             return;
         }
@@ -100,7 +103,7 @@ public class GroupExecutor implements ITransactionAsyncExecutor, ITransactionExe
     }
 
     protected ResultCursor wrapResultCursor(IDataNodeExecutor command, ISchematicCursor iSchematicCursor,
-                                            ExecutionContext context) throws Exception {
+                                            ExecutionContext context) throws TddlException {
         ResultCursor cursor;
         // 包装为可以传输的ResultCursor
         if (command instanceof IQueryTree) {

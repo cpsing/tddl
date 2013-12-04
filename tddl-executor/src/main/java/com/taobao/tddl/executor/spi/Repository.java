@@ -2,6 +2,7 @@ package com.taobao.tddl.executor.spi;
 
 import java.util.Map;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.optimizer.config.Group;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 
@@ -20,12 +21,12 @@ public interface Repository {
      * @return
      * @throws Exception
      */
-    Table getTable(TableMeta meta, String groupNode, long requestID) throws Exception;
+    Table getTable(TableMeta meta, String groupNode, long requestID) throws TddlException;
 
     /**
      * 关闭存储引擎所使用的对象。
      */
-    void close();
+    void close() throws TddlException;
 
     /**
      * 针对这个存储引擎，开始一个事务。
@@ -34,7 +35,7 @@ public interface Repository {
      * @return
      * @throws Exception
      */
-    Transaction beginTransaction(TransactionConfig conf) throws Exception;
+    Transaction beginTransaction(TransactionConfig conf) throws TddlException;
 
     /**
      * 获取所有的表对象

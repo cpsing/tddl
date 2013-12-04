@@ -1,5 +1,7 @@
 package com.taobao.tddl.executor.common;
 
+import com.taobao.tddl.executor.common.CursorMetaImp.ColumnHolder;
+
 
 public class ColMetaAndIndex {
 

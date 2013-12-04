@@ -4,18 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.groovy.util.StringUtil;
-
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.executor.common.CloneableRecord;
+import com.taobao.tddl.common.utils.TStringUtil;
+import com.taobao.tddl.executor.common.CursorMetaImp;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.IColumnAliasCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
+import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.rowset.IRowSetWrapper;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
+import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
@@ -59,18 +61,18 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
                     tableAlias = GeneralUtil.getLogicTableName(tableAlias);
                 }
             }
-            if (!StringUtil.isBlank(col.getAlias())) {
-                if (StringUtil.isBlank(tableAlias)) {
+            if (!TStringUtil.isBlank(col.getAlias())) {
+                if (TStringUtil.isBlank(tableAlias)) {
 
-                    cm = GeneralUtil.getColumnMeta(col, col.getAlias());
+                    cm = ExecUtils.getColumnMeta(col, col.getAlias());
                 } else {
-                    cm = GeneralUtil.getColumnMeta(col, tableAlias, col.getAlias());
+                    cm = ExecUtils.getColumnMeta(col, tableAlias, col.getAlias());
                 }
             } else {
-                if (StringUtil.isBlank(tableAlias)) {
-                    cm = GeneralUtil.getColumnMeta(col);
+                if (TStringUtil.isBlank(tableAlias)) {
+                    cm = ExecUtils.getColumnMeta(col);
                 } else {
-                    cm = GeneralUtil.getColumnMetaTable(col, tableAlias);
+                    cm = ExecUtils.getColumnMetaTable(col, tableAlias);
                 }
             }
             Integer index = cursormeta.getIndex(col.getTableName(), col.getColumnName());
@@ -84,16 +86,18 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
                 colMessages.add(cm);
             }
         }
-        if (!StringUtil.isBlank(tableAlias)) {
+        if (!TStringUtil.isBlank(tableAlias)) {
             // 如果没有就用下层的tableName
             newMeta = CursorMetaImp.buildNew(colMessages, indexes, cursormeta.getIndexRange());
             List<IOrderBy> obOld = getOrderBy();
             if (obOld != null) {
                 List<IOrderBy> obNew = new ArrayList<IOrderBy>(obOld.size());
                 for (IOrderBy orderBy : obOld) {
-                    IColumn icol = GeneralUtil.getIColumn(orderBy.getColumn());
+                    IColumn icol = ExecUtils.getIColumn(orderBy.getColumn());
                     IColumn icolNew = (IColumn) icol.copy();
-                    obNew.add(new OrderBy().setColumn(icolNew.setTableName(tableAlias).setAlias(null))
+                    obNew.add(ASTNodeFactory.getInstance()
+                        .createOrderBy()
+                        .setColumn(icolNew.setTableName(tableAlias).setAlias(null))
                         .setDirection(orderBy.getDirection()));
                 }
                 setOrderBy(obNew);
@@ -188,7 +192,7 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
         for (ISelectable cm : this.retColumns) {
             String tableName = tableAlias;
             if (tableName == null) tableName = cm.getTableName();
-            returnColumnMetas.add(new ColumnMeta(tableName, cm.getColumnName(), cm.getDataType()));
+            returnColumnMetas.add(new ColumnMeta(tableName, cm.getColumnName(), cm.getDataType(), cm.getAlias(), true));
         }
 
         return returnColumnMetas;

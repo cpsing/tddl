@@ -4,14 +4,16 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
-import com.taobao.tddl.executor.common.CloneableRecord;
 import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.executor.cursor.IRangeCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.RangeMaker;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
+import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
@@ -63,9 +65,12 @@ public class RangeCursor1 extends SchematicCursor implements IRangeCursor {
         schemaInited = true;
 
         List<ColumnMeta> columnMetas = to.getParentCursorMeta().getColumns();
-        List<ISelectable> iColumns = ExecUtil.getIColumnsWithISelectable(columnMetas.toArray(new ColumnMeta[0]));
-        toComparator = ExecUtil.getComp(iColumns, iColumns, to.getParentCursorMeta(), firstRowSet.getParentCursorMeta());
-        fromComparator = ExecUtil.getComp(iColumns,
+        List<ISelectable> iColumns = ExecUtils.getIColumnsWithISelectable(columnMetas.toArray(new ColumnMeta[0]));
+        toComparator = ExecUtils.getComp(iColumns,
+            iColumns,
+            to.getParentCursorMeta(),
+            firstRowSet.getParentCursorMeta());
+        fromComparator = ExecUtils.getComp(iColumns,
             iColumns,
             from.getParentCursorMeta(),
             firstRowSet.getParentCursorMeta());
@@ -142,7 +147,7 @@ public class RangeCursor1 extends SchematicCursor implements IRangeCursor {
     public IRowSet first() throws Exception {
         this.first = false;
         IRowSet iRowSet = from;
-        CloneableRecord cr = GeneralUtil.convertToClonableRecord(iRowSet);
+        CloneableRecord cr = ExecUtils.convertToClonableRecord(iRowSet);
         if (!cursor.skipTo(cr)) {
             return null;
         } else {
@@ -154,7 +159,7 @@ public class RangeCursor1 extends SchematicCursor implements IRangeCursor {
     public IRowSet last() throws Exception {
         first = false;
         IRowSet iRowSet = to;
-        CloneableRecord cr = GeneralUtil.convertToClonableRecord(iRowSet);
+        CloneableRecord cr = ExecUtils.convertToClonableRecord(iRowSet);
 
         // to在数据中间有四种可能
         // data:5,6,7,8,9,10,15
@@ -244,7 +249,7 @@ public class RangeCursor1 extends SchematicCursor implements IRangeCursor {
             .append(" end : ")
             .append(to)
             .append("\n");
-        GeneralUtil.printOrderBy(orderBys, inden, sb);
+        ExecUtils.printOrderBy(orderBys, inden, sb);
         sb.append(super.toStringWithInden(inden));
         return sb.toString();
     }

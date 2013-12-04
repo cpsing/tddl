@@ -7,13 +7,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.taobao.tddl.executor.common.CloneableRecord;
+import com.taobao.tddl.executor.codec.CodecFactory;
+import com.taobao.tddl.executor.codec.RecordCodec;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.common.KVPair;
-import com.taobao.tddl.executor.common.RecordCodec;
+import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.cursor.IInCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
+import com.taobao.tddl.executor.record.CloneableRecord;
+import com.taobao.tddl.executor.record.MapRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
@@ -60,7 +64,7 @@ public class InCursor extends SchematicCursor implements IInCursor {
     public InCursor(Cursor cursor, List<IOrderBy> orderBys, IColumn c, List<Comparable> v, OPERATION op){
         super(cursor, null, orderBys);
         keyCodec = CodecFactory.getInstance(CodecFactory.FIXED_LENGTH)
-            .getCodec(Arrays.asList(ExecUtil.getColumnMeta(c)));
+            .getCodec(Arrays.asList(ExecUtils.getColumnMeta(c)));
         this.c = c;
 
         if (c.getDataType() == DATA_TYPE.DATE_VAL) {

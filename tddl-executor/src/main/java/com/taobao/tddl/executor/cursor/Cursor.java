@@ -3,9 +3,9 @@ package com.taobao.tddl.executor.cursor;
 import java.util.List;
 import java.util.Map;
 
-import com.taobao.tddl.executor.common.CloneableRecord;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.common.KVPair;
+import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 

@@ -11,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.executor.common.CursorMetaImp;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.IAggregateCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;

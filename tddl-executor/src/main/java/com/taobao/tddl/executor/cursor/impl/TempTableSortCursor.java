@@ -6,23 +6,29 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.groovy.util.StringUtil;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.executor.common.CloneableRecord;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
+import com.taobao.tddl.executor.codec.CodecFactory;
+import com.taobao.tddl.executor.common.CursorMetaImp;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.ITempTableSortCursor;
+import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.rowset.IRowSetWrapper;
 import com.taobao.tddl.executor.spi.CursorFactory;
+import com.taobao.tddl.executor.spi.Table;
 import com.taobao.tddl.executor.spi.TempTable;
 import com.taobao.tddl.executor.spi.TransactionConfig.Isolation;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
+import com.taobao.tddl.optimizer.config.table.IndexType;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
@@ -35,7 +41,7 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
  */
 public class TempTableSortCursor extends SortCursor implements ITempTableSortCursor {
 
-    private final static Log    logger           = LogFactory.getLog(TempTableSortCursor.class);
+    private final static Logger logger           = LoggerFactory.getLogger(TempTableSortCursor.class);
 
     protected static AtomicLong seed             = new AtomicLong(0);
     protected long              sizeProtection   = 100000;
@@ -63,8 +69,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
      * @throws Exception
      */
     public TempTableSortCursor(CursorFactory cursorFactory, TempTable repo, ISchematicCursor cursor,
-                               List<IOrderBy> orderBys, boolean sortedDuplicates, long requestID)
-                                                                                                 throws FetchException,
+                               List<IOrderBy> orderBys, boolean sortedDuplicates, long requestID) throws TddlException,
                                                                                                  Exception{
         super(cursor, orderBys);
         this.sortedDuplicates = sortedDuplicates;
@@ -111,7 +116,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
             // 因为实际做cursor的表名匹配的时候，使用的是截取法。。取第一个"."之前的作为匹配标志。
             tableName = oldTableName + ".tmp." + System.currentTimeMillis() + "." + seed + "requestID." + requestID;
 
-            if (AndorLogManager.isDebugMode()) {
+            if (logger.isDebugEnabled()) {
                 logger.warn("tempTableName:\n" + tableName);
             }
         }
@@ -160,7 +165,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
                      * 会在这里被合并，导致后面取值有问题。现在准备将临时表中的columnName改成
                      * tableName.columnName的形式。顺序不变可以将后面的取值完成 有点hack..
                      */
-                    Object o = GeneralUtil.getValueByTableAndName(rowSet, column.getTableName(), colName);
+                    Object o = ExecUtils.getValueByTableAndName(rowSet, column.getTableName(), colName);
                     key.put(column.getName(), o);
                 }
                 if (valuesArray != null && valuesArray.length != 0) {
@@ -180,7 +185,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
                          * 会在这里被合并，导致后面取值有问题。现在准备将临时表中的columnName改成
                          * tableName.columnName的形式。顺序不变可以将后面的取值完成 有点hack..
                          */
-                        Object o = GeneralUtil.getValueByTableAndName(rowSet, valueColumn.getTableName(), colName);
+                        Object o = ExecUtils.getValueByTableAndName(rowSet, valueColumn.getTableName(), colName);
                         value.put(valueColumn.getName(), o);
                     }
                 }

@@ -1,4 +1,6 @@
-package com.taobao.tddl.executor.common;
+package com.taobao.tddl.executor.codec;
+
+import com.taobao.tddl.executor.record.CloneableRecord;
 
 
 /**

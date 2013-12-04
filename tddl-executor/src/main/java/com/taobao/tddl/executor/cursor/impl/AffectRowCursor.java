@@ -3,12 +3,15 @@ package com.taobao.tddl.executor.cursor.impl;
 import java.util.Arrays;
 
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.executor.common.CursorMetaImp;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.IAffectRowCursor;
 import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.executor.utils.ExecUtils;
+import com.taobao.tddl.optimizer.config.table.ColumnMessage;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 
 public class AffectRowCursor extends SchematicCursor implements IAffectRowCursor {
@@ -54,8 +57,8 @@ public class AffectRowCursor extends SchematicCursor implements IAffectRowCursor
         StringBuilder sb = new StringBuilder();
         String tab = GeneralUtil.getTab(inden);
         sb.append(tab).append("【AffectRowCursor : ").append("\n");
-        GeneralUtil.printMeta(cursormeta, inden, sb);
-        GeneralUtil.printOrderBy(orderBys, inden, sb);
+        ExecUtils.printMeta(cursormeta, inden, sb);
+        ExecUtils.printOrderBy(orderBys, inden, sb);
         sb.append(super.toStringWithInden(inden + 1));
         return sb.toString();
     }

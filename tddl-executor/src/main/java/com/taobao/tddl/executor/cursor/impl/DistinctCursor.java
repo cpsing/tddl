@@ -2,9 +2,11 @@ package com.taobao.tddl.executor.cursor.impl;
 
 import java.util.List;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 
 /**
@@ -15,12 +17,12 @@ import com.taobao.tddl.optimizer.core.expression.IOrderBy;
  */
 public class DistinctCursor extends MergeSortedCursors {
 
-    public DistinctCursor(ISchematicCursor cursor) throws FetchException{
+    public DistinctCursor(ISchematicCursor cursor) throws TddlException{
         super(cursor, null, false);
         this.cursor = cursor;
     }
 
-    public DistinctCursor(ISchematicCursor cursor, List<IOrderBy> orderBys) throws FetchException{
+    public DistinctCursor(ISchematicCursor cursor, List<IOrderBy> orderBys) throws TddlException{
         super(cursor, null, false);
         this.cursor = cursor;
         this.orderBys = orderBys;
@@ -59,7 +61,7 @@ public class DistinctCursor extends MergeSortedCursors {
 
             next = null;
         }
-        this.current = GeneralUtil.fromIRowSetToArrayRowSet(next);
+        this.current = ExecUtils.fromIRowSetToArrayRowSet(next);
         return next;
     }
 

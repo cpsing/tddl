@@ -5,6 +5,7 @@ import com.taobao.tddl.executor.cursor.ILimitFromToCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.executor.utils.ExecUtils;
 
 /**
  * 用于做limit操作
@@ -73,7 +74,7 @@ public class LimitFromToCursor extends SchematicCursor implements ILimitFromToCu
         StringBuilder sb = new StringBuilder();
         String tab = GeneralUtil.getTab(inden);
         sb.append(tab).append("【Limit cursor . from : ").append(limitFrom).append(" to :").append(offset).append("\n");
-        GeneralUtil.printOrderBy(orderBys, inden, sb);
+        ExecUtils.printOrderBy(orderBys, inden, sb);
         sb.append(super.toStringWithInden(inden));
         return sb.toString();
     }

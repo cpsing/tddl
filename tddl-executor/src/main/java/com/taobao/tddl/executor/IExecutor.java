@@ -1,5 +1,6 @@
 package com.taobao.tddl.executor;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.spi.ExecutionContext;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
@@ -22,5 +23,6 @@ public interface IExecutor {
      * @return
      * @throws Exception
      */
-    public ResultCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext) throws Exception;
+    public ResultCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext)
+                                                                                                   throws TddlException;
 }

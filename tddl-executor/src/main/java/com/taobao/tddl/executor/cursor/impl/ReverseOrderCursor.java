@@ -7,6 +7,7 @@ import com.taobao.tddl.executor.cursor.IReverseOrderCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 
 /**
@@ -51,7 +52,7 @@ public class ReverseOrderCursor extends SchematicCursor implements IReverseOrder
         StringBuilder sb = new StringBuilder();
         String tab = GeneralUtil.getTab(inden);
         sb.append(tab).append("【Reverse order cursor .").append("\n");
-        GeneralUtil.printOrderBy(orderBys, inden, sb);
+        ExecUtils.printOrderBy(orderBys, inden, sb);
         sb.append(super.toStringWithInden(inden));
         return sb.toString();
     }

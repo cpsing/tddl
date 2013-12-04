@@ -1,6 +1,6 @@
 package com.taobao.tddl.executor;
 
-import com.taobao.tddl.executor.exception.DataAccessException;
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.spi.ExecutionContext;
 
 /**
@@ -11,7 +11,7 @@ import com.taobao.tddl.executor.spi.ExecutionContext;
  */
 public interface ITransactionExecutor extends IExecutor {
 
-    void commit(ExecutionContext executionContext) throws DataAccessException;
+    void commit(ExecutionContext executionContext) throws TddlException;
 
-    void rollback(ExecutionContext executionContext) throws DataAccessException;
+    void rollback(ExecutionContext executionContext) throws TddlException;
 }

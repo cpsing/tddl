@@ -11,6 +11,4 @@ import javax.sql.DataSource;
 public interface DataSourceGetter {
 
     DataSource getDataSource(ExecutionContext executionContext, String group);
-
-    DataSource getDatasourceByGroupNode(AndorContext commonRuntimeConfigHolder, String groupNode);
 }

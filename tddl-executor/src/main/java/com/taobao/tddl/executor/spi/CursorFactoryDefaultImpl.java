@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.groovy.util.StringUtil;
-
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.cursor.IANDCursor;
@@ -33,6 +33,7 @@ import com.taobao.tddl.executor.cursor.impl.ColumnAliasCursor;
 import com.taobao.tddl.executor.cursor.impl.InCursor;
 import com.taobao.tddl.executor.cursor.impl.IndexNestedLoopMgetImpCursor;
 import com.taobao.tddl.executor.cursor.impl.LimitFromToCursor;
+import com.taobao.tddl.executor.cursor.impl.MergeCursor;
 import com.taobao.tddl.executor.cursor.impl.MergeSortedCursors;
 import com.taobao.tddl.executor.cursor.impl.RangeCursor1;
 import com.taobao.tddl.executor.cursor.impl.ReverseOrderCursor;
@@ -162,13 +163,13 @@ public class CursorFactoryDefaultImpl implements CursorFactory {
     @Override
     public ITempTableSortCursor tempTableSortCursor(ISchematicCursor cursor, List<IOrderBy> orderBys,
                                                     boolean sortedDuplicates, long requestID,
-                                                    Map<String, Comparable> extraContext) throws FetchException,
+                                                    Map<String, Comparable> extraContext) throws TddlException,
                                                                                          Exception {
         try {
             Comparable comp = extraContext.get(ExtraCmd.ExecutionExtraCmd.ALLOW_TEMPORARY_TABLE);
             // 只有当AllowTemporaryTable不为空，并且为true的时候，才允许使用临时表。
             if (comp != null) {
-                String valueInStr = StringUtil.trim(String.valueOf(comp));
+                String valueInStr = TStringUtil.trim(String.valueOf(comp));
                 Boolean valueInBool = Boolean.valueOf(valueInStr);
                 if (valueInBool) {
                     TempTable tt = commonConfig.getOrBuildTempTable(Group.BDB_JE);
