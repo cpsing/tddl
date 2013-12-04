@@ -3,6 +3,7 @@ package com.taobao.tddl.optimizer.utils;
 import java.util.List;
 
 import com.taobao.tddl.common.exception.NotSupportException;
+import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
@@ -18,7 +19,11 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
 public class OptimizerToString {
 
     public static String printFilterString(IFilter filter) {
-        return printFilterString(filter, true);
+        return printFilterString(filter, 0, true);
+    }
+
+    public static String printFilterString(IFilter filter, int inden) {
+        return printFilterString(filter, inden, true);
     }
 
     public static String getTab(int count) {
@@ -52,7 +57,7 @@ public class OptimizerToString {
         sb.append(v).append("\n");
     }
 
-    public static String printFilterString(IFilter filter, boolean needTable) {
+    public static String printFilterString(IFilter filter, int inden, boolean needTable) {
         if (filter == null) {
             return null;
         }
@@ -66,20 +71,20 @@ public class OptimizerToString {
             IBooleanFilter bf = (IBooleanFilter) filter;
             if (bf.getColumn() != null && (bf.getValue() != null || bf.getValues() != null)) {
                 if (bf.getOperation().equals(OPERATION.IN)) {
-                    builder.append(getColumnName(bf, needTable))
+                    builder.append(getColumnName(bf, inden, needTable))
                         .append(" ")
                         .append(bf.getOperation().getOPERATIONString())
                         .append(" ")
-                        .append(getValueName(bf, needTable, true));
+                        .append(getValueName(bf, inden, needTable, true));
                 } else {
-                    builder.append(getColumnName(bf, needTable))
+                    builder.append(getColumnName(bf, inden, needTable))
                         .append(" ")
                         .append(bf.getOperation().getOPERATIONString())
                         .append(" ")
-                        .append(getValueName(bf, needTable, false));
+                        .append(getValueName(bf, inden, needTable, false));
                 }
             } else {
-                builder.append(getColumnName(bf, needTable));
+                builder.append(getColumnName(bf, inden, needTable));
             }
 
             if (filter.isNot()) {
@@ -114,7 +119,7 @@ public class OptimizerToString {
         }
     }
 
-    private static String getColumnName(IBooleanFilter bf, boolean needTable) {
+    private static String getColumnName(IBooleanFilter bf, int inden, boolean needTable) {
         if (bf == null) {
             return null;
         }
@@ -136,7 +141,7 @@ public class OptimizerToString {
         }
     }
 
-    private static String getValueName(IBooleanFilter bf, boolean needTable, boolean isIn) {
+    private static String getValueName(IBooleanFilter bf, int inden, boolean needTable, boolean isIn) {
         if (bf == null) {
             return null;
         }
@@ -144,7 +149,11 @@ public class OptimizerToString {
             if (isIn) {
                 return bf.getValues().toString();
             } else {
-                return bf.getValue().toString();
+                if (bf.getValue() instanceof QueryTreeNode) {
+                    return "\n" + ((QueryTreeNode) bf.getValue()).toString(inden);
+                } else {
+                    return bf.getValue().toString();
+                }
             }
         } else {
             List args = bf.getArgs();

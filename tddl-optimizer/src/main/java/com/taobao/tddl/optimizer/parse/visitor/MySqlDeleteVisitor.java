@@ -1,8 +1,11 @@
 package com.taobao.tddl.optimizer.parse.visitor;
 
+import java.util.Map;
+
 import com.alibaba.cobar.parser.ast.expression.Expression;
 import com.alibaba.cobar.parser.ast.stmt.dml.DMLDeleteStatement;
 import com.alibaba.cobar.parser.visitor.EmptySQLASTVisitor;
+import com.google.common.collect.Maps;
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.optimizer.core.ast.dml.DeleteNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
@@ -14,7 +17,15 @@ import com.taobao.tddl.optimizer.core.ast.query.TableNode;
  */
 public class MySqlDeleteVisitor extends EmptySQLASTVisitor {
 
-    private DeleteNode deleteNode;
+    private DeleteNode           deleteNode;
+    private Map<Integer, Object> bindVals = Maps.newHashMap();
+
+    public MySqlDeleteVisitor(){
+    }
+
+    public MySqlDeleteVisitor(Map<Integer, Object> bindVals){
+        this.bindVals = bindVals;
+    }
 
     public void visit(DMLDeleteStatement node) {
         TableNode table = null;
@@ -37,7 +48,7 @@ public class MySqlDeleteVisitor extends EmptySQLASTVisitor {
     }
 
     private void handleCondition(Expression expr, TableNode table) {
-        MySqlExprVisitor mv = new MySqlExprVisitor();
+        MySqlExprVisitor mv = new MySqlExprVisitor(bindVals);
         expr.accept(mv);
         table.query(mv.getFilter());
     }

@@ -160,7 +160,7 @@ public class BooleanFilter extends Function<IBooleanFilter> implements IBooleanF
 
     public String getColumnName() {
         if (this.columnName == null || this.columnName.isEmpty()) {
-            return TStringUtil.upperCase(OptimizerToString.printFilterString(this, false));
+            return TStringUtil.upperCase(OptimizerToString.printFilterString(this, 0, false));
         } else {// 在builder阶段，为了保证节点间相互关系，所以可能会对columnName进行重新的定义。
             return columnName;
         }

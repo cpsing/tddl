@@ -31,6 +31,7 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.expression.bean.BindVal;
 import com.taobao.tddl.optimizer.core.expression.bean.NullValue;
+import com.taobao.tddl.optimizer.parse.visitor.MySqlExprVisitor;
 import com.taobao.tddl.rule.exceptions.TddlRuleException;
 
 /**
@@ -52,7 +53,12 @@ public class OptimizerUtils {
      * @return group名加上表名的编号
      */
     public static String getGroupAndIdentifierOfTablePattern(KVIndexNode child) {
-        Matcher matcher = suffixPattern.matcher(child.getActualTableName());
+        String tableName = child.getActualTableName();
+        if (tableName == null) {
+            tableName = child.getIndexName();
+        }
+
+        Matcher matcher = suffixPattern.matcher(tableName);
         if (matcher.find()) {
             return (child.getDataNode() + matcher.group());
         } else {
@@ -255,8 +261,9 @@ public class OptimizerUtils {
             return null;
         }
 
-        if (TStringUtil.containsIgnoreCase(columnStr, "AS")) {
-            String tmp[] = TStringUtil.split(columnStr, "AS");
+        // 别名只能单独处理
+        if (TStringUtil.containsIgnoreCase(columnStr, " AS ")) {
+            String tmp[] = TStringUtil.splitByWholeSeparator(columnStr, " AS ");
             if (tmp.length != 2) {
                 throw new RuntimeException("createColumnFromString:" + columnStr);
             }
@@ -264,16 +271,17 @@ public class OptimizerUtils {
             ISelectable c = createColumnFromString(tmp[0].trim());
             c.setAlias(tmp[1].trim());
             return c;
-        }
-
-        IColumn c = ASTNodeFactory.getInstance().createColumn();
-        if (columnStr.contains(".")) {
-            String tmp[] = columnStr.split("\\.");
-            c.setColumnName(tmp[1]).setTableName(tmp[0]);
         } else {
-            c.setColumnName(columnStr);
+            MySqlExprVisitor visitor = MySqlExprVisitor.parser(columnStr);
+            Comparable value = MySqlExprVisitor.parser(columnStr).getColumnOrValue();
+            if (value instanceof ISelectable) {
+                return (ISelectable) value;
+            } else if (value instanceof IFilter) {
+                return (IFilter) value;
+            } else { // 可能是常量
+                return visitor.buildConstanctFilter(value);
+            }
         }
-        return c;
     }
 
     public static IColumn columnMetaToIColumn(ColumnMeta m, String tableName) {
@@ -281,6 +289,7 @@ public class OptimizerUtils {
         c.setDataType(m.getDataType());
         c.setColumnName(m.getName());
         c.setTableName(tableName);
+        c.setAlias(m.getAlias());
         return c;
     }
 
@@ -289,14 +298,11 @@ public class OptimizerUtils {
         c.setDataType(m.getDataType());
         c.setColumnName(m.getName());
         c.setTableName(m.getTableName());
+        c.setAlias(m.getAlias());
         return c;
     }
 
     public static IColumn getColumn(Object column) {
-        return getIColumn(column);
-    }
-
-    public static IColumn getIColumn(Object column) {
         if (column instanceof IFunction) {
             return (IColumn) ASTNodeFactory.getInstance()
                 .createColumn()

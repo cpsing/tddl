@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.DMLNode;
+import com.taobao.tddl.optimizer.core.ast.query.KVIndexNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
@@ -51,7 +52,13 @@ public class UpdateNode extends DMLNode<UpdateNode> {
         update.setQueryTree(this.getNode().toDataNodeExecutor());
         update.setUpdateColumns(this.getUpdateColumns());
         update.setUpdateValues(values);
-        update.setTableName(this.getNode().getTableName());
+        if (this.getNode().getActualTableName() != null) {
+            update.setTableName(this.getNode().getActualTableName());
+        } else if (this.getNode() instanceof KVIndexNode) {
+            update.setTableName(((KVIndexNode) this.getNode()).getIndexName());
+        } else {
+            update.setTableName(this.getNode().getTableName());
+        }
         update.setIndexName(this.getNode().getIndexUsed().getName());
         return update;
     }

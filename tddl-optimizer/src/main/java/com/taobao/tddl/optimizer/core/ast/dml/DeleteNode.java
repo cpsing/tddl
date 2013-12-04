@@ -2,6 +2,7 @@ package com.taobao.tddl.optimizer.core.ast.dml;
 
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.DMLNode;
+import com.taobao.tddl.optimizer.core.ast.query.KVIndexNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.dml.IDelete;
@@ -18,7 +19,13 @@ public class DeleteNode extends DMLNode<DeleteNode> {
         delete.setConsistent(true);
         delete.executeOn(this.getDataNode());
         delete.setQueryTree(this.getNode().toDataNodeExecutor());
-        delete.setTableName(this.getNode().getTableName());
+        if (this.getNode().getActualTableName() != null) {
+            delete.setTableName(this.getNode().getActualTableName());
+        } else if (this.getNode() instanceof KVIndexNode) {
+            delete.setTableName(((KVIndexNode) this.getNode()).getIndexName());
+        } else {
+            delete.setTableName(this.getNode().getTableName());
+        }
         delete.setIndexName(this.getNode().getIndexUsed().getName());
         return delete;
     }

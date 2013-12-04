@@ -1,6 +1,7 @@
 package com.taobao.tddl.optimizer.parse.cobar;
 
 import java.sql.SQLSyntaxErrorException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,12 +44,21 @@ import com.taobao.tddl.optimizer.parse.visitor.MySqlUpdateVisitor;
  */
 public class CobarSqlAnalysisResult implements SqlAnalysisResult {
 
-    private SqlType       sqlType;
-    private SQLASTVisitor visitor;
-    private QueryTreeNode dalQueryTreeNode;
+    private SqlType                        sqlType;
+    private SQLASTVisitor                  visitor;
+    private QueryTreeNode                  dalQueryTreeNode;
+    private Map<Integer, ParameterContext> parameterSettings;
 
-    public void parse(String sql) throws SQLSyntaxErrorException {
+    public void parse(String sql, Map<Integer, ParameterContext> parameterSettings) throws SQLSyntaxErrorException {
         if (sql != null) {
+            this.parameterSettings = parameterSettings;
+            Map<Integer, Object> bindVals = new HashMap<Integer, Object>();
+            if (parameterSettings != null) {
+                for (ParameterContext context : parameterSettings.values()) {
+                    bindVals.put((Integer) context.getArgs()[0] + 1, context.getArgs()[1]);// cobar的ParamMarker是从1开始
+                }
+            }
+
             SQLStatement statement = SQLParserDelegate.parse(sql);
             if (statement instanceof DMLSelectStatement) {
                 if (isSysSelectStatement((DMLSelectStatement) statement, sql)) {
@@ -57,23 +67,23 @@ public class CobarSqlAnalysisResult implements SqlAnalysisResult {
                 }
 
                 sqlType = SqlType.SELECT;
-                visitor = new MySqlSelectVisitor();
+                visitor = new MySqlSelectVisitor(bindVals);
                 statement.accept(visitor);
             } else if (statement instanceof DMLUpdateStatement) {
                 sqlType = SqlType.UPDATE;
-                visitor = new MySqlUpdateVisitor();
+                visitor = new MySqlUpdateVisitor(bindVals);
                 statement.accept(visitor);
             } else if (statement instanceof DMLDeleteStatement) {
                 sqlType = SqlType.DELETE;
-                visitor = new MySqlDeleteVisitor();
+                visitor = new MySqlDeleteVisitor(bindVals);
                 statement.accept(visitor);
             } else if (statement instanceof DMLInsertStatement) {
                 sqlType = SqlType.INSERT;
-                visitor = new MySqlInsertVisitor();
+                visitor = new MySqlInsertVisitor(bindVals);
                 statement.accept(visitor);
             } else if (statement instanceof DMLReplaceStatement) {
                 sqlType = SqlType.REPLACE;
-                visitor = new MySqlReplaceIntoVisitor();
+                visitor = new MySqlReplaceIntoVisitor(bindVals);
                 statement.accept(visitor);
             } else if (statement instanceof DDLStatement) {
                 throw new IllegalArgumentException("tddl not support DDL statement:'" + sql + "'");
@@ -126,7 +136,7 @@ public class CobarSqlAnalysisResult implements SqlAnalysisResult {
         return sqlType;
     }
 
-    public QueryTreeNode getQueryTreeNode(Map<Integer, ParameterContext> parameterSettings) {
+    public QueryTreeNode getQueryTreeNode() {
         if (dalQueryTreeNode == null) {
             return ((MySqlSelectVisitor) visitor).getTableNode();
         } else {
@@ -134,33 +144,33 @@ public class CobarSqlAnalysisResult implements SqlAnalysisResult {
         }
     }
 
-    public UpdateNode getUpdateNode(Map<Integer, ParameterContext> parameterSettings) {
+    public UpdateNode getUpdateNode() {
         return (UpdateNode) ((MySqlUpdateVisitor) visitor).getUpdateNode().setParameterSettings(parameterSettings);
     }
 
-    public InsertNode getInsertNode(Map<Integer, ParameterContext> parameterSettings) {
+    public InsertNode getInsertNode() {
         return (InsertNode) ((MySqlInsertVisitor) visitor).getInsertNode().setParameterSettings(parameterSettings);
     }
 
-    public PutNode getReplaceNode(Map<Integer, ParameterContext> parameterSettings) {
+    public PutNode getReplaceNode() {
         return (PutNode) ((MySqlReplaceIntoVisitor) visitor).getReplaceNode().setParameterSettings(parameterSettings);
     }
 
-    public DeleteNode getDeleteNode(Map<Integer, ParameterContext> parameterSettings) {
+    public DeleteNode getDeleteNode() {
         return (DeleteNode) ((MySqlDeleteVisitor) visitor).getDeleteNode().setParameterSettings(parameterSettings);
     }
 
-    public ASTNode getAstNode(Map<Integer, ParameterContext> parameterSettings) {
+    public ASTNode getAstNode() {
         if (sqlType == SqlType.SELECT || sqlType == SqlType.SHOW_WITH_TABLE) {
-            return getQueryTreeNode(parameterSettings);
+            return getQueryTreeNode();
         } else if (sqlType == SqlType.UPDATE) {
-            return getUpdateNode(parameterSettings);
+            return getUpdateNode();
         } else if (sqlType == SqlType.INSERT) {
-            return getInsertNode(parameterSettings);
+            return getInsertNode();
         } else if (sqlType == SqlType.REPLACE) {
-            return getReplaceNode(parameterSettings);
+            return getReplaceNode();
         } else if (sqlType == SqlType.DELETE) {
-            return getDeleteNode(parameterSettings);
+            return getDeleteNode();
         }
 
         throw new NotSupportException(sqlType.toString());

@@ -105,7 +105,7 @@ public class MergeJoinMergeOptimizer implements QueryPlanOptimizer {
     /**
      * 将左边的merge展开，依次和右边做join
      */
-    private IQueryTree expandLeft(IJoin j) {
+    public IQueryTree expandLeft(IJoin j) {
         if (!(j.getLeftNode() instanceof IMerge)) {
             j.setJoinType(JoinType.SORT_MERGE_JOIN);
             return j;

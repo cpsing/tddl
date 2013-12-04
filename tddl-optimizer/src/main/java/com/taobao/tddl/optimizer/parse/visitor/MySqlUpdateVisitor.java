@@ -1,6 +1,7 @@
 package com.taobao.tddl.optimizer.parse.visitor;
 
 import java.util.List;
+import java.util.Map;
 
 import com.alibaba.cobar.parser.ast.expression.Expression;
 import com.alibaba.cobar.parser.ast.expression.primary.Identifier;
@@ -9,6 +10,7 @@ import com.alibaba.cobar.parser.ast.fragment.tableref.TableReferences;
 import com.alibaba.cobar.parser.ast.stmt.dml.DMLUpdateStatement;
 import com.alibaba.cobar.parser.util.Pair;
 import com.alibaba.cobar.parser.visitor.EmptySQLASTVisitor;
+import com.google.common.collect.Maps;
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.dml.UpdateNode;
@@ -21,7 +23,15 @@ import com.taobao.tddl.optimizer.core.ast.query.TableNode;
  */
 public class MySqlUpdateVisitor extends EmptySQLASTVisitor {
 
-    private UpdateNode updateNode;
+    private UpdateNode           updateNode;
+    private Map<Integer, Object> bindVals = Maps.newHashMap();
+
+    public MySqlUpdateVisitor(){
+    }
+
+    public MySqlUpdateVisitor(Map<Integer, Object> bindVals){
+        this.bindVals = bindVals;
+    }
 
     public void visit(DMLUpdateStatement node) {
         QueryTreeNode table = getTableNode(node);
@@ -34,7 +44,7 @@ public class MySqlUpdateVisitor extends EmptySQLASTVisitor {
                 updateColumnsSb.append(" ");
             }
             updateColumnsSb.append(p.getKey().getIdTextUpUnescape());
-            MySqlExprVisitor mv = new MySqlExprVisitor();
+            MySqlExprVisitor mv = new MySqlExprVisitor(bindVals);
             p.getValue().accept(mv);
             updateValues[i] = (Comparable) mv.getColumnOrValue();// 可能为function
         }
@@ -52,7 +62,7 @@ public class MySqlUpdateVisitor extends EmptySQLASTVisitor {
         List<TableReference> tbls = trs.getTableReferenceList();
         QueryTreeNode table = null;
         if (tbls != null && tbls.size() == 1) {
-            MySqlExprVisitor tv = new MySqlExprVisitor();
+            MySqlExprVisitor tv = new MySqlExprVisitor(bindVals);
             tbls.get(0).accept(tv);
             table = tv.getTableNode();
         } else {
@@ -63,7 +73,7 @@ public class MySqlUpdateVisitor extends EmptySQLASTVisitor {
     }
 
     private void handleCondition(QueryTreeNode table, Expression expr) {
-        MySqlExprVisitor mv = new MySqlExprVisitor();
+        MySqlExprVisitor mv = new MySqlExprVisitor(bindVals);
         expr.accept(mv);
         table.query(mv.getFilter());
     }

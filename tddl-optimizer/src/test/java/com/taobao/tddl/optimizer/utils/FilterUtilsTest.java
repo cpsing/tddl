@@ -89,6 +89,10 @@ public class FilterUtilsTest {
         where = "gmt_create = '2013-11-11 11:11:11'";
         filter = FilterUtils.createFilter(where);
         System.out.println(filter);
+
+        where = "1+1";
+        filter = FilterUtils.createFilter(where);
+        System.out.println(filter);
     }
 
     private IFilter filter(Comparable column) {

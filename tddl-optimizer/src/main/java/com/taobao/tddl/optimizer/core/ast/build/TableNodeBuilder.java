@@ -107,6 +107,7 @@ public class TableNodeBuilder extends QueryTreeNodeBuilder {
     }
 
     public ISelectable getSelectableFromChild(ISelectable c) {
+        // 如果存在表名，则进行强校验，比如字段为A.ID，否则直接进行ID名字匹配
         if (c.getTableName() != null && !c.getTableName().equals(this.getNode().getTableName())
             && !c.getTableName().equals(this.getNode().getAlias())) {
             return null;
@@ -121,11 +122,7 @@ public class TableNodeBuilder extends QueryTreeNodeBuilder {
             return c;
         }
 
-        ISelectable rs = this.getSelectableFromChild(c.getColumnName());
-        if (rs != null) {
-            rs.setDistinct(c.isDistinct());
-        }
-        return rs;
+        return this.getSelectableFromChild(c.getColumnName());
     }
 
     public ISelectable getSelectableFromChild(String name) {

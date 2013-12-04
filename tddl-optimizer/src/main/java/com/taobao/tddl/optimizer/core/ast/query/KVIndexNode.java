@@ -1,10 +1,15 @@
 package com.taobao.tddl.optimizer.core.ast.query;
 
+import static com.taobao.tddl.optimizer.utils.OptimizerToString.appendField;
+import static com.taobao.tddl.optimizer.utils.OptimizerToString.appendln;
+import static com.taobao.tddl.optimizer.utils.OptimizerToString.printFilterString;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
+import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
@@ -13,6 +18,7 @@ import com.taobao.tddl.optimizer.core.ast.build.QueryTreeNodeBuilder;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
+import com.taobao.tddl.optimizer.utils.FilterUtils;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
 
 public class KVIndexNode extends TableNode {
@@ -33,9 +39,21 @@ public class KVIndexNode extends TableNode {
         return this;
     }
 
+    public KVIndexNode keyQuery(String f) {
+        this.setNeedBuild(true);
+        this.keyFilter = FilterUtils.createFilter(f);
+        return this;
+    }
+
     public KVIndexNode valueQuery(IFilter f) {
         this.setNeedBuild(true);
         this.resultFilter = f;
+        return this;
+    }
+
+    public KVIndexNode valueQuery(String f) {
+        this.setNeedBuild(true);
+        this.resultFilter = FilterUtils.createFilter(f);
         return this;
     }
 
@@ -50,8 +68,8 @@ public class KVIndexNode extends TableNode {
         query.setConsistent(this.getConsistent());
         query.setGroupBys(this.getGroupBys());
         String tableName = null;
-        if (this.getIndexName() != null) {
-            tableName = this.getIndexName();
+        if (this.getActualTableName() != null) {
+            tableName = this.getActualTableName();
         } else if (this.getIndex() != null) {
             tableName = this.getIndex().getName();
         }
@@ -178,4 +196,41 @@ public class KVIndexNode extends TableNode {
         return this.getIndexName();
     }
 
+    public String toString(int inden) {
+
+        String tabTittle = GeneralUtil.getTab(inden);
+        String tabContent = GeneralUtil.getTab(inden + 1);
+        StringBuilder sb = new StringBuilder();
+
+        if (this.getAlias() != null) {
+            appendln(sb, tabTittle + "Query from " + this.getIndexName() + " as " + this.getAlias());
+        } else {
+            appendln(sb, tabTittle + "Query from " + this.getIndexName());
+        }
+        appendField(sb, "actualTableName", this.getActualTableName(), tabContent);
+        appendField(sb, "keyFilter", printFilterString(this.getKeyFilter()), tabContent);
+        appendField(sb, "resultFilter", printFilterString(this.getResultFilter()), tabContent);
+        appendField(sb, "whereFilter", printFilterString(this.getWhereFilter()), tabContent);
+        appendField(sb, "having", printFilterString(this.getHavingFilter()), tabContent);
+        if (!(this.getLimitFrom() != null && this.getLimitFrom().equals(0L) && this.getLimitTo() != null && this.getLimitTo()
+            .equals(0L))) {
+            appendField(sb, "limitFrom", this.getLimitFrom(), tabContent);
+            appendField(sb, "limitTo", this.getLimitTo(), tabContent);
+        }
+
+        if (this.isSubQuery()) {
+            appendField(sb, "isSubQuery", this.isSubQuery(), tabContent);
+        }
+        appendField(sb, "orderBy", this.getOrderBys(), tabContent);
+        appendField(sb, "queryConcurrency", this.getQueryConcurrency(), tabContent);
+        appendField(sb, "lockModel", this.getLockModel(), tabContent);
+        appendField(sb, "columns", this.getColumnsSelected(), tabContent);
+        appendField(sb, "groupBys", this.getGroupBys(), tabContent);
+
+        appendField(sb, "sql", this.getSql(), tabContent);
+        appendField(sb, "executeOn", this.getDataNode(), tabContent);
+
+        return sb.toString();
+
+    }
 }

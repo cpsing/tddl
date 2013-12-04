@@ -124,8 +124,8 @@ public class MergeNode extends QueryTreeNode {
             appendln(sb, tabTittle + (this.isUnion() ? "Union" : "Merge"));
         }
 
-        appendField(sb, "resultFilter", printFilterString(this.getResultFilter()), tabContent);
-        appendField(sb, "having", printFilterString(this.getHavingFilter()), tabContent);
+        appendField(sb, "resultFilter", printFilterString(this.getResultFilter(), inden + 2), tabContent);
+        appendField(sb, "having", printFilterString(this.getHavingFilter(), inden + 2), tabContent);
         if (!(this.getLimitFrom() != null && this.getLimitFrom().equals(0L) && this.getLimitTo() != null && this.getLimitTo()
             .equals(0L))) {
             appendField(sb, "limitFrom", this.getLimitFrom(), tabContent);

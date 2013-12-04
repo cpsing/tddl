@@ -1,19 +1,29 @@
 package com.taobao.tddl.optimizer.parse.visitor;
 
 import java.util.List;
+import java.util.Map;
 
 import com.alibaba.cobar.parser.ast.expression.misc.QueryExpression;
 import com.alibaba.cobar.parser.ast.expression.primary.Identifier;
 import com.alibaba.cobar.parser.ast.expression.primary.RowExpression;
 import com.alibaba.cobar.parser.ast.stmt.dml.DMLInsertStatement;
 import com.alibaba.cobar.parser.visitor.EmptySQLASTVisitor;
+import com.google.common.collect.Maps;
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.optimizer.core.ast.dml.InsertNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 
 public class MySqlInsertVisitor extends EmptySQLASTVisitor {
 
-    private InsertNode insertNode;
+    private InsertNode           insertNode;
+    private Map<Integer, Object> bindVals = Maps.newHashMap();
+
+    public MySqlInsertVisitor(){
+    }
+
+    public MySqlInsertVisitor(Map<Integer, Object> bindVals){
+        this.bindVals = bindVals;
+    }
 
     public void visit(DMLInsertStatement node) {
         TableNode table = getTableNode(node);
@@ -58,7 +68,7 @@ public class MySqlInsertVisitor extends EmptySQLASTVisitor {
     private Comparable[] getRowValue(RowExpression expr) {
         Comparable[] iv = new Comparable[expr.getRowExprList().size()];
         for (int i = 0; i < expr.getRowExprList().size(); i++) {
-            MySqlExprVisitor mv = new MySqlExprVisitor();
+            MySqlExprVisitor mv = new MySqlExprVisitor(bindVals);
             expr.getRowExprList().get(i).accept(mv);
             Object obj = mv.getColumnOrValue();
             iv[i] = (Comparable) obj;

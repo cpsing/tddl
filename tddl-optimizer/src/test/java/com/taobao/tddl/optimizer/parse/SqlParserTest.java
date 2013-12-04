@@ -2,18 +2,17 @@ package com.taobao.tddl.optimizer.parse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.jdbc.ParameterMethod;
 import com.taobao.tddl.common.model.SqlType;
+import com.taobao.tddl.optimizer.BaseOptimizerTest;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.dml.DeleteNode;
@@ -27,60 +26,92 @@ import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
-import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
 import com.taobao.tddl.optimizer.core.expression.bean.BindVal;
 import com.taobao.tddl.optimizer.exceptions.QueryException;
 import com.taobao.tddl.optimizer.exceptions.SqlParserException;
-import com.taobao.tddl.optimizer.parse.cobar.CobarSqlParseManager;
-import com.taobao.tddl.optimizer.utils.FilterUtils;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author jianghang 2013-11-15 下午3:55:47
  * @since 5.1.0
  */
-public class SqlParserTest {
+public class SqlParserTest extends BaseOptimizerTest {
 
-    private static SqlParseManager manager;
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-        manager = new CobarSqlParseManager();
-    }
+    private static final Logger logger = LoggerFactory.getLogger(SqlParserTest.class);
 
     @Test
-    public void testQueryNoCondition() throws SqlParserException, QueryException {
-
-    }
-
-    @Test
-    public void testQueryOnPrimaryWithIndex() throws SqlParserException, QueryException {
+    public void testQuery_简单主键查询() throws SqlParserException, QueryException {
         String sql = "SELECT * FROM TABLE1 WHERE ID=1";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
-        QueryTreeNode qnExpected = new TableNode("TABLE1").select("*").query("ID=1");
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        QueryTreeNode qnExpected = new TableNode("TABLE1").query("ID=1");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
-    public void testQueryOnJoinNormal() throws SqlParserException, QueryException {
+    public void testQuery_字段别名() throws SqlParserException, QueryException {
+        String sql = "SELECT ID AS TID,NAME,SCHOOL FROM TABLE1  WHERE ID=1";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+
+        QueryTreeNode qnExpected = new TableNode("TABLE1").select("ID AS TID,NAME,SCHOOL").query("ID=1");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
+    }
+
+    @Test
+    public void testQuery_字段别名_表别名() throws SqlParserException, QueryException {
+        String sql = "SELECT T.ID AS TID,T.NAME,T.SCHOOL FROM TABLE1 T  WHERE ID=1";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+
+        QueryTreeNode qnExpected = new TableNode("TABLE1").alias("T").select("ID AS TID,NAME,SCHOOL").query("ID=1");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
+    }
+
+    @Test
+    public void testQuery_函数别名() throws SqlParserException, QueryException {
+        String sql = "SELECT T.ID , LENGTH(NAME) AS LEN FROM TABLE1 T  WHERE ID=1";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+
+        IFunction function = ASTNodeFactory.getInstance().createFunction();
+        function.setColumnName("LENGTH(NAME)");
+        function.setAlias("LEN");
+        function.setFunctionName("LENGTH");
+
+        QueryTreeNode qnExpected = new TableNode("TABLE1").alias("T").select("T.ID").query("ID=1");
+        qnExpected.addColumnsSelected(function);
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
+    }
+
+    @Test
+    public void testQuery_普通join() throws SqlParserException, QueryException {
         String sql = "SELECT * FROM TABLE1 A JOIN TABLE2 B ON A.ID=B.ID WHERE A.NAME=1";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         TableNode table2 = new TableNode("TABLE2");
         QueryTreeNode qnExpected = table1.alias("A")
             .join(table2.alias("B"))
             .addJoinKeys("A.ID", "B.ID")
-            .query("A.NAME=1")
-            .select("*")
-            .setAllWhereFilter(FilterUtils.createFilter("A.NAME=1"));
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+            .query("A.NAME=1");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
-    public void testQueryOnJoinInner() throws SqlParserException, QueryException {
+    public void testQuery_内连接() throws SqlParserException, QueryException {
         String sql = "SELECT * FROM TABLE1 A INNER JOIN TABLE2 B ON A.ID=B.ID WHERE A.NAME=1";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         TableNode table2 = new TableNode("TABLE2");
@@ -88,16 +119,16 @@ public class SqlParserTest {
             .join(table2.alias("B"))
             .setInnerJoin()
             .addJoinKeys("A.ID", "B.ID")
-            .query("A.NAME=1")
-            .select("*")
-            .setAllWhereFilter(FilterUtils.createFilter("A.NAME=1"));
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+            .query("A.NAME=1");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
-    public void testQueryOnJoinUsingEquals_left_outer() throws SqlParserException, QueryException {
+    public void testQuery_左连接() throws SqlParserException, QueryException {
         String sql = "SELECT * FROM TABLE1 A LEFT JOIN TABLE2 B ON A.ID=B.ID WHERE A.NAME=1";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         TableNode table2 = new TableNode("TABLE2");
@@ -105,16 +136,16 @@ public class SqlParserTest {
             .join(table2.alias("B"))
             .setLeftOuterJoin()
             .addJoinKeys("A.ID", "B.ID")
-            .query("A.NAME=1")
-            .select("*")
-            .setAllWhereFilter(FilterUtils.createFilter("A.NAME=1"));
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+            .query("A.NAME=1");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
-    public void testQueryOnJoinUsingEquals_right_outer() throws SqlParserException, QueryException {
+    public void testQuery_右连接() throws SqlParserException, QueryException {
         String sql = "SELECT * FROM TABLE1 A RIGHT JOIN TABLE2 B ON A.ID=B.ID WHERE A.NAME=1";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         TableNode table2 = new TableNode("TABLE2");
@@ -122,17 +153,33 @@ public class SqlParserTest {
             .join(table2.alias("B"))
             .setRightOuterJoin()
             .addJoinKeys("A.ID", "B.ID")
-            .query("A.NAME=1")
-            .select("*")
-            .setAllWhereFilter(FilterUtils.createFilter("A.NAME=1"));
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+            .query("A.NAME=1");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
-    public void testQueryOnJoinUsingEquals_twoArgs() throws SqlParserException, QueryException {
-
+    public void testQuery_普通链接_多个连接条件() throws SqlParserException, QueryException {
         String sql = "SELECT * FROM TABLE1 A INNER JOIN TABLE2 B ON A.ID=B.ID AND A.NAME = B.NAME WHERE A.NAME=1";
         QueryTreeNode qn = query(sql);
+        qn.build();
+
+        TableNode table1 = new TableNode("TABLE1");
+        TableNode table2 = new TableNode("TABLE2");
+        QueryTreeNode qnExpected = table1.alias("A")
+            .join(table2.alias("B"))
+            .addJoinKeys("A.ID", "B.ID")
+            .addJoinKeys("A.NAME", "B.NAME")
+            .query("A.NAME=1");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
+    }
+
+    @Test
+    public void testQuery_普通链接_字段别名() throws SqlParserException, QueryException {
+        String sql = "SELECT A.ID AS AID,A.SCHOOL AS ASCHOOL,B.* FROM TABLE1 A INNER JOIN TABLE2 B ON A.ID=B.ID AND A.NAME = B.NAME WHERE A.NAME=1";
+        QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         TableNode table2 = new TableNode("TABLE2");
@@ -141,17 +188,72 @@ public class SqlParserTest {
             .addJoinKeys("A.ID", "B.ID")
             .addJoinKeys("A.NAME", "B.NAME")
             .query("A.NAME=1")
-            .select("*")
-            .setAllWhereFilter(FilterUtils.createFilter("A.NAME=1"));
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+            .select("A.ID AS AID,A.SCHOOL AS ASCHOOL,B.*");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
+    }
 
+    @Test
+    public void testQuery_普通链接_order_group_having() throws SqlParserException, QueryException {
+        String sql = "SELECT A.ID AS AID,A.SCHOOL AS ASCHOOL,B.* FROM TABLE1 A INNER JOIN TABLE2 B ON A.ID=B.ID AND A.NAME = B.NAME WHERE A.NAME=1";
+        sql += " GROUP BY AID HAVING AID > 0 ORDER BY A.ID ASC ";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+
+        TableNode table1 = new TableNode("TABLE1");
+        TableNode table2 = new TableNode("TABLE2");
+        QueryTreeNode qnExpected = table1.alias("A")
+            .join(table2.alias("B"))
+            .addJoinKeys("A.ID", "B.ID")
+            .addJoinKeys("A.NAME", "B.NAME")
+            .query("A.NAME=1")
+            .select("A.ID AS AID,A.SCHOOL AS ASCHOOL,B.*")
+            .groupBy("AID")
+            .having("AID > 0")
+            .orderBy("A.ID", true);
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
+    }
+
+    @Test
+    public void testQuery_普通链接_函数() throws SqlParserException, QueryException {
+        String sql = "SELECT A.ID as AID,A.ID,COUNT(A.ID),COUNT(*) FROM TABLE1 A INNER JOIN TABLE2 B ON A.ID=B.ID AND A.NAME = B.NAME WHERE A.NAME=1";
+        sql += " GROUP BY AID HAVING AID > 0 ORDER BY A.ID ASC ";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+
+        TableNode table1 = new TableNode("TABLE1");
+        TableNode table2 = new TableNode("TABLE2");
+        QueryTreeNode qnExpected = table1.alias("A")
+            .join(table2.alias("B"))
+            .addJoinKeys("A.ID", "B.ID")
+            .addJoinKeys("A.NAME", "B.NAME")
+            .query("A.NAME=1")
+            .select("A.ID AS AID,A.ID")
+            .groupBy("AID")
+            .having("AID > 0")
+            .orderBy("A.ID", true);
+        IFunction function1 = ASTNodeFactory.getInstance().createFunction();
+        function1.setColumnName("COUNT(A.ID)");
+        function1.setFunctionName("COUNT");
+
+        IFunction function2 = ASTNodeFactory.getInstance().createFunction();
+        function2.setColumnName("COUNT(*)");
+        function2.setFunctionName("COUNT");
+        qnExpected.addColumnsSelected(function1);
+        qnExpected.addColumnsSelected(function2);
+
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     // @Test
-    public void testQueryOnJoinUsingEquals_or_will_throw_excps() throws Exception {
+    // 后续调整
+    public void testQuery_内连接_OR条件_不支持() throws Exception {
         String sql = "SELECT * FROM TABLE1 A INNER JOIN TABLE2 B ON A.ID=B.ID OR A.NAME = B.NAME WHERE A.NAME=1";
         try {
             QueryTreeNode qn = query(sql);
+            qn.build();
             Assert.fail();
         } catch (Exception e) {
             Assert.assertEquals("java.lang.IllegalArgumentException: not support 'or' in join on statment ",
@@ -159,235 +261,196 @@ public class SqlParserTest {
         }
     }
 
-    // @Test
-    public void testQueryUsingPageOptmizer_case1() throws Exception {
-        String sql = " select * from table1 where id >= (select id from table1 limit 100000,1) limit 100;";
-        QueryTreeNode qn;
-        try {
-            qn = query(sql);
-            qn.toString();
-            Assert.fail();
-        } catch (Exception e) {
-            Assert.assertEquals("java.lang.RuntimeException: boolean filter right value not support subquery.",
-                e.getCause().getMessage());
-        }
-
-    }
-
-    // @Test
-    public void testQueryUsingPageOptmizer_case2() throws Exception {
-        String sql = " SELECT A.ID,A.NAME FROM (SELECT * FROM TABLE1 WHERE ID > 100 LIMIT 10000,10) AS A,TABLE2 B WHERE A.ID = B.ID;";
-        QueryTreeNode qn;
-        qn = query(sql);
-
-        TableNode table1 = new TableNode("table1");
-        TableNode table2 = new TableNode("table2");
-        QueryTreeNode qnExpected = table1.select("*")
-            .query("ID>100")
-            .setLimitFrom(10000)
-            .setLimitTo(10)
-            .alias("A")
-            .select("A.ID,A.NAME")
-            .join(table2.alias("B"))
-            .addJoinKeys("A.ID", "B.ID")
-            .select("A.ID,A.NAME");
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
-    }
-
-    // @Test
-    public void testQueryUsingPageOptmizer_case3() throws Exception {
-        String sql = "SELECT A.ID,A.NAME FROM (SELECT * FROM TABLE1 WHERE ID > 100 LIMIT 10000,10) AS A,TABLE2 B WHERE A.ID = B.ID AND A.NAME=B.NAME;";
-        QueryTreeNode qn = query(sql);
-
-        TableNode table1 = new TableNode("TABLE1");
-        TableNode table2 = new TableNode("TABLE2");
-        QueryTreeNode qnExpected = table1.select("*")
-            .query("ID>100")
-            .setLimitFrom(10000)
-            .setLimitTo(10)
-            .alias("A")
-            .select("A.ID,A.NAME")
-            .join(table2.alias("B"))
-            .addJoinKeys("A.ID", "B.ID")
-            .addJoinKeys("A.NAME", "B.NAME")
-            .select("A.ID,A.NAME");
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
-    }
-
     @Test
-    public void testQueryWithOrderBy() throws Exception {
+    public void testQuery_正常orderby() throws Exception {
         String sql = "SELECT ID,NAME FROM TABLE1 WHERE ID=1 ORDER BY ID";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         QueryTreeNode qnExpected = table1.select("ID,NAME").query("ID=1").orderBy("ID");
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
-    public void testQueryWithOrderByIDASC() throws Exception {
+    public void testQuery_OrderByAsc() throws Exception {
         String sql = "SELECT ID,NAME FROM TABLE1 WHERE ID=1 ORDER BY ID ASC";
-
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         QueryTreeNode qnExpected = table1.select("ID,NAME").query("ID=1").orderBy("ID", true);
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
-
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
-    public void testQueryWithOrderByDesc() throws Exception {
+    public void testQuery_OrderByDesc() throws Exception {
         String sql = "SELECT ID,NAME FROM TABLE1 WHERE ID=1 ORDER BY ID DESC";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         QueryTreeNode qnExpected = table1.select("ID,NAME").query("ID=1").orderBy("ID", false);
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
-
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
-    public void testQueryWithOrderByIdAndNameASC() throws Exception {
+    public void testQuery_OrderByIdAndNameASC() throws Exception {
         String sql = "SELECT ID,NAME FROM TABLE1 WHERE ID=1 ORDER BY ID,NAME";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         QueryTreeNode qnExpected = table1.select("ID,NAME").query("ID=1").orderBy("ID").orderBy("NAME");
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
 
     }
 
     @Test
-    public void testQueryWithOrderByIdAndNameDesc() throws Exception {
+    public void testQuery_OrderByIdAndNameDesc() throws Exception {
         String sql = "SELECT ID,NAME FROM TABLE1 WHERE ID=1 ORDER BY ID,NAME DESC";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         QueryTreeNode qnExpected = table1.select("ID,NAME").query("ID=1").orderBy("ID").orderBy("NAME", false);
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
-    public void testQueryWithOrderByIdDescAndNameDesc() throws Exception {
+    public void testQuery_OrderByIdDescAndNameDesc() throws Exception {
         String sql = "SELECT ID,NAME FROM TABLE1 WHERE ID=1 ORDER BY ID DESC,NAME DESC";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         QueryTreeNode qnExpected = table1.select("ID,NAME").query("ID=1").orderBy("ID", false).orderBy("NAME", false);
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
 
     }
 
     @Test
-    public void testQueryWithOrExpression() throws SqlParserException, QueryException {
+    public void testQuery_OrExpression() throws SqlParserException, QueryException {
         String sql = "SELECT * FROM TABLE1 WHERE NAME = 2323 OR ID=1";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
-        QueryTreeNode qnExpected = table1.select("*").query("NAME=2323 || ID=1");
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        QueryTreeNode qnExpected = table1.query("NAME=2323 || ID=1");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
-    public void testQueryComplex() throws SqlParserException, QueryException {
+    public void testQuery_复杂条件() throws SqlParserException, QueryException {
         String sql = "SELECT * FROM TABLE1 WHERE (SCHOOL=1 OR NAME=2) AND (ID=1)";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
-        QueryTreeNode qnExpected = table1.select("*").query("(SCHOOL=1 || NAME=2) && (ID=1)");
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        QueryTreeNode qnExpected = table1.query("(SCHOOL=1 || NAME=2) && (ID=1)");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
-    public void testJoinWithPrimary() throws SqlParserException, QueryException {
+    public void testJoin_多表主键关联() throws SqlParserException, QueryException {
         String sql = "SELECT * FROM TABLE1,TABLE2 WHERE TABLE1.NAME=1 AND TABLE1.ID=TABLE2.ID";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
-        QueryTreeNode qnExpected = table1.join("TABLE2")
-            .query("TABLE1.NAME=1 AND TABLE1.ID=TABLE2.ID")
-            .setAllWhereFilter(FilterUtils.createFilter("TABLE1.NAME=1 AND TABLE1.ID=TABLE2.ID"))
-            .select("*");
-
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        QueryTreeNode qnExpected = table1.join("TABLE2").query("TABLE1.NAME=1 AND TABLE1.ID=TABLE2.ID");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
-    public void testJoinWithPrimaryAlias() throws SqlParserException, QueryException {
-        String sql = "SELECT * FROM TABLE1 T1,TABLE2 T2 WHERE T1.NAME=1 AND T1.ID=T2.ID";
+    public void testJoin_多表主键关联_表别名() throws SqlParserException, QueryException {
+        String sql = "SELECT * FROM TABLE1 T1,TABLE2 WHERE T1.NAME=1";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         TableNode table2 = new TableNode("TABLE2");
-        QueryTreeNode qnExpected = table1.alias("T1")
-            .join(table2.alias("T2"))
-            .query("T1.NAME=1 AND T1.ID=T2.ID")
-            .setAllWhereFilter(FilterUtils.createFilter("T1.NAME=1 AND T1.ID=T2.ID"))
-            .select("*");
-
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        QueryTreeNode qnExpected = table1.alias("T1").join(table2).query("T1.NAME=1");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
-    public void testQueryWithAndExpression() throws SqlParserException, QueryException {
+    public void testQuery_and表达式() throws SqlParserException, QueryException {
+        String sql = "SELECT * FROM TABLE1 T1 WHERE ID<=10 AND ID>=5";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+
+        TableNode table1 = new TableNode("TABLE1");
+        QueryTreeNode qnExpected = table1.alias("T1").query("ID<=10 AND ID>=5");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
+    }
+
+    @Test
+    public void testQuery_and表达式_别名() throws SqlParserException, QueryException {
         String sql = "SELECT * FROM TABLE1 T1 WHERE T1.ID=4 AND T1.ID>=2";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         QueryTreeNode qnExpected = table1.select("*").alias("T1").query("T1.ID=4 && T1.ID>=2");
+        qnExpected.build();
 
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        assertEquals(qn, qnExpected);
     }
 
     @Test
-    public void testQueryWithAndExpression2() throws SqlParserException, QueryException {
-        String sql = "SELECT * FROM TABLE1 T1 WHERE ID<=10 AND ID>=5";
+    public void testQuery_and表达式_字符串() throws SqlParserException, QueryException {
+        String sql = "SELECT * FROM TABLE1 T1 WHERE NAME='4' AND ID<=2";
         QueryTreeNode qn = query(sql);
-        TableNode table1 = new TableNode("TABLE1");
+        qn.build();
 
-        QueryTreeNode qnExpected = table1.select("*").alias("T1").query("ID<=10 && ID>=5");
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        TableNode table1 = new TableNode("TABLE1");
+        QueryTreeNode qnExpected = table1.alias("T1").query("NAME=4 && ID<=2");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
-    public void testQueryWithAndExpression3() throws SqlParserException, QueryException {
-        String sql = "select * from table1 t1 where name='4' and id<=2";
+    public void testQuery_or表达式() throws SqlParserException, QueryException {
+        String sql = "SELECT * FROM TABLE1 T1 WHERE ID<5 OR ID<=6 OR ID=3";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
-        QueryTreeNode qnExpected = table1.select("*").alias("T1").query(" NAME=4 && ID<=2");
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        QueryTreeNode qnExpected = table1.alias("T1").query("ID<5 || ID<=6 || ID=3");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
-    public void testQueryWithOrMutiExpression1() throws SqlParserException, QueryException {
-        String sql = "select * from table1 t1 where id<5 or id<=6 or id=3";
+    public void testQueryWith_or表达式_别名() throws SqlParserException, QueryException {
+        String sql = "SELECT * FROM TABLE1 T1 WHERE ID<5 OR ID<=6 OR ID=7";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
-
-        QueryTreeNode qnExpected = table1.select("*").alias("T1").query(" ID<5 || ID<=6 || ID=3");
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
-    }
-
-    @Test
-    public void testQueryWithOrMutiExpression2() throws SqlParserException, QueryException {
-        String sql = "select * from table1 t1 where id<5 or id<=6 or id=7";
-        QueryTreeNode qn = query(sql);
-
-        TableNode table1 = new TableNode("TABLE1");
-
-        QueryTreeNode qnExpected = table1.select("*").alias("T1").query(" ID<5 || ID<=6 || ID=7");
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        QueryTreeNode qnExpected = table1.alias("T1").query(" ID<5 || ID<=6 || ID=7");
+        table1.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
     public void testFunction() throws SqlParserException, QueryException {
         String sql = "SELECT COUNT(*) FROM TABLE1 T1 WHERE ID = 1";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
-
         IFunction f = ASTNodeFactory.getInstance().createFunction();
         f.setFunctionName("COUNT");
         IColumn c = ASTNodeFactory.getInstance().createColumn();
@@ -400,7 +463,8 @@ public class SqlParserTest {
         f.setTableName("TABLE1");
         f.setColumnName("COUNT(*)");
         QueryTreeNode qnExpected = table1.alias("T1").query("ID=1").select(f);
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
@@ -420,41 +484,26 @@ public class SqlParserTest {
         args.add(c);
         f.setArgs(args);
         QueryTreeNode qnExpected = table1.alias("T1").query("ID=1").select(f);
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        assertEquals(qn, qnExpected);
     }
 
     @Test
     public void testFunction_double_function() throws SqlParserException, QueryException {
         String sql = "SELECT COUNT(ID),AVG(ID) FROM TABLE1 T1 WHERE ID = 1";
         QueryTreeNode qn = query(sql);
+        qn.build();
         TableNode table1 = new TableNode("TABLE1");
 
-        IFunction f = ASTNodeFactory.getInstance().createFunction();
-        f.setFunctionName("AVG");
-        f.setColumnName("AVG(ID)");
-        IColumn c = ASTNodeFactory.getInstance().createColumn();
-        c.setColumnName("ID");
-
-        List args = new ArrayList();
-        args.add(c);
-        f.setArgs(args);
-
-        IFunction f2 = ASTNodeFactory.getInstance().createFunction();
-        f2.setFunctionName("COUNT");
-        f2.setColumnName("COUNT(ID)");
-        args = new ArrayList();
-        args.add(c);
-        f2.setArgs(args);
-
-        QueryTreeNode qnExpected = table1.alias("T1").query(" ID=1").select(f2, f);
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        QueryTreeNode qnExpected = table1.alias("T1").query("ID=1").select("COUNT(ID),AVG(ID)");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
-    // 语法错误
     @Test
     public void testFunction_to_char() throws Exception {
         String sql = "SELECT * FROM TABLE1 T1 WHERE DATE_ADD(ID, INTERVAL 1 SECOND)= '2012-11-11'";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
 
@@ -474,14 +523,16 @@ public class SqlParserTest {
         ((IBooleanFilter) filter).setColumn(f);
         ((IBooleanFilter) filter).setValue("2012-11-11");
 
-        QueryTreeNode qnExpected = table1.select("*").alias("T1").query(filter);
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        QueryTreeNode qnExpected = table1.alias("T1").query(filter);
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
     public void testFunction_twoArgs() throws Exception {
         String sql = "SELECT * FROM TABLE1 T1 WHERE IFNULL(STR_TO_DATE(ID, '%d,%m,%y'),1) = '1'";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
 
@@ -510,14 +561,16 @@ public class SqlParserTest {
         ((IBooleanFilter) filter).setColumn(f2);
         ((IBooleanFilter) filter).setValue('1');
 
-        QueryTreeNode qnExpected = table1.select("*").alias("T1").query(filter);
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        QueryTreeNode qnExpected = table1.alias("T1").query(filter);
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
     public void testFunction_noArgs() throws Exception {
         String sql = "SELECT * FROM TABLE1 T1 WHERE ID = NOW()";
         QueryTreeNode qn = query(sql);
+        qn.build();
         TableNode table1 = new TableNode("TABLE1");
 
         IFunction f = ASTNodeFactory.getInstance().createFunction();
@@ -532,201 +585,148 @@ public class SqlParserTest {
         ((IBooleanFilter) filter).setColumn(c);
         ((IBooleanFilter) filter).setValue(f);
 
-        QueryTreeNode qnExpected = table1.select("*").alias("T1").query(filter);
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
-    }
-
-    @Test
-    public void testFunction_noArgs_with_other() throws Exception {
-        String sql = "SELECT * FROM TABLE1 T1 WHERE ID = NOW() AND NAME=1";
-        QueryTreeNode qn = query(sql);
-        TableNode table1 = new TableNode("TABLE1");
-
-        IFunction f = ASTNodeFactory.getInstance().createFunction();
-        f.setFunctionName("NOW");
-        f.setColumnName("NOW()");
-
-        IColumn c = ASTNodeFactory.getInstance().createColumn();
-        c.setColumnName("ID");
-
-        IColumn c2 = ASTNodeFactory.getInstance().createColumn();
-        c2.setColumnName("NAME");
-
-        IFilter filter = ASTNodeFactory.getInstance().createBooleanFilter();
-        filter.setOperation(OPERATION.EQ);
-        ((IBooleanFilter) filter).setColumn(c);
-        ((IBooleanFilter) filter).setValue(f);
-
-        IFilter filter2 = ASTNodeFactory.getInstance().createBooleanFilter();
-        filter2.setOperation(OPERATION.EQ);
-        ((IBooleanFilter) filter2).setColumn(c2);
-        ((IBooleanFilter) filter2).setValue(1);
-
-        IFilter filter3 = ASTNodeFactory.getInstance().createLogicalFilter();
-        filter3.setOperation(OPERATION.AND);
-        ((ILogicalFilter) filter3).addSubFilter(filter);
-        ((ILogicalFilter) filter3).addSubFilter(filter2);
-
-        QueryTreeNode qnExpected = table1.select("*").alias("T1").query(filter3);
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
-    }
-
-    @Test
-    public void testFunction_timeFunction() throws Exception {
-        String sql = "SELECT * FROM TABLE1 T1 WHERE ID >= STR_TO_DATE('1900-10-10','%d,%m,%Y')";
-        QueryTreeNode qn = query(sql);
-        TableNode table1 = new TableNode("TABLE1");
-
-        IFunction f = ASTNodeFactory.getInstance().createFunction();
-        f.setFunctionName("STR_TO_DATE");
-
-        List args = new ArrayList();
-        args.add("1900-10-10");
-        args.add("%d,%m,%Y");
-        f.setArgs(args);
-
-        f.setColumnName("STR_TO_DATE('1900-10-10', '%d,%m,%Y')");
-        IColumn c = ASTNodeFactory.getInstance().createColumn();
-        c.setColumnName("ID");
-
-        IFilter filter = ASTNodeFactory.getInstance().createBooleanFilter();
-        filter.setOperation(OPERATION.GT_EQ);
-        ((IBooleanFilter) filter).setColumn(c);
-        ((IBooleanFilter) filter).setValue(f);
-
-        QueryTreeNode qnExpected = table1.select("*").alias("T1").query(filter);
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        QueryTreeNode qnExpected = table1.alias("T1").query(filter);
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
     public void testGroupBY() throws Exception {
         String sql = "SELECT * FROM TABLE1 T1 WHERE ID = 1 GROUP BY NAME ";
         QueryTreeNode qn = query(sql);
+        qn.build();
+
         TableNode table1 = new TableNode("TABLE1");
-
-        QueryTreeNode qnExpected = table1.select("*").alias("T1").query(" ID=1").groupBy("NAME");
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        QueryTreeNode qnExpected = table1.alias("T1").query(" ID=1").groupBy("NAME");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
-
-    // @Test
-    public void testFunction_timeFunction1() throws Exception {
-        // TODO shenxun :这个compare的函数要想办法弄通顺
-        String sql = "select * from table1 t1 where TO_DAYS(NOW()) + TO_DAYS(id) <= 30";
-        QueryTreeNode qn = query(sql);
-        // IQuery query = (IQuery) o.optimizeAndAssignment(qn, null, null);
-        //
-        // validateIQuery(query,
-        // null,
-        // "TABLE1._ID",
-        // "T1",
-        // "BooleanFilter [column=-(TO_DAYS(NOW()),TO_DAYS(T1.ID)), value=30, operation=5]");
-    }
-
-    // @Test
-    public void testFunction_timeFunction3() throws Exception {
-        // TODO shenxun :这个compare的函数要想办法弄通顺
-        // String sql = "select id from table1 t1 where id=+1";
-        // QueryTreeNode qn = query(sql);
-        // System.out.println(qn);
-        // IQuery query = (IQuery) o.optimizeAndAssignment(qn, null, null);
-        //
-        // validateIQuery(query,
-        // null,
-        // "TABLE1._ID",
-        // "T1",
-        // "BooleanFilter [column=-(TO_DAYS(NOW()),TO_DAYS(T1.ID)), value=30, operation=5]");
-    }
-
-    // @Test
-    // public void testFunction_timeFunction2() throws Exception{
-    // //TODO shenxun :这个compare的函数要想办法弄通顺
-    // String sql =
-    // "select * from table1 t1 where DATE_SUB('1998-01-02' - INTERVAL 1 SECOND) <= '30'";
-    // QueryTreeNode qn = query(sql);
-    // qnExpected.build();Assert.assertEquals(/*using
-    // com.taobao.ustore.sqlparser.test.MatchUtils
-    // to format */
-    // "Query [lockModel=SHARED_LOCK, indexKey=TABLE1._ID, "
-    // +"resultSetFilter=BooleanFilter [column=Function [functionName=SUBTRACTION, args=[Function [functionName=TO_DAYS, args=[Function [functionName=NOW, args=[], distinct=false, ]], distinct=false, ], Function [functionName=TO_DAYS, args=[Column [name=ID, tableName=T1, dataType=LONG_VAL, distinct=false, ]], distinct=false, ]], distinct=false, ], value=30, operation=5], "
-    // +"orderBy=[], "
-    // +"columns=[Column [name=NAME, tableName=T1, dataType=STRING_VAL, distinct=false, ], Column [name=SCHOOL, tableName=T1, dataType=STRING_VAL, distinct=false, ], Column [name=ID, tableName=T1, dataType=LONG_VAL, distinct=false, ]], alias=T1, "
-    // +"queryConcurrency=SEQUENTIAL, consistentRead=true]",
-    // o.optimize(qn,null,null).toString());
-    // }
 
     @Test
-    public void testUpdate() throws SqlParserException, QueryException {
+    public void testFunction_提前计算() throws SqlParserException, QueryException {
+        String sql = "SELECT 1+1 FROM TABLE1";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+
+        TableNode table1 = new TableNode("TABLE1");
+        QueryTreeNode qnExpected = table1.select("2");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
+    }
+
+    @Test
+    public void testFunction_提前计算_bindVal() throws SqlParserException, QueryException {
+        String sql = "SELECT 1+? FROM TABLE1";
+        QueryTreeNode qn = query(sql, Arrays.asList(Integer.valueOf(1)));
+
+        TableNode table1 = new TableNode("TABLE1");
+        QueryTreeNode qnExpected = table1.select("2");
+        assertEquals(qn, qnExpected);
+    }
+
+    @Test
+    public void testJoin_条件提前计算() throws SqlParserException, QueryException {
+        String sql = "SELECT * FROM TABLE1 A JOIN TABLE2 B ON A.ID=B.ID WHERE A.ID>1+4 AND B.ID<12-1";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+
+        TableNode table1 = new TableNode("TABLE1");
+        TableNode table2 = new TableNode("TABLE2");
+        QueryTreeNode qnExpected = table1.alias("A")
+            .join(table2.alias("B"))
+            .addJoinKeys("ID", "ID")
+            .query("A.ID>5 && B.ID<11");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
+    }
+
+    @Test
+    public void testUpdate_正常() throws SqlParserException, QueryException {
         String sql = "UPDATE TABLE1 SET NAME=2 WHERE ID>=5 AND ID<=5";
         UpdateNode un = update(sql);
+        un.build();
 
         TableNode table1 = new TableNode("TABLE1");
         UpdateNode unExpected = table1.update("NAME", new Comparable[] { 2 });
         table1.query("ID>=5 AND ID<=5");
-
-        Assert.assertEquals(unExpected.toString(), un.toString());
+        unExpected.build();
+        assertEquals(un, unExpected);
     }
 
     @Test
-    public void testDelete() throws SqlParserException, QueryException {
+    public void testDelete_正常() throws SqlParserException, QueryException {
         String sql = "DELETE FROM TABLE1 WHERE ID>=5 AND ID<=5";
         DeleteNode dn = delete(sql);
+        dn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         DeleteNode dnExpected = table1.delete();
         table1.query("ID>=5 AND ID<=5");
+        dnExpected.build();
 
-        Assert.assertEquals(dnExpected.toString(), dn.toString());
+        assertEquals(dn, dnExpected);
     }
 
     @Test
-    public void testInsert() throws SqlParserException, QueryException {
+    public void testInsert_无字段() throws SqlParserException, QueryException {
         String sql = "INSERT INTO TABLE1(ID) VALUES (2)";
         InsertNode in = insert(sql);
+        in.build();
 
         TableNode table1 = new TableNode("TABLE1");
         InsertNode inExpected = table1.insert("ID", new Comparable[] { 2 });
+        inExpected.build();
 
-        Assert.assertEquals(inExpected.toString(), in.toString());
+        assertEquals(in, inExpected);
     }
 
     @Test
-    public void testInsert2() throws SqlParserException, QueryException {
-        String sql = "INSERT INTO TABLE1(ID, NAME1, NAME2) VALUES (2, 'sun', 'sysu')";
+    public void testInsert_多字段() throws SqlParserException, QueryException {
+        String sql = "INSERT INTO TABLE1(ID, NAME, SCHOOL) VALUES (2, 'sun', 'sysu')";
 
         InsertNode in = insert(sql);
+        in.build();
 
         TableNode table1 = new TableNode("TABLE1");
-        InsertNode inExpected = table1.insert("ID NAME1 NAME2", new Comparable[] { 2, "sun", "sysu" });
+        InsertNode inExpected = table1.insert("ID NAME SCHOOL", new Comparable[] { 2, "sun", "sysu" });
+        inExpected.build();
 
-        Assert.assertEquals(inExpected.toString(), in.toString());
+        assertEquals(in, inExpected);
     }
 
     @Test
     public void testLimit() throws SqlParserException, QueryException {
         String sql = "SELECT * FROM TABLE1 LIMIT 1,10";
         QueryTreeNode qn = query(sql);
+        qn.build();
+
         TableNode table1 = new TableNode("TABLE1");
-        QueryTreeNode qnExpected = table1.select("*").limit(1, 10);
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        QueryTreeNode qnExpected = table1.limit(1, 10);
+        qnExpected.build();
+
+        assertEquals(qn, qnExpected);
     }
 
     @Test
     public void testLimit1() throws SqlParserException, QueryException {
         String sql = "SELECT * FROM TABLE1 WHERE ID = 10 LIMIT 10";
         QueryTreeNode qn = query(sql);
+        qn.build();
+
         TableNode table1 = new TableNode("TABLE1");
-        QueryTreeNode qnExpected = table1.select("*").query("id=10").setLimitFrom(0).setLimitTo(10);
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        QueryTreeNode qnExpected = table1.query("id=10").setLimitFrom(0).setLimitTo(10);
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
     public void testLimit_bindval1() throws SqlParserException, QueryException {
         String sql = "SELECT * FROM TABLE1 WHERE TABLE1.ID = 10 LIMIT ?,10";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         Assert.assertTrue(qn.getLimitFrom() instanceof BindVal);
         BindVal bv = (BindVal) qn.getLimitFrom();
-
         Assert.assertEquals(0, bv.getBindVal());
         Assert.assertEquals(10L, qn.getLimitTo());
     }
@@ -735,9 +735,9 @@ public class SqlParserTest {
     public void testLimit_bindval2() throws SqlParserException, QueryException {
         String sql = "select * from table1 where table1.id = 10 limit 1,?";
         QueryTreeNode qn = query(sql);
+        qn.build();
         Assert.assertTrue(qn.getLimitTo() instanceof BindVal);
         BindVal bv = (BindVal) qn.getLimitTo();
-
         Assert.assertEquals(0, bv.getBindVal());
         Assert.assertEquals(1L, qn.getLimitFrom());
     }
@@ -746,14 +746,12 @@ public class SqlParserTest {
     public void testLimit_bindval3() throws SqlParserException, QueryException {
         String sql = "select * from table1 where table1.id = 10 limit ?,?";
         QueryTreeNode qn = query(sql);
+        qn.build();
         Assert.assertTrue(qn.getLimitFrom() instanceof BindVal);
         BindVal bv = (BindVal) qn.getLimitFrom();
-
         Assert.assertEquals(0, bv.getBindVal());
-
         Assert.assertTrue(qn.getLimitTo() instanceof BindVal);
         bv = (BindVal) qn.getLimitTo();
-
         Assert.assertEquals(1, bv.getBindVal());
 
     }
@@ -772,10 +770,12 @@ public class SqlParserTest {
         parameterSettings.put(2, p3);
 
         in.assignment(parameterSettings);
+        in.build();
+
         TableNode table1 = new TableNode("TABLE1");
         InsertNode inExpected = table1.insert("ID NAME SCHOOL", new Comparable[] { 2, "sun", "sysu" });
-
-        Assert.assertEquals(inExpected.toString(), in.toString());
+        inExpected.build();
+        assertEquals(in, inExpected);
     }
 
     @Test
@@ -793,12 +793,14 @@ public class SqlParserTest {
         parameterSettings.put(2, p3);
 
         un.assignment(parameterSettings);
+        un.build();
 
         TableNode table1 = new TableNode("TABLE1");
         UpdateNode unExpected = table1.update("ID", new Comparable[] { 2 });
         table1.query("ID>=3 AND ID<=5");
+        unExpected.build();
 
-        Assert.assertEquals(unExpected.toString(), un.toString());
+        assertEquals(un, unExpected);
     }
 
     @Test
@@ -814,29 +816,18 @@ public class SqlParserTest {
         parameterSettings.put(1, p2);
 
         dn.assignment(parameterSettings);
+        dn.build();
+
         TableNode table1 = new TableNode("TABLE1");
         DeleteNode dnExpected = table1.delete();
         table1.query("ID>=3 AND ID<=5");
-        Assert.assertEquals(dnExpected.toString(), dn.toString());
-    }
-
-    // @Test
-    public void testJoinRestrictionCopy() throws SqlParserException, QueryException {
-        String sql = "SELECT * FROM TABLE1 A JOIN TABLE2 B ON A.ID=B.ID WHERE A.ID>1+4 AND B.ID<12-1";
-        QueryTreeNode qn = query(sql);
-
-        TableNode table1 = new TableNode("TABLE1");
-        TableNode table2 = new TableNode("TABLE2");
-        QueryTreeNode qnExpected = table1.alias("A")
-            .join(table2.alias("B"))
-            .addJoinKeys("ID", "ID")
-            .query("A.ID>5 && B.ID<11");
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        dnExpected.build();
+        assertEquals(dn, dnExpected);
     }
 
     @Test
     public void testDistinct() throws SqlParserException, QueryException {
-        String sql = "SELECT  COUNT(DISTINCT ID) FROM TABLE1";
+        String sql = "SELECT COUNT(DISTINCT ID) FROM TABLE1";
         QueryTreeNode qn = query(sql);
 
         TableNode table1 = new TableNode("TABLE1");
@@ -850,18 +841,19 @@ public class SqlParserTest {
 
         List args = new ArrayList();
         args.add(c);
-
         f.setArgs(args);
+        qn.build();
 
         QueryTreeNode qnExpected = table1.select(f);
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
-    public void testQueryWithOrderByFunction() throws Exception {
+    public void testQuery_orderBy加函数() throws Exception {
         String sql = "SELECT * FROM TABLE1 WHERE ID=1 ORDER BY COUNT(ID)";
-
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         IColumn c = ASTNodeFactory.getInstance().createColumn();
@@ -875,76 +867,151 @@ public class SqlParserTest {
         f.setArgs(args);
 
         f.setColumnName("COUNT(ID)");
-        QueryTreeNode qnExpected = table1.select("*").query("ID=1").orderBy(f, true);
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        QueryTreeNode qnExpected = table1.query("ID=1").orderBy(f, true);
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
-    public void testQueryWithLike() throws SqlParserException, QueryException {
+    public void testQuery_Like() throws SqlParserException, QueryException {
         String sql = "SELECT NAME FROM TABLE1 WHERE NAME LIKE '%XASX%'";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         QueryTreeNode qnExpected = table1.select("NAME").query("NAME LIKE '%XASX%'");
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
     public void testMultiAnd() throws QueryException, SqlParserException {
         String sql = "SELECT NAME FROM TABLE1 WHERE NAME=? AND (ID>? AND ID<?)";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         QueryTreeNode qnExpected = table1.select("NAME").query("NAME=? AND ID>? AND ID<?");
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
     public void testMultiOr() throws QueryException, SqlParserException {
         String sql = "SELECT NAME FROM TABLE1 WHERE NAME=? OR(ID>? OR ID<?)";
         QueryTreeNode qn = query(sql);
+        qn.build();
+
         TableNode table1 = new TableNode("TABLE1");
         QueryTreeNode qnExpected = table1.select("NAME").query("NAME=? OR(ID>? OR ID<?)");
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
     @Test
     public void testMultiAndOr() throws QueryException, SqlParserException {
         String sql = "SELECT NAME FROM TABLE1 WHERE NAME=? AND NAME>? AND (ID=? OR ID<?)";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         QueryTreeNode qnExpected = table1.select("NAME").query("NAME=? AND NAME>? AND (ID=? OR ID<?)");
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
     }
 
-    // @Test
-    public void testWhereSubQuery() throws QueryException, SqlParserException {
+    @Test
+    public void testWhere_字段子查询() throws QueryException, SqlParserException {
         String sql = "SELECT NAME FROM TABLE1 WHERE NAME=(SELECT NAME FROM TABLE2 B WHERE B.ID=1)";
         QueryTreeNode qn = query(sql);
+        qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
         QueryTreeNode qnExpected = table1.select("NAME");
 
         TableNode table2 = new TableNode("TABLE2");
         table2.alias("B").select("NAME").query("B.ID=1");
-        IBooleanFilter filter = ASTNodeFactory.getInstance().createBooleanFilter();
-        filter.setColumn("NAME");
-        filter.setOperation(OPERATION.EQ);
-        filter.setValue(new QueryNode(table2));
+        table1.query("NAME=(SELECT NAME FROM TABLE2 B WHERE B.ID=1)");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
+    }
 
+    @Test
+    public void testWhere_字段多级子查询() throws QueryException, SqlParserException {
+        String subSql = "SELECT B.* FROM TABLE2 B WHERE B.ID=1 GROUP BY SCHOOL HAVING COUNT(*) > 1 ORDER BY ID DESC LIMIT 1";
+        String sql = "SELECT NAME FROM TABLE1 WHERE NAME=(SELECT C.NAME FROM (" + subSql + ") C )";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+
+        TableNode table1 = new TableNode("TABLE1");
+        QueryTreeNode qnExpected = table1.select("NAME");
+
+        TableNode table2 = new TableNode("TABLE2");
+        table2.alias("B").select("*").query("B.ID=1");
+        table2.groupBy("SCHOOL");
+        table2.having("COUNT(*) > 1");
+        table2.orderBy("ID", false);
+        table2.limit(0, 1);
+        table2.setSubQuery(true);
+
+        QueryNode subQuery = new QueryNode(table2);
+        subQuery.alias("C").select("C.NAME");
+
+        IColumn column = ASTNodeFactory.getInstance().createColumn().setColumnName("NAME");
+        IBooleanFilter filter = ASTNodeFactory.getInstance()
+            .createBooleanFilter()
+            .setColumn(column)
+            .setValue(subQuery)
+            .setOperation(OPERATION.EQ);
         table1.query(filter);
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
+    }
 
-        Assert.assertEquals(qnExpected.toString(), qn.toString());
+    @Test
+    public void testWhere_表子查询() throws QueryException, SqlParserException {
+        String sql = "SELECT NAME FROM (SELECT * FROM TABLE1 A WHERE A.ID=1) B";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+
+        TableNode table1 = new TableNode("TABLE1");
+        table1.alias("A").query("A.ID=1");
+        QueryTreeNode qnExpected = new QueryNode(table1);
+        qnExpected.alias("B").select("NAME");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
+    }
+
+    @Test
+    public void testWhere_字段_表_复杂子查询() throws QueryException, SqlParserException {
+        String subSql = "SELECT B.* FROM TABLE2 B WHERE B.ID=1 GROUP BY SCHOOL HAVING COUNT(*) > 1 ORDER BY ID DESC LIMIT 1";
+        String sql = "SELECT NAME FROM (SELECT * FROM TABLE1 A WHERE A.ID=1) A WHERE NAME=(SELECT C.NAME FROM ("
+                     + subSql + ") C )";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+
+        System.out.println(qn);
     }
 
     // ==================================================
 
     private QueryTreeNode query(String sql) throws SqlParserException {
-        SqlAnalysisResult sm = manager.parse(sql, false);
+        SqlAnalysisResult sm = parser.parse(sql, null, false);
         QueryTreeNode qn = null;
         if (sm.getSqlType() == SqlType.SELECT) {
-            qn = sm.getQueryTreeNode(null);
+            qn = sm.getQueryTreeNode();
+        } else {
+            qn = new KVIndexNode(null);
+            qn.setSql(sql);
+        }
+        return qn;
+    }
+
+    private QueryTreeNode query(String sql, List args) throws SqlParserException {
+        SqlAnalysisResult sm = parser.parse(sql, convert(args), false);
+        QueryTreeNode qn = null;
+        if (sm.getSqlType() == SqlType.SELECT) {
+            qn = sm.getQueryTreeNode();
         } else {
             qn = new KVIndexNode(null);
             qn.setSql(sql);
@@ -953,47 +1020,52 @@ public class SqlParserTest {
     }
 
     private UpdateNode update(String sql) throws SqlParserException {
-        SqlAnalysisResult sm = manager.parse(sql, false);
+        SqlAnalysisResult sm = parser.parse(sql, null, false);
         UpdateNode qn = null;
         if (sm.getSqlType() == SqlType.UPDATE) {
-            qn = sm.getUpdateNode(null);
+            qn = sm.getUpdateNode();
         }
 
         return qn;
     }
 
     private DeleteNode delete(String sql) throws SqlParserException {
-        SqlAnalysisResult sm = manager.parse(sql, false);
+        SqlAnalysisResult sm = parser.parse(sql, null, false);
         DeleteNode qn = null;
         if (sm.getSqlType() == SqlType.DELETE) {
-            qn = sm.getDeleteNode(null);
+            qn = sm.getDeleteNode();
         }
 
         return qn;
     }
 
     private InsertNode insert(String sql) throws SqlParserException {
-        SqlAnalysisResult sm = manager.parse(sql, false);
+        SqlAnalysisResult sm = parser.parse(sql, null, false);
         InsertNode qn = null;
         if (sm.getSqlType() == SqlType.INSERT) {
-            qn = sm.getInsertNode(null);
+            qn = sm.getInsertNode();
         }
 
         return qn;
     }
 
-    public static Map<Integer, ParameterContext> convert(List<Object> args) {
-        Map<Integer, ParameterContext> map = new HashMap<Integer, ParameterContext>(args.size());
-        int index = 0;
-        for (Object obj : args) {
-            ParameterContext context = new ParameterContext(ParameterMethod.setObject1, new Object[] { index, obj });
-            map.put(index, context);
-            index++;
-        }
-        return map;
+    private void assertEquals(QueryTreeNode qn, QueryTreeNode qnExpected) {
+        logger.debug(qn.toString());
+        Assert.assertEquals(qnExpected.toString(), qn.toString());
     }
 
-    public static Map<Integer, ParameterContext> convert(Object[] args) {
-        return convert(Arrays.asList(args));
+    private void assertEquals(UpdateNode un, UpdateNode unExpected) {
+        logger.debug(un.toString());
+        Assert.assertEquals(unExpected.toString(), un.toString());
+    }
+
+    private void assertEquals(DeleteNode dn, DeleteNode dnExpected) {
+        logger.debug(dn.toString());
+        Assert.assertEquals(dnExpected.toString(), dn.toString());
+    }
+
+    private void assertEquals(InsertNode in, InsertNode inExpected) {
+        logger.debug(in.toString());
+        Assert.assertEquals(inExpected.toString(), in.toString());
     }
 }
