@@ -22,7 +22,7 @@ import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-import com.taobao.tddl.optimizer.core.plan.IQueryTree;
+import com.taobao.tddl.optimizer.core.plan.query.IJoin;
 import com.taobao.tddl.optimizer.exceptions.QueryException;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
@@ -201,7 +201,7 @@ public class JoinNode extends QueryTreeNode {
 
     }
 
-    public IQueryTree toDataNodeExecutor() throws QueryException {
+    public IJoin toDataNodeExecutor() throws QueryException {
         return this.getJoinStrategy().getQuery(this, null);
     }
 
@@ -465,10 +465,11 @@ public class JoinNode extends QueryTreeNode {
             appendField(sb, "type", "outer join", tabContent);
         }
 
-        appendField(sb, "resultFilter", printFilterString(this.getResultFilter()), tabContent);
-        appendField(sb, "whereFilter", printFilterString(this.getWhereFilter()), tabContent);
-        appendField(sb, "allWhereFilter", printFilterString(this.getAllWhereFilter()), tabContent);
-        appendField(sb, "having", printFilterString(this.getHavingFilter()), tabContent);
+        appendField(sb, "resultFilter", printFilterString(this.getResultFilter(), inden + 2), tabContent);
+        appendField(sb, "whereFilter", printFilterString(this.getWhereFilter(), inden + 2), tabContent);
+        // appendField(sb, "allWhereFilter",
+        // printFilterString(this.getAllWhereFilter()), tabContent);
+        appendField(sb, "having", printFilterString(this.getHavingFilter(), inden + 2), tabContent);
         if (!(this.getLimitFrom() != null && this.getLimitFrom().equals(0L) && this.getLimitTo() != null && this.getLimitTo()
             .equals(0L))) {
             appendField(sb, "limitFrom", this.getLimitFrom(), tabContent);
@@ -478,7 +479,7 @@ public class JoinNode extends QueryTreeNode {
         if (this.isSubQuery()) {
             appendField(sb, "isSubQuery", this.isSubQuery(), tabContent);
         }
-        appendField(sb, "orderBy", this.getOrderBys(), tabContent);
+        appendField(sb, "orderBys", this.getOrderBys(), tabContent);
         appendField(sb, "queryConcurrency", this.getQueryConcurrency(), tabContent);
         appendField(sb, "columns", this.getColumnsSelected(), tabContent);
         appendField(sb, "groupBys", this.getGroupBys(), tabContent);

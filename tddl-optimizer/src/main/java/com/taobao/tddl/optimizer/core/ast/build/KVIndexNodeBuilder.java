@@ -11,6 +11,7 @@ import com.taobao.tddl.optimizer.core.ast.query.KVIndexNode;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
+import com.taobao.tddl.optimizer.exceptions.OptimizerException;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
 
 /**
@@ -93,13 +94,13 @@ public class KVIndexNodeBuilder extends QueryTreeNodeBuilder {
         if (kvIndexName != null) {
             IndexMeta index = OptimizerContext.getContext().getIndexManager().getIndexByName(kvIndexName);
             if (index == null) {
-                throw new RuntimeException("index :" + kvIndexName + " is not found");
+                throw new OptimizerException("index :" + kvIndexName + " is not found");
             }
 
             getNode().setIndex(index);
             getNode().setTableMeta(OptimizerContext.getContext().getSchemaManager().getTable(index.getTableName()));
         } else if (getNode().getIndex() == null) {
-            throw new IllegalArgumentException("index is null");
+            throw new OptimizerException("index is null");
         }
 
     }
@@ -107,9 +108,9 @@ public class KVIndexNodeBuilder extends QueryTreeNodeBuilder {
     public ISelectable getSelectableFromChild(ISelectable c) {
         if (c.getTableName() != null) {
             if ((!c.getTableName().equals(this.getNode().getIndexName()))
-                && (!c.getTableName().equals(this.getNode().getAlias()))
-                && (!c.getTableName().equals(this.getNode().getTableName()))) {
-
+                && (!c.getTableName().equals(this.getNode().getAlias()))) {
+                // 貌似不应该再去匹配tableName，不然一旦一张表的两个索引进行join时，查询字段就会串了
+                // && (!c.getTableName().equals(this.getNode().getTableName()))
                 return null;
             }
         }
@@ -122,11 +123,7 @@ public class KVIndexNodeBuilder extends QueryTreeNodeBuilder {
             return c;
         }
 
-        ISelectable rs = this.getSelectableFromChild(c.getColumnName());
-        if (rs != null) {
-            rs.setDistinct(c.isDistinct());
-        }
-        return rs;
+        return this.getSelectableFromChild(c.getColumnName());
     }
 
     private ISelectable getSelectableFromChild(String columnName) {

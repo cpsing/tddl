@@ -18,7 +18,6 @@ public class UnitDeployProtect {
     }
 
     public static void unitDeployProtect(String sql, Map<Integer, ParameterContext> params) throws SQLException {
-
         delegate.unitDeployProtect(sql, params);
     }
 

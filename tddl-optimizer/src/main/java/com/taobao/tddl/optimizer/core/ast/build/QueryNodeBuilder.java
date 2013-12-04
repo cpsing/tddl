@@ -7,7 +7,9 @@ import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.ASTNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.query.QueryNode;
+import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
+import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
@@ -107,7 +109,7 @@ public class QueryNodeBuilder extends QueryTreeNodeBuilder {
 
                 IColumn newS = ASTNodeFactory.getInstance().createColumn();
 
-                if (child.getAlias() != null) {
+                if (child.getAlias() != null) {// sub alias
                     newS.setTableName(child.getAlias());
                 } else {
                     newS.setTableName(selectedFromChild.getTableName());
@@ -138,6 +140,50 @@ public class QueryNodeBuilder extends QueryTreeNodeBuilder {
             return c;
         }
 
-        return this.getColumnFromOtherNode(c, this.getNode().getChild());
+        if (c instanceof IBooleanFilter && ((IBooleanFilter) c).getOperation().equals(OPERATION.CONSTANT)) {
+            return c;
+        }
+
+        return this.getColumnFromOtherNode(c);
+    }
+
+    public ISelectable getColumnFromOtherNode(ISelectable c) {
+        ISelectable res = null;
+        QueryTreeNode child = this.getNode().getChild();
+        for (ISelectable selected : child.getColumnsSelected()) {
+            boolean isThis = false;
+            if (c.getTableName() != null) {
+                if (!(c.getTableName().equals(this.getNode().getAlias()))) {
+                    continue;
+                }
+            }
+
+            if (IColumn.STAR.equals(c.getColumnName())) {
+                return c;
+            }
+
+            // 若列别名存在，只比较别名
+            isThis = c.isSameName(selected);
+
+            if (isThis) {
+                res = selected;
+                break;
+            }
+        }
+
+        if (res == null) {
+            return res;
+        }
+
+        if (c instanceof IColumn) {
+            // 如果是子表的结构，比如Join/Merge的子节点，字段的名字直接使用别名
+            if (this.getNode().getAlias() != null) {
+                c.setTableName(this.getNode().getAlias());
+            } else {
+                c.setTableName(res.getTableName());
+            }
+        }
+
+        return c;
     }
 }

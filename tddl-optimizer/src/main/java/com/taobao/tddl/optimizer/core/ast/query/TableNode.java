@@ -326,6 +326,11 @@ public class TableNode extends QueryTreeNode {
             .getSelectableFromChild(ASTNodeFactory.getInstance().createColumn().setColumnName(name));
     }
 
+    public TableNode setIndexUsed(IndexMeta indexUsed) {
+        this.indexUsed = indexUsed;
+        return this;
+    }
+
     // ============= insert/update/delete/put==================
 
     public InsertNode insert(List<ISelectable> columns, List<Comparable> values) {
@@ -475,11 +480,7 @@ public class TableNode extends QueryTreeNode {
     }
 
     public String getTableName() {
-        if (StringUtils.isNotEmpty(actualTableName)) {
-            return this.actualTableName; // 存在分库分表时，真实表名会改写
-        } else {
-            return this.tableName;
-        }
+        return this.tableName;
     }
 
     public TableMeta getTableMeta() {
@@ -522,13 +523,16 @@ public class TableNode extends QueryTreeNode {
         }
 
         appendField(sb, "actualTableName", this.getActualTableName(), tabContent);
-        appendField(sb, "keyFilter", printFilterString(this.getKeyFilter()), tabContent);
-        appendField(sb, "resultFilter", printFilterString(this.getResultFilter()), tabContent);
-        appendField(sb, "whereFilter", printFilterString(this.getWhereFilter()), tabContent);
-        appendField(sb, "indexQueryValueFilter", printFilterString(this.getIndexQueryValueFilter()), tabContent);
-        appendField(sb, "otherJoinOnFilter", printFilterString(this.getOtherJoinOnFilter()), tabContent);
-        appendField(sb, "having", printFilterString(this.getHavingFilter()), tabContent);
-        appendField(sb, "indexUsed", this.getIndexUsed(), tabContent);
+        appendField(sb, "keyFilter", printFilterString(this.getKeyFilter(), inden + 2), tabContent);
+        appendField(sb, "resultFilter", printFilterString(this.getResultFilter(), inden + 2), tabContent);
+        appendField(sb, "whereFilter", printFilterString(this.getWhereFilter(), inden + 2), tabContent);
+        appendField(sb,
+            "indexQueryValueFilter",
+            printFilterString(this.getIndexQueryValueFilter(), inden + 2),
+            tabContent);
+        appendField(sb, "otherJoinOnFilter", printFilterString(this.getOtherJoinOnFilter(), inden + 2), tabContent);
+        appendField(sb, "having", printFilterString(this.getHavingFilter(), inden + 2), tabContent);
+        appendField(sb, "indexUsed", "\n" + this.getIndexUsed().toStringWithInden(inden + 2), tabContent);
         if (!(this.getLimitFrom() != null && this.getLimitFrom().equals(0L) && this.getLimitTo() != null && this.getLimitTo()
             .equals(0L))) {
             appendField(sb, "limitFrom", this.getLimitFrom(), tabContent);

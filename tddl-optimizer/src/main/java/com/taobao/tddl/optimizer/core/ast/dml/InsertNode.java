@@ -2,6 +2,7 @@ package com.taobao.tddl.optimizer.core.ast.dml;
 
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.DMLNode;
+import com.taobao.tddl.optimizer.core.ast.query.KVIndexNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.dml.IInsert;
@@ -16,7 +17,13 @@ public class InsertNode extends DMLNode<InsertNode> {
 
     public IDataNodeExecutor toDataNodeExecutor() {
         IInsert insert = ASTNodeFactory.getInstance().createInsert();
-        insert.setTableName(this.getNode().getTableName());
+        if (this.getNode().getActualTableName() != null) {
+            insert.setTableName(this.getNode().getActualTableName());
+        } else if (this.getNode() instanceof KVIndexNode) {
+            insert.setTableName(((KVIndexNode) this.getNode()).getIndexName());
+        } else {
+            insert.setTableName(this.getNode().getTableName());
+        }
         insert.setIndexName((this.getNode()).getIndexUsed().getName());
         insert.setConsistent(true);
         insert.setUpdateColumns(this.getColumns());

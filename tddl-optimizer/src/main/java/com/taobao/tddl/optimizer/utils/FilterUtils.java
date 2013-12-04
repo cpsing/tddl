@@ -1,20 +1,14 @@
 package com.taobao.tddl.optimizer.utils;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.reflect.MethodUtils;
+import org.apache.commons.lang.StringUtils;
 
-import com.alibaba.cobar.parser.ast.expression.Expression;
-import com.alibaba.cobar.parser.recognizer.mysql.lexer.MySQLLexer;
-import com.alibaba.cobar.parser.recognizer.mysql.syntax.MySQLExprParser;
 import com.google.common.collect.Lists;
-import com.taobao.tddl.common.exception.NotSupportException;
-import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.expression.IBindVal;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
@@ -23,6 +17,7 @@ import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
+import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.exceptions.EmptyResultFilterException;
 import com.taobao.tddl.optimizer.parse.visitor.MySqlExprVisitor;
 import com.taobao.tddl.optimizer.utils.range.AndRangeProcessor;
@@ -541,30 +536,18 @@ public class FilterUtils {
      * 基于字符串表达式构建IFilter
      */
     public static IFilter createFilter(String where) {
-        where = where.toUpperCase();
-        try {
-            // 调用cobar的expression解析器
-            MySQLExprParser expr = new MySQLExprParser(new MySQLLexer(where));
-            Expression expression = expr.expression();
-            // 反射调用visit构造IFilter
-            MySqlExprVisitor parser = new MySqlExprVisitor();
-            Class args = expression.getClass();
-            Method method = null;
-            while (true) {
-                method = MethodUtils.getAccessibleMethod(parser.getClass(), "visit", args);
-                if (method == null) {
-                    args = args.getSuperclass();
-                    if (args == null) {
-                        throw new NotSupportException("parse failed : " + where);
-                    }
-                } else {
-                    break;
-                }
-            }
-            method.invoke(parser, expression);
-            return parser.getFilter();
-        } catch (Exception e) {
-            throw new TddlRuntimeException(e);
+        if (StringUtils.isEmpty(where)) {
+            return null;
+        }
+
+        MySqlExprVisitor visitor = MySqlExprVisitor.parser(where);
+        Comparable value = visitor.getColumnOrValue();
+        if (value instanceof IFilter) {
+            return (IFilter) value;
+        } else if (value instanceof ISelectable) {
+            throw new IllegalArgumentException("不合法的filter表达式:" + where);
+        } else {
+            return visitor.buildConstanctFilter(value);
         }
     }
 

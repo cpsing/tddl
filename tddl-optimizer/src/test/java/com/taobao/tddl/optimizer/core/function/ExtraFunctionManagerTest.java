@@ -14,7 +14,10 @@ public class ExtraFunctionManagerTest {
 
     @Test
     public void test_extension() {
-        IExtraFunction func = ExtraFunctionManager.getExtraFunction("custom");
-        Assert.assertEquals(Custom.class, func.getClass());
+        IExtraFunction func = ExtraFunctionManager.getExtraFunction("DUMMY");
+        Assert.assertEquals(Dummy.class, func.getClass());
+
+        func = ExtraFunctionManager.getExtraFunction("NOT_EXIST");
+        Assert.assertEquals(Dummy.class, func.getClass());
     }
 }

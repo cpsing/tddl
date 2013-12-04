@@ -89,6 +89,7 @@ public class JoinNodeBuilder extends QueryTreeNodeBuilder {
                 rightKey = this.getColumnFromOtherNode((ISelectable) f.getValue(), this.getNode().getRightNode());
             }
 
+            // 可能顺序调换了，重新找一次
             if (leftKey == null || rightKey == null) {
                 if (f.getValue() != null && f.getValue() instanceof ISelectable) {
                     leftKey = this.getColumnFromOtherNode((ISelectable) f.getValue(), this.getNode().getLeftNode());
@@ -135,7 +136,7 @@ public class JoinNodeBuilder extends QueryTreeNodeBuilder {
     }
 
     private void buildSelectedFromSelectableObject() {
-
+        // 如果为空，代表是用*
         if (this.getNode().getColumnsSelected().isEmpty()) {
             this.getNode()
                 .getColumnsSelected()
@@ -158,18 +159,20 @@ public class JoinNodeBuilder extends QueryTreeNodeBuilder {
 
                 ISelectable selected = this.getNode().getColumnsSelected().get(i);
                 if (this.getNode().getColumnsSelected().get(i).getColumnName().equals(IColumn.STAR)) {
-
                     // 遇到*就把所有列再添加一遍
                     // select *,id这样的语法最后会有两个id列，mysql是这样的
                     for (ASTNode child : this.getNode().getChildren()) {
                         for (ISelectable selectedFromChild : ((QueryTreeNode) child).getColumnsSelectedForParent()) {
+                            // 考虑
+                            // a. SELECT B.* FROM TABLE1 A INNER JOIN TABLE2 B
+                            // b. SELECT * FROM TABLE1 A INNER JOIN TABLE2 B
                             if (selected.getTableName() != null
                                 && !selected.getTableName().equals(selectedFromChild.getTableName())) {
                                 break;
                             }
 
                             IColumn newS = ASTNodeFactory.getInstance().createColumn();
-
+                            // 尝试复制子节点的表别名
                             if (((QueryTreeNode) child).getAlias() != null) {
                                 newS.setTableName(((QueryTreeNode) child).getAlias());
                             } else {
@@ -216,16 +219,16 @@ public class JoinNodeBuilder extends QueryTreeNodeBuilder {
             resFromLeft = this.getColumnFromOtherNode(c, left);
             if (resFromLeft == null) {// 如果不在select中，添加到select进行join传递
                 left.addColumnsSelected(c);
+                resFromLeft = this.getColumnFromOtherNode(c, left);
             }
-            resFromLeft = this.getColumnFromOtherNode(c, left);
         }
 
         if (right.hasColumn(c)) {// 可能在select/from中
             resFromRight = this.getColumnFromOtherNode(c, right);
             if (resFromRight == null) {// 如果不在select中，添加到select进行join传递
                 right.addColumnsSelected(c);
+                resFromRight = this.getColumnFromOtherNode(c, right);
             }
-            resFromRight = this.getColumnFromOtherNode(c, right);
         }
 
         if (resFromLeft != null && resFromRight != null) {

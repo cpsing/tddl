@@ -103,7 +103,7 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
             this.getNode().having(((QueryTreeNode) this.getNode().getChild()).getHavingFilter());
             for (ASTNode child : this.getNode().getChildren()) {
                 if (child instanceof QueryTreeNode) {
-                    ((QueryTreeNode) child).having(null);
+                    ((QueryTreeNode) child).having("");
                 }
             }
         }
@@ -285,9 +285,8 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
                 QueryTreeNode sub = (QueryTreeNode) this.getNode().getChildren().get(i);
                 sub.addColumnsSelected(c);
             }
+            s = this.getColumnFromOtherNode(c, child);
         }
-
-        s = this.getColumnFromOtherNode(c, child);
         return s;
     }
 

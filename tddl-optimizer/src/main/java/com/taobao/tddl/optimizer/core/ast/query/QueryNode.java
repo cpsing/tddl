@@ -33,6 +33,7 @@ public class QueryNode extends QueryTreeNode {
         this.builder = new QueryNodeBuilder(this);
         this.whereFilter = filter;
         this.setChild(child);
+        child.setSubQuery(true);// 默认设置为subQuery
     }
 
     public QueryTreeNode getChild() {
@@ -67,7 +68,11 @@ public class QueryNode extends QueryTreeNode {
     }
 
     public void build() {
-        this.getBuilder().build();
+        if (this.isNeedBuild()) {
+            this.builder.build();
+        }
+
+        setNeedBuild(false);
     }
 
     public List getImplicitOrderBys() {
@@ -130,14 +135,16 @@ public class QueryNode extends QueryTreeNode {
         String tabTittle = GeneralUtil.getTab(inden);
         String tabContent = GeneralUtil.getTab(inden + 1);
         StringBuilder sb = new StringBuilder();
-
         if (this.getAlias() != null) {
-            appendln(sb, tabTittle + "Query" + " as " + this.getAlias());
+            appendln(sb, tabTittle + "SubQuery" + " as " + this.getAlias());
         } else {
-            appendln(sb, tabTittle + "Query");
+            appendln(sb, tabTittle + "SubQuery");
         }
-        appendField(sb, "keyFilter", printFilterString(this.getKeyFilter()), tabContent);
-        appendField(sb, "resultFilter", printFilterString(this.getResultFilter()), tabContent);
+        appendField(sb, "keyFilter", printFilterString(this.getKeyFilter(), inden + 2), tabContent);
+        appendField(sb, "resultFilter", printFilterString(this.getResultFilter(), inden + 2), tabContent);
+        appendField(sb, "whereFilter", printFilterString(this.getWhereFilter(), inden + 2), tabContent);
+        appendField(sb, "otherJoinOnFilter", printFilterString(this.getOtherJoinOnFilter(), inden + 2), tabContent);
+        appendField(sb, "having", printFilterString(this.getHavingFilter(), inden + 2), tabContent);
 
         if (!(this.getLimitFrom() != null && this.getLimitFrom().equals(0L) && this.getLimitTo() != null && this.getLimitTo()
             .equals(0L))) {
@@ -153,7 +160,6 @@ public class QueryNode extends QueryTreeNode {
         appendField(sb, "lockModel", this.getLockModel(), tabContent);
         appendField(sb, "columns", this.getColumnsSelected(), tabContent);
         appendField(sb, "groupBys", this.getGroupBys(), tabContent);
-
         appendField(sb, "sql", this.getSql(), tabContent);
         appendField(sb, "executeOn", this.getDataNode(), tabContent);
 

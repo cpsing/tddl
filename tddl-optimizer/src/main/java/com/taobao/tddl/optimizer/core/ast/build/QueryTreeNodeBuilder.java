@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.query.KVIndexNode;
+import com.taobao.tddl.optimizer.core.ast.query.QueryNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
@@ -66,6 +67,12 @@ public abstract class QueryTreeNodeBuilder {
 
         if (filter.getValue() instanceof ISelectable) {
             filter.setValue(this.buildSelectable((ISelectable) filter.getValue(), findInSelectList));
+        } else if (filter.getValue() instanceof TableNode) {
+            // subQuery，比如WHERE ID = (SELECT ID FROM A)
+            ((TableNode) filter.getValue()).build();
+        } else if (filter.getValue() instanceof QueryNode) {
+            // 两层subQuery，比如WHERE ID = (SELECT * FROM (SELECT ID FROM A) B)
+            ((QueryNode) filter.getValue()).build();
         }
 
     }
@@ -96,6 +103,7 @@ public abstract class QueryTreeNodeBuilder {
             return null;
         }
 
+        // 比如SELECT A.ID FROM TABLE1 A，将A.ID改名为TABLE1.ID
         if (c.getTableName() != null) {
             // 对于TableNode如果别名存在别名
             if (node instanceof TableNode && (!(node instanceof KVIndexNode))) {
@@ -104,8 +112,7 @@ public abstract class QueryTreeNodeBuilder {
                     throw new IllegalArgumentException("column: " + c.getFullName() + " is not existed in either "
                                                        + this.getNode().getName() + " or select clause");
                 }
-
-                c.setTableName(((TableNode) node).getTableName());
+                c.setTableName(((TableNode) node).getTableName());// 统一改为表名
             }
         }
 
@@ -115,6 +122,7 @@ public abstract class QueryTreeNodeBuilder {
         columnFromMeta = this.getSelectableFromChild(c);
         if (columnFromMeta != null) {
             column = columnFromMeta;
+            // 直接从子类的table定义中获取表字段，然后根据当前column状态，设置alias和distinct
             column.setAlias(c.getAlias());
             column.setDistinct(c.isDistinct());
         }
@@ -222,6 +230,9 @@ public abstract class QueryTreeNodeBuilder {
         return false;
     }
 
+    /**
+     * 从select列表中查找字段
+     */
     public ISelectable getColumnFromOtherNode(ISelectable c, QueryTreeNode other) {
         if (c == null) {
             return c;
@@ -257,10 +268,8 @@ public abstract class QueryTreeNodeBuilder {
             return res;
         }
 
-        // TODO 列的tableName的信息更新，放在另外一个函数调用更合适
         if (c instanceof IColumn) {
-            c.setDataType(res.getDataType());
-            // 如果存在表别名，在这里将只是用表别名
+            // 如果是子表的结构，比如Join/Merge的子节点，字段的名字直接使用别名
             if (other.getAlias() != null) {
                 c.setTableName(other.getAlias());
             } else {
@@ -270,5 +279,4 @@ public abstract class QueryTreeNodeBuilder {
 
         return c;
     }
-
 }

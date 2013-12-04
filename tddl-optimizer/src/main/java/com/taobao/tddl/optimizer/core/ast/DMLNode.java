@@ -206,7 +206,7 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
 
         if (this.getNode() != null) {
             OptimizerToString.appendln(sb, tabContent + "query:");
-            sb.append(this.getNode().toString(inden + 1));
+            sb.append(this.getNode().toString(inden + 2));
         }
         return sb.toString();
     }

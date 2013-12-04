@@ -1,8 +1,5 @@
 package com.taobao.tddl.optimizer.parse;
 
-import java.util.Map;
-
-import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.SqlType;
 import com.taobao.tddl.optimizer.core.ast.ASTNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
@@ -18,15 +15,15 @@ public interface SqlAnalysisResult {
 
     public SqlType getSqlType();
 
-    public ASTNode getAstNode(Map<Integer, ParameterContext> parameterSettings);
+    public ASTNode getAstNode();
 
-    public QueryTreeNode getQueryTreeNode(Map<Integer, ParameterContext> parameterSettings);
+    public QueryTreeNode getQueryTreeNode();
 
-    public UpdateNode getUpdateNode(Map<Integer, ParameterContext> parameterSettings);
+    public UpdateNode getUpdateNode();
 
-    public InsertNode getInsertNode(Map<Integer, ParameterContext> parameterSettings);
+    public InsertNode getInsertNode();
 
-    public PutNode getReplaceNode(Map<Integer, ParameterContext> parameterSettings);
+    public PutNode getReplaceNode();
 
-    public DeleteNode getDeleteNode(Map<Integer, ParameterContext> parameterSettings);
+    public DeleteNode getDeleteNode();
 }

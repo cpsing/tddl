@@ -101,7 +101,7 @@ public class TableMetaParser {
             } else if ("strongConsistent".equals(cnode.getNodeName())) {
                 strongConsistent = BooleanUtils.toBoolean(cnode.getFirstChild().getNodeValue());
             } else if ("secondaryIndexes".equals(cnode.getNodeName())) {
-                NodeList indexsChild = node.getChildNodes();
+                NodeList indexsChild = cnode.getChildNodes();
                 for (int j = 0; j < indexsChild.getLength(); j++) {
                     Node ccnode = indexsChild.item(j);
                     if ("indexMeta".equals(ccnode.getNodeName())) {

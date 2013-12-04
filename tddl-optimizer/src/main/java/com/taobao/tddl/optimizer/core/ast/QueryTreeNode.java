@@ -327,15 +327,6 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         this.implicitSelectable = implicitSelectable;
     }
 
-    /**
-     * 添加一个不存在的字段
-     */
-    public void addImplicitSelectable(ISelectable selectable) {
-        if (!this.implicitSelectable.contains(selectable)) {
-            this.implicitSelectable.add(selectable);
-        }
-    }
-
     public List<ISelectable> getColumnsSelected() {
         return columnsSelected;
     }
@@ -348,8 +339,17 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
     /**
      * 添加一个不存在的字段
      */
+    public void addImplicitSelectable(ISelectable selected) {
+        if (!implicitSelectable.contains(selected)) {
+            this.implicitSelectable.add(selected);
+        }
+    }
+
+    /**
+     * 添加一个不存在的字段
+     */
     public void addColumnsSelected(ISelectable selected) {
-        if (!this.columnsSelected.contains(selected)) {
+        if (!columnsSelected.contains(selected)) {
             columnsSelected.add(selected);
         }
     }
@@ -358,9 +358,16 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
      * 添加一个不存在的字段
      */
     public void addColumnsRefered(ISelectable selected) {
-        if (!this.columnsRefered.contains(selected)) {
+        if (!columnsRefered.contains(selected)) {
             columnsRefered.add(selected);
         }
+    }
+
+    /**
+     * 判断一个字段是否存在于当前库
+     */
+    public boolean hasColumn(ISelectable c) {
+        return this.getBuilder().hasColumn(c);
     }
 
     public QueryTreeNode select(List<ISelectable> columnSelected) {
@@ -572,9 +579,10 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         return subQuery;
     }
 
-    public void setSubQuery(boolean subQuery) {
+    public QueryTreeNode setSubQuery(boolean subQuery) {
         setNeedBuild(true);
         this.subQuery = subQuery;
+        return this;
     }
 
     public boolean isNeedBuild() {
@@ -616,6 +624,11 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         return this;
     }
 
+    public QueryTreeNode having(String having) {
+        this.havingFilter = FilterUtils.createFilter(having);
+        return this;
+    }
+
     public IFilter getHavingFilter() {
         return this.havingFilter;
     }
@@ -644,10 +657,6 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
 
     public LOCK_MODEL getLockModel() {
         return lockModel;
-    }
-
-    public boolean hasColumn(ISelectable c) {
-        return this.getBuilder().hasColumn(c);
     }
 
     // ==================== helper method =================

@@ -33,7 +33,7 @@
 	</table>
 	
 	
-		<table name="orders">
+	<table name="orders">
 		<columns>
 			<column name="id" type="long" />
 			<column name="buyer_id" type="string" />
@@ -95,72 +95,13 @@
 			</indexMeta>
 		</secondaryIndexes>
 	</table>
-
-	<table name="ItemInfo">
-		<columns>
-			<column name="userID" type="long" />
-			<column name="itemID" type="long" />
-			<column name="itemType" type="long" />
-			<column name="info" type="string" />
-		</columns>
-		<primaryKey>itemID</primaryKey>
-		<secondaryIndexes>
-			<indexMeta name="userID_idx" type="btree">
-				<keys>userID</keys>
-				<values>itemID</values>
-			</indexMeta>
-
-			<indexMeta name="itemType_idx" type="btree">
-				<keys>itemType</keys>
-				<values>itemID</values>
-			</indexMeta>
-		</secondaryIndexes>
-	</table>
-	<table name="course">
-		<columns>
-			<column name="cid" type="long" />
-			<column name="sid" type="long" />
-			<column name="course_name" type="string" />
-		</columns>
-
-		<primaryKey>cid</primaryKey>
-		<secondaryIndexes>
-			<indexMeta name="course_index" type="btree">
-				<keys>sid</keys>
-				<values>cid</values>
-			</indexMeta>
-		</secondaryIndexes>
-	</table>
-
-
-	<table name="ItemUrl">
-
-		<columns>
-			<column name="itemUrlID" type="long" />
-			<column name="userID" type="long" />
-			<column name="itemID" type="long" />
-			<column name="itemType" type="long" />
-			<column name="url" type="string" />
-		</columns>
-		<primaryKey>itemUrlID</primaryKey>
-		<secondaryIndexes>
-			<indexMeta name="userID_idx" type="btree">
-				<keys>userID</keys>
-				<values>itemUrlID</values>
-			</indexMeta>
-
-			<indexMeta name="itemID_idx" type="btree">
-				<keys>itemID</keys>
-				<values>itemUrlID</values>
-			</indexMeta>
-		</secondaryIndexes>
-	</table>
-
+	
 	<table name="table3">
 		<columns>
 			<column name="id" type="long" />
 			<column name="name" type="string" />
 			<column name="school" type="string" />
+			<column name="score" type="long" />
 		</columns>
 		<primaryKey>id</primaryKey>
 		<secondaryIndexes>
@@ -170,7 +111,6 @@
 			</indexMeta>
 		</secondaryIndexes>
 	</table>
-
 	<table name="table4">
 		<columns>
 			<column name="id" type="long" />
@@ -347,6 +287,67 @@
 			</indexMeta>
 		</secondaryIndexes>
 	</table>
+	
+	<table name="ItemInfo">
+		<columns>
+			<column name="userID" type="long" />
+			<column name="itemID" type="long" />
+			<column name="itemType" type="long" />
+			<column name="info" type="string" />
+		</columns>
+		<primaryKey>itemID</primaryKey>
+		<secondaryIndexes>
+			<indexMeta name="userID_idx" type="btree">
+				<keys>userID</keys>
+				<values>itemID</values>
+			</indexMeta>
+
+			<indexMeta name="itemType_idx" type="btree">
+				<keys>itemType</keys>
+				<values>itemID</values>
+			</indexMeta>
+		</secondaryIndexes>
+	</table>
+	<table name="course">
+		<columns>
+			<column name="cid" type="long" />
+			<column name="sid" type="long" />
+			<column name="course_name" type="string" />
+		</columns>
+
+		<primaryKey>cid</primaryKey>
+		<secondaryIndexes>
+			<indexMeta name="course_index" type="btree">
+				<keys>sid</keys>
+				<values>cid</values>
+			</indexMeta>
+		</secondaryIndexes>
+	</table>
+
+
+	<table name="ItemUrl">
+
+		<columns>
+			<column name="itemUrlID" type="long" />
+			<column name="userID" type="long" />
+			<column name="itemID" type="long" />
+			<column name="itemType" type="long" />
+			<column name="url" type="string" />
+		</columns>
+		<primaryKey>itemUrlID</primaryKey>
+		<secondaryIndexes>
+			<indexMeta name="userID_idx" type="btree">
+				<keys>userID</keys>
+				<values>itemUrlID</values>
+			</indexMeta>
+
+			<indexMeta name="itemID_idx" type="btree">
+				<keys>itemID</keys>
+				<values>itemUrlID</values>
+			</indexMeta>
+		</secondaryIndexes>
+	</table>
+
 	
 	
 	<table name="t1">

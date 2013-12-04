@@ -212,7 +212,12 @@ public class Function<RT extends IFunction> implements IFunction<RT> {
     }
 
     public String toString() {
-        return this.getColumnName();
+        StringBuilder builder = new StringBuilder();
+        builder.append(this.getColumnName());
+        if (this.getAlias() != null) {
+            builder.append(" as ").append(this.getAlias());
+        }
+        return builder.toString();
     }
 
     public IExtraFunction getExtraFunction() {

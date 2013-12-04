@@ -69,18 +69,25 @@ public class PackageUtils {
 
             List<Class> result = Lists.newArrayList();
             for (String clazz : classes) {
-                Class<?> cls = Class.forName(clazz);
-                if (filter == null || filter.filter(cls)) {
-                    result.add(cls);
+                if (filter == null || filter.preFilter(clazz)) {
+                    Class<?> cls = null;
+                    try {
+                        cls = Class.forName(clazz);
+                    } catch (Throwable e) {
+                        // ignore
+                    }
+
+                    if (cls != null && (filter == null || filter.filter(cls))) {
+                        result.add(cls);
+                    }
                 }
             }
 
             return result;
         } catch (IOException e) {
             throw new FunctionException("findClassesInPackage : " + packageName + " is failed. ", e);
-        } catch (ClassNotFoundException e) {
-            throw new FunctionException("findClassesInPackage : " + packageName + " is failed. ", e);
         }
+
     }
 
     private static void findClassesInDirPackage(String packageName, String packagePath, List<String> classes) {
@@ -112,6 +119,8 @@ public class PackageUtils {
     }
 
     public static interface ClassFilter {
+
+        public boolean preFilter(String className);
 
         public boolean filter(Class clazz);
     }
