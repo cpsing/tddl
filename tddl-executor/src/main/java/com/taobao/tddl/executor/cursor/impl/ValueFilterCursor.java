@@ -8,17 +8,19 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.codehaus.groovy.util.StringUtil;
-
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.executor.common.CloneableRecord;
+import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.IValueFilterCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
+import com.taobao.tddl.executor.function.ExtraFunction;
+import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.spi.ExecutionContext;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
@@ -50,7 +52,7 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
 
     }
 
-    DuplicateKVPair allow(IFilter f, DuplicateKVPair dkv) throws FetchException {
+    DuplicateKVPair allow(IFilter f, DuplicateKVPair dkv) throws TddlException {
         if (f == null) {
             return dkv;
         }
@@ -83,7 +85,7 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
     }
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         IRowSet kv = null;
         while ((kv = parentCursorNext()) != null) {
             if (allow(filter, kv)) {
@@ -93,14 +95,14 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
         return null;
     }
 
-    private boolean allowOneDKV(IFilter f, DuplicateKVPair dkv) throws FetchException {
+    private boolean allowOneDKV(IFilter f, DuplicateKVPair dkv) throws TddlException {
         // 遍历链表，如果有notallow，就丢掉他。
         boolean ok = allow(f, dkv.currentKey);
         return ok;
     }
 
     @SuppressWarnings("unchecked")
-    boolean allow(IFilter f, IRowSet iRowSet) throws FetchException {
+    boolean allow(IFilter f, IRowSet iRowSet) throws TddlException {
 
         if (f == null) {
             return true;
@@ -118,17 +120,17 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
                     } else {
                         // TODO shenxun : 这是否应该用cursorMeta?
 
-                        column_value = GeneralUtil.getValueByIColumn(iRowSet, (ISelectable) col);
+                        column_value = ExecUtils.getValueByIColumn(iRowSet, (ISelectable) col);
                     }
                 } catch (Exception e) {
-                    throw new FetchException(e);
+                    throw new TddlException(e);
                 }
             } else {
                 throw new IllegalArgumentException("" + "暂时不支持左值为非IExpression");
             }
-            if (column_value instanceof Utf8) {
-                column_value = column_value.toString();
-            }
+            // if (column_value instanceof Utf8) {
+            // column_value = column_value.toString();
+            // }
             Object v = null;
             List values = bf.getValues();
             if (bf.getValue() instanceof IColumn) {
@@ -140,10 +142,10 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
                                 v = processFunction(iRowSet, c);
                             }
                         } else {
-                            v = GeneralUtil.getValueByIColumn(iRowSet, (IColumn) col);
+                            v = ExecUtils.getValueByIColumn(iRowSet, (IColumn) col);
                         }
                     } catch (Exception e) {
-                        throw new FetchException(e);
+                        throw new TddlException(e);
                     }
                 } else {
                     throw new IllegalArgumentException("" + "暂时不支持左值为非IExpression");
@@ -151,9 +153,9 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
             } else {
                 v = bf.getValue();
             }
-            if (v instanceof Utf8) {
-                v = v.toString();
-            }
+            // if (v instanceof Utf8) {
+            // v = v.toString();
+            // }
             // shenxun bug fix : 这里未考虑参数为null的情况
             if (v == null && values == null) {
 
@@ -177,12 +179,12 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
                 try {
                     if (((IFunction) v).getFunctionType().equals(FunctionType.Aggregate)) throw new RuntimeException("Invalid use of group function");
 
-                    ((IFunction) v).serverMap(iRowSet);
+                    ((ExtraFunction) ((IFunction) v).getExtraFunction()).serverMap(iRowSet);
 
                     v = processFunction(iRowSet, v);
 
                 } catch (Exception e) {
-                    throw new FetchException(e);
+                    throw new TddlException(e);
                 }
             }
             OPERATION op = bf.getOperation();
@@ -233,13 +235,13 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
         return false;
     }
 
-    private Object processFunction(IRowSet iRowSet, Object c) throws Exception {
+    private Object processFunction(IRowSet iRowSet, Object c) throws TddlException {
         Object v = null;
         // 在Filter里面是不能出现聚合函数的
         if (((IFunction) c).getFunctionType().equals(FunctionType.Aggregate)) throw new RuntimeException("Invalid use of group function");
-        ((IFunction) c).serverMap(iRowSet);
+        ((ExtraFunction) ((IFunction) c).getExtraFunction()).serverMap(iRowSet);
 
-        v = ((IFunction) c).getResult();
+        v = ((IFunction) c).getExtraFunction().getResult();
         return v;
     }
 
@@ -259,7 +261,7 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
     // }
 
     @Override
-    public boolean skipTo(CloneableRecord key) throws Exception {
+    public boolean skipTo(CloneableRecord key) throws TddlException {
         if (super.skipTo(key)) {
             IRowSet kv = parentCursorCurrent();
             if (kv != null && allow(filter, kv)) {
@@ -287,13 +289,13 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
 
             tarCache = tar;
             // trim and remove %%
-            tar = StringUtil.trim(tar);
-            tar = StringUtil.replace(tar, "\\_", "[uANDOR]");
-            tar = StringUtil.replace(tar, "\\%", "[pANDOR]");
-            tar = StringUtil.replace(tar, "%", ".*");
-            tar = StringUtil.replace(tar, "_", ".");
-            tar = StringUtil.replace(tar, "[uANDOR]", "\\_");
-            tar = StringUtil.replace(tar, "[pANDOR]", "\\%");
+            tar = TStringUtil.trim(tar);
+            tar = TStringUtil.replace(tar, "\\_", "[uANDOR]");
+            tar = TStringUtil.replace(tar, "\\%", "[pANDOR]");
+            tar = TStringUtil.replace(tar, "%", ".*");
+            tar = TStringUtil.replace(tar, "_", ".");
+            tar = TStringUtil.replace(tar, "[uANDOR]", "\\_");
+            tar = TStringUtil.replace(tar, "[pANDOR]", "\\%");
 
             // case insensitive
             tar = "(?i)" + tar;
@@ -309,12 +311,12 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
     }
 
     @Override
-    public boolean skipTo(KVPair key) throws Exception {
+    public boolean skipTo(KVPair key) throws TddlException {
         return skipTo(key.getKey());
     }
 
     @Override
-    public IRowSet first() throws Exception {
+    public IRowSet first() throws TddlException {
         IRowSet kv = parentCursorFirst();
         if (kv != null) {
             do {
@@ -338,7 +340,7 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
     // }
 
     @Override
-    public IRowSet last() throws Exception {
+    public IRowSet last() throws TddlException {
         IRowSet kv = parentCursorLast();
         do {
             if (kv != null && allow(filter, kv)) {
@@ -349,7 +351,7 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
     }
 
     @Override
-    public IRowSet prev() throws Exception {
+    public IRowSet prev() throws TddlException {
         IRowSet kv = parentCursorPrev();
         do {
             if (kv != null && allow(filter, kv)) {
@@ -380,7 +382,7 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
 
     @Override
     public Map<CloneableRecord, DuplicateKVPair> mgetWithDuplicate(List<CloneableRecord> keys, boolean prefixMatch,
-                                                                   boolean keyFilterOrValueFilter) throws Exception {
+                                                                   boolean keyFilterOrValueFilter) throws TddlException {
         Map<CloneableRecord, DuplicateKVPair> map = super.mgetWithDuplicate(keys, prefixMatch, keyFilterOrValueFilter);
         if (map == null) {
             return null;
@@ -404,7 +406,7 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
         String subQueryTab = GeneralUtil.getTab(inden);
         sb.append(subQueryTab).append("【Value Filter Cursor : ").append("\n");
         sb.append(subQueryTab).append(filter).append("\n");
-        GeneralUtil.printOrderBy(orderBys, inden, sb);
+        ExecUtils.printOrderBy(orderBys, inden, sb);
         sb.append(super.toStringWithInden(inden));
         return sb.toString();
     }

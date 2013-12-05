@@ -3,15 +3,18 @@ package com.taobao.tddl.executor.cursor.impl;
 import java.util.Comparator;
 import java.util.List;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
-import com.taobao.tddl.executor.common.CloneableRecord;
 import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.executor.cursor.IRangeCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.RangeMaker;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
+import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
@@ -63,9 +66,12 @@ public class RangeCursor1 extends SchematicCursor implements IRangeCursor {
         schemaInited = true;
 
         List<ColumnMeta> columnMetas = to.getParentCursorMeta().getColumns();
-        List<ISelectable> iColumns = ExecUtil.getIColumnsWithISelectable(columnMetas.toArray(new ColumnMeta[0]));
-        toComparator = ExecUtil.getComp(iColumns, iColumns, to.getParentCursorMeta(), firstRowSet.getParentCursorMeta());
-        fromComparator = ExecUtil.getComp(iColumns,
+        List<ISelectable> iColumns = ExecUtils.getIColumnsWithISelectable(columnMetas.toArray(new ColumnMeta[0]));
+        toComparator = ExecUtils.getComp(iColumns,
+            iColumns,
+            to.getParentCursorMeta(),
+            firstRowSet.getParentCursorMeta());
+        fromComparator = ExecUtils.getComp(iColumns,
             iColumns,
             from.getParentCursorMeta(),
             firstRowSet.getParentCursorMeta());
@@ -73,7 +79,7 @@ public class RangeCursor1 extends SchematicCursor implements IRangeCursor {
     }
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         if (cursor == null) {
             return null;
         }
@@ -123,7 +129,7 @@ public class RangeCursor1 extends SchematicCursor implements IRangeCursor {
     }
 
     @Override
-    public boolean skipTo(CloneableRecord key) throws Exception {
+    public boolean skipTo(CloneableRecord key) throws TddlException {
         if (parentCursorSkipTo(key)) {
             IRowSet kv = current();
             if (match(kv)) {
@@ -134,15 +140,15 @@ public class RangeCursor1 extends SchematicCursor implements IRangeCursor {
     }
 
     @Override
-    public boolean skipTo(KVPair key) throws Exception {
+    public boolean skipTo(KVPair key) throws TddlException {
         return skipTo(key.getKey());
     }
 
     @Override
-    public IRowSet first() throws Exception {
+    public IRowSet first() throws TddlException {
         this.first = false;
         IRowSet iRowSet = from;
-        CloneableRecord cr = GeneralUtil.convertToClonableRecord(iRowSet);
+        CloneableRecord cr = ExecUtils.convertToClonableRecord(iRowSet);
         if (!cursor.skipTo(cr)) {
             return null;
         } else {
@@ -151,10 +157,10 @@ public class RangeCursor1 extends SchematicCursor implements IRangeCursor {
     }
 
     @Override
-    public IRowSet last() throws Exception {
+    public IRowSet last() throws TddlException {
         first = false;
         IRowSet iRowSet = to;
-        CloneableRecord cr = GeneralUtil.convertToClonableRecord(iRowSet);
+        CloneableRecord cr = ExecUtils.convertToClonableRecord(iRowSet);
 
         // to在数据中间有四种可能
         // data:5,6,7,8,9,10,15
@@ -205,7 +211,7 @@ public class RangeCursor1 extends SchematicCursor implements IRangeCursor {
     }
 
     @Override
-    public IRowSet prev() throws Exception {
+    public IRowSet prev() throws TddlException {
         IRowSet kv;
 
         if (!first) {
@@ -244,13 +250,13 @@ public class RangeCursor1 extends SchematicCursor implements IRangeCursor {
             .append(" end : ")
             .append(to)
             .append("\n");
-        GeneralUtil.printOrderBy(orderBys, inden, sb);
+        ExecUtils.printOrderBy(orderBys, inden, sb);
         sb.append(super.toStringWithInden(inden));
         return sb.toString();
     }
 
     @Override
-    public void beforeFirst() throws Exception {
+    public void beforeFirst() throws TddlException {
         this.first = true;
     }
 

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.ITransactionAsyncExecutor;
 import com.taobao.tddl.executor.ITransactionExecutor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -18,7 +19,7 @@ public class MatrixExecutor implements ITransactionAsyncExecutor, ITransactionEx
     Map<String, GroupExecutor> groupExecutors = new HashMap();
 
     @Override
-    public Future<ResultCursor> execByExecPlanNodeFuture(IDataNodeExecutor qc,
+    public Future<ISchematicCursor> execByExecPlanNodeFuture(IDataNodeExecutor qc,
 
     ExecutionContext executionContext) throws DataAccessException {
         // TODO Auto-generated method stub
@@ -26,7 +27,8 @@ public class MatrixExecutor implements ITransactionAsyncExecutor, ITransactionEx
     }
 
     @Override
-    public ResultCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext) throws Exception {
+    public ISchematicCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext)
+                                                                                                       throws TddlException {
         ResultCursor cursor = null;
         ISchematicCursor iSchematicCursor = null;
 
@@ -61,13 +63,13 @@ public class MatrixExecutor implements ITransactionAsyncExecutor, ITransactionEx
     }
 
     @Override
-    public Future<ResultCursor> commitFuture() throws DataAccessException {
+    public Future<ISchematicCursor> commitFuture(ExecutionContext executionContext) throws TddlException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Future<ResultCursor> rollbackFuture() throws DataAccessException {
+    public Future<ISchematicCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException {
         // TODO Auto-generated method stub
         return null;
     }

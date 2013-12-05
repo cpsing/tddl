@@ -2,8 +2,9 @@ package com.taobao.tddl.executor;
 
 import java.util.concurrent.Future;
 
-import com.taobao.tddl.executor.cursor.ResultCursor;
-import com.taobao.tddl.executor.exception.DataAccessException;
+import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.executor.cursor.ISchematicCursor;
+import com.taobao.tddl.executor.spi.ExecutionContext;
 
 /**
  * 带事务的异步执行器
@@ -13,7 +14,7 @@ import com.taobao.tddl.executor.exception.DataAccessException;
  */
 public interface ITransactionAsyncExecutor extends IAsyncExecutor {
 
-    Future<ResultCursor> commitFuture() throws DataAccessException;
+    Future<ISchematicCursor> commitFuture(ExecutionContext executionContext) throws TddlException;
 
-    Future<ResultCursor> rollbackFuture() throws DataAccessException;
+    Future<ISchematicCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException;
 }

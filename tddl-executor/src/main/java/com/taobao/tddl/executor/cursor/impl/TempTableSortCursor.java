@@ -6,23 +6,31 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.codehaus.groovy.util.StringUtil;
-
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.executor.common.CloneableRecord;
+import com.taobao.tddl.common.utils.TStringUtil;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
+import com.taobao.tddl.executor.codec.CodecFactory;
+import com.taobao.tddl.executor.common.CursorMetaImp;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.ITempTableSortCursor;
+import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.rowset.IRowSetWrapper;
 import com.taobao.tddl.executor.spi.CursorFactory;
+import com.taobao.tddl.executor.spi.ExecutionContext;
+import com.taobao.tddl.executor.spi.Table;
 import com.taobao.tddl.executor.spi.TempTable;
 import com.taobao.tddl.executor.spi.TransactionConfig.Isolation;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
+import com.taobao.tddl.optimizer.config.table.IndexType;
+import com.taobao.tddl.optimizer.config.table.Relationship;
+import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
@@ -35,7 +43,7 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
  */
 public class TempTableSortCursor extends SortCursor implements ITempTableSortCursor {
 
-    private final static Log    logger           = LogFactory.getLog(TempTableSortCursor.class);
+    private final static Logger logger           = LoggerFactory.getLogger(TempTableSortCursor.class);
 
     protected static AtomicLong seed             = new AtomicLong(0);
     protected long              sizeProtection   = 100000;
@@ -52,6 +60,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
 
     protected ICursorMeta       returnMeta       = null;
     private long                requestID;
+    ExecutionContext            executionContext = null;
 
     /**
      * @param cursorFactory
@@ -60,21 +69,21 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
      * @param orderBys 按照何列排序
      * @param sortedDuplicates 是否允许重复
      * @throws FetchException
-     * @throws Exception
+     * @throws TddlException
      */
     public TempTableSortCursor(CursorFactory cursorFactory, TempTable repo, ISchematicCursor cursor,
-                               List<IOrderBy> orderBys, boolean sortedDuplicates, long requestID)
-                                                                                                 throws FetchException,
-                                                                                                 Exception{
+                               List<IOrderBy> orderBys, boolean sortedDuplicates, long requestID,
+                               ExecutionContext executionContext) throws TddlException, TddlException{
         super(cursor, orderBys);
         this.sortedDuplicates = sortedDuplicates;
         setCursorFactory(cursorFactory);
         tempTargetCursor = cursor;
         this.repo = repo;
         this.requestID = requestID;
+        this.executionContext = executionContext;
     }
 
-    private void initTTSC() throws Exception {
+    private void initTTSC() throws TddlException {
         if (!inited) {
             prepare(repo, tempTargetCursor, orderBys);
             inited = true;
@@ -83,7 +92,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
     }
 
     protected ISchematicCursor prepare(TempTable repo, ISchematicCursor cursor, List<IOrderBy> orderBys)
-                                                                                                        throws Exception {
+                                                                                                        throws TddlException {
 
         List<ColumnMeta> columns = new ArrayList<ColumnMeta>();
         List<ColumnMeta> values = new ArrayList<ColumnMeta>();
@@ -101,9 +110,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
             return null;
         }
         String oldTableName = rowSet.getParentCursorMeta().getColumns().iterator().next().getTableName();
-        ColumnMeta[] columnsArray = columns.toArray(new ColumnMeta[0]);
-        ColumnMeta[] valuesArray = values.toArray(new ColumnMeta[0]);
-        //
+
         String tableName;
         synchronized (this.getClass()) {
             seed.addAndGet(1);
@@ -111,30 +118,29 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
             // 因为实际做cursor的表名匹配的时候，使用的是截取法。。取第一个"."之前的作为匹配标志。
             tableName = oldTableName + ".tmp." + System.currentTimeMillis() + "." + seed + "requestID." + requestID;
 
-            if (AndorLogManager.isDebugMode()) {
+            if (logger.isDebugEnabled()) {
                 logger.warn("tempTableName:\n" + tableName);
             }
         }
 
         IndexMeta primary_meta = new IndexMeta(tableName,
-            columnsArray,
+            columns,
+            values,
             IndexType.BTREE,
-            valuesArray,
-            1,
+            Relationship.ONE_TO_ONE,
             true,
-            null,
+            true,
             null);
 
-        primary_meta.addDbName(tableName);
-        TableSchema tmpSchema = new TableSchema(tableName);
-        tmpSchema.setPrimaryIndex(primary_meta);
+        TableMeta tmpSchema = new TableMeta(tableName, new ArrayList(), primary_meta, null);
+
         tmpSchema.setTmp(true);
         tmpSchema.setSortedDuplicates(sortedDuplicates);
         // 增加临时表的判定
         targetTable = repo.getTable(tmpSchema, "", true, requestID);
         CloneableRecord key = CodecFactory.getInstance(CodecFactory.FIXED_LENGTH).getCodec(columns).newEmptyRecord();
         CloneableRecord value = null;
-        if (valuesArray != null && valuesArray.length != 0) {
+        if (values != null && values.size() != 0) {
             value = CodecFactory.getInstance(CodecFactory.FIXED_LENGTH).getCodec(values).newEmptyRecord();
         }
         int i = 0;
@@ -149,10 +155,10 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
                     protection = true;
                     break;
                 }
-                for (ColumnMeta column : columnsArray) {
+                for (ColumnMeta column : columns) {
                     String colName = column.getName();
                     if (colName.contains(".")) {
-                        String[] sp = StringUtil.split(colName, ".");
+                        String[] sp = TStringUtil.split(colName, ".");
                         colName = sp[sp.length - 1];
                     }
                     /**
@@ -160,11 +166,11 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
                      * 会在这里被合并，导致后面取值有问题。现在准备将临时表中的columnName改成
                      * tableName.columnName的形式。顺序不变可以将后面的取值完成 有点hack..
                      */
-                    Object o = GeneralUtil.getValueByTableAndName(rowSet, column.getTableName(), colName);
+                    Object o = ExecUtils.getValueByTableAndName(rowSet, column.getTableName(), colName);
                     key.put(column.getName(), o);
                 }
-                if (valuesArray != null && valuesArray.length != 0) {
-                    for (ColumnMeta valueColumn : valuesArray) {
+                if (values != null && values.size() != 0) {
+                    for (ColumnMeta valueColumn : values) {
                         String colName = valueColumn.getName();
                         if ("__IDENTITY__".equals(colName)) {
                             continue;
@@ -180,7 +186,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
                          * 会在这里被合并，导致后面取值有问题。现在准备将临时表中的columnName改成
                          * tableName.columnName的形式。顺序不变可以将后面的取值完成 有点hack..
                          */
-                        Object o = GeneralUtil.getValueByTableAndName(rowSet, valueColumn.getTableName(), colName);
+                        Object o = ExecUtils.getValueByTableAndName(rowSet, valueColumn.getTableName(), colName);
                         value.put(valueColumn.getName(), o);
                     }
                 }
@@ -194,10 +200,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
             } while ((rowSet = cursor.next()) != null);
         }
 
-        ISchematicCursor ret = targetTable.getCursor(null,
-            primary_meta,
-            Isolation.READ_UNCOMMITTED,
-            primary_meta.getDbNames().get(0));
+        ISchematicCursor ret = targetTable.getCursor(null, primary_meta, Isolation.READ_UNCOMMITTED, tableName);
 
         // 去除唯一标志
         List<ColumnMeta> retColumns = new ArrayList<ColumnMeta>();
@@ -215,10 +218,10 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
         // ret = cursorFactory.columnAliasCursor(ret, columnsInReturn,
         // oldTableName);
         if (!orderBys.get(0).getDirection()) {
-            ret = cursorFactory.reverseOrderCursor(ret);
+            ret = cursorFactory.reverseOrderCursor(executionContext, ret);
         }
 
-        List<Exception> exs = new ArrayList();
+        List<TddlException> exs = new ArrayList();
         exs = cursor.close(exs);
         if (!exs.isEmpty()) throw GeneralUtil.mergeException(exs);
         if (protection) {
@@ -250,8 +253,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
                     cm.getTableName() + "." + cm.getName(),
                     cm.getDataType(),
                     cm.getAlias(),
-                    cm.getNullable(),
-                    cm.isAutoCreated());
+                    cm.isNullable());
 
                 if (!values.contains(cm2)) values.add(cm2);
                 if (!metaValues.contains(cm)) metaValues.add(cm);
@@ -270,13 +272,14 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
                         ColumnMeta cm2 = new ColumnMeta(cm.getTableName(),
                             cm.getTableName() + "." + cm.getColumnName(),
                             cm.getDataType(),
-                            cm.getAlias());
+                            cm.getAlias(),
+                            true);
                         columns.add(cm2);
                         metaColumns.add(cm2);
                     }
                 }
             }
-            values.add(new ColumnMeta(columns.get(0).getTableName(), identity, IColumn.DATA_TYPE.INT_VAL));
+            values.add(new ColumnMeta(columns.get(0).getTableName(), identity, IColumn.DATA_TYPE.INT_VAL, null, true));
         }
     }
 
@@ -288,14 +291,13 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
 
             orderByTable = GeneralUtil.getLogicTableName(orderByTable);
 
-            if (cm != null && StringUtil.equals(GeneralUtil.getLogicTableName(cm.getTableName()), orderByTable)) {
-                if (StringUtil.equals(cm.getName(), iSelectable.getColumnName())) {
+            if (cm != null && TStringUtil.equals(GeneralUtil.getLogicTableName(cm.getTableName()), orderByTable)) {
+                if (TStringUtil.equals(cm.getName(), iSelectable.getColumnName())) {
                     ColumnMeta cm2 = new ColumnMeta(cm.getTableName(),
                         cm.getTableName() + "." + cm.getName(),
                         cm.getDataType(),
                         cm.getAlias(),
-                        cm.getNullable(),
-                        cm.isAutoCreated());
+                        cm.isNullable());
                     // 列名与order by Match.放到key里
                     columns.add(cm2);
                     hashOrderBys.add(ob);
@@ -316,7 +318,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
     }
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         initTTSC();
         IRowSet next = parentCursorNext();
         next = wrap(next);
@@ -332,19 +334,19 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
     }
 
     @Override
-    public boolean skipTo(CloneableRecord key) throws Exception {
+    public boolean skipTo(CloneableRecord key) throws TddlException {
         initTTSC();
         return parentCursorSkipTo(key);
     }
 
     @Override
-    public boolean skipTo(KVPair key) throws Exception {
+    public boolean skipTo(KVPair key) throws TddlException {
         initTTSC();
         return parentCursorSkipTo(key);
     }
 
     @Override
-    public IRowSet current() throws Exception {
+    public IRowSet current() throws TddlException {
         initTTSC();
         IRowSet current = parentCursorCurrent();
         current = wrap(current);
@@ -352,7 +354,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
     }
 
     @Override
-    public IRowSet first() throws Exception {
+    public IRowSet first() throws TddlException {
         initTTSC();
         IRowSet first = parentCursorFirst();
         first = wrap(first);
@@ -360,7 +362,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
     }
 
     @Override
-    public IRowSet last() throws Exception {
+    public IRowSet last() throws TddlException {
         initTTSC();
         IRowSet last = parentCursorPrev();
         last = wrap(last);
@@ -368,7 +370,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
     }
 
     @Override
-    public IRowSet prev() throws Exception {
+    public IRowSet prev() throws TddlException {
         initTTSC();
         IRowSet prev = parentCursorPrev();
         prev = wrap(prev);
@@ -376,9 +378,13 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
     }
 
     @Override
-    public List<Exception> close(List<Exception> exs) {
+    public List<TddlException> close(List<TddlException> exs) {
         exs = parentCursorClose(exs);
-        if (targetTable != null) targetTable.close();
+        if (targetTable != null) try {
+            targetTable.close();
+        } catch (TddlException e) {
+            exs.add(e);
+        }
         return exs;
     }
 

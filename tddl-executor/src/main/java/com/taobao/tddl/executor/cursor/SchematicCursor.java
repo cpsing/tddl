@@ -4,11 +4,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.executor.common.CloneableRecord;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.common.KVPair;
+import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
@@ -46,53 +47,53 @@ public class SchematicCursor extends AbstractCursor implements ISchematicCursor 
     }
 
     @Override
-    public boolean skipTo(CloneableRecord key) throws Exception {
+    public boolean skipTo(CloneableRecord key) throws TddlException {
         return parentCursorSkipTo(key);
     }
 
     @Override
-    public boolean skipTo(KVPair key) throws Exception {
+    public boolean skipTo(KVPair key) throws TddlException {
         return parentCursorSkipTo(key);
     }
 
     @Override
-    public IRowSet current() throws Exception {
+    public IRowSet current() throws TddlException {
         return parentCursorCurrent();
     }
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         return parentCursorNext();
     }
 
     @Override
-    public IRowSet prev() throws Exception {
+    public IRowSet prev() throws TddlException {
         return parentCursorPrev();
     }
 
     @Override
-    public IRowSet first() throws Exception {
+    public IRowSet first() throws TddlException {
         return parentCursorFirst();
     }
 
     @Override
-    public void beforeFirst() throws Exception {
+    public void beforeFirst() throws TddlException {
         parentCursorBeforeFirst();
     }
 
     @Override
-    public IRowSet last() throws Exception {
+    public IRowSet last() throws TddlException {
         return parentCursorLast();
     }
 
     @Override
-    public IRowSet getNextDup() throws Exception {
+    public IRowSet getNextDup() throws TddlException {
         return parentCursorGetNextDup();
     }
 
     @Override
-    public List<Exception> close(List<Exception> exceptions) {
-        List<Exception> ex = parentCursorClose(exceptions);
+    public List<TddlException> close(List<TddlException> exceptions) {
+        List<TddlException> ex = parentCursorClose(exceptions);
         return ex;
     }
 
@@ -103,13 +104,13 @@ public class SchematicCursor extends AbstractCursor implements ISchematicCursor 
 
     @Override
     public Map<CloneableRecord, DuplicateKVPair> mgetWithDuplicate(List<CloneableRecord> keys, boolean prefixMatch,
-                                                                   boolean keyFilterOrValueFilter) throws Exception {
+                                                                   boolean keyFilterOrValueFilter) throws TddlException {
         return parentCursorMgetWithDuplicate(keys, prefixMatch, keyFilterOrValueFilter);
     }
 
     @Override
     public List<DuplicateKVPair> mgetWithDuplicateList(List<CloneableRecord> keys, boolean prefixMatch,
-                                                       boolean keyFilterOrValueFilter) throws Exception {
+                                                       boolean keyFilterOrValueFilter) throws TddlException {
         return parentCursorMgetWithDuplicateList(keys, prefixMatch, keyFilterOrValueFilter);
     }
 
@@ -122,7 +123,7 @@ public class SchematicCursor extends AbstractCursor implements ISchematicCursor 
     }
 
     @Override
-    public List<ColumnMeta> getReturnColumns() throws Exception {
+    public List<ColumnMeta> getReturnColumns() throws TddlException {
         return parentCursorGetReturnColumns();
     }
 }

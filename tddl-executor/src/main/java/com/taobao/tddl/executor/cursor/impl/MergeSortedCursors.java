@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.executor.common.CloneableRecord;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
+import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.cursor.IORCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
+import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 
 /**
@@ -40,7 +43,7 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
     private boolean                      templateIsLeft = true;
 
     public MergeSortedCursors(List<ISchematicCursor> cursors, String tableAlias, boolean duplicated)
-                                                                                                    throws FetchException{
+                                                                                                    throws TddlException{
         super(cursors.get(0), null);
         this.cursors = cursors;
         this.allowDuplicated = duplicated;
@@ -49,7 +52,7 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
         buildAndSetOrderBy(cursors.get(0), tableAlias);
     }
 
-    public MergeSortedCursors(ISchematicCursor cursor, String tableAlias, boolean duplicated) throws FetchException{
+    public MergeSortedCursors(ISchematicCursor cursor, String tableAlias, boolean duplicated) throws TddlException{
         super(cursor, null);
         List<ISchematicCursor> cursors = new ArrayList(1);
         cursors.add(cursor);
@@ -63,7 +66,7 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
     }
 
     @Override
-    public void beforeFirst() throws Exception {
+    public void beforeFirst() throws TddlException {
         inited = false;
         values.clear();
         values = new ArrayList(cursors.size());
@@ -82,7 +85,7 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
     private void buildAndSetOrderBy(ISchematicCursor cursor, String tableAlias) {
         if (cursor != null) {
             List<IOrderBy> orderBy = cursor.getOrderBy();
-            List<IOrderBy> orderbyAfterCopy = GeneralUtil.copyOrderBys(orderBy);
+            List<IOrderBy> orderbyAfterCopy = ExecUtils.copyOrderBys(orderBy);
             if (tableAlias != null && !tableAlias.isEmpty()) {
                 for (IOrderBy orderby : orderbyAfterCopy) {
                     orderby.getColumn().setTableName(tableAlias);
@@ -98,7 +101,7 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
     IRowSet current         = null;
     boolean inited          = false;
 
-    public void init() throws Exception {
+    public void init() throws TddlException {
         if (inited) return;
         inited = true;
 
@@ -118,7 +121,7 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
      * 如果去重，需要将重复的值略过
      */
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         init();
 
         int indexOfCurrentMaxOrMin = 0;
@@ -166,7 +169,7 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
 
         if (currentMaxOrMin != null) {
             IRowSet rowToRemoveDuplicate = null;
-            currentMaxOrMin = GeneralUtil.fromIRowSetToArrayRowSet(currentMaxOrMin);
+            currentMaxOrMin = ExecUtils.fromIRowSetToArrayRowSet(currentMaxOrMin);
 
             // 选中的cursor消费一行记录，往前移动，如果有需要，还要去重
             while (true) {
@@ -219,7 +222,7 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
     }
 
     @Override
-    public IRowSet first() throws Exception {
+    public IRowSet first() throws TddlException {
         for (int i = 0; i < this.cursors.size(); i++) {
             cursors.get(i).beforeFirst();
         }
@@ -231,7 +234,7 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
     }
 
     @Override
-    public void put(CloneableRecord key, CloneableRecord value) throws Exception {
+    public void put(CloneableRecord key, CloneableRecord value) throws TddlException {
         throw new UnsupportedOperationException("should not be here");
     }
 
@@ -242,14 +245,14 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
 
     @Override
     public Map<CloneableRecord, DuplicateKVPair> mgetWithDuplicate(List<CloneableRecord> keys, boolean prefixMatch,
-                                                                   boolean keyFilterOrValueFilter) throws Exception {
+                                                                   boolean keyFilterOrValueFilter) throws TddlException {
 
         throw new UnsupportedOperationException("should not be here");
     }
 
     @Override
     public List<DuplicateKVPair> mgetWithDuplicateList(List<CloneableRecord> keys, boolean prefixMatch,
-                                                       boolean keyFilterOrValueFilter) throws Exception {
+                                                       boolean keyFilterOrValueFilter) throws TddlException {
         throw new UnsupportedOperationException("should not be here");
     }
 
@@ -272,7 +275,7 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
     }
 
     @Override
-    public List<Exception> close(List<Exception> exs) {
+    public List<TddlException> close(List<TddlException> exs) {
 
         for (Cursor c : this.cursors) {
             if (c != null) exs = c.close(exs);

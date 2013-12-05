@@ -1,5 +1,6 @@
 package com.taobao.tddl.executor.spi;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 
@@ -19,5 +20,5 @@ public interface CommandHandler {
      * @return
      * @throws Exception
      */
-    public ISchematicCursor handle(IDataNodeExecutor executor, ExecutionContext executionContext) throws Exception;
+    public ISchematicCursor handle(IDataNodeExecutor executor, ExecutionContext executionContext) throws TddlException;
 }

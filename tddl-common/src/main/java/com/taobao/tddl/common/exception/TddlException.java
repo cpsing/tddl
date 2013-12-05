@@ -31,4 +31,8 @@ public class TddlException extends NestableException {
     public TddlException(Throwable cause){
         super(cause);
     }
+
+    public TddlException(int errorCode, String errorDesc){
+        this(String.valueOf(errorCode), errorDesc);
+    }
 }

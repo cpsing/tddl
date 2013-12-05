@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.executor.common.CloneableRecord;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.common.KVPair;
+import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 
@@ -21,12 +22,12 @@ public abstract class AbstractCursor implements Cursor {
 
     protected boolean inited = false;
 
-    protected void init() throws Exception {
+    protected void init() throws TddlException {
         inited = true;
 
     }
 
-    protected void checkInited() throws Exception {
+    protected void checkInited() throws TddlException {
         if (!inited) {
             throw new RuntimeException("not yet inited ");
         }
@@ -37,134 +38,134 @@ public abstract class AbstractCursor implements Cursor {
     }
 
     @Override
-    public boolean skipTo(CloneableRecord key) throws Exception {
+    public boolean skipTo(CloneableRecord key) throws TddlException {
         throw new IllegalArgumentException("null object");
     }
 
-    protected boolean parentCursorSkipTo(CloneableRecord key) throws Exception {
+    protected boolean parentCursorSkipTo(CloneableRecord key) throws TddlException {
         return cursor.skipTo(key);
     }
 
     // @Override
-    // public KVPair get(KVPair key) throws Exception {
+    // public KVPair get(KVPair key) throws TddlException {
     //
     // return cursor.get(key);
     // }
 
     @Override
-    public boolean skipTo(KVPair key) throws Exception {
+    public boolean skipTo(KVPair key) throws TddlException {
         throw new IllegalArgumentException("null object");
     }
 
-    protected boolean parentCursorSkipTo(KVPair key) throws Exception {
+    protected boolean parentCursorSkipTo(KVPair key) throws TddlException {
         return cursor.skipTo(key);
     }
 
     @Override
-    public IRowSet current() throws Exception {
+    public IRowSet current() throws TddlException {
         throw new IllegalArgumentException("null object");
     }
 
-    protected IRowSet parentCursorCurrent() throws Exception {
+    protected IRowSet parentCursorCurrent() throws TddlException {
         return cursor.current();
     }
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         GeneralUtil.checkInterrupted();
         throw new IllegalArgumentException("null object");
         // if(cursor == null) return null;
         // return cursor.next();
     }
 
-    protected IRowSet parentCursorNext() throws Exception {
+    protected IRowSet parentCursorNext() throws TddlException {
         GeneralUtil.checkInterrupted();
         if (cursor == null) return null;
         return cursor.next();
     }
 
     @Override
-    public IRowSet prev() throws Exception {
+    public IRowSet prev() throws TddlException {
         throw new IllegalArgumentException("null object");
     }
 
-    protected IRowSet parentCursorPrev() throws Exception {
+    protected IRowSet parentCursorPrev() throws TddlException {
         return cursor.prev();
     }
 
     @Override
-    public IRowSet first() throws Exception {
+    public IRowSet first() throws TddlException {
         throw new IllegalArgumentException("null object");
     }
 
-    protected IRowSet parentCursorFirst() throws Exception {
+    protected IRowSet parentCursorFirst() throws TddlException {
         return cursor.first();
     }
 
     @Override
-    public void beforeFirst() throws Exception {
+    public void beforeFirst() throws TddlException {
         throw new IllegalArgumentException("null object");
         // cursor.beforeFirst();
     }
 
-    protected void parentCursorBeforeFirst() throws Exception {
+    protected void parentCursorBeforeFirst() throws TddlException {
         cursor.beforeFirst();
     }
 
     @Override
-    public IRowSet last() throws Exception {
+    public IRowSet last() throws TddlException {
         throw new IllegalArgumentException("null object");
     }
 
-    protected IRowSet parentCursorLast() throws Exception {
+    protected IRowSet parentCursorLast() throws TddlException {
         return cursor.last();
     }
 
     //
     // @Override
-    // public KVPair get(CloneableRecord key) throws Exception {
+    // public KVPair get(CloneableRecord key) throws TddlException {
     //
     // return cursor.get(key);
     // }
 
     @Override
-    public IRowSet getNextDup() throws Exception {
+    public IRowSet getNextDup() throws TddlException {
         throw new IllegalArgumentException("null object");
     }
 
-    protected IRowSet parentCursorGetNextDup() throws Exception {
+    protected IRowSet parentCursorGetNextDup() throws TddlException {
         return cursor.getNextDup();
     }
 
     @Override
-    public List<Exception> close(List<Exception> exceptions) {
-        List<Exception> ex = parentCursorClose(exceptions);
+    public List<TddlException> close(List<TddlException> exceptions) {
+        List<TddlException> ex = parentCursorClose(exceptions);
         return ex;
     }
 
-    protected List<Exception> parentCursorClose(List<Exception> exceptions) {
+    protected List<TddlException> parentCursorClose(List<TddlException> exceptions) {
         if (cursor != null) {
-            List<Exception> ex = cursor.close(exceptions);
+            List<TddlException> ex = cursor.close(exceptions);
             cursor = null;
             return ex;
         }
 
-        if (exceptions == null) exceptions = new ArrayList<Exception>();
+        if (exceptions == null) exceptions = new ArrayList<TddlException>();
         return exceptions;
 
     }
 
     @Override
-    public boolean delete() throws Exception {
+    public boolean delete() throws TddlException {
         throw new IllegalArgumentException("null object");
     }
 
-    protected boolean parentCursorDelete() throws Exception {
+    protected boolean parentCursorDelete() throws TddlException {
         return cursor.delete();
     }
 
     @Override
-    public void put(CloneableRecord key, CloneableRecord value) throws Exception {
+    public void put(CloneableRecord key, CloneableRecord value) throws TddlException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -178,25 +179,26 @@ public abstract class AbstractCursor implements Cursor {
 
     @Override
     public Map<CloneableRecord, DuplicateKVPair> mgetWithDuplicate(List<CloneableRecord> keys, boolean prefixMatch,
-                                                                   boolean keyFilterOrValueFilter) throws Exception {
+                                                                   boolean keyFilterOrValueFilter) throws TddlException {
         throw new IllegalArgumentException("null object");
     }
 
     protected Map<CloneableRecord, DuplicateKVPair> parentCursorMgetWithDuplicate(List<CloneableRecord> keys,
                                                                                   boolean prefixMatch,
                                                                                   boolean keyFilterOrValueFilter)
-                                                                                                                 throws Exception {
+                                                                                                                 throws TddlException {
         return cursor.mgetWithDuplicate(keys, prefixMatch, keyFilterOrValueFilter);
     }
 
     @Override
     public List<DuplicateKVPair> mgetWithDuplicateList(List<CloneableRecord> keys, boolean prefixMatch,
-                                                       boolean keyFilterOrValueFilter) throws Exception {
+                                                       boolean keyFilterOrValueFilter) throws TddlException {
         throw new IllegalArgumentException("null object");
     }
 
     protected List<DuplicateKVPair> parentCursorMgetWithDuplicateList(List<CloneableRecord> keys, boolean prefixMatch,
-                                                                      boolean keyFilterOrValueFilter) throws Exception {
+                                                                      boolean keyFilterOrValueFilter)
+                                                                                                     throws TddlException {
         return cursor.mgetWithDuplicateList(keys, prefixMatch, keyFilterOrValueFilter);
     }
 
@@ -218,7 +220,7 @@ public abstract class AbstractCursor implements Cursor {
         return toStringWithInden(0);
     }
 
-    public List<ColumnMeta> parentCursorGetReturnColumns() throws Exception {
+    public List<ColumnMeta> parentCursorGetReturnColumns() throws TddlException {
         return this.cursor.getReturnColumns();
     }
 }

@@ -1,5 +1,6 @@
 package com.taobao.tddl.atom.config;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.config.ConfigDataListener;
 
 /**
@@ -40,5 +41,5 @@ public interface DbConfManager {
     /**
      * 停止DbConfManager
      */
-    public void stopDbConfManager();
+    public void stopDbConfManager() throws TddlException;
 }

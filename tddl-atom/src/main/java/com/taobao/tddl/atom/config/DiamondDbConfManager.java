@@ -7,13 +7,13 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import com.taobao.tddl.atom.common.TAtomConstants;
+import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.config.ConfigDataHandler;
 import com.taobao.tddl.config.ConfigDataHandlerFactory;
 import com.taobao.tddl.config.ConfigDataListener;
 import com.taobao.tddl.config.impl.ConfigDataHandlerCity;
-
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * 全局和应用的配置管理Diamond实现
@@ -102,7 +102,8 @@ public class DiamondDbConfManager implements DbConfManager {
         appDbConfListener.add(listener);
     }
 
-    public void stopDbConfManager() {
+    @Override
+    public void stopDbConfManager() throws TddlException {
         if (null != this.globalHandler) {
             this.globalHandler.destory();
         }

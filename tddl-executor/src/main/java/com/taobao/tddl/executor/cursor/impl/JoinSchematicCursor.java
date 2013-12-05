@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.executor.common.CursorMetaImp;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
@@ -95,7 +98,7 @@ public class JoinSchematicCursor extends SchematicCursor {
 
         List<ColumnMeta> leftColumns = leftCursorMeta.getColumns();
         List<ColumnMeta> rightColumns = rightCursorMeta.getColumns();
-        this.kvPairComparator = ExecUtil.getComp(this.leftJoinOnColumns,
+        this.kvPairComparator = ExecUtils.getComp(this.leftJoinOnColumns,
             this.rightJoinOnColumns,
             leftCursorMeta,
             rightCursorMeta);
@@ -160,7 +163,7 @@ public class JoinSchematicCursor extends SchematicCursor {
     }
 
     @Override
-    public List<Exception> close(List<Exception> exs) {
+    public List<TddlException> close(List<TddlException> exs) {
         if (left_cursor != null) {
             exs = left_cursor.close(exs);
         }

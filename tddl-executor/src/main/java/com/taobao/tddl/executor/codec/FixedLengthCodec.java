@@ -1,4 +1,4 @@
-package com.taobao.tddl.executor;
+package com.taobao.tddl.executor.codec;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -6,8 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.taobao.tddl.executor.common.CloneableRecord;
-import com.taobao.tddl.executor.common.RecordCodec;
+import com.taobao.tddl.executor.record.CloneableRecord;
+import com.taobao.tddl.executor.record.FixedLengthRecord;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 
@@ -39,7 +40,7 @@ public class FixedLengthCodec implements RecordCodec<byte[]> {
         for (ColumnMeta c : columns) {
             Object v = record.get(c.getName());
             DATA_TYPE t = c.getDataType();
-            if (v == null && !c.getNullable()) {
+            if (v == null && !c.isNullable()) {
                 throw new RuntimeException(c + " is not nullable.");
             }
             offset += encode1(v, t, dst, offset);
@@ -120,7 +121,7 @@ public class FixedLengthCodec implements RecordCodec<byte[]> {
                 if (v instanceof Date) {
                     v = ((Date) v).getTime();
                 } else {
-                    v = ExecUtil.convertStringToDate(v.toString()).getTime();
+                    v = ExecUtils.convertStringToDate(v.toString()).getTime();
                 }
             }
             return DataEncoder.encode((Long) v, dst, offset);

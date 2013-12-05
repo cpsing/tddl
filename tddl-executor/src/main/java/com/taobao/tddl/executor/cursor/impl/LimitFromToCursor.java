@@ -1,10 +1,12 @@
 package com.taobao.tddl.executor.cursor.impl;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.cursor.ILimitFromToCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.executor.utils.ExecUtils;
 
 /**
  * 用于做limit操作
@@ -28,7 +30,7 @@ public class LimitFromToCursor extends SchematicCursor implements ILimitFromToCu
     private int  count     = 0;
 
     @Override
-    protected void init() throws Exception {
+    protected void init() throws TddlException {
         if (inited) {
             return;
         }
@@ -45,7 +47,7 @@ public class LimitFromToCursor extends SchematicCursor implements ILimitFromToCu
     }
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         init();
         count++;
         if (offset != null) {
@@ -73,7 +75,7 @@ public class LimitFromToCursor extends SchematicCursor implements ILimitFromToCu
         StringBuilder sb = new StringBuilder();
         String tab = GeneralUtil.getTab(inden);
         sb.append(tab).append("【Limit cursor . from : ").append(limitFrom).append(" to :").append(offset).append("\n");
-        GeneralUtil.printOrderBy(orderBys, inden, sb);
+        ExecUtils.printOrderBy(orderBys, inden, sb);
         sb.append(super.toStringWithInden(inden));
         return sb.toString();
     }

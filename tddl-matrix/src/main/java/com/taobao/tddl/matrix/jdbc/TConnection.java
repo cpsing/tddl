@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.NClob;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
@@ -15,10 +16,23 @@ import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
+import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.jdbc.ParameterContext;
+import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.executor.TExecutor;
+import com.taobao.tddl.executor.cursor.ResultCursor;
+import com.taobao.tddl.executor.cursor.impl.ResultSetCursor;
+import com.taobao.tddl.executor.spi.ExecutionContext;
+import com.taobao.tddl.matrix.jdbc.utils.ExceptionUtils;
 
 /**
  * @author mengshi.sunmengshi 2013-11-22 下午3:26:06
@@ -26,300 +40,437 @@ import com.taobao.tddl.executor.TExecutor;
  */
 public class TConnection implements Connection {
 
-    TExecutor executor = null;
+    private TExecutor        executor         = null;
+    private TDataSource      ds;
+    private ExecutionContext executionContext = null;
+    private Set<TStatement>  openedStatements = new HashSet<TStatement>(2);
 
-    @Override
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+    public TConnection(TDataSource ds){
+        this.ds = ds;
+        this.executor = ds.getExecutor();
     }
 
-    @Override
-    public <T> T unwrap(Class<T> iface) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+    public PreparedStatement prepareStatement(String sql) throws SQLException {
+
+        checkClosed();
+        TPreparedStatement stmt = new TPreparedStatement(ds, this, sql);
+        openedStatements.add(stmt);
+        return stmt;
     }
 
-    @Override
-    public void clearWarnings() throws SQLException {
-        // TODO Auto-generated method stub
-
+    public Statement createStatement() throws SQLException {
+        checkClosed();
+        TStatement stmt = new TStatement(ds, this);
+        openedStatements.add(stmt);
+        return stmt;
     }
 
-    @Override
-    public void close() throws SQLException {
-        // TODO Auto-generated method stub
+    /*
+     * ========================================================================
+     * JDBC事务相关的autoCommit设置、commit/rollback、TransactionIsolation等
+     * ======================================================================
+     */
+    private boolean isAutoCommit = true; // jdbc规范，新连接为true
 
+    public void setAutoCommit(boolean autoCommit) throws SQLException {
+        checkClosed();
+        if (this.isAutoCommit == autoCommit) {
+            // 先排除两种最常见的状态,true==true 和false == false: 什么也不做
+            return;
+        }
+        this.isAutoCommit = autoCommit;
+        if (!this.isAutoCommit) {
+            initTransactionResource();
+        }
     }
 
-    @Override
+    public boolean getAutoCommit() throws SQLException {
+        checkClosed();
+        return isAutoCommit;
+    }
+
     public void commit() throws SQLException {
-        // TODO Auto-generated method stub
+        checkClosed();
+        if (isAutoCommit) {
+            return;
+        }
+
+        try {
+            this.executor.commit(this.executionContext);
+        } catch (TddlException e) {
+            throw new SQLException(e);
+        }
+
+        clearTransactionResource();
+    }
+
+    public void rollback() throws SQLException {
+        checkClosed();
+        if (isAutoCommit) {
+            return;
+        }
+
+        try {
+            this.executor.rollback(executionContext);
+        } catch (TddlException e) {
+            throw new SQLException(e);
+        }
+
+        clearTransactionResource();
+    }
+
+    private void initTransactionResource() {
+    }
+
+    private void clearTransactionResource() {
 
     }
 
-    @Override
-    public Array createArrayOf(String arg0, Object[] arg1) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+    // FIXME DatabaseMetaData 未实现
+    public DatabaseMetaData getMetaData() throws SQLException {
+        checkClosed();
+        return new TDatabaseMetaData();
     }
 
-    @Override
-    public Blob createBlob() throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+    public Savepoint setSavepoint() throws SQLException {
+        throw new UnsupportedOperationException("setSavepoint");
     }
 
-    @Override
+    public Savepoint setSavepoint(String name) throws SQLException {
+        throw new UnsupportedOperationException("setSavepoint");
+    }
+
+    public void rollback(Savepoint savepoint) throws SQLException {
+        throw new UnsupportedOperationException("rollback");
+
+    }
+
+    public void releaseSavepoint(Savepoint savepoint) throws SQLException {
+        throw new UnsupportedOperationException("releaseSavepoint");
+
+    }
+
+    /*
+     * ========================================================================
+     * 关闭逻辑
+     * ======================================================================
+     */
+    private boolean closed;
+
+    private void checkClosed() throws SQLException {
+        if (closed) {
+            throw new SQLException("No operations allowed after connection closed.");
+        }
+    }
+
+    public boolean isClosed() throws SQLException {
+        return closed;
+    }
+
+    @SuppressWarnings("unchecked")
+    public void close() throws SQLException {
+        if (closed) {
+            return;
+        }
+        List<SQLException> exceptions = new LinkedList<SQLException>();
+        try {
+
+            // 关闭statement
+            for (TStatement stmt : openedStatements) {
+                try {
+                    stmt.close(false);
+                } catch (SQLException e) {
+                    exceptions.add(e);
+                }
+            }
+
+        } finally {
+            openedStatements.clear();
+        }
+
+        if (this.executionContext != null && this.executionContext.getTransaction() != null) {
+            try {
+                this.executionContext.getTransaction().setAutoCommit(true);
+                this.executionContext.getTransaction().close();
+            } catch (TddlException e) {
+                exceptions.add(new SQLException(e));
+            }
+        }
+        closed = true;
+        ExceptionUtils.throwSQLException(exceptions, "close tconnection", Collections.EMPTY_LIST);
+    }
+
+    private Map<String, Comparable> buildExtraCommand(String sql) {
+        Map<String, Comparable> extraCmd = new HashMap();
+        if (sql != null && sql.startsWith("/* ANDOR ")) {
+            // 去掉注释
+            String commet = TStringUtil.substringAfter(sql, "/* ANDOR ");
+            commet = TStringUtil.substringBefore(commet, "*/");
+            String[] params = commet.split(",");
+            for (String param : params) {
+                String[] keyAndVal = param.split("=");
+                if (keyAndVal.length != 2) {
+                    throw new IllegalArgumentException(param + " is wrong , only key = val supported");
+                }
+                String key = keyAndVal[0];
+                String val = keyAndVal[1];
+                extraCmd.put(key, val);
+            }
+        }
+        extraCmd.putAll(this.ds.getConnectionProperties());
+        return extraCmd;
+    }
+
+    /**
+     * 执行sql语句的逻辑
+     * 
+     * @param sql
+     * @param context
+     * @return
+     * @throws SQLException
+     */
+    public ResultSet executeSQL(String sql, Map<Integer, ParameterContext> context, TStatement stmt,
+                                Map<String, Comparable> extraCmd) throws SQLException {
+
+        ResultCursor resultCursor;
+        ResultSet rs = null;
+        extraCmd.putAll(buildExtraCommand(sql));
+
+        if (isAutoCommit) {
+            executionContext = new ExecutionContext();
+        } else {
+            if (executionContext == null) executionContext = new ExecutionContext();
+        }
+
+        executionContext.setParams(context);
+        executionContext.setExtraCmds(extraCmd);
+
+        try {
+            resultCursor = executor.execute(sql, executionContext);
+        } catch (TddlException e) {
+            throw new SQLException(e);
+        }
+
+        if (resultCursor instanceof ResultSetCursor) rs = ((ResultSetCursor) resultCursor).getResultSet();
+        else rs = new TResultSet(resultCursor);
+
+        return rs;
+    }
+
+    /**
+     * 未实现方法
+     */
+    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability)
+                                                                                                           throws SQLException {
+        throw new UnsupportedOperationException();
+    }
+
+    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency,
+                                              int resultSetHoldability) throws SQLException {
+        throw new UnsupportedOperationException();
+    }
+
+    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency,
+                                         int resultSetHoldability) throws SQLException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+        // return null;
+    }
+
+    /**
+     * andor 暂时不支持GeneratedKeys
+     */
+    public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
+
+        throw new UnsupportedOperationException();
+        // return null;
+    }
+
+    public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
+        throw new UnsupportedOperationException();
+        // TODO Auto-generated method stub
+        // return null;
+    }
+
+    public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+        // return null;
+    }
+
     public Clob createClob() throws SQLException {
         // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
+        // return null;
     }
 
-    @Override
+    public Blob createBlob() throws SQLException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+        // return null;
+    }
+
     public NClob createNClob() throws SQLException {
         // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
+        // return null;
     }
 
-    @Override
     public SQLXML createSQLXML() throws SQLException {
         // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
+        // return null;
     }
 
-    @Override
-    public Statement createStatement() throws SQLException {
+    /**
+     * 暂时实现为isClosed
+     */
+    public boolean isValid(int timeout) throws SQLException {
+        // TODO 暂时实现为isClosed
+
+        return this.isClosed();
+    }
+
+    public void setClientInfo(String name, String value) throws SQLClientInfoException {
         // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
+
     }
 
-    @Override
-    public Statement createStatement(int arg0, int arg1) throws SQLException {
+    public void setClientInfo(Properties properties) throws SQLClientInfoException {
         // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
+
     }
 
-    @Override
-    public Statement createStatement(int arg0, int arg1, int arg2) throws SQLException {
+    public String getClientInfo(String name) throws SQLException {
         // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
+        // return null;
+
     }
 
-    @Override
-    public Struct createStruct(String arg0, Object[] arg1) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean getAutoCommit() throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public String getCatalog() throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public Properties getClientInfo() throws SQLException {
         // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
+        // return null;
     }
 
-    @Override
-    public String getClientInfo(String arg0) throws SQLException {
+    public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
         // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
+        // return null;
     }
 
-    @Override
-    public int getHoldability() throws SQLException {
+    public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
         // TODO Auto-generated method stub
-        return 0;
+        throw new UnsupportedOperationException();
+        // return null;
     }
 
-    @Override
-    public DatabaseMetaData getMetaData() throws SQLException {
+    public void setReadOnly(boolean readOnly) throws SQLException {
         // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
-    @Override
+    public boolean isReadOnly() throws SQLException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+        // return false;
+    }
+
+    public void setCatalog(String catalog) throws SQLException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
+
+    public String getCatalog() throws SQLException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+        // return null;
+    }
+
+    public void setTransactionIsolation(int level) throws SQLException {
+        // TODO Auto-generated method stub
+
+    }
+
     public int getTransactionIsolation() throws SQLException {
         // TODO Auto-generated method stub
         return 0;
     }
 
-    @Override
-    public Map<String, Class<?>> getTypeMap() throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public SQLWarning getWarnings() throws SQLException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
-    public boolean isClosed() throws SQLException {
+    public void clearWarnings() throws SQLException {
+        // TODO Auto-generated method stub
+
+    }
+
+    public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+        // return null;
+    }
+
+    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency)
+                                                                                                      throws SQLException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+        // return null;
+    }
+
+    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Map<String, Class<?>> getTypeMap() throws SQLException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void setHoldability(int holdability) throws SQLException {
+        // TODO Auto-generated method stub
+
+    }
+
+    public int getHoldability() throws SQLException {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public CallableStatement prepareCall(String sql) throws SQLException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public String nativeSQL(String sql) throws SQLException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+        // return null;
+    }
+
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
         // TODO Auto-generated method stub
         return false;
     }
 
-    @Override
-    public boolean isReadOnly() throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean isValid(int arg0) throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public String nativeSQL(String arg0) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public CallableStatement prepareCall(String arg0) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public CallableStatement prepareCall(String arg0, int arg1, int arg2) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public CallableStatement prepareCall(String arg0, int arg1, int arg2, int arg3) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String arg0) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String arg0, int arg1) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String arg0, int[] arg1) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String arg0, String[] arg1) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String arg0, int arg1, int arg2) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String arg0, int arg1, int arg2, int arg3) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void releaseSavepoint(Savepoint arg0) throws SQLException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void rollback() throws SQLException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void rollback(Savepoint arg0) throws SQLException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setAutoCommit(boolean arg0) throws SQLException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setCatalog(String arg0) throws SQLException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setClientInfo(Properties arg0) throws SQLClientInfoException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setClientInfo(String arg0, String arg1) throws SQLClientInfoException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setHoldability(int arg0) throws SQLException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setReadOnly(boolean arg0) throws SQLException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public Savepoint setSavepoint() throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Savepoint setSavepoint(String arg0) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setTransactionIsolation(int arg0) throws SQLException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setTypeMap(Map<String, Class<?>> arg0) throws SQLException {
-        // TODO Auto-generated method stub
-
+    public boolean removeStatement(Object arg0) {
+        return openedStatements.remove(arg0);
     }
 
 }

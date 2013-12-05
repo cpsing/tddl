@@ -2,10 +2,12 @@ package com.taobao.tddl.executor.cursor.impl;
 
 import java.util.List;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.cursor.IIndexNestLoopCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 
 /**
@@ -29,13 +31,13 @@ public class IndexNestLoopCursor extends SortMergeJoinCursor1 implements IIndexN
      */
     public IndexNestLoopCursor(ISchematicCursor leftCursor, ISchematicCursor rightCursor, List leftJoinOnColumns,
                                List rightJoinOnColumns, List columns, List leftColumns, List rightColumns)
-                                                                                                          throws Exception{
+                                                                                                          throws TddlException{
         this(leftCursor, rightCursor, leftJoinOnColumns, rightJoinOnColumns, columns, false, leftColumns, rightColumns);
     }
 
     public IndexNestLoopCursor(ISchematicCursor leftCursor, ISchematicCursor rightCursor, List leftJoinOnColumns,
                                List rightJoinOnColumns, List columns, boolean prefix, List leftColumns,
-                               List rightColumns) throws Exception{
+                               List rightColumns) throws TddlException{
         super(leftCursor,
             rightCursor,
             leftJoinOnColumns,
@@ -49,7 +51,7 @@ public class IndexNestLoopCursor extends SortMergeJoinCursor1 implements IIndexN
     }
 
     @Override
-    public IRowSet prev() throws Exception {
+    public IRowSet prev() throws TddlException {
         if (iteratorDirection == null) {
             iteratorDirection = IteratorDirection.BACKWARD;
         } else if (iteratorDirection == IteratorDirection.FORWARD) {
@@ -65,7 +67,7 @@ public class IndexNestLoopCursor extends SortMergeJoinCursor1 implements IIndexN
     }
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         if (iteratorDirection == null) {
             iteratorDirection = IteratorDirection.FORWARD;
         } else if (iteratorDirection == IteratorDirection.BACKWARD) {
@@ -84,7 +86,7 @@ public class IndexNestLoopCursor extends SortMergeJoinCursor1 implements IIndexN
         }
     }
 
-    private IRowSet processJoinOneWithProfix() throws Exception, InterruptedException {
+    private IRowSet processJoinOneWithProfix() throws TddlException {
         IRowSet ret = null;
 
         if (dup != null) {
@@ -96,11 +98,11 @@ public class IndexNestLoopCursor extends SortMergeJoinCursor1 implements IIndexN
     }
 
     @Override
-    public void beforeFirst() throws Exception {
+    public void beforeFirst() throws TddlException {
         left_cursor.beforeFirst();
     }
 
-    protected IRowSet proecessJoinOneWithNoneProfix(boolean forward) throws Exception, InterruptedException {
+    protected IRowSet proecessJoinOneWithNoneProfix(boolean forward) throws TddlException {
         IRowSet ret = null;
 
         if (dup != null) {
@@ -122,9 +124,9 @@ public class IndexNestLoopCursor extends SortMergeJoinCursor1 implements IIndexN
         return null;
     }
 
-    protected IRowSet getOneLeftCursor(boolean forward) throws Exception {
-        if (forward) left = GeneralUtil.fromIRowSetToArrayRowSet(left_cursor.next());
-        else left = GeneralUtil.fromIRowSetToArrayRowSet(left_cursor.prev());
+    protected IRowSet getOneLeftCursor(boolean forward) throws TddlException {
+        if (forward) left = ExecUtils.fromIRowSetToArrayRowSet(left_cursor.next());
+        else left = ExecUtils.fromIRowSetToArrayRowSet(left_cursor.prev());
         return left;
     }
 
@@ -135,9 +137,9 @@ public class IndexNestLoopCursor extends SortMergeJoinCursor1 implements IIndexN
         right_key = rightCodec.newEmptyRecord();
         for (int k = 0; k < leftJoinOnColumns.size(); k++) {
 
-            Object v = GeneralUtil.getValueByIColumn(left, (IColumn) leftJoinOnColumns.get(k));
+            Object v = ExecUtils.getValueByIColumn(left, (IColumn) leftJoinOnColumns.get(k));
 
-            right_key.put(GeneralUtil.getColumn(rightJoinOnColumns.get(k)).getColumnName(), v);
+            right_key.put(ExecUtils.getColumn(rightJoinOnColumns.get(k)).getColumnName(), v);
         }
     }
 
@@ -145,9 +147,9 @@ public class IndexNestLoopCursor extends SortMergeJoinCursor1 implements IIndexN
      * 处理右值重复用。 左值不变，右值因为有相同key的值，所以取右，下移指针一次。
      * 
      * @return
-     * @throws Exception
+     * @throws TddlException
      */
-    protected IRowSet processDuplicateValue() throws Exception {
+    protected IRowSet processDuplicateValue() throws TddlException {
         IRowSet ret;
         ret = joinRecord(left, dup);
         if (!right_prefix) {
@@ -186,7 +188,7 @@ public class IndexNestLoopCursor extends SortMergeJoinCursor1 implements IIndexN
 
     // public Map<CloneableRecord, DuplicateKVPair>
     // mgetWithDuplicate(List<CloneableRecord> keys,boolean prefixMatch,boolean
-    // keyFilterOrValueFilter) throws Exception
+    // keyFilterOrValueFilter) throws TddlException
     // {
     // this.beforeFirst();
     // IBooleanFilter filter = new PBBooleanFilterAdapter();

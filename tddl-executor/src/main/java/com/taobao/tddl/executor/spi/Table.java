@@ -3,8 +3,8 @@ package com.taobao.tddl.executor.spi;
 import java.sql.SQLException;
 
 import com.taobao.tddl.common.exception.TddlException;
-import com.taobao.tddl.executor.common.CloneableRecord;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
+import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;

@@ -81,6 +81,7 @@ public class ExtraCmd {
         public static final String ALLOW_BIO                  = "ALLOW_BIO";
 
         public static final String HBASE_MAPPING_FILE         = "HBASE_MAPPING_FILE";
+        public static final String FETCH_SIZE                 = "FETCH_SIZE";
     }
 
     public static class ConnectionExtraCmd {
@@ -97,7 +98,8 @@ public class ExtraCmd {
         public static final String USE_BOTH_LOCALSCHEMA_AND_DYNAMICSCHEMA = "USE_BOTH_LOCALSCHEMA_AND_DYNAMICSCHEMA";
         public static final String RULE                                   = "RULE";
         public static final String CONFIG_DATA_HANDLER_FACTORY            = "CONFIG_DATA_HANDLER_FACTORY";
-
+        public static final String PARSER_CACHE                           = "PARSER_CACHE";
+        public static final String OPTIMIZER_CACHE                        = "OPTIMIZER_CACHE";
     }
 
 }

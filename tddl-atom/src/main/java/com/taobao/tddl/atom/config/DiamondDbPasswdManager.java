@@ -7,13 +7,13 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import com.taobao.tddl.atom.common.TAtomConstants;
+import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.config.ConfigDataHandler;
 import com.taobao.tddl.config.ConfigDataHandlerFactory;
 import com.taobao.tddl.config.ConfigDataListener;
 import com.taobao.tddl.config.impl.ConfigDataHandlerCity;
-
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * 密码管理器Diamond实现
@@ -65,7 +65,7 @@ public class DiamondDbPasswdManager implements DbPasswdManager {
         this.unitName = unitName;
     }
 
-    public void stopDbPasswdManager() {
+    public void stopDbPasswdManager() throws TddlException {
         if (null != this.passwdHandler) {
             this.passwdHandler.destory();
         }

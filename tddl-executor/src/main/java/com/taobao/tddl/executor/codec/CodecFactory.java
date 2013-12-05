@@ -1,8 +1,7 @@
-package com.taobao.tddl.executor.common;
+package com.taobao.tddl.executor.codec;
 
 import java.util.List;
 
-import com.taobao.tddl.executor.FixedLengthCodec;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 
 /**

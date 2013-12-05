@@ -11,5 +11,20 @@
 	<packaging>jar</packaging>
 	<name>${project.artifactId} module for tddl ${project.version}</name>
 	<dependencies>
+	<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>tddl-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>tddl-executor</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>tddl-optimizer</artifactId>
+			<version>${project.version}</version>
+		</dependency>
   </dependencies>
 </project>

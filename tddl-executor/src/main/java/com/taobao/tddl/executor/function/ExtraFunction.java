@@ -3,7 +3,8 @@ package com.taobao.tddl.executor.function;
 import java.util.Arrays;
 import java.util.List;
 
-import com.taobao.tddl.executor.IRowSet;
+import com.taobao.tddl.common.exception.TddlRuntimeException;
+import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IExtraFunction;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
@@ -82,7 +83,7 @@ public abstract class ExtraFunction implements IExtraFunction {
      * @param kvPair
      * @throws Exception
      */
-    public void serverMap(IRowSet kvPair) throws Exception {
+    public void serverMap(IRowSet kvPair) throws TddlRuntimeException {
         // 当前function需要的args 有些可能是函数，也有些是其他的一些数据
         List<Object> argsArr = function.getArgs();
         // 函数的input参数
@@ -120,7 +121,7 @@ public abstract class ExtraFunction implements IExtraFunction {
      * @param kvPair
      * @throws Exception
      */
-    public void serverReduce(IRowSet kvPair) throws Exception {
+    public void serverReduce(IRowSet kvPair) throws TddlRuntimeException {
         if (this.getFunctionType().equals(FunctionType.Scalar)) {
             if (this.getClass().equals(Dummy.class)) {
                 // TODO

@@ -1,13 +1,15 @@
-package com.taobao.ustore.spi.cursor.common;
+package com.taobao.tddl.executor.cursor.impl;
 
 import java.util.Comparator;
 import java.util.List;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 
 /**
@@ -30,7 +32,7 @@ public abstract class SortCursor extends SchematicCursor {
 
     private boolean               schemaInited = false;
 
-    public SortCursor(ISchematicCursor cursor, List<IOrderBy> orderBys) throws FetchException{
+    public SortCursor(ISchematicCursor cursor, List<IOrderBy> orderBys) throws TddlException{
         super(cursor, null, orderBys);
     }
 
@@ -40,7 +42,7 @@ public abstract class SortCursor extends SchematicCursor {
         }
         schemaInited = true;
         if (orderBys != null) {
-            this.kvPairComparator = ExecUtil.getComp(orderBys, cursorMeta);
+            this.kvPairComparator = ExecUtils.getComp(orderBys, cursorMeta);
         }
     }
 }

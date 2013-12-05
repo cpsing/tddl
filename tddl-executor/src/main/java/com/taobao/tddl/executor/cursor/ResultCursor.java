@@ -2,12 +2,12 @@ package com.taobao.tddl.executor.cursor;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.ExceptionErrorCodeUtils;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.executor.spi.ExecutionContext;
 
 /**
  * @author mengshi.sunmengshi 2013-11-29 下午1:38:39
@@ -20,8 +20,8 @@ public class ResultCursor extends SchematicCursor {
 
     private static class EmptyResultCursor extends ResultCursor {
 
-        public EmptyResultCursor(ISchematicCursor cursor, Map<String, Comparable> context){
-            super(cursor, context);
+        public EmptyResultCursor(ISchematicCursor cursor, ExecutionContext executionContext){
+            super(cursor, executionContext);
         }
 
         @Override
@@ -31,16 +31,6 @@ public class ResultCursor extends SchematicCursor {
 
         @Override
         public void setOriginalSelectColumns(List<Object> originalSelectColumns) {
-
-        }
-
-        @Override
-        public Map<String, Comparable> getExtraCmd() {
-            return null;
-        }
-
-        @Override
-        public void setExtraCmd(Map<String, Comparable> extraCmd) {
 
         }
 
@@ -115,7 +105,7 @@ public class ResultCursor extends SchematicCursor {
         }
 
         @Override
-        public IRowSet next() throws Exception {
+        public IRowSet next() throws TddlException {
             return null;
         }
 
@@ -125,7 +115,7 @@ public class ResultCursor extends SchematicCursor {
         }
 
         @Override
-        public void beforeFirst() throws Exception {
+        public void beforeFirst() throws TddlException {
 
         }
 
@@ -153,8 +143,9 @@ public class ResultCursor extends SchematicCursor {
     Iterator<IRowSet>          iter;
     int                        size       = 10;
     int                        totalCount;
-    Map<String, Comparable>    extraCmd;
     List<Object>               originalSelectColumns;
+
+    private ExecutionContext   executionContext;
 
     public List<Object> getOriginalSelectColumns() {
         return originalSelectColumns;
@@ -164,12 +155,12 @@ public class ResultCursor extends SchematicCursor {
         this.originalSelectColumns = originalSelectColumns;
     }
 
-    public Map<String, Comparable> getExtraCmd() {
-        return extraCmd;
+    public ExecutionContext getExecutionContext() {
+        return executionContext;
     }
 
-    public void setExtraCmd(Map<String, Comparable> extraCmd) {
-        this.extraCmd = extraCmd;
+    public void setExecutionContext(ExecutionContext executionContext) {
+        this.executionContext = executionContext;
     }
 
     //
@@ -207,19 +198,14 @@ public class ResultCursor extends SchematicCursor {
         }
     }
 
-    public ResultCursor(ISchematicCursor cursor, String exception){
+    public ResultCursor(ISchematicCursor cursor, ExecutionContext executionContext){
         super(cursor, null, cursor == null ? null : cursor.getOrderBy());
-        this.exception = exception;
+        this.executionContext = executionContext;
     }
 
-    public ResultCursor(ISchematicCursor cursor, Map<String, Comparable> context){
+    public ResultCursor(ISchematicCursor cursor, ExecutionContext executionContext, List<Object> originalSelectColumns){
         super(cursor, null, cursor == null ? null : cursor.getOrderBy());
-        this.extraCmd = context;
-    }
-
-    public ResultCursor(ISchematicCursor cursor, Map<String, Comparable> context, List<Object> originalSelectColumns){
-        super(cursor, null, cursor == null ? null : cursor.getOrderBy());
-        this.extraCmd = context;
+        this.executionContext = executionContext;
         this.originalSelectColumns = originalSelectColumns;
     }
 
@@ -276,7 +262,7 @@ public class ResultCursor extends SchematicCursor {
     }
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         if (closed) {
             return null;
         }
@@ -299,7 +285,7 @@ public class ResultCursor extends SchematicCursor {
     }
 
     @Override
-    public void beforeFirst() throws Exception {
+    public void beforeFirst() throws TddlException {
         throwExceptionIfClosed();
         GeneralUtil.checkInterrupted();
 
@@ -319,12 +305,12 @@ public class ResultCursor extends SchematicCursor {
     }
 
     @Override
-    public List<Exception> close(List<Exception> exceptions) {
+    public List<TddlException> close(List<TddlException> exceptions) {
         if (closed) {
             return exceptions;
         }
         closed = true;
-        List<Exception> ex = parentCursorClose(exceptions);
+        List<TddlException> ex = parentCursorClose(exceptions);
         return ex;
     }
 

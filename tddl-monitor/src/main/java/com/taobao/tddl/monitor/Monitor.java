@@ -9,42 +9,90 @@ import com.taobao.tddl.monitor.utils.PositiveAtomicCounter;
 
 public class Monitor extends MonitorConfig {
 
-    public static final String                                    KEY1                               = "TDDL";
-    public static final String                                    KEY3_PARSE_SQL                     = "PARSE_SQL_SUCCESS";
+    public static final String                                    KEY1                                 = "TDDL";
+    public static final String                                    KEY3_PARSE_SQL                       = "PARSE_SQL_SUCCESS";
 
     // 会记录走则引擎用的时间和总耗时
-    public static final String                                    KEY3_GET_DB_AND_TABLES             = "GET_DB_ANDTABLES_SUCCESS";
+    public static final String                                    KEY3_GET_DB_AND_TABLES               = "GET_DB_ANDTABLES_SUCCESS";
     /**
      * 执行sql的总时间，包含真正数据库的执行时间和总时间
      */
-    public static final String                                    KEY3_EXECUTE_A_SQL_SUCCESS         = "EXECUTE_A_SQL_SUCCESS";
+    public static final String                                    KEY3_EXECUTE_A_SQL_SUCCESS           = "EXECUTE_A_SQL_SUCCESS";
     /**
      * 总共执行了几个库，几个表
      */
-    public static final String                                    KEY3_EXECUTE_A_SQL_SUCCESS_DBTAB   = "EXECUTE_A_SQL_SUCCESS_DBTAB";
+    public static final String                                    KEY3_EXECUTE_A_SQL_SUCCESS_DBTAB     = "EXECUTE_A_SQL_SUCCESS_DBTAB";
     /**
      * 执行sql的总时间，包含真正数据库的执行时间和总时间
      */
-    public static final String                                    KEY3_EXECUTE_A_SQL_TIMEOUT         = "EXECUTE_A_SQL_TIMEOUT";
+    public static final String                                    KEY3_EXECUTE_A_SQL_TIMEOUT           = "EXECUTE_A_SQL_TIMEOUT";
 
-    public static final String                                    KEY3_EXECUTE_A_SQL_TIMEOUT_DBTAB   = "EXECUTE_A_SQL_TIMEOUT_DBTAB";
+    public static final String                                    KEY3_EXECUTE_A_SQL_TIMEOUT_DBTAB     = "EXECUTE_A_SQL_TIMEOUT_DBTAB";
 
-    public static final String                                    KEY3_EXECUTE_A_SQL_EXCEPTION       = "EXECUTE_A_SQL_WITH_EXCEPTION";
+    public static final String                                    KEY3_EXECUTE_A_SQL_EXCEPTION         = "EXECUTE_A_SQL_WITH_EXCEPTION";
 
-    public static final String                                    KEY3_EXECUTE_A_SQL_EXCEPTION_DBTAB = "EXECUTE_A_SQL_WITH_EXCEPTION_DBTAB";
+    public static final String                                    KEY3_EXECUTE_A_SQL_EXCEPTION_DBTAB   = "EXECUTE_A_SQL_WITH_EXCEPTION_DBTAB";
 
     /**
      * TDDL 数据库（分桶）连接数
      */
-    public static final String                                    KEY3_CONN_NUMBER                   = "CONN_NUM";
+    public static final String                                    KEY3_CONN_NUMBER                     = "CONN_NUM";
     /**
      * TDDL 数据库（分桶）连接阻塞时间
      */
-    public static final String                                    KEY3_CONN_BLOCKING                 = "CONN_BLOCKING";
+    public static final String                                    KEY3_CONN_BLOCKING                   = "CONN_BLOCKING";
 
-    private static final GoogleConcurrentLruCache<String, String> sqlToMD5Map                        = new GoogleConcurrentLruCache<String, String>();
-    private static MD5Maker                                       md5Maker                           = MD5Maker.getInstance();
-    private final static PositiveAtomicCounter                    pc                                 = new PositiveAtomicCounter();
+    public static String                                          blockingExecution                    = "blockingExecution";
+
+    public static String                                          RPCClientcloseResultSetHandler       = "RPCClient_closeResultSetHandler";
+    public static String                                          RPCClientcommit                      = "RPCClient_commit";
+    public static String                                          RPCClientrollback                    = "RPCClient_rollback";
+    public static String                                          RPCClientfetchNext                   = "RPCClient_fetchNext";
+    public static String                                          RPCClientfirst                       = "RPCClient_first";
+
+    public static String                                          RPCClientpingFuture                  = "RPCClient_pingFuture";
+    public static String                                          RPCClientexecuteFuture               = "RPCClient_executeFuture";
+    public static String                                          RPCClientfetchNextFuture             = "RPCClient_fetchNextFuture";
+    public static String                                          RPCClientfirstFuture                 = "RPCClient_firstFuture";
+
+    public static String                                          RPCClientcloseResultSetHandlerFuture = "RPCClient_closeResultSetHandlerFuture";
+    public static String                                          RPCClientcommitFuture                = "RPCClient_commitFuture";
+    public static String                                          RPCClientrollbackFuture              = "RPCClient_rollbackFuture";
+
+    public static String                                          AndOrExecutorParse                   = "AndOrExecutor_Parse";
+    public static String                                          AndOrExecutorOptimize                = "AndOrExecutorOptimize";
+    public static String                                          TDDL_EXECUTE                 = "AndOrExecutorExecute";
+    public static String                                          AndOrExecutorExecuteFuture           = "AndOrExecutorExecuteFuture";
+    public static String                                          QueryTdhsHandlerUseTdhsApi           = "QueryTdhsHandlerUseTdhsApi";
+
+    /**
+     * 异步发送请求后，到拿结果集的时间
+     */
+    public static String                                          AndOrExecutorExecuteFuture_getResult = "AndOrExecutorExecuteFuture";
+
+    public static String                                          ServerExecuteOnOthers                = "Server_ExecuteOnOthers";
+    public static String                                          ServerPut                            = "Server_Put";
+    public static String                                          ServerQuery                          = "Server_Query";
+    // public static String
+    // public static String
+    // public static String
+    // public static String
+    // public static String
+    // public static String
+    // public static String
+    // public static String
+
+    public static String                                          Key3Success                          = "success";
+    public static String                                          Key3Fail                             = "fail";
+    public static String                                          Key3FutureDone                       = "futureDone";
+    public static String                                          Key3FutureGet                        = "futureGet";
+
+    public static String                                          Key3True                             = "Key3True";
+    public static String                                          Key3False                            = "Key3False";
+
+    private static final GoogleConcurrentLruCache<String, String> sqlToMD5Map                          = new GoogleConcurrentLruCache<String, String>();
+    private static MD5Maker                                       md5Maker                             = MD5Maker.getInstance();
+    private final static PositiveAtomicCounter                    pc                                   = new PositiveAtomicCounter();
 
     static {
         LoggerInit.initTddlLog();
@@ -250,4 +298,17 @@ public class Monitor extends MonitorConfig {
     public static synchronized void removeSnapshotValuesCallback(SnapshotValuesOutputCallBack callbackList) {
         statMonitor.removeSnapshotValuesCallback(callbackList);
     }
+
+    public static long monitorAndRenewTime(String key1, String key2, String key3, long count, long time) {
+        bufferedStatLogWriter.stat(key1, key2, key3, count, System.currentTimeMillis() - time);
+        time = System.currentTimeMillis();
+        return time;
+    }
+
+    public static long monitorAndRenewTime(String key1, String key2, String key3, long time) {
+        bufferedStatLogWriter.stat(key1, key2, key3, System.currentTimeMillis() - time);
+        time = System.currentTimeMillis();
+        return time;
+    }
+
 }

@@ -3,15 +3,19 @@ package com.taobao.tddl.executor.cursor.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.executor.common.CloneableRecord;
+import com.taobao.tddl.executor.codec.CodecFactory;
+import com.taobao.tddl.executor.codec.RecordCodec;
 import com.taobao.tddl.executor.common.ICursorMeta;
-import com.taobao.tddl.executor.common.RecordCodec;
 import com.taobao.tddl.executor.cursor.IANDCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
+import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.rowset.JoinRowSet;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
+import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 
@@ -63,18 +67,18 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     @SuppressWarnings("unchecked")
     public SortMergeJoinCursor1(ISchematicCursor left_cursor, ISchematicCursor right_cursor, List left_columns,
                                 List right_columns, boolean left_prefix, boolean right_prefix, List<IOrderBy> orderBys,
-                                List leftColumns, List rightColumns) throws Exception{
+                                List leftColumns, List rightColumns) throws TddlException{
         super(left_cursor, right_cursor, left_columns, right_columns, leftColumns, rightColumns);
         this.left_cursor = left_cursor;
         this.right_cursor = right_cursor;
         this.left_prefix = left_prefix;
         this.right_prefix = right_prefix;
 
-        List<ColumnMeta> colMetas = GeneralUtil.convertIColumnsToColumnMeta(left_columns);
+        List<ColumnMeta> colMetas = ExecUtils.convertIColumnsToColumnMeta(left_columns);
         leftCodec = CodecFactory.getInstance(CodecFactory.FIXED_LENGTH).getCodec(colMetas);
         this.left_key = leftCodec.newEmptyRecord();
 
-        colMetas = GeneralUtil.convertIColumnsToColumnMeta(right_columns);
+        colMetas = ExecUtils.convertIColumnsToColumnMeta(right_columns);
         rightCodec = CodecFactory.getInstance(CodecFactory.FIXED_LENGTH).getCodec(colMetas);
         this.right_key = rightCodec.newEmptyRecord();
     }
@@ -83,7 +87,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     // public SortMergeJoinCursor1(ISchematicCursor left_cursor,
     // ISchematicCursor right_cursor, List left_columns,
     // List right_columns, List columns, boolean left_prefix,
-    // boolean right_prefix, List<IOrderBy> orderBys) throws Exception {
+    // boolean right_prefix, List<IOrderBy> orderBys) throws TddlException {
     // this(left_cursor, right_cursor, left_columns, right_columns, columns,
     // left_prefix, right_prefix, left_cursor.getOrderBy(), ExecUtil
     // .getComp(left_columns, right_columns));
@@ -91,7 +95,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
 
     // public SortMergeJoinCursor1(ISchematicCursor left_cursor,
     // ISchematicCursor right_cursor, List left_columns,
-    // List right_columns, List columns) throws Exception {
+    // List right_columns, List columns) throws TddlException {
     // this(left_cursor, right_cursor, left_columns, right_columns, columns,
     // false, false);
     // }
@@ -100,7 +104,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     // public SortMergeJoinCursor1(ISchematicCursor left_cursor,
     // ISchematicCursor right_cursor, List left_columns,
     // List right_columns, List columns, List<IOrderBy> orderBys)
-    // throws Exception {
+    // throws TddlException {
     // this(left_cursor, right_cursor, left_columns, right_columns, columns,
     // false, false, orderBys);
     // }
@@ -108,7 +112,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     // public SortMergeJoinCursor1(ISchematicCursor left_cursor,
     // ISchematicCursor right_cursor, List left_columns,
     // List right_columns, List columns, List<IOrderBy> orderBys,
-    // Comparator<KVPair> kvPairComparator) throws Exception {
+    // Comparator<KVPair> kvPairComparator) throws TddlException {
     // this(left_cursor, right_cursor, left_columns, right_columns, columns,
     // false, false, orderBys, kvPairComparator);
     // }
@@ -116,7 +120,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     public static List<IOrderBy> getOrderBy(List<IColumn> columns) {
         List<IOrderBy> ret = new ArrayList<IOrderBy>();
         for (IColumn c : columns) {
-            ret.add(new OrderBy().setColumn(c).setDirection(true));
+            ret.add(ASTNodeFactory.getInstance().createOrderBy().setColumn(c).setDirection(true));
         }
         return ret;
     }
@@ -127,7 +131,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
      * @return @throws FetchException
      */
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         if (nextDup) {
             // 有相同的的，那么取一个相同的
             nextDup = false;
@@ -237,7 +241,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     private List<Integer> fillJoinOnColumnsIndex(ICursorMeta icm, List joinOnColumns) throws IllegalStateException {
         List<Integer> joinOnColumnsIndex = new ArrayList<Integer>(joinOnColumns.size());
         for (Object oneColObj : joinOnColumns) {
-            IColumn oneRightColumn = GeneralUtil.getIColumn(oneColObj);
+            IColumn oneRightColumn = ExecUtils.getIColumn(oneColObj);
             Integer index = icm.getIndex(oneRightColumn.getTableName(), oneRightColumn.getColumnName());
 
             if (index == null) index = icm.getIndex(oneRightColumn.getTableName(), oneRightColumn.getAlias());
@@ -250,7 +254,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     }
 
     // @Override
-    // public IRowSet getNextDup() throws Exception {
+    // public IRowSet getNextDup() throws TddlException {
     // if (prevJoinedKV == null) {
     // return null;
     // }
@@ -265,13 +269,13 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     // }
 
     // @Override
-    // public boolean skipTo(KVPair kv) throws Exception {
+    // public boolean skipTo(KVPair kv) throws TddlException {
     // return skipTo(kv.getKey());
     // }
     // 直接丢异常
 
     // @Override
-    // public boolean skipTo(CloneableRecord key) throws Exception {
+    // public boolean skipTo(CloneableRecord key) throws TddlException {
     // KVPair kv;
     // while ((kv = next()) != null) {
     // if (kv.getKey().equals(key)) {
@@ -284,22 +288,22 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     // 直接丢异常
 
     @Override
-    public IRowSet current() throws Exception {
+    public IRowSet current() throws TddlException {
         return current;
     }
 
     // @Override
-    // public KVPair first() throws Exception {
+    // public KVPair first() throws TddlException {
     // throw new UnsupportedOperationException();
     // }
 
     // @Override
-    // public KVPair last() throws Exception {
+    // public KVPair last() throws TddlException {
     // throw new UnsupportedOperationException();
     // }
 
     // @Override
-    // public KVPair prev() throws Exception {
+    // public KVPair prev() throws TddlException {
     // throw new UnsupportedOperationException();
     // }
 
@@ -316,7 +320,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
                                 CloneableRecord to_key) {
         for (int k = 0; k < fromCololumnIndexes.size(); k++) {
             Object v = fromCololumnIndexes.get(k);
-            to_key.put(GeneralUtil.getColumn(to_columns.get(k)).getColumnName(), v);
+            to_key.put(ExecUtils.getColumn(to_columns.get(k)).getColumnName(), v);
         }
         return to_key;
     }
@@ -337,7 +341,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     }
 
     // @Override
-    // public void close() throws Exception {
+    // public void close() throws TddlException {
     // left_cursor.close();
     // right_cursor.close();
     // }
@@ -350,8 +354,8 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     public String toStringWithInden(int inden) {
         StringBuilder sb = new StringBuilder();
         String subQueryTab = GeneralUtil.getTab(inden);
-        GeneralUtil.printMeta(joinCursorMeta, inden, sb);
-        GeneralUtil.printOrderBy(orderBys, inden, sb);
+        ExecUtils.printMeta(joinCursorMeta, inden, sb);
+        ExecUtils.printOrderBy(orderBys, inden, sb);
         sb.append(subQueryTab).append("【Sort Merge Join : ").append("\n");
         sb.append(subQueryTab).append("leftCursor:").append("\n");
         sb.append(left_cursor.toStringWithInden(inden + 1));

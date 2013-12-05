@@ -2,12 +2,11 @@ package com.taobao.tddl.executor.spi;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.codehaus.groovy.util.StringUtil;
-
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.executor.ExecutorContext;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.cursor.IANDCursor;
@@ -33,6 +32,7 @@ import com.taobao.tddl.executor.cursor.impl.ColumnAliasCursor;
 import com.taobao.tddl.executor.cursor.impl.InCursor;
 import com.taobao.tddl.executor.cursor.impl.IndexNestedLoopMgetImpCursor;
 import com.taobao.tddl.executor.cursor.impl.LimitFromToCursor;
+import com.taobao.tddl.executor.cursor.impl.MergeCursor;
 import com.taobao.tddl.executor.cursor.impl.MergeSortedCursors;
 import com.taobao.tddl.executor.cursor.impl.RangeCursor1;
 import com.taobao.tddl.executor.cursor.impl.ReverseOrderCursor;
@@ -59,80 +59,56 @@ import com.taobao.tddl.optimizer.core.plan.query.IJoin;
 @SuppressWarnings("rawtypes")
 public class CursorFactoryDefaultImpl implements CursorFactory {
 
-    private AndorContext commonConfig;
-
-    public CursorFactoryDefaultImpl(AndorContext commonConfig){
+    public CursorFactoryDefaultImpl(){
         super();
-        this.commonConfig = commonConfig;
-    }
-
-    /*
-     * AggregateCursor aggregateCursor(SchematicCursor cursor, List<IFunction>
-     * aggregates,boolean isMerge) { return new AggregateCursor(cursor,
-     * aggregates,isMerge); }
-     */
-    ResultCursor resultCursor(SchematicCursor cursor, String exception) {
-        try {
-            return new ResultCursor(cursor, exception);
-        } catch (RuntimeException e) {
-            closeParentCursor(cursor);
-            throw e;
-        }
     }
 
     protected void closeParentCursor(Cursor parentCursor) {
         if (parentCursor != null) {
-            List<Exception> exs = new ArrayList();
+            List<TddlException> exs = new ArrayList();
             exs = parentCursor.close(exs);
             if (!exs.isEmpty()) throw new RuntimeException(GeneralUtil.mergeException(exs));
 
         }
     }
 
-    ResultCursor resultCursor(SchematicCursor cursor, Map<String, Comparable> context) {
-        try {
-            return new ResultCursor(cursor, context);
-        } catch (RuntimeException e) {
-            closeParentCursor(cursor);
-            throw e;
-        }
-    }
-
     @Override
-    public IAggregateCursor aggregateCursor(ISchematicCursor cursor, List<IFunction> aggregates,
-                                            List<IOrderBy> groupBycols, List<ISelectable> allSelectable, boolean isMerge) {
+    public IAggregateCursor aggregateCursor(ExecutionContext executionContext, ISchematicCursor cursor,
+                                            List<IFunction> aggregates, List<IOrderBy> groupBycols,
+                                            List<ISelectable> allSelectable, boolean isMerge) throws TddlException {
         try {
             return new AggregateCursor(cursor, aggregates, groupBycols, allSelectable, isMerge);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             closeParentCursor(cursor);
-            throw e;
+            throw new TddlException(e);
         }
     }
 
     @Override
-    public IColumnAliasCursor columnAliasCursor(ISchematicCursor cursor, List<ISelectable> retColumns, String name) {
+    public IColumnAliasCursor columnAliasCursor(ExecutionContext executionContext, ISchematicCursor cursor,
+                                                List<ISelectable> retColumns, String name) throws TddlException {
         try {
             return new ColumnAliasCursor(cursor, retColumns, name);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             closeParentCursor(cursor);
-            throw e;
+            throw new TddlException(e);
         }
     }
 
     @Override
-    public ValueFilterCursor valueFilterCursor(ISchematicCursor cursor, IFilter filter,
-                                               ExecutionContext executionContext) {
+    public ValueFilterCursor valueFilterCursor(ExecutionContext executionContext, ISchematicCursor cursor,
+                                               IFilter filter) throws TddlException {
         try {
             return new ValueFilterCursor(cursor, filter, null);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             closeParentCursor(cursor);
-            throw e;
+            throw new TddlException(e);
         }
     }
 
     @Override
-    public IORCursor mergeSortedCursor(List<ISchematicCursor> cursors, boolean duplicated, String tableAlias)
-                                                                                                             throws Exception {
+    public IORCursor mergeSortedCursor(ExecutionContext executionContext, List<ISchematicCursor> cursors,
+                                       boolean duplicated, String tableAlias) throws TddlException {
         try {
             return new MergeSortedCursors(cursors, tableAlias, duplicated);
         } catch (Exception e) {
@@ -140,94 +116,69 @@ public class CursorFactoryDefaultImpl implements CursorFactory {
                 closeParentCursor(cursor);
             }
 
-            throw e;
+            throw new TddlException(e);
         }
     }
 
     @Override
-    public ResultCursor resultCursor(ISchematicCursor cursor, String exception) {
+    public ITempTableSortCursor tempTableSortCursor(ExecutionContext executionContext, ISchematicCursor cursor,
+                                                    List<IOrderBy> orderBys, boolean sortedDuplicates, long requestID)
+                                                                                                                      throws TddlException {
         try {
-            return new ResultCursor(cursor, exception);
-        } catch (RuntimeException e) {
-            closeParentCursor(cursor);
-            throw e;
-        }
-    }
+            if ("True".equalsIgnoreCase(GeneralUtil.getExtraCmd(executionContext.getExtraCmds(),
+                ExtraCmd.ExecutionExtraCmd.ALLOW_TEMPORARY_TABLE))) {
 
-    @Override
-    public ResultCursor resultCursor(ISchematicCursor cursor, Map<String, Comparable> context) {
-        return new ResultCursor(cursor, context);
-    }
-
-    @Override
-    public ITempTableSortCursor tempTableSortCursor(ISchematicCursor cursor, List<IOrderBy> orderBys,
-                                                    boolean sortedDuplicates, long requestID,
-                                                    Map<String, Comparable> extraContext) throws FetchException,
-                                                                                         Exception {
-        try {
-            Comparable comp = extraContext.get(ExtraCmd.ExecutionExtraCmd.ALLOW_TEMPORARY_TABLE);
-            // 只有当AllowTemporaryTable不为空，并且为true的时候，才允许使用临时表。
-            if (comp != null) {
-                String valueInStr = StringUtil.trim(String.valueOf(comp));
-                Boolean valueInBool = Boolean.valueOf(valueInStr);
-                if (valueInBool) {
-                    TempTable tt = commonConfig.getOrBuildTempTable(Group.BDB_JE);
-                    return new TempTableSortCursor(this, tt, cursor, orderBys, sortedDuplicates, requestID);
-                }
+                TempTable tt = ExecutorContext.getContext()
+                    .getRepositoryHolder()
+                    .get(Group.GroupType.BDB_JE)
+                    .createTempTable();
+                return new TempTableSortCursor(this,
+                    tt,
+                    cursor,
+                    orderBys,
+                    sortedDuplicates,
+                    requestID,
+                    executionContext);
             }
+
             throw new IllegalStateException("not allow to use temporary table . allow first ");
 
         } catch (Exception e) {
             closeParentCursor(cursor);
-            throw e;
+            throw new TddlException(e);
         }
     }
 
     @Override
-    public IReverseOrderCursor reverseOrderCursor(ISchematicCursor cursor) {
+    public IReverseOrderCursor reverseOrderCursor(ExecutionContext executionContext, ISchematicCursor cursor)
+                                                                                                             throws TddlException {
         try {
             return new ReverseOrderCursor(cursor);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             closeParentCursor(cursor);
-            throw e;
+            throw new TddlException(e);
         }
     }
 
-    // @Override
-    // public IMergeSortCursor mergeSortCursor(ISchematicCursor cursor,
-    // List<IOrderBy> orderBys, boolean prepare) throws Exception {
-    // return new MergeSortCursor(cursor, orderBys);
-    // }
-
     @Override
-    public IMergeCursor mergeCursor(List<ISchematicCursor> cursors, IDataNodeExecutor currentExecotor,
-                                    ExecutionContext executionContext) {
+    public IMergeCursor mergeCursor(ExecutionContext executionContext, List<ISchematicCursor> cursors,
+                                    IDataNodeExecutor currentExecotor) throws TddlException {
         try {
-            return new MergeCursor(cursors, commonConfig, currentExecotor, executionContext);
-        } catch (RuntimeException e) {
+            return new MergeCursor(cursors, currentExecotor, executionContext);
+        } catch (Exception e) {
             if (cursors != null) {
                 for (ISchematicCursor iSchematicCursor : cursors) {
                     closeParentCursor(iSchematicCursor);
                 }
             }
-            throw e;
+            throw new TddlException(e);
         }
     }
 
     @Override
-    public ResultCursor resultCursor(ISchematicCursor cursor, Map<String, Comparable> context, List<Object> retColumns) {
-        try {
-            return new ResultCursor(cursor, context);
-        } catch (RuntimeException e) {
-            closeParentCursor(cursor);
-            throw e;
-        }
-    }
-
-    @Override
-    public IIndexNestLoopCursor indexNestLoopCursor(ISchematicCursor leftCursor, ISchematicCursor rightCursor,
-                                                    List leftColumns, List rightColumns, List columns, boolean prefix,
-                                                    IJoin executor) throws Exception {
+    public IIndexNestLoopCursor indexNestLoopCursor(ExecutionContext executionContext, ISchematicCursor leftCursor,
+                                                    ISchematicCursor rightCursor, List leftColumns, List rightColumns,
+                                                    List columns, boolean prefix, IJoin executor) throws TddlException {
         try {
             return new IndexNestedLoopMgetImpCursor(leftCursor,
                 rightCursor,
@@ -241,25 +192,26 @@ public class CursorFactoryDefaultImpl implements CursorFactory {
         } catch (Exception e) {
             closeParentCursor(leftCursor);
             closeParentCursor(rightCursor);
-            throw e;
+            throw new TddlException(e);
         }
     }
 
     @Override
-    public ILimitFromToCursor limitFromToCursor(ISchematicCursor cursor, Long limitFrom, Long limitTo) {
+    public ILimitFromToCursor limitFromToCursor(ExecutionContext executionContext, ISchematicCursor cursor,
+                                                Long limitFrom, Long limitTo) throws TddlException {
         try {
             return new LimitFromToCursor(cursor, limitFrom, limitTo);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             closeParentCursor(cursor);
-            throw e;
+            throw new TddlException(e);
         }
     }
 
     @Override
-    public IMergeSortCursor join_sortMergeCursor(ISchematicCursor left_cursor, ISchematicCursor right_cursor,
-                                                 List left_columns, List right_columns, List columns,
-                                                 boolean left_prefix, boolean right_prefix, IJoin join)
-                                                                                                       throws Exception {
+    public IMergeSortCursor join_sortMergeCursor(ExecutionContext executionContext, ISchematicCursor left_cursor,
+                                                 ISchematicCursor right_cursor, List left_columns, List right_columns,
+                                                 List columns, boolean left_prefix, boolean right_prefix, IJoin join)
+                                                                                                                     throws TddlException {
         try {
             List<IOrderBy> orderBys = left_cursor.getOrderBy();
             // Comparator<IRowSet> rows=
@@ -276,50 +228,52 @@ public class CursorFactoryDefaultImpl implements CursorFactory {
         } catch (Exception e) {
             closeParentCursor(left_cursor);
             closeParentCursor(right_cursor);
-            throw e;
+            throw new TddlException(e);
         }
     }
 
     @Override
-    public AffectRowCursor affectRowCursor(int affectRow) {
+    public AffectRowCursor affectRowCursor(ExecutionContext executionContext, int affectRow) {
         return new AffectRowCursor(affectRow);
     }
 
     @Override
-    public ISchematicCursor schematicCursor(Cursor cursor, ICursorMeta meta, List<IOrderBy> orderBys) {
+    public ISchematicCursor schematicCursor(ExecutionContext executionContext, Cursor cursor, ICursorMeta meta,
+                                            List<IOrderBy> orderBys) throws TddlException {
         try {
             return new SchematicCursor(cursor, meta, orderBys);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             closeParentCursor(cursor);
-            throw e;
+            throw new TddlException(e);
         }
     }
 
     @Override
-    public IInCursor inCursor(Cursor cursor, List<IOrderBy> orderBys, IColumn c, List<Comparable> v, OPERATION op) {
+    public IInCursor inCursor(ExecutionContext executionContext, Cursor cursor, List<IOrderBy> orderBys, IColumn c,
+                              List<Comparable> v, OPERATION op) {
         return new InCursor(cursor, orderBys, c, v, op);
     }
 
     @Override
-    public IMergeCursor mergeCursor(List<ISchematicCursor> cursors, ICursorMeta indexMeta,
-                                    IDataNodeExecutor currentExecotor, ExecutionContext executionContext,
-                                    List<IOrderBy> orderBys) {
+    public IMergeCursor mergeCursor(ExecutionContext executionContext, List<ISchematicCursor> cursors,
+                                    ICursorMeta indexMeta, IDataNodeExecutor currentExecotor, List<IOrderBy> orderBys)
+                                                                                                                      throws TddlException {
         try {
-            return new MergeCursor(cursors, indexMeta, commonConfig, currentExecotor, executionContext, orderBys);
-        } catch (RuntimeException e) {
+            return new MergeCursor(cursors, indexMeta, currentExecotor, executionContext, orderBys);
+        } catch (Exception e) {
             if (cursors != null) {
                 for (ISchematicCursor iSchematicCursor : cursors) {
                     closeParentCursor(iSchematicCursor);
                 }
             }
-            throw e;
+            throw new TddlException(e);
         }
     }
 
     @Override
-    public IANDCursor join_blockNestedLoopCursor(ISchematicCursor left_cursor, ISchematicCursor right_cursor,
-                                                 List left_columns, List right_columns, List columns, IJoin join,
-                                                 ExecutionContext executionContext) throws Exception {
+    public IANDCursor join_blockNestedLoopCursor(ExecutionContext executionContext, ISchematicCursor left_cursor,
+                                                 ISchematicCursor right_cursor, List left_columns, List right_columns,
+                                                 List columns, IJoin join) throws TddlException {
 
         try {
             return new BlockNestedtLoopCursor(left_cursor,
@@ -335,28 +289,36 @@ public class CursorFactoryDefaultImpl implements CursorFactory {
         } catch (Exception e) {
             closeParentCursor(left_cursor);
             closeParentCursor(right_cursor);
-            throw e;
+            throw new TddlException(e);
         }
     }
 
     @Override
-    public IRangeCursor rangeCursor(ISchematicCursor cursor, IFilter lf) {
+    public IRangeCursor rangeCursor(ExecutionContext executionContext, ISchematicCursor cursor, IFilter lf)
+                                                                                                           throws TddlException {
         try {
             return new RangeCursor1(cursor, lf);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             closeParentCursor(cursor);
-            throw e;
+            throw new TddlException(e);
         }
     }
 
     @Override
-    public ISetOrderCursor setOrderCursor(ISchematicCursor cursor, List<IOrderBy> ordersInRequest) {
+    public ISetOrderCursor setOrderCursor(ExecutionContext executionContext, ISchematicCursor cursor,
+                                          List<IOrderBy> ordersInRequest) throws TddlException {
         try {
             return new SetOrderByCursor(cursor, null, ordersInRequest);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             closeParentCursor(cursor);
-            throw e;
+            throw new TddlException(e);
         }
+    }
+
+    @Override
+    public ResultCursor resultCursor(ExecutionContext context, ISchematicCursor cursor, List<Object> retColumns)
+                                                                                                                throws TddlException {
+        return new ResultCursor(cursor, context, retColumns);
     }
 
 }
