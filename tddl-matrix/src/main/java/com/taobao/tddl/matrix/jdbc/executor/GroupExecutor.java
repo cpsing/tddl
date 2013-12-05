@@ -6,7 +6,6 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.ITransactionAsyncExecutor;
 import com.taobao.tddl.executor.ITransactionExecutor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
-import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.exception.DataAccessException;
 import com.taobao.tddl.executor.spi.CommandExecutorFactory;
 import com.taobao.tddl.executor.spi.CommandHandler;
@@ -15,7 +14,6 @@ import com.taobao.tddl.executor.spi.Repository;
 import com.taobao.tddl.executor.spi.Transaction;
 import com.taobao.tddl.executor.spi.TransactionConfig;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
-import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 
 @SuppressWarnings("rawtypes")
 public class GroupExecutor implements ITransactionAsyncExecutor, ITransactionExecutor {
@@ -24,15 +22,15 @@ public class GroupExecutor implements ITransactionAsyncExecutor, ITransactionExe
     private Repository         repo;
 
     @Override
-    public Future<ResultCursor> execByExecPlanNodeFuture(IDataNodeExecutor qc,
+    public Future<ISchematicCursor> execByExecPlanNodeFuture(IDataNodeExecutor qc,
 
     ExecutionContext executionContext) throws DataAccessException {
         return null;
     }
 
     @Override
-    public ResultCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext)
-                                                                                                   throws TddlException {
+    public ISchematicCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext)
+                                                                                                       throws TddlException {
         // ResultCursor rc = executeOnOthers(context, command,
         // executionContext);
         getTransaction(executionContext, qc);
@@ -41,7 +39,7 @@ public class GroupExecutor implements ITransactionAsyncExecutor, ITransactionExe
 
         returnCursor = executeInner(qc, executionContext);
 
-        return wrapResultCursor(qc, returnCursor, executionContext);
+        return returnCursor;
     }
 
     public ISchematicCursor executeInner(IDataNodeExecutor executor, ExecutionContext executionContext)
@@ -67,12 +65,12 @@ public class GroupExecutor implements ITransactionAsyncExecutor, ITransactionExe
     }
 
     @Override
-    public Future<ResultCursor> commitFuture(ExecutionContext executionContext) throws TddlException {
+    public Future<ISchematicCursor> commitFuture(ExecutionContext executionContext) throws TddlException {
         return null;
     }
 
     @Override
-    public Future<ResultCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException {
+    public Future<ISchematicCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException {
         return null;
     }
 
@@ -101,39 +99,5 @@ public class GroupExecutor implements ITransactionAsyncExecutor, ITransactionExe
             executionContext.setTransactionSequence(transactionSequence);
         }
     }
-
-    protected ResultCursor wrapResultCursor(IDataNodeExecutor command, ISchematicCursor iSchematicCursor,
-                                            ExecutionContext context) throws TddlException {
-        ResultCursor cursor;
-        // 包装为可以传输的ResultCursor
-        if (command instanceof IQueryTree) {
-            if (!(iSchematicCursor instanceof ResultCursor)) {
-
-                cursor = new ResultCursor(iSchematicCursor, context.getExtraCmds());
-            } else {
-                cursor = (ResultCursor) iSchematicCursor;
-            }
-
-        } else {
-            if (!(iSchematicCursor instanceof ResultCursor)) {
-                cursor = new ResultCursor(iSchematicCursor, context.getExtraCmds());
-            } else {
-                cursor = (ResultCursor) iSchematicCursor;
-            }
-        }
-        generateResultIdAndPutIntoResultSetMap(cursor);
-        return cursor;
-    }
-
-    private void generateResultIdAndPutIntoResultSetMap(ResultCursor cursor) {
-        int id = idGen.getIntegerNextNumber();
-        cursor.setResultID(id);
-
-    }
-
-    /**
-     * id 生成器
-     */
-    private AtomicNumberCreator idGen = AtomicNumberCreator.getNewInstance();
 
 }

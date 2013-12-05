@@ -11,15 +11,19 @@ import com.taobao.tddl.common.model.lifecycle.Lifecycle;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
+import com.taobao.tddl.executor.common.AtomicNumberCreator;
+import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.cursor.impl.QueryPlanResultCursor;
 import com.taobao.tddl.executor.exception.DataAccessException;
 import com.taobao.tddl.executor.spi.ExecutionContext;
 import com.taobao.tddl.executor.utils.ExecUtils;
+import com.taobao.tddl.monitor.Monitor;
 import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
+import com.taobao.tddl.optimizer.exceptions.EmptyResultFilterException;
 
 public class TExecutor implements Lifecycle, ITransactionAsyncExecutor, ITransactionExecutor {
 
@@ -63,15 +67,14 @@ public class TExecutor implements Lifecycle, ITransactionAsyncExecutor, ITransac
                 return createQueryPlanResultCursor(qc);
             }
 
-            boolean useTemporaryTable = clientContext.getUserConfig().useTemporaryTable();
-            extraCmd = processTemporary(extraCmd, useTemporaryTable);
+            ISchematicCursor sc = ExecutorContext.getContext()
+                .getTransactionExecutor()
+                .execByExecPlanNode(qc, executionContext);
 
-            ResultCursor c = clientContext.getMatrixExecutor()
-                .get()
-                .execute(extraCmd, createTxn, transactionSequence, qc, closeResultSet, executionContext);
+            ResultCursor rc = this.wrapResultCursor(qc, sc, executionContext);
 
             // 控制语句
-            time = GeneralUtil.monitorAndRenewTime(Key1, AndOrExecutorExecute, Key3Success, time);
+            time = Monitor.monitorAndRenewTime(Monitor.KEY1, Monitor.TDDL_EXECUTE, Monitor.Key3Success, time);
 
             if (qc instanceof IQueryTree) {
                 // 做下表名替换
@@ -82,14 +85,14 @@ public class TExecutor implements Lifecycle, ITransactionAsyncExecutor, ITransac
                         ((ISelectable) s).setTableName(((IQueryTree) qc).getAlias());
                     }
                 }
-                c.setOriginalSelectColumns(columnsForResultSet);
+                rc.setOriginalSelectColumns(columnsForResultSet);
             }
-            return c;
-        } catch (EmptyResultRestrictionException e) {
+            return rc;
+        } catch (EmptyResultFilterException e) {
             // e.printStackTrace();
             return ResultCursor.EMPTY_RESULT_CURSOR;
         } catch (Exception e) {
-            throw new DataAccessException(e);
+            throw new TddlException(e);
         }
     }
 
@@ -164,8 +167,8 @@ public class TExecutor implements Lifecycle, ITransactionAsyncExecutor, ITransac
     }
 
     @Override
-    public Future<ResultCursor> execByExecPlanNodeFuture(IDataNodeExecutor qc, ExecutionContext executionContext)
-                                                                                                                 throws TddlException {
+    public Future<ISchematicCursor> execByExecPlanNodeFuture(IDataNodeExecutor qc, ExecutionContext executionContext)
+                                                                                                                     throws TddlException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -190,15 +193,48 @@ public class TExecutor implements Lifecycle, ITransactionAsyncExecutor, ITransac
     }
 
     @Override
-    public Future<ResultCursor> commitFuture(ExecutionContext executionContext) throws TddlException {
+    public Future<ISchematicCursor> commitFuture(ExecutionContext executionContext) throws TddlException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Future<ResultCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException {
+    public Future<ISchematicCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException {
         // TODO Auto-generated method stub
         return null;
     }
 
+    protected ResultCursor wrapResultCursor(IDataNodeExecutor command, ISchematicCursor iSchematicCursor,
+                                            ExecutionContext context) throws TddlException {
+        ResultCursor cursor;
+        // 包装为可以传输的ResultCursor
+        if (command instanceof IQueryTree) {
+            if (!(iSchematicCursor instanceof ResultCursor)) {
+
+                cursor = new ResultCursor(iSchematicCursor, context);
+            } else {
+                cursor = (ResultCursor) iSchematicCursor;
+            }
+
+        } else {
+            if (!(iSchematicCursor instanceof ResultCursor)) {
+                cursor = new ResultCursor(iSchematicCursor, context);
+            } else {
+                cursor = (ResultCursor) iSchematicCursor;
+            }
+        }
+        generateResultIdAndPutIntoResultSetMap(cursor);
+        return cursor;
+    }
+
+    private void generateResultIdAndPutIntoResultSetMap(ResultCursor cursor) {
+        int id = idGen.getIntegerNextNumber();
+        cursor.setResultID(id);
+
+    }
+
+    /**
+     * id 生成器
+     */
+    private AtomicNumberCreator idGen = AtomicNumberCreator.getNewInstance();
 }

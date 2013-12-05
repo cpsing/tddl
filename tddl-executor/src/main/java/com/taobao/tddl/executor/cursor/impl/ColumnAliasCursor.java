@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.executor.common.CursorMetaImp;
@@ -110,33 +111,33 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
     }
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         // 不做判断是否需要replace和select，只进行浅封装
         return replaceAliasAndSelect(parentCursorNext());
     }
 
     @Override
-    public IRowSet prev() throws Exception {
+    public IRowSet prev() throws TddlException {
         return replaceAliasAndSelect(parentCursorPrev());
     }
 
     @Override
-    public IRowSet current() throws Exception {
+    public IRowSet current() throws TddlException {
         return replaceAliasAndSelect(parentCursorCurrent());
     }
 
     @Override
-    public IRowSet first() throws Exception {
+    public IRowSet first() throws TddlException {
         return replaceAliasAndSelect(parentCursorFirst());
     }
 
     @Override
-    public IRowSet getNextDup() throws Exception {
+    public IRowSet getNextDup() throws TddlException {
         return replaceAliasAndSelect(parentCursorGetNextDup());
     }
 
     @Override
-    public IRowSet last() throws Exception {
+    public IRowSet last() throws TddlException {
         return replaceAliasAndSelect(parentCursorLast());
     }
 
@@ -150,7 +151,7 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
     }
 
     public Map<CloneableRecord, DuplicateKVPair> mgetWithDuplicate(List<CloneableRecord> keys, boolean prefixMatch,
-                                                                   boolean keyFilterOrValueFilter) throws Exception {
+                                                                   boolean keyFilterOrValueFilter) throws TddlException {
         Map<CloneableRecord, DuplicateKVPair> res = super.mgetWithDuplicate(keys, prefixMatch, keyFilterOrValueFilter);
 
         for (DuplicateKVPair dkv : res.values()) {
@@ -184,7 +185,7 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
 
     }
 
-    public List<ColumnMeta> getReturnColumns() throws Exception {
+    public List<ColumnMeta> getReturnColumns() throws TddlException {
         if (this.returnColumnMetas != null) return this.returnColumnMetas;
 
         returnColumnMetas = new ArrayList();

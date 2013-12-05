@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.common.CursorMetaImp;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -162,7 +163,7 @@ public class JoinSchematicCursor extends SchematicCursor {
     }
 
     @Override
-    public List<Exception> close(List<Exception> exs) {
+    public List<TddlException> close(List<TddlException> exs) {
         if (left_cursor != null) {
             exs = left_cursor.close(exs);
         }

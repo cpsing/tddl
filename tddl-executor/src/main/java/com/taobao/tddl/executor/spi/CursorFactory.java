@@ -1,12 +1,11 @@
 package com.taobao.tddl.executor.spi;
 
 import java.util.List;
-import java.util.Map;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.cursor.IANDCursor;
-import com.taobao.tddl.executor.cursor.IANDDupValuesCursor;
 import com.taobao.tddl.executor.cursor.IAffectRowCursor;
 import com.taobao.tddl.executor.cursor.IAggregateCursor;
 import com.taobao.tddl.executor.cursor.IColumnAliasCursor;
@@ -48,8 +47,8 @@ public interface CursorFactory {
      * @param orderBys
      * @return
      */
-    IMergeCursor mergeCursor(List<ISchematicCursor> cursors, ICursorMeta indexMeta, IDataNodeExecutor currentExecotor,
-                             ExecutionContext executionContext, List<IOrderBy> orderBys);
+    IMergeCursor mergeCursor(ExecutionContext context, List<ISchematicCursor> cursors, ICursorMeta indexMeta,
+                             IDataNodeExecutor currentExecotor, List<IOrderBy> orderBys) throws TddlException;
 
     /**
      * 用来处理合并的cursor . 对应QueryNode里面的Merge node.
@@ -58,8 +57,8 @@ public interface CursorFactory {
      * @param cursors
      * @return
      */
-    IMergeCursor mergeCursor(List<ISchematicCursor> cursors, IDataNodeExecutor currentExecotor,
-                             ExecutionContext executionContext);
+    IMergeCursor mergeCursor(ExecutionContext context, List<ISchematicCursor> cursors, IDataNodeExecutor currentExecotor)
+                                                                                                                         throws TddlException;
 
     /**
      * 用于处理count max min avg 等函数的cursor
@@ -70,8 +69,9 @@ public interface CursorFactory {
      * @param isMerge
      * @return
      */
-    IAggregateCursor aggregateCursor(ISchematicCursor cursor, List<IFunction> aggregates, List<IOrderBy> groupBycols,
-                                     List<ISelectable> retColumns, boolean isMerge);
+    IAggregateCursor aggregateCursor(ExecutionContext context, ISchematicCursor cursor, List<IFunction> aggregates,
+                                     List<IOrderBy> groupBycols, List<ISelectable> retColumns, boolean isMerge)
+                                                                                                               throws TddlException;
 
     /**
      * @param cursor
@@ -79,21 +79,8 @@ public interface CursorFactory {
      * @param name 表别名
      * @return
      */
-    IColumnAliasCursor columnAliasCursor(ISchematicCursor cursor, List<ISelectable> retColumns, String name);
-
-    /**
-     * term-doc_id_list 合并可重复tree节点的值列表。
-     * 
-     * @param cursors
-     * @return
-     */
-    IANDDupValuesCursor andDupValuesCursor(IRangeCursor... cursors);
-
-    /**
-     * @param cursorsss
-     * @return
-     */
-    IANDDupValuesCursor andDupValuesCursor(List<IRangeCursor> cursorsss);
+    IColumnAliasCursor columnAliasCursor(ExecutionContext context, ISchematicCursor cursor,
+                                         List<ISelectable> retColumns, String name) throws TddlException;
 
     /**
      * 用来针对每一个值进行过滤的cursor. 将join merge query得到的结果中的每一行，放入这个value
@@ -104,17 +91,8 @@ public interface CursorFactory {
      * @param executionContext TODO
      * @return
      */
-    IValueFilterCursor valueFilterCursor(ISchematicCursor cursor, IFilter filter, ExecutionContext executionContext);
-
-    /**
-     * 将两组已经按照asc排序的数据，做归并的cursor 一般用于将多个子有序结果集内数据排序。
-     * 
-     * @param left_cursor
-     * @param right_cursor
-     * @return
-     * @throws Exception
-     */
-    IORCursor mergeSortedCursor(ISchematicCursor left_cursor, ISchematicCursor right_cursor) throws Exception;
+    IValueFilterCursor valueFilterCursor(ExecutionContext context, ISchematicCursor cursor, IFilter filter)
+                                                                                                           throws TddlException;
 
     /**
      * 最基本的cursor对象，用于给指定的cursor赋予对应的schema描述之用。
@@ -124,27 +102,10 @@ public interface CursorFactory {
      * @param orderBys
      * @return
      */
-    ISchematicCursor schematicCursor(Cursor cursor, ICursorMeta meta, List<IOrderBy> orderBys);
+    ISchematicCursor schematicCursor(ExecutionContext context, Cursor cursor, ICursorMeta meta, List<IOrderBy> orderBys)
+                                                                                                                        throws TddlException;
 
-    IAffectRowCursor affectRowCursor(int affectRow);
-
-    /**
-     * 结果集对象，封装结果集对象，用于网络传输
-     * 
-     * @param cursor
-     * @param exception
-     * @return
-     */
-    ResultCursor resultCursor(ISchematicCursor cursor, String exception);
-
-    /**
-     * 结果集对象，封装结果集对象，用于网络传输
-     * 
-     * @param cursor
-     * @param context
-     * @return
-     */
-    ResultCursor resultCursor(ISchematicCursor cursor, Map<String, Comparable> context);
+    IAffectRowCursor affectRowCursor(ExecutionContext context, int affectRow) throws TddlException;
 
     /**
      * 结果集对象，封装结果集对象，用于网络传输
@@ -154,7 +115,8 @@ public interface CursorFactory {
      * @param retColumns
      * @return
      */
-    ResultCursor resultCursor(ISchematicCursor cursor, Map<String, Comparable> context, List<Object> retColumns);
+    ResultCursor resultCursor(ExecutionContext context, ISchematicCursor cursor, List<Object> retColumns)
+                                                                                                         throws TddlException;
 
     /**
      * 临时表的排序用cursor ，将数据拿出写入临时表中，并进行排序。
@@ -164,12 +126,12 @@ public interface CursorFactory {
      * @param sortedDuplicates
      * @param extraContext TODO
      * @return
-     * @throws FetchException
-     * @throws Exception
+     * @throws FetchTddlException
+     * @throws TddlException
      */
-    ITempTableSortCursor tempTableSortCursor(ISchematicCursor cursor, List<IOrderBy> orderBys,
-                                             boolean sortedDuplicates, long requestID,
-                                             Map<String, Comparable> extraContext) throws Exception;
+    ITempTableSortCursor tempTableSortCursor(ExecutionContext context, ISchematicCursor cursor,
+                                             List<IOrderBy> orderBys, boolean sortedDuplicates, long requestID)
+                                                                                                               throws TddlException;
 
     /**
      * 对应执行计划join节点 假定右表有序，以左表的每一个值去和右表进行 join.
@@ -180,11 +142,12 @@ public interface CursorFactory {
      * @param right_columns
      * @param columns
      * @return
-     * @throws Exception
+     * @throws TddlException
      */
-    IMergeSortCursor join_sortMergeCursor(ISchematicCursor left_cursor, ISchematicCursor right_cursor,
-                                          List left_columns, List right_columns, List columns, boolean left_prefix,
-                                          boolean right_prefix, IJoin joinNOde) throws Exception;
+    IMergeSortCursor join_sortMergeCursor(ExecutionContext context, ISchematicCursor left_cursor,
+                                          ISchematicCursor right_cursor, List left_columns, List right_columns,
+                                          List columns, boolean left_prefix, boolean right_prefix, IJoin joinNOde)
+                                                                                                                  throws TddlException;
 
     /**
      * join的Block Nested Loop实现
@@ -197,11 +160,11 @@ public interface CursorFactory {
      * @param join
      * @param executionContext TODO
      * @return
-     * @throws Exception
+     * @throws TddlException
      */
-    public IANDCursor join_blockNestedLoopCursor(ISchematicCursor left_cursor, ISchematicCursor right_cursor,
-                                                 List left_columns, List right_columns, List columns, IJoin join,
-                                                 ExecutionContext executionContext) throws Exception;
+    public IANDCursor join_blockNestedLoopCursor(ExecutionContext context, ISchematicCursor left_cursor,
+                                                 ISchematicCursor right_cursor, List left_columns, List right_columns,
+                                                 List columns, IJoin join) throws TddlException;
 
     /**
      * 如果order by col中的列，不是数据库的正常排序列，那么这个cursor会将数据查询进行颠倒操作。
@@ -209,7 +172,7 @@ public interface CursorFactory {
      * @param cursor
      * @return
      */
-    IReverseOrderCursor reverseOrderCursor(ISchematicCursor cursor);
+    IReverseOrderCursor reverseOrderCursor(ExecutionContext context, ISchematicCursor cursor) throws TddlException;
 
     /**
      * 范围查询cursor . 对于key filter来说，这个cursor可以进行范围查询。 用于处理
@@ -220,7 +183,7 @@ public interface CursorFactory {
      * @param rangeFilters
      * @return
      */
-    IRangeCursor rangeCursor(ISchematicCursor cursor, IFilter lf) throws Exception;
+    IRangeCursor rangeCursor(ExecutionContext context, ISchematicCursor cursor, IFilter lf) throws TddlException;
 
     /**
      * 默认右边有序，左面无序的join查询时，会调用这个cursor.一般来说，主要的用例是二级索引，
@@ -232,11 +195,11 @@ public interface CursorFactory {
      * @param rightColumns
      * @param columns
      * @return
-     * @throws Exception
+     * @throws TddlException
      */
-    IIndexNestLoopCursor indexNestLoopCursor(ISchematicCursor leftCursor, ISchematicCursor rightCursor,
-                                             List leftColumns, List rightColumns, List columns, boolean prefix,
-                                             IJoin executor) throws Exception;
+    IIndexNestLoopCursor indexNestLoopCursor(ExecutionContext context, ISchematicCursor leftCursor,
+                                             ISchematicCursor rightCursor, List leftColumns, List rightColumns,
+                                             List columns, boolean prefix, IJoin executor) throws TddlException;
 
     /**
      * 从哪个值开始取，取多少个。
@@ -246,7 +209,8 @@ public interface CursorFactory {
      * @param limitTo
      * @return
      */
-    ILimitFromToCursor limitFromToCursor(ISchematicCursor cursor, Long limitFrom, Long limitTo);
+    ILimitFromToCursor limitFromToCursor(ExecutionContext context, ISchematicCursor cursor, Long limitFrom, Long limitTo)
+                                                                                                                         throws TddlException;
 
     /**
      * id in 的优化。 会尽可能自动的将数据做分隔，比如有一组值 {0,1,2,3,4} 按照id % 2 切分的数据，那么得到的是 0 -> 0
@@ -259,19 +223,8 @@ public interface CursorFactory {
      * @param op
      * @return
      */
-    IInCursor inCursor(Cursor cursor, List<IOrderBy> orderBys, IColumn c, List<Comparable> v, OPERATION op);
-
-    /**
-     * 合并排序后的数据用的cursor 。
-     * 
-     * @param left_cursor
-     * @param right_cursor
-     * @param duplicated
-     * @return
-     * @throws Exception
-     */
-    IORCursor mergeSortedCursor(ISchematicCursor left_cursor, ISchematicCursor right_cursor, boolean duplicated)
-                                                                                                                throws Exception;
+    IInCursor inCursor(ExecutionContext context, Cursor cursor, List<IOrderBy> orderBys, IColumn c, List<Comparable> v,
+                       OPERATION op) throws TddlException;
 
     /**
      * set request order by when cursor's orderBy tableName is not equals
@@ -281,7 +234,9 @@ public interface CursorFactory {
      * @param ordersInRequest
      * @return
      */
-    ISetOrderCursor setOrderCursor(ISchematicCursor cursor, List<IOrderBy> ordersInRequest);
+    ISetOrderCursor setOrderCursor(ExecutionContext context, ISchematicCursor cursor, List<IOrderBy> ordersInRequest)
+                                                                                                                     throws TddlException;
 
-    IORCursor mergeSortedCursor(List<ISchematicCursor> cursors, boolean duplicated, String tableAlias) throws Exception;
+    IORCursor mergeSortedCursor(ExecutionContext context, List<ISchematicCursor> cursors, boolean duplicated,
+                                String tableAlias) throws TddlException;
 }

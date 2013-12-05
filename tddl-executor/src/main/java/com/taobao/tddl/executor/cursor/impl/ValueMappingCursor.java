@@ -3,6 +3,7 @@ package com.taobao.tddl.executor.cursor.impl;
 import java.util.List;
 import java.util.Map;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.Cursor;
@@ -27,12 +28,12 @@ public class ValueMappingCursor extends SchematicCursor {
     ICursorMeta                                                meta = null;
 
     @Override
-    public IRowSet current() throws Exception {
+    public IRowSet current() throws TddlException {
         return wrap(super.current());
     }
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         return wrap(super.next());
     }
 
@@ -49,22 +50,22 @@ public class ValueMappingCursor extends SchematicCursor {
     }
 
     @Override
-    public IRowSet prev() throws Exception {
+    public IRowSet prev() throws TddlException {
         return wrap(super.prev());
     }
 
     @Override
-    public IRowSet first() throws Exception {
+    public IRowSet first() throws TddlException {
         return wrap(super.first());
     }
 
     @Override
-    public IRowSet last() throws Exception {
+    public IRowSet last() throws TddlException {
         return wrap(super.last());
     }
 
     @Override
-    public IRowSet getNextDup() throws Exception {
+    public IRowSet getNextDup() throws TddlException {
         return wrap(super.getNextDup());
     }
 
@@ -75,13 +76,13 @@ public class ValueMappingCursor extends SchematicCursor {
 
     @Override
     public Map<CloneableRecord, DuplicateKVPair> mgetWithDuplicate(List<CloneableRecord> keys, boolean prefixMatch,
-                                                                   boolean keyFilterOrValueFilter) throws Exception {
+                                                                   boolean keyFilterOrValueFilter) throws TddlException {
         return super.mgetWithDuplicate(keys, prefixMatch, keyFilterOrValueFilter);
     }
 
     @Override
     public List<DuplicateKVPair> mgetWithDuplicateList(List<CloneableRecord> keys, boolean prefixMatch,
-                                                       boolean keyFilterOrValueFilter) throws Exception {
+                                                       boolean keyFilterOrValueFilter) throws TddlException {
         return super.mgetWithDuplicateList(keys, prefixMatch, keyFilterOrValueFilter);
     }
 

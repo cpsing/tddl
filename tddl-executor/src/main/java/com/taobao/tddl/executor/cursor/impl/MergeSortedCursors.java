@@ -66,7 +66,7 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
     }
 
     @Override
-    public void beforeFirst() throws Exception {
+    public void beforeFirst() throws TddlException {
         inited = false;
         values.clear();
         values = new ArrayList(cursors.size());
@@ -101,7 +101,7 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
     IRowSet current         = null;
     boolean inited          = false;
 
-    public void init() throws Exception {
+    public void init() throws TddlException {
         if (inited) return;
         inited = true;
 
@@ -121,7 +121,7 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
      * 如果去重，需要将重复的值略过
      */
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         init();
 
         int indexOfCurrentMaxOrMin = 0;
@@ -222,7 +222,7 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
     }
 
     @Override
-    public IRowSet first() throws Exception {
+    public IRowSet first() throws TddlException {
         for (int i = 0; i < this.cursors.size(); i++) {
             cursors.get(i).beforeFirst();
         }
@@ -234,7 +234,7 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
     }
 
     @Override
-    public void put(CloneableRecord key, CloneableRecord value) throws Exception {
+    public void put(CloneableRecord key, CloneableRecord value) throws TddlException {
         throw new UnsupportedOperationException("should not be here");
     }
 
@@ -245,14 +245,14 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
 
     @Override
     public Map<CloneableRecord, DuplicateKVPair> mgetWithDuplicate(List<CloneableRecord> keys, boolean prefixMatch,
-                                                                   boolean keyFilterOrValueFilter) throws Exception {
+                                                                   boolean keyFilterOrValueFilter) throws TddlException {
 
         throw new UnsupportedOperationException("should not be here");
     }
 
     @Override
     public List<DuplicateKVPair> mgetWithDuplicateList(List<CloneableRecord> keys, boolean prefixMatch,
-                                                       boolean keyFilterOrValueFilter) throws Exception {
+                                                       boolean keyFilterOrValueFilter) throws TddlException {
         throw new UnsupportedOperationException("should not be here");
     }
 
@@ -275,7 +275,7 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
     }
 
     @Override
-    public List<Exception> close(List<Exception> exs) {
+    public List<TddlException> close(List<TddlException> exs) {
 
         for (Cursor c : this.cursors) {
             if (c != null) exs = c.close(exs);

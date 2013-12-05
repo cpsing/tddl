@@ -49,14 +49,14 @@ public interface Repository {
      * 
      * @param conf
      */
-    void init(ServerConfig conf, AndorContext commonConfig);
+    void init(RepoConfig conf);
 
     /**
      * 获取当前存储引擎的一些配置信息。
      * 
      * @return
      */
-    QueryEngineCommonConf getServerConfig();
+    RepoConfig getRepoConfig();
 
     /**
      * 判断当前引擎是否是read only的，如果为readOnly则不可写，只可读，用于容灾。
@@ -88,5 +88,5 @@ public interface Repository {
 
     RemotingExecutor buildRemoting(Group group);
 
-    AndorContext getCommonRuntimeConfigHolder();
+    TempTable createTempTable();
 }

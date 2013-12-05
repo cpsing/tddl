@@ -9,6 +9,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.taobao.tddl.common.exception.TddlException;
+
 /**
  * 公共方便方法
  * 
@@ -120,9 +122,9 @@ public class GeneralUtil {
         }
     }
 
-    public static void checkInterrupted() throws InterruptedException {
+    public static void checkInterrupted() throws TddlException {
         if (Thread.interrupted()) {
-            throw new InterruptedException();
+            throw new TddlException(new InterruptedException());
         }
     }
 
@@ -139,9 +141,9 @@ public class GeneralUtil {
 
     public static StackTraceElement split = new StackTraceElement("------- one sql exceptions-----", "", "", 0);
 
-    public static Exception mergeException(List<Exception> exceptions) {
+    public static TddlException mergeException(List<TddlException> exceptions) {
         // return new OneToManySQLExceptionsWrapper(exceptions);
-        Exception first = exceptions.get(0);
+        TddlException first = exceptions.get(0);
         List<StackTraceElement> stes = new ArrayList<StackTraceElement>(30 * exceptions.size());
         // stes.addAll(Arrays.asList(first.getStackTrace()));
         boolean hasSplit = false;

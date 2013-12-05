@@ -1,4 +1,4 @@
-package com.taobao.tddl.matrix.jdbc.executor;
+package com.taobao.tddl.executor.common;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;

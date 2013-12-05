@@ -3,6 +3,7 @@ package com.taobao.tddl.executor.cursor.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.codec.CodecFactory;
 import com.taobao.tddl.executor.codec.RecordCodec;
@@ -66,7 +67,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     @SuppressWarnings("unchecked")
     public SortMergeJoinCursor1(ISchematicCursor left_cursor, ISchematicCursor right_cursor, List left_columns,
                                 List right_columns, boolean left_prefix, boolean right_prefix, List<IOrderBy> orderBys,
-                                List leftColumns, List rightColumns) throws Exception{
+                                List leftColumns, List rightColumns) throws TddlException{
         super(left_cursor, right_cursor, left_columns, right_columns, leftColumns, rightColumns);
         this.left_cursor = left_cursor;
         this.right_cursor = right_cursor;
@@ -86,7 +87,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     // public SortMergeJoinCursor1(ISchematicCursor left_cursor,
     // ISchematicCursor right_cursor, List left_columns,
     // List right_columns, List columns, boolean left_prefix,
-    // boolean right_prefix, List<IOrderBy> orderBys) throws Exception {
+    // boolean right_prefix, List<IOrderBy> orderBys) throws TddlException {
     // this(left_cursor, right_cursor, left_columns, right_columns, columns,
     // left_prefix, right_prefix, left_cursor.getOrderBy(), ExecUtil
     // .getComp(left_columns, right_columns));
@@ -94,7 +95,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
 
     // public SortMergeJoinCursor1(ISchematicCursor left_cursor,
     // ISchematicCursor right_cursor, List left_columns,
-    // List right_columns, List columns) throws Exception {
+    // List right_columns, List columns) throws TddlException {
     // this(left_cursor, right_cursor, left_columns, right_columns, columns,
     // false, false);
     // }
@@ -103,7 +104,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     // public SortMergeJoinCursor1(ISchematicCursor left_cursor,
     // ISchematicCursor right_cursor, List left_columns,
     // List right_columns, List columns, List<IOrderBy> orderBys)
-    // throws Exception {
+    // throws TddlException {
     // this(left_cursor, right_cursor, left_columns, right_columns, columns,
     // false, false, orderBys);
     // }
@@ -111,7 +112,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     // public SortMergeJoinCursor1(ISchematicCursor left_cursor,
     // ISchematicCursor right_cursor, List left_columns,
     // List right_columns, List columns, List<IOrderBy> orderBys,
-    // Comparator<KVPair> kvPairComparator) throws Exception {
+    // Comparator<KVPair> kvPairComparator) throws TddlException {
     // this(left_cursor, right_cursor, left_columns, right_columns, columns,
     // false, false, orderBys, kvPairComparator);
     // }
@@ -130,7 +131,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
      * @return @throws FetchException
      */
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         if (nextDup) {
             // 有相同的的，那么取一个相同的
             nextDup = false;
@@ -253,7 +254,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     }
 
     // @Override
-    // public IRowSet getNextDup() throws Exception {
+    // public IRowSet getNextDup() throws TddlException {
     // if (prevJoinedKV == null) {
     // return null;
     // }
@@ -268,13 +269,13 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     // }
 
     // @Override
-    // public boolean skipTo(KVPair kv) throws Exception {
+    // public boolean skipTo(KVPair kv) throws TddlException {
     // return skipTo(kv.getKey());
     // }
     // 直接丢异常
 
     // @Override
-    // public boolean skipTo(CloneableRecord key) throws Exception {
+    // public boolean skipTo(CloneableRecord key) throws TddlException {
     // KVPair kv;
     // while ((kv = next()) != null) {
     // if (kv.getKey().equals(key)) {
@@ -287,22 +288,22 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     // 直接丢异常
 
     @Override
-    public IRowSet current() throws Exception {
+    public IRowSet current() throws TddlException {
         return current;
     }
 
     // @Override
-    // public KVPair first() throws Exception {
+    // public KVPair first() throws TddlException {
     // throw new UnsupportedOperationException();
     // }
 
     // @Override
-    // public KVPair last() throws Exception {
+    // public KVPair last() throws TddlException {
     // throw new UnsupportedOperationException();
     // }
 
     // @Override
-    // public KVPair prev() throws Exception {
+    // public KVPair prev() throws TddlException {
     // throw new UnsupportedOperationException();
     // }
 
@@ -340,7 +341,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
     }
 
     // @Override
-    // public void close() throws Exception {
+    // public void close() throws TddlException {
     // left_cursor.close();
     // right_cursor.close();
     // }

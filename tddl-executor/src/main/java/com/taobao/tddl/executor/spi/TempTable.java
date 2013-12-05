@@ -1,5 +1,6 @@
 package com.taobao.tddl.executor.spi;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 
 /**
@@ -19,6 +20,6 @@ public interface TempTable {
      * @return
      * @throws Exception
      */
-    Table getTable(TableMeta meta, String groupNode, boolean isTempTable, long requestID) throws Exception;
+    Table getTable(TableMeta meta, String groupNode, boolean isTempTable, long requestID) throws TddlException;
 
 }

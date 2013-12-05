@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.codec.CodecFactory;
 import com.taobao.tddl.executor.common.CursorMetaImp;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
@@ -67,7 +68,7 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor {
     }
 
     protected Map<CloneableRecord, DuplicateKVPair> getRecordFromRightByValueFilter(List<CloneableRecord> leftJoinOnColumnCache)
-                                                                                                                                throws Exception {
+                                                                                                                                throws TddlException {
         right_cursor.beforeFirst();
         IBooleanFilter filter = ASTNodeFactory.getInstance().createBooleanFilter();
 
@@ -85,7 +86,7 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor {
         filter.setValues(values);
         filter.setColumn(this.rightJoinOnColumns.get(0));
         IColumn rightColumn = (IColumn) this.rightJoinOnColumns.get(0);
-        IValueFilterCursor vfc = this.cursorFactory.valueFilterCursor(right_cursor, filter, executionContext);
+        IValueFilterCursor vfc = this.cursorFactory.valueFilterCursor(executionContext, right_cursor, filter);
 
         Map<CloneableRecord, DuplicateKVPair> records = new HashMap();
 
@@ -102,7 +103,7 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor {
     }
 
     protected Map<CloneableRecord, DuplicateKVPair> getRecordFromRight(List<CloneableRecord> leftJoinOnColumnCache)
-                                                                                                                   throws Exception {
+                                                                                                                   throws TddlException {
         // 子查询的话不能用mget
         // 因为子查询的话，join的列可以是函数，函数应该放在having里，而不是放在valueFilter里
         if (this.join.getRightNode().isSubQuery()) return this.getRecordFromRightByValueFilter(leftJoinOnColumnCache);
@@ -110,7 +111,7 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor {
     }
 
     private void leftOutJoin(List<CloneableRecord> leftJoinOnColumnCache, IColumn rightColumn, IValueFilterCursor vfc,
-                             Map<CloneableRecord, DuplicateKVPair> records) throws Exception {
+                             Map<CloneableRecord, DuplicateKVPair> records) throws TddlException {
         Map<Comparable, CloneableRecord> leftMap = new HashMap<Comparable, CloneableRecord>();
         Map<Comparable, CloneableRecord> tempMap = new HashMap<Comparable, CloneableRecord>();
         for (CloneableRecord record : leftJoinOnColumnCache) {
@@ -142,7 +143,7 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor {
 
     private void blockNestedLoopJoin(List<CloneableRecord> leftJoinOnColumnCache, IColumn rightColumn,
                                      IValueFilterCursor vfc, Map<CloneableRecord, DuplicateKVPair> records)
-                                                                                                           throws Exception {
+                                                                                                           throws TddlException {
         IRowSet kv = null;
         while ((kv = vfc.next()) != null) {
             kv = ExecUtils.fromIRowSetToArrayRowSet(kv);

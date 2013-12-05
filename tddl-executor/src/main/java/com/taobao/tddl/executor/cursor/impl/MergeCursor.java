@@ -1,7 +1,6 @@
 package com.taobao.tddl.executor.cursor.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,9 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.executor.ExecutorContext;
 import com.taobao.tddl.executor.codec.CodecFactory;
 import com.taobao.tddl.executor.codec.RecordCodec;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
@@ -35,8 +36,7 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
-import com.taobao.tddl.optimizer.costbased.DataNodeChooser;
-import com.taobao.tddl.optimizer.costbased.before.QueryPlanOptimizer;
+import com.taobao.tddl.optimizer.utils.FilterUtils;
 
 /**
  * @author jianxing <jianxing.qx@taobao.com>
@@ -110,7 +110,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
     // }
 
     @Override
-    protected void init() throws Exception {
+    protected void init() throws TddlException {
         if (this.inited) return;
 
         super.init();
@@ -119,7 +119,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
     }
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         init();
         /*
          * 因为subCursor和first Cursor的meta数据可能排列的顺序不一样。 比如，cursor1 ,顺序可能是pk ,
@@ -131,7 +131,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
         return iRowSet;
     }
 
-    private IRowSet innerNext() throws Exception {
+    private IRowSet innerNext() throws TddlException {
         init();
         IRowSet ret;
         while (true) {
@@ -156,13 +156,13 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
         valueMappingIRowSetConvertor.reset();
     }
 
-    List<Exception>          exceptionsWhenCloseSubCursor = new ArrayList();
+    List<TddlException>      exceptionsWhenCloseSubCursor = new ArrayList();
     private List<ColumnMeta> returnColumns                = null;
 
     @Override
-    public List<Exception> close(List<Exception> exs) {
+    public List<TddlException> close(List<TddlException> exs) {
         exs.addAll(exceptionsWhenCloseSubCursor);
-        Exception e = null;
+        TddlException e = null;
 
         for (ISchematicCursor _cursor : cursors) {
             exs = _cursor.close(exs);
@@ -171,7 +171,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
     }
 
     @Override
-    public boolean skipTo(CloneableRecord key) throws Exception {
+    public boolean skipTo(CloneableRecord key) throws TddlException {
         init();
         return super.skipTo(key);
     }
@@ -182,7 +182,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
 
     @Override
     public List<DuplicateKVPair> mgetWithDuplicateList(List<CloneableRecord> keys, boolean prefixMatch,
-                                                       boolean keyFilterOrValueFilter) throws Exception {
+                                                       boolean keyFilterOrValueFilter) throws TddlException {
         logger.error("do mgetWith Duplicatelist in mergeCursor. should not be here");
         init();
         Map<CloneableRecord, DuplicateKVPair> map = parentCursorMgetWithDuplicate(keys,
@@ -193,13 +193,12 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
 
     @Override
     public Map<CloneableRecord, DuplicateKVPair> mgetWithDuplicate(List<CloneableRecord> keys, boolean prefixMatch,
-                                                                   boolean keyFilterOrValueFilter) throws Exception {
+                                                                   boolean keyFilterOrValueFilter) throws TddlException {
         init();
         if (prefixMatch) {
             throw new UnsupportedOperationException("not supported yet");
         } else {
             OptimizerContext optimizerContext = OptimizerContext.getContext();
-            DataNodeChooser dnc = optimizerContext.getDataNodeChooser();
 
             IBooleanFilter ibf = ASTNodeFactory.getInstance().createBooleanFilter();
             List<Comparable> values = new ArrayList<Comparable>();
@@ -221,7 +220,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
 
             IQuery iquery = (IQuery) currentExecotor;
 
-            KVIndexNode query = new KVIndexNode(iquery.getIndexName(), optimizerContext);
+            KVIndexNode query = new KVIndexNode(iquery.getIndexName());
             query.select(iquery.getColumns());
             query.setLimitFrom(iquery.getLimitFrom());
             query.setLimitTo(iquery.getLimitTo());
@@ -245,22 +244,24 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
             // .getIndexKey() : iquery.getAlias());
             // }
             // iquery.setKeyFilter(ibf);
-            KVBuilderUtils u = new KVBuilderUtils(optimizerContext);
-            if (keyFilterOrValueFilter) query.keyQuery(u.and(query.getKeyFilter(), ibf));
-            else query.valueQuery(u.and(query.getResultFilter(), ibf));
+
+            if (keyFilterOrValueFilter) query.keyQuery(FilterUtils.and(query.getKeyFilter(), ibf));
+            else query.valueQuery(FilterUtils.and(query.getResultFilter(), ibf));
 
             query.alias(iquery.getAlias());
             query.build();
             // IDataNodeExecutor idne = dnc.shard(currentExecotor,
             // Collections.EMPTY_MAP, null);
-            IDataNodeExecutor idne = dnc.shard(query, ibf, Collections.EMPTY_MAP, null).toDataNodeExecutor();
+            IDataNodeExecutor idne = null;
             // 优化做法，将数据分配掉。
             Integer currentThread = currentExecotor.getThread();
-            Map<String, Comparable> extraCmds = new HashMap();
-            extraCmds.put("initThread", currentThread);
-            for (QueryPlanOptimizer after : optimizerContext.getAfterOptimizers()) {
-                idne = after.optimize(idne, null, extraCmds);
-            }
+
+            executionContext.getExtraCmds().put("initThread", currentThread);
+
+            idne = optimizerContext.getOptimizer().optimizeAndAssignment(query,
+                executionContext.getParams(),
+                executionContext.getExtraCmds());
+
             ISchematicCursor cursor = null;
             List<KVPair> returnList;
             Map<CloneableRecord, DuplicateKVPair> duplicateKeyMap = null;
@@ -268,14 +269,14 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
 
                 ExecutionContext tempContext = new ExecutionContext();
                 tempContext.setCurrentRepository(executionContext.getCurrentRepository());
-                cursor = tra.executeTransactional(null, tempContext, idne, null);
+                cursor = ExecutorContext.getContext().getTransactionExecutor().execByExecPlanNode(idne, tempContext);
                 // 用于关闭，统一管理
                 this.returnColumns = cursor.getReturnColumns();
                 duplicateKeyMap = buildDuplicateKVPairMap(col, cursor);
 
             } finally {
                 if (cursor != null) {
-                    List<Exception> exs = new ArrayList();
+                    List<TddlException> exs = new ArrayList();
                     exs = cursor.close(exs);
                     if (!exs.isEmpty()) throw GeneralUtil.mergeException(exs);
                 }
@@ -291,10 +292,10 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
      * @param cursor
      * @param duplicateKeyMap
      * @return
-     * @throws Exception
+     * @throws TddlException
      */
     private Map<CloneableRecord, DuplicateKVPair> buildDuplicateKVPairMap(IColumn c, ISchematicCursor cursor)
-                                                                                                             throws Exception {
+                                                                                                             throws TddlException {
 
         Map<CloneableRecord, DuplicateKVPair> duplicateKeyMap = new HashMap<CloneableRecord, DuplicateKVPair>();
         IRowSet kvPair;
@@ -340,7 +341,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
     }
 
     @Override
-    public void beforeFirst() throws Exception {
+    public void beforeFirst() throws TddlException {
         init();
         for (int i = 0; i < cursors.size(); i++) {
             cursors.get(i).beforeFirst();
@@ -370,7 +371,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
     }
 
     @Override
-    public List<ColumnMeta> getReturnColumns() throws Exception {
+    public List<ColumnMeta> getReturnColumns() throws TddlException {
         if (this.returnColumns != null) return this.returnColumns;
         if (this.cursors != null && !cursors.isEmpty()) {
             this.returnColumns = cursors.get(0).getReturnColumns();

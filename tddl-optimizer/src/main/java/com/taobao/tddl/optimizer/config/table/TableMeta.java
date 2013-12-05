@@ -42,6 +42,10 @@ public class TableMeta implements Serializable, Cloneable {
     private final Map<String, ColumnMeta>                allColumns               = new HashMap<String, ColumnMeta>();
     private final List<ColumnMeta>                       allColumnsOrderByDefined = new LinkedList<ColumnMeta>();
 
+    private boolean                                      temp                     = false;
+
+    private boolean                                      sortedDuplicates         = true;
+
     public TableMeta(String tableName, List<ColumnMeta> allColumnsOrderByDefined, IndexMeta primaryIndex,
                      List<IndexMeta> secondaryIndexes){
         this.tableName = tableName;
@@ -124,5 +128,22 @@ public class TableMeta implements Serializable, Cloneable {
 
     public String toString() {
         return ToStringBuilder.reflectionToString(this, TddlToStringStyle.DEFAULT_STYLE);
+    }
+
+    public void setTmp(boolean b) {
+        this.temp = b;
+    }
+
+    public boolean isTmp() {
+        return this.temp;
+    }
+
+    public void setSortedDuplicates(boolean sortedDuplicates) {
+        this.sortedDuplicates = sortedDuplicates;
+
+    }
+
+    public boolean issortedDuplicates() {
+        return sortedDuplicates;
     }
 }

@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.executor.common.ColMetaAndIndex;
+import com.taobao.tddl.executor.common.CursorMetaImp;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.executor.cursor.IRowsValueScaner;
@@ -33,6 +34,7 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.expression.bean.Function;
 import com.taobao.tddl.optimizer.core.expression.bean.OrderBy;
+import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 
 public class ExecUtils {
 
@@ -681,5 +683,58 @@ public class ExecUtils {
             cr.put(cmAndIndex.getName(), iRowSet.getObject(cmAndIndex.getIndex()));
         }
         return cr;
+    }
+
+    public static ICursorMeta convertToICursorMeta(IQueryTree query) {
+        if (query.getSql() != null) {
+            return null;
+        }
+        ICursorMeta iCursorMeta = null;
+        List<ColumnMeta> columns = convertISelectablesToColumnMeta(query.getColumns(),
+            query.getAlias(),
+            query.isSubQuery());
+        iCursorMeta = CursorMetaImp.buildNew(columns, columns.size());
+        return iCursorMeta;
+    }
+
+    public static ICursorMeta convertToICursorMeta(IndexMeta meta) {
+        ICursorMeta iCursorMeta = null;
+        List<ColumnMeta> columns = new ArrayList<ColumnMeta>();
+        List<ColumnMeta> columnMeta = meta.getKeyColumns();
+        addNewColumnMeta(columnMeta, columns);
+        columnMeta = meta.getValueColumns();
+        addNewColumnMeta(columnMeta, columns);
+        iCursorMeta = CursorMetaImp.buildNew(columns, columns.size());
+        return iCursorMeta;
+    }
+
+    private static void addNewColumnMeta(List<ColumnMeta> columnMeta, List<ColumnMeta> columns) {
+        for (ColumnMeta cm : columnMeta) {
+            ColumnMeta cmNew = new ColumnMeta(GeneralUtil.getLogicTableName(cm.getTableName()),
+                cm.getName(),
+                cm.getDataType(),
+                cm.getAlias(),
+                cm.isNullable());
+            columns.add(cmNew);
+        }
+    }
+
+    public static Object getObject(final ICursorMeta meta, IRowSet rowSet, String tableName, String columnName) {
+        Integer index = meta.getIndex(tableName, columnName);
+        if (index == null) {
+            throw new RuntimeException("在meta中没找到该列:" + tableName + "." + columnName + " ICursorMeta:" + meta);
+        }
+        return rowSet.getObject(index);
+    }
+
+    public static List<ISelectable> copySelectables(List<ISelectable> cs) {
+        if (cs == null) return null;
+
+        List<ISelectable> news = new ArrayList(cs.size());
+        for (ISelectable c : cs) {
+            news.add(c.copy());
+        }
+
+        return news;
     }
 }

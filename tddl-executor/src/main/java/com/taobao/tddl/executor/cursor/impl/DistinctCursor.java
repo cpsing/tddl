@@ -44,7 +44,7 @@ public class DistinctCursor extends MergeSortedCursors {
     }
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         IRowSet next = null;
         while ((next = (cursor.next())) != null) {
 

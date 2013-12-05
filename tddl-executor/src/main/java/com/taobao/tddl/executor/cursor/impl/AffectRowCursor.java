@@ -2,6 +2,7 @@ package com.taobao.tddl.executor.cursor.impl;
 
 import java.util.Arrays;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.common.CursorMetaImp;
 import com.taobao.tddl.executor.common.ICursorMeta;
@@ -41,7 +42,7 @@ public class AffectRowCursor extends SchematicCursor implements IAffectRowCursor
     }
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         initSchema();
         if (!first) {
             return null;

@@ -3,7 +3,7 @@ package com.taobao.tddl.executor;
 import java.util.concurrent.Future;
 
 import com.taobao.tddl.common.exception.TddlException;
-import com.taobao.tddl.executor.cursor.ResultCursor;
+import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.spi.ExecutionContext;
 
 /**
@@ -14,7 +14,7 @@ import com.taobao.tddl.executor.spi.ExecutionContext;
  */
 public interface ITransactionAsyncExecutor extends IAsyncExecutor {
 
-    Future<ResultCursor> commitFuture(ExecutionContext executionContext) throws TddlException;
+    Future<ISchematicCursor> commitFuture(ExecutionContext executionContext) throws TddlException;
 
-    Future<ResultCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException;
+    Future<ISchematicCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException;
 }

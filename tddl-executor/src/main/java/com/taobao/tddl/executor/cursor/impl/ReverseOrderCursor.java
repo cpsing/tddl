@@ -2,6 +2,7 @@ package com.taobao.tddl.executor.cursor.impl;
 
 import java.util.List;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.cursor.IReverseOrderCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -39,7 +40,7 @@ public class ReverseOrderCursor extends SchematicCursor implements IReverseOrder
     }
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         return parentCursorPrev();
     }
 

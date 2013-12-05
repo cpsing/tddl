@@ -3,6 +3,7 @@ package com.taobao.tddl.executor.cursor.impl;
 import java.util.Comparator;
 import java.util.List;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
@@ -78,7 +79,7 @@ public class RangeCursor1 extends SchematicCursor implements IRangeCursor {
     }
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         if (cursor == null) {
             return null;
         }
@@ -128,7 +129,7 @@ public class RangeCursor1 extends SchematicCursor implements IRangeCursor {
     }
 
     @Override
-    public boolean skipTo(CloneableRecord key) throws Exception {
+    public boolean skipTo(CloneableRecord key) throws TddlException {
         if (parentCursorSkipTo(key)) {
             IRowSet kv = current();
             if (match(kv)) {
@@ -139,12 +140,12 @@ public class RangeCursor1 extends SchematicCursor implements IRangeCursor {
     }
 
     @Override
-    public boolean skipTo(KVPair key) throws Exception {
+    public boolean skipTo(KVPair key) throws TddlException {
         return skipTo(key.getKey());
     }
 
     @Override
-    public IRowSet first() throws Exception {
+    public IRowSet first() throws TddlException {
         this.first = false;
         IRowSet iRowSet = from;
         CloneableRecord cr = ExecUtils.convertToClonableRecord(iRowSet);
@@ -156,7 +157,7 @@ public class RangeCursor1 extends SchematicCursor implements IRangeCursor {
     }
 
     @Override
-    public IRowSet last() throws Exception {
+    public IRowSet last() throws TddlException {
         first = false;
         IRowSet iRowSet = to;
         CloneableRecord cr = ExecUtils.convertToClonableRecord(iRowSet);
@@ -210,7 +211,7 @@ public class RangeCursor1 extends SchematicCursor implements IRangeCursor {
     }
 
     @Override
-    public IRowSet prev() throws Exception {
+    public IRowSet prev() throws TddlException {
         IRowSet kv;
 
         if (!first) {
@@ -255,7 +256,7 @@ public class RangeCursor1 extends SchematicCursor implements IRangeCursor {
     }
 
     @Override
-    public void beforeFirst() throws Exception {
+    public void beforeFirst() throws TddlException {
         this.first = true;
     }
 

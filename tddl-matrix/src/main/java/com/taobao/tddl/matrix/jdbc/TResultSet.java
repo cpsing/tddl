@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.executor.common.ICursorMeta;
@@ -107,7 +108,7 @@ public class TResultSet implements ResultSet {
         }
         try {
             this.resultSetMetaData = null;
-            List<Exception> exs = new ArrayList();
+            List<TddlException> exs = new ArrayList();
             exs = this.resultCursor.close(exs);
             if (!exs.isEmpty()) throw GeneralUtil.mergeException(exs);
             isClosed = true;

@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.common.KVPair;
@@ -59,19 +60,19 @@ public class IndexNestedLoopMgetImpCursor extends IndexNestLoopCursor implements
 
     public IndexNestedLoopMgetImpCursor(ISchematicCursor leftCursor, ISchematicCursor rightCursor, List leftColumns,
                                         List rightColumns, List columns, List leftRetColumns, List rightRetColumns,
-                                        IJoin join) throws Exception{
+                                        IJoin join) throws TddlException{
         super(leftCursor, rightCursor, leftColumns, rightColumns, columns, leftRetColumns, rightRetColumns);
         setLeftRightJoin(join);
     }
 
     public IndexNestedLoopMgetImpCursor(ISchematicCursor leftCursor, ISchematicCursor rightCursor, List leftColumns,
                                         List rightColumns, List columns, boolean prefix, List leftRetColumns,
-                                        List rightRetColumns, IJoin join) throws Exception{
+                                        List rightRetColumns, IJoin join) throws TddlException{
         super(leftCursor, rightCursor, leftColumns, rightColumns, columns, prefix, leftRetColumns, rightRetColumns);
         setLeftRightJoin(join);
     }
 
-    protected IRowSet proecessJoinOneWithNoneProfix(boolean forward) throws Exception, InterruptedException {
+    protected IRowSet proecessJoinOneWithNoneProfix(boolean forward) throws TddlException {
         //
         isLeftJoin = isLeftOutJoin() & !isRightOutJoin();
         while (true) {
@@ -188,7 +189,7 @@ public class IndexNestedLoopMgetImpCursor extends IndexNestLoopCursor implements
         return new NamedRecord(cr.getMap().keySet().iterator().next(), cr);
     }
 
-    private boolean getMoreRecord(boolean forward) throws Exception, InterruptedException {
+    private boolean getMoreRecord(boolean forward) throws TddlException {
         List<CloneableRecord> leftJoinOnColumnCache = new ArrayList<CloneableRecord>(sizeKeyLimination);
         List<IRowSet> liftKVPair = new ArrayList<IRowSet>(sizeKeyLimination);
         boolean hasMore = fillCache(leftJoinOnColumnCache, liftKVPair, forward);
@@ -203,7 +204,7 @@ public class IndexNestedLoopMgetImpCursor extends IndexNestLoopCursor implements
     }
 
     protected Map<CloneableRecord, DuplicateKVPair> getRecordFromRight(List<CloneableRecord> leftJoinOnColumnCache)
-                                                                                                                   throws Exception {
+                                                                                                                   throws TddlException {
         return right_cursor.mgetWithDuplicate(leftJoinOnColumnCache, false, true);
     }
 
@@ -213,12 +214,11 @@ public class IndexNestedLoopMgetImpCursor extends IndexNestLoopCursor implements
      * @param leftJoinOnColumnCache
      * @param leftKVPair
      * @return
-     * @throws Exception
+     * @throws TddlException
      * @throws InterruptedException
      */
     private boolean fillCache(List<CloneableRecord> leftJoinOnColumnCache, List<IRowSet> leftKVPair, boolean forward)
-                                                                                                                     throws Exception,
-                                                                                                                     InterruptedException {
+                                                                                                                     throws TddlException {
 
         int currentSize = 0;
         boolean hasMore = false;

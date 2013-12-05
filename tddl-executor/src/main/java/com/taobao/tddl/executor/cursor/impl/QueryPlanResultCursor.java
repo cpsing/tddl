@@ -2,13 +2,14 @@ package com.taobao.tddl.executor.cursor.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.common.CursorMetaImp;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.executor.spi.ExecutionContext;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
@@ -35,8 +36,8 @@ public class QueryPlanResultCursor extends ResultCursor {
     }
     List<IRowSet>           rows    = new ArrayList();
 
-    public QueryPlanResultCursor(String queryPlan, Map<String, Comparable> context){
-        super(null, context);
+    public QueryPlanResultCursor(String queryPlan, ExecutionContext executionContext){
+        super(null, executionContext);
 
         ICursorMeta meta = CursorMetaImp.buildNew(cms);
         IRowSet row = new ArrayRowSet(meta, new String[] { queryPlan });
@@ -62,20 +63,20 @@ public class QueryPlanResultCursor extends ResultCursor {
     int index = 0;
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         if (index > 0) return null;
 
         return rows.get(index++);
     }
 
     @Override
-    public void beforeFirst() throws Exception {
+    public void beforeFirst() throws TddlException {
         index = 0;
         return;
     }
 
     @Override
-    public List<Exception> close(List<Exception> exceptions) {
+    public List<TddlException> close(List<TddlException> exceptions) {
         if (exceptions == null) exceptions = new ArrayList();
         return exceptions;
     }

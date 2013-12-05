@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.codec.CodecFactory;
 import com.taobao.tddl.executor.codec.RecordCodec;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
@@ -79,22 +80,22 @@ public class InCursor extends SchematicCursor implements IInCursor {
     }
 
     @Override
-    protected void init() throws Exception {
+    protected void init() throws TddlException {
         super.init();
     }
 
     @Override
-    protected void checkInited() throws Exception {
+    protected void checkInited() throws TddlException {
         super.checkInited();
     }
 
     @Override
-    public boolean skipTo(CloneableRecord key) throws Exception {
+    public boolean skipTo(CloneableRecord key) throws TddlException {
         throw new IllegalArgumentException("should not be here");
     }
 
     @Override
-    public boolean skipTo(KVPair key) throws Exception {
+    public boolean skipTo(KVPair key) throws TddlException {
         throw new IllegalArgumentException("should not be here");
     }
 
@@ -105,14 +106,14 @@ public class InCursor extends SchematicCursor implements IInCursor {
     }
 
     @Override
-    public IRowSet current() throws Exception {
+    public IRowSet current() throws TddlException {
         return current;
     }
 
     Iterator<KVPair> duplicatePairIterator = null;
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
 
         if (valuesToFind == null) {
             throw new IllegalArgumentException("value is null ");
@@ -175,13 +176,13 @@ public class InCursor extends SchematicCursor implements IInCursor {
      */
 
     @Override
-    public boolean delete() throws Exception {
+    public boolean delete() throws TddlException {
         throw new IllegalArgumentException("should not be here");
     }
 
     @Override
     public Map<CloneableRecord, DuplicateKVPair> mgetWithDuplicate(List<CloneableRecord> keys, boolean prefixMatch,
-                                                                   boolean keyFilterOrValueFilter) throws Exception {
+                                                                   boolean keyFilterOrValueFilter) throws TddlException {
         return parentCursorMgetWithDuplicate(keys, prefixMatch, keyFilterOrValueFilter);
     }
 

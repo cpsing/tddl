@@ -1,5 +1,6 @@
 package com.taobao.tddl.executor.cursor.impl;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.cursor.ILimitFromToCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -29,7 +30,7 @@ public class LimitFromToCursor extends SchematicCursor implements ILimitFromToCu
     private int  count     = 0;
 
     @Override
-    protected void init() throws Exception {
+    protected void init() throws TddlException {
         if (inited) {
             return;
         }
@@ -46,7 +47,7 @@ public class LimitFromToCursor extends SchematicCursor implements ILimitFromToCu
     }
 
     @Override
-    public IRowSet next() throws Exception {
+    public IRowSet next() throws TddlException {
         init();
         count++;
         if (offset != null) {
