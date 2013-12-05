@@ -238,25 +238,6 @@ public class FilterUtils {
         return columns;
     }
 
-    /**
-     * 将一系列的boolean filter ，拼装成一个andFilter { boolFilter , boolFilter...}
-     * 的filter..
-     * 
-     * @param DNFNode
-     * @return
-     */
-    public static IFilter DNFNodeToBoolTree(List<IFilter> DNFNode) {
-        if (DNFNode == null || DNFNode.isEmpty()) {
-            return null;
-        }
-
-        IFilter rootNode = DNFNode.get(0);
-        for (int i = 1; i < DNFNode.size(); i++) {
-            rootNode = and(rootNode, DNFNode.get(i));
-        }
-
-        return rootNode;
-    }
 
     /**
      * 非严格DNF检查，允许出现 Filter(A and B)
@@ -333,7 +314,7 @@ public class FilterUtils {
             || DNFNodes.get(0).get(0) == null) {
             return null;
         } else {
-            return toOrLogicTree(DNFNodes);
+            return DNFToOrLogicTree(DNFNodes);
         }
     }
 
@@ -428,14 +409,14 @@ public class FilterUtils {
      * @param DNFNodes
      * @return
      */
-    private static IFilter toOrLogicTree(List<List<IFilter>> DNFNodes) {
+    public static IFilter DNFToOrLogicTree(List<List<IFilter>> DNFNodes) {
         if (DNFNodes.isEmpty()) {
             return null;
         }
 
-        IFilter treeNode = toAndLogicTree(DNFNodes.get(0));
+        IFilter treeNode = DNFToAndLogicTree(DNFNodes.get(0));
         for (int i = 1; i < DNFNodes.size(); i++) {
-            treeNode = and(treeNode, toAndLogicTree(DNFNodes.get(i)));
+            treeNode = and(treeNode, DNFToAndLogicTree(DNFNodes.get(i)));
         }
         return treeNode;
     }
@@ -447,7 +428,7 @@ public class FilterUtils {
      * @param DNFNode
      * @return
      */
-    private static IFilter toAndLogicTree(List<IFilter> DNFNode) {
+    public static IFilter DNFToAndLogicTree(List<IFilter> DNFNode) {
         if (DNFNode == null || DNFNode.isEmpty()) {
             return null;
         }

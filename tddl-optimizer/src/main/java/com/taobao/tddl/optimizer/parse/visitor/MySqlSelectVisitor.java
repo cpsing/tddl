@@ -2,7 +2,6 @@ package com.taobao.tddl.optimizer.parse.visitor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.alibaba.cobar.parser.ast.expression.Expression;
 import com.alibaba.cobar.parser.ast.expression.primary.ParamMarker;
@@ -18,7 +17,6 @@ import com.alibaba.cobar.parser.ast.stmt.dml.DMLSelectStatement.SelectOption;
 import com.alibaba.cobar.parser.ast.stmt.dml.DMLSelectUnionStatement;
 import com.alibaba.cobar.parser.util.Pair;
 import com.alibaba.cobar.parser.visitor.EmptySQLASTVisitor;
-import com.google.common.collect.Maps;
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
@@ -32,15 +30,7 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
  */
 public class MySqlSelectVisitor extends EmptySQLASTVisitor {
 
-    private QueryTreeNode        tableNode;
-    private Map<Integer, Object> bindVals = Maps.newHashMap();
-
-    public MySqlSelectVisitor(){
-    }
-
-    public MySqlSelectVisitor(Map<Integer, Object> bindVals){
-        this.bindVals = bindVals;
-    }
+    private QueryTreeNode tableNode;
 
     public QueryTreeNode getTableNode() {
         return tableNode;
@@ -97,7 +87,7 @@ public class MySqlSelectVisitor extends EmptySQLASTVisitor {
     private void handleFrom(TableReferences tables) {
         List<TableReference> trs = tables.getTableReferenceList();
         for (TableReference tr : trs) {
-            MySqlExprVisitor mtv = new MySqlExprVisitor(bindVals);
+            MySqlExprVisitor mtv = new MySqlExprVisitor();
             tr.accept(mtv);
             if (this.tableNode == null) {
                 this.tableNode = mtv.getTableNode();
@@ -115,7 +105,7 @@ public class MySqlSelectVisitor extends EmptySQLASTVisitor {
         for (Pair<Expression, String> item : items) {
             Expression expr = item.getKey();
 
-            MySqlExprVisitor ev = new MySqlExprVisitor(bindVals);
+            MySqlExprVisitor ev = new MySqlExprVisitor();
             expr.accept(ev);
             Comparable obj = ev.getColumnOrValue();
             if (!(obj instanceof ISelectable)) { // 常量先转成booleanFilter
@@ -138,7 +128,7 @@ public class MySqlSelectVisitor extends EmptySQLASTVisitor {
     }
 
     private void handleWhereCondition(Expression whereExpr) {
-        MySqlExprVisitor mev = new MySqlExprVisitor(bindVals);
+        MySqlExprVisitor mev = new MySqlExprVisitor();
         whereExpr.accept(mev);
         if (this.tableNode != null) {
             if (mev.getFilter() != null) {
@@ -157,7 +147,7 @@ public class MySqlSelectVisitor extends EmptySQLASTVisitor {
         List<Pair<Expression, SortOrder>> olist = orderBy.getOrderByList();
         for (Pair<Expression, SortOrder> p : olist) {
             Expression expr = p.getKey();
-            MySqlExprVisitor v = new MySqlExprVisitor(bindVals);
+            MySqlExprVisitor v = new MySqlExprVisitor();
             expr.accept(v);
             SortOrder sorder = p.getValue();
             this.tableNode = tableNode.orderBy((ISelectable) v.getColumnOrValue(),
@@ -169,7 +159,7 @@ public class MySqlSelectVisitor extends EmptySQLASTVisitor {
         List<Pair<Expression, SortOrder>> glist = groupBy.getOrderByList();
         for (Pair<Expression, SortOrder> p : glist) {
             Expression expr = p.getKey();
-            MySqlExprVisitor v = new MySqlExprVisitor(bindVals);
+            MySqlExprVisitor v = new MySqlExprVisitor();
             expr.accept(v);
             SortOrder sorder = p.getValue();
             this.tableNode = tableNode.groupBy((ISelectable) v.getColumnOrValue(),
@@ -178,7 +168,7 @@ public class MySqlSelectVisitor extends EmptySQLASTVisitor {
     }
 
     private void handleHavingCondition(Expression havingExpr) {
-        MySqlExprVisitor mev = new MySqlExprVisitor(bindVals);
+        MySqlExprVisitor mev = new MySqlExprVisitor();
         havingExpr.accept(mev);
         IFilter havingFilter = mev.getFilter();
         if (this.tableNode == null) {

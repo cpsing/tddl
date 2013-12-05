@@ -1,4 +1,4 @@
-package com.taobao.tddl.optimizer.costbased;
+package com.taobao.tddl.optimizer.costbased.chooser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,12 +27,12 @@ import com.taobao.tddl.optimizer.utils.OptimizerUtils;
  * @author Dreamond
  * @since 5.1.0
  */
-public class FilterSpliter {
+public class FilterChooser {
 
     /**
      * 根据where中的所有条件按照or进行分隔，生成多个query请求. (主要考虑部分存储引擎不支持or语法)
      */
-    public static List<QueryTreeNode> split(TableNode node, Map<String, Comparable> extraCmd) throws QueryException {
+    public static List<QueryTreeNode> optimize(TableNode node, Map<String, Comparable> extraCmd) throws QueryException {
         if (node.getWhereFilter() == null) {
             return new LinkedList<QueryTreeNode>();
         }
@@ -57,7 +57,7 @@ public class FilterSpliter {
                 subQuery.setFullTableScan(true);
             }
 
-            Map<FilterType, IFilter> filters = splitByType(DNFNode, subQuery);
+            Map<FilterType, IFilter> filters = optimize(DNFNode, subQuery);
             subQuery.setKeyFilter(filters.get(FilterType.IndexQueryKeyFilter));
             subQuery.setResultFilter(filters.get(FilterType.ResultFilter));
             subQuery.setIndexQueryValueFilter(filters.get(FilterType.IndexQueryValueFilter));
@@ -70,7 +70,7 @@ public class FilterSpliter {
     /**
      * 将一组filter，根据索引信息拆分为key/indexValue/Value几种分组，keyFilter可以下推到叶子节点减少数据返回
      */
-    public static Map<FilterType, IFilter> splitByType(List<IFilter> DNFNode, TableNode table) {
+    public static Map<FilterType, IFilter> optimize(List<IFilter> DNFNode, TableNode table) {
         IndexMeta index = table.getIndexUsed();
         Map<FilterType, IFilter> filters = new HashMap();
         Map<Comparable, List<IFilter>> columnAndItsFilters = FilterUtils.toColumnFiltersMap(DNFNode);
@@ -131,9 +131,9 @@ public class FilterSpliter {
         resultFilters.removeAll(indexQueryKeyFilters);
         resultFilters.removeAll(indexQueryValueFilters);
 
-        IFilter indexQueryKeyTree = FilterUtils.DNFNodeToBoolTree(indexQueryKeyFilters);
-        IFilter indexQueryValueTree = FilterUtils.DNFNodeToBoolTree(indexQueryValueFilters);
-        IFilter resultTree = FilterUtils.DNFNodeToBoolTree(resultFilters);
+        IFilter indexQueryKeyTree = FilterUtils.DNFToAndLogicTree(indexQueryKeyFilters);
+        IFilter indexQueryValueTree = FilterUtils.DNFToAndLogicTree(indexQueryValueFilters);
+        IFilter resultTree = FilterUtils.DNFToAndLogicTree(resultFilters);
         filters.put(FilterType.IndexQueryKeyFilter, indexQueryKeyTree);
         filters.put(FilterType.IndexQueryValueFilter, indexQueryValueTree);
         filters.put(FilterType.ResultFilter, resultTree);

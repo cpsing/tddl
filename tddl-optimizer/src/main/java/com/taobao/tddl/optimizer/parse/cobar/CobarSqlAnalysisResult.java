@@ -1,7 +1,6 @@
 package com.taobao.tddl.optimizer.parse.cobar;
 
 import java.sql.SQLSyntaxErrorException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,13 +51,6 @@ public class CobarSqlAnalysisResult implements SqlAnalysisResult {
     public void parse(String sql, Map<Integer, ParameterContext> parameterSettings) throws SQLSyntaxErrorException {
         if (sql != null) {
             this.parameterSettings = parameterSettings;
-            Map<Integer, Object> bindVals = new HashMap<Integer, Object>();
-            if (parameterSettings != null) {
-                for (ParameterContext context : parameterSettings.values()) {
-                    bindVals.put((Integer) context.getArgs()[0] + 1, context.getArgs()[1]);// cobar的ParamMarker是从1开始
-                }
-            }
-
             SQLStatement statement = SQLParserDelegate.parse(sql);
             if (statement instanceof DMLSelectStatement) {
                 if (isSysSelectStatement((DMLSelectStatement) statement, sql)) {
@@ -67,23 +59,23 @@ public class CobarSqlAnalysisResult implements SqlAnalysisResult {
                 }
 
                 sqlType = SqlType.SELECT;
-                visitor = new MySqlSelectVisitor(bindVals);
+                visitor = new MySqlSelectVisitor();
                 statement.accept(visitor);
             } else if (statement instanceof DMLUpdateStatement) {
                 sqlType = SqlType.UPDATE;
-                visitor = new MySqlUpdateVisitor(bindVals);
+                visitor = new MySqlUpdateVisitor();
                 statement.accept(visitor);
             } else if (statement instanceof DMLDeleteStatement) {
                 sqlType = SqlType.DELETE;
-                visitor = new MySqlDeleteVisitor(bindVals);
+                visitor = new MySqlDeleteVisitor();
                 statement.accept(visitor);
             } else if (statement instanceof DMLInsertStatement) {
                 sqlType = SqlType.INSERT;
-                visitor = new MySqlInsertVisitor(bindVals);
+                visitor = new MySqlInsertVisitor();
                 statement.accept(visitor);
             } else if (statement instanceof DMLReplaceStatement) {
                 sqlType = SqlType.REPLACE;
-                visitor = new MySqlReplaceIntoVisitor(bindVals);
+                visitor = new MySqlReplaceIntoVisitor();
                 statement.accept(visitor);
             } else if (statement instanceof DDLStatement) {
                 throw new IllegalArgumentException("tddl not support DDL statement:'" + sql + "'");

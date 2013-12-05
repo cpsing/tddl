@@ -8,7 +8,6 @@ import com.taobao.tddl.optimizer.core.plan.IPut;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin;
 import com.taobao.tddl.optimizer.core.plan.query.IMerge;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
-import com.taobao.tddl.optimizer.costbased.before.QueryPlanOptimizer;
 
 /**
  * 防止死锁的thread 号选择器。 每层会独立指定一个thread进行执行。这样就算是A->B->A 也不会出现死锁的问题。

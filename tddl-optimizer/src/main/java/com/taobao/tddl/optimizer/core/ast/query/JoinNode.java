@@ -19,7 +19,6 @@ import com.taobao.tddl.optimizer.core.ast.query.strategy.BlockNestedLoopJoin;
 import com.taobao.tddl.optimizer.core.ast.query.strategy.IndexNestedLoopJoin;
 import com.taobao.tddl.optimizer.core.ast.query.strategy.JoinStrategy;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
-import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin;
@@ -203,14 +202,6 @@ public class JoinNode extends QueryTreeNode {
 
     public IJoin toDataNodeExecutor() throws QueryException {
         return this.getJoinStrategy().getQuery(this, null);
-    }
-
-    public IFilter getResultFilter() {
-        return this.getWhereFilter();
-    }
-
-    public void setResultFilter(IFilter f) {
-        this.query(f);
     }
 
     public QueryTreeNode convertToJoinIfNeed() {

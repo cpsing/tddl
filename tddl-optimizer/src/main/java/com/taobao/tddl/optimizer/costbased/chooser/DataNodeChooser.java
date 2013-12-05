@@ -1,4 +1,4 @@
-package com.taobao.tddl.optimizer.costbased;
+package com.taobao.tddl.optimizer.costbased.chooser;
 
 import java.util.ArrayList;
 import java.util.HashMap;

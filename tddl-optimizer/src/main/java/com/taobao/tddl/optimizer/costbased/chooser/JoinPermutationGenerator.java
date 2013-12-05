@@ -1,4 +1,4 @@
-package com.taobao.tddl.optimizer.costbased;
+package com.taobao.tddl.optimizer.costbased.chooser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.utils.PermutationGenerator;
 
 /**
- * 用生成Join顺序的全排列 不会反回无法Join的顺序
+ * 对于inner join的所有节点生成一个全排列
  * 
  * @author Dreamond
  */
@@ -66,7 +66,7 @@ public final class JoinPermutationGenerator {
      * <pre>
      * 包括： 
      * 1、非InnerJoin的Join节点。因为既然用户已经指定了left或者right，说明用户已经指定了outter的就为驱动表，所以无需再做额外的调整
-     * 2、被标记为子查询的Join节点，子查询中的节点会单独去调整 
+     * 2、被标记为子查询的Join节点，子查询中的节点会单独去调整
      * 3、不在1中的Query节点
      * </pre>
      */
@@ -131,8 +131,9 @@ public final class JoinPermutationGenerator {
     public QueryTreeNode getNext() {
         while (pg.hasNext()) {
             List<QueryTreeNode> nodes = pg.next();
-            for (int i = 0; i < nodes.size(); i++)
+            for (int i = 0; i < nodes.size(); i++) {
                 nodes.set(i, nodes.get(i).deepCopy());
+            }
 
             QueryTreeNode newTree = getQueryTreeFromQueryNodes(nodes);
 
@@ -151,6 +152,9 @@ public final class JoinPermutationGenerator {
         return null;
     }
 
+    /**
+     * 构造一个join
+     */
     private QueryTreeNode getQueryTreeFromQueryNodes(List<QueryTreeNode> nodes) {
         if (nodes.size() == 1) {
             return nodes.get(0);

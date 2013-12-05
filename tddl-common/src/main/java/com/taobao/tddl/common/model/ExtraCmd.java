@@ -10,14 +10,19 @@ public class ExtraCmd {
     public static class OptimizerExtraCmd {
 
         /**
+         * 为true时，选取索引，
+         */
+        public final static String ChooseIndex              = "ChooseIndex";
+
+        /**
+         * 为true时，最优join策略选择
+         */
+        public final static String ChooseJoin               = "ChooseJoin";
+
+        /**
          * 为true时，Merge将并行执行
          */
         public final static String MergeConcurrent          = "MergeConcurrent";
-
-        /**
-         * 为true/null时，选取索引，
-         */
-        public final static String ChooseIndex              = "ChooseIndex";
 
         /**
          * 此选项为True时将关闭分库分表

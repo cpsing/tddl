@@ -620,7 +620,7 @@ public class SqlParserTest extends BaseOptimizerTest {
         QueryTreeNode qn = query(sql, Arrays.asList(Integer.valueOf(1)));
 
         TableNode table1 = new TableNode("TABLE1");
-        QueryTreeNode qnExpected = table1.select("2");
+        QueryTreeNode qnExpected = table1.select("1+?");// 不做计算，否则解析结果不能缓存
         assertEquals(qn, qnExpected);
     }
 

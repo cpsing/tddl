@@ -661,6 +661,12 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
 
     // ==================== helper method =================
 
+    /**
+     * 如果order by中的列与group by中的都一样，且order by的列少于group by的列 则应将最后的group
+     * by的列补到order by中 <br/>
+     * 如：group by c1 c2 order by c1 等价于group by c1 c2 order by c1 c2<br/>
+     * 其他情况返回orderby列，不做任何修改
+     */
     protected List<IOrderBy> getOrderByCombineWithGroupBy() {
         // 如果用户没指定order by，则显示index的order by
         if (this.getOrderBys() != null && !this.getOrderBys().isEmpty()) {
@@ -671,11 +677,6 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
 
                 List<IOrderBy> orderByCombineWithGroupBy = new ArrayList();
 
-                /**
-                 * 如果order by中的列与group by中的都一样，且order by的列少于group by的列
-                 * 则应将最后的group by的列补到order by中 <br/>
-                 * 如：group by c1 c2 order by c1 等价于group by c1 c2 order by c1 c2
-                 */
                 for (int i = 0; i < this.getOrderBys().size(); i++) {
                     if (this.getGroupBys().get(i).getColumn().equals(this.getOrderBys().get(i).getColumn())) {
                         orderByCombineWithGroupBy.add(this.getOrderBys().get(i));
@@ -692,13 +693,15 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
             } else {
                 return this.getOrderBys();
             }
+        } else {
+            // 没有orderby
+            if (this.getGroupBys() != null && !this.getGroupBys().isEmpty()) {
+                return OptimizerUtils.copyOrderBys(this.getGroupBys());
+            }
+
+            return null;
         }
 
-        if (this.getGroupBys() != null && !this.getGroupBys().isEmpty()) {
-            return OptimizerUtils.copyOrderBys(this.getGroupBys());
-        }
-
-        return null;
     }
 
     /**

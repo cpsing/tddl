@@ -153,6 +153,38 @@ public class IndexMeta implements Serializable, Cloneable {
         return toStringWithInden(0);
     }
 
+    /**
+     * 根据列名获取对应的index key column
+     * 
+     * @param name
+     * @return
+     */
+    public ColumnMeta getKeyColumn(String name) {
+        for (ColumnMeta column : keyColumns) {
+            if (column.getName().equals(name)) {
+                return column;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * 根据列名获取对应的index value column
+     * 
+     * @param name
+     * @return
+     */
+    public ColumnMeta getValueColumn(String name) {
+        for (ColumnMeta column : valueColumns) {
+            if (column.getName().equals(name)) {
+                return column;
+            }
+        }
+
+        return null;
+    }
+
     private List<ColumnMeta> uniq(List<ColumnMeta> s) {
         if (s == null) {
             return null;
