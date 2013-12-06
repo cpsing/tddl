@@ -21,15 +21,15 @@ import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.jdbc.ParameterMethod;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.impl.AffectRowCursor;
 import com.taobao.tddl.executor.cursor.impl.ResultSetCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.executor.spi.ExecutionContext;
-import com.taobao.tddl.executor.spi.Table;
-import com.taobao.tddl.executor.spi.Transaction;
+import com.taobao.tddl.executor.spi.ITable;
+import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IPut;
@@ -50,11 +50,8 @@ public class My_JdbcHandler implements GeneralQueryHandler {
 
     private static final Logger       log              = LoggerFactory.getLogger(My_JdbcHandler.class);
     protected My_Transaction          myTransaction    = null;
-    // protected List<ResultSet> updateResultSets = new ArrayList<ResultSet>(1);
     protected ResultSet               resultSet        = null;
-    // protected DataSource ds = null;
     protected PreparedStatement       ps               = null;
-    // protected boolean inited = false;
     protected ExecutionType           executionType    = null;
     protected IRowSet                 current          = null;
     protected IRowSet                 prev_kv          = null;
@@ -62,7 +59,6 @@ public class My_JdbcHandler implements GeneralQueryHandler {
     protected Map<String, Comparable> extraCmd         = Collections.EMPTY_MAP;
     protected final static Log        logger           = LogFactory.getLog(My_JdbcHandler.class);
     protected ICursorMeta             cursorMeta;
-    // protected OneQuery oQuery = null;
     protected boolean                 isStreaming      = false;
     protected String                  groupName        = null;
     protected DataSource              ds               = null;
@@ -150,61 +146,18 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         if (cursorMeta == null) {
             cursorMeta = meta;
         }
-        // if (oQuery == null) {
-        // oQuery = oneQuery;
-        // }
+
         if (isStreaming != this.isStreaming) {
             this.isStreaming = isStreaming;
         }
     }
 
-    // protected void buildRetColumns(OneQuery oneQuery, ICursorMeta meta) {
-    // List<ISelectable> columns = new
-    // ArrayList<ISelectable>(oneQuery.columns.size());
-    // for (ISelectable is : oneQuery.columns) {
-    // columns.add(is);
-    // }
-    //
-    // for (ISelectable is : oneQuery.columns) {
-    // String tableName = null;
-    // if (is instanceof IFunction) {
-    // // 如果是函数，没有tableName
-    // } else {
-    // // tableName = GeneralUtil.getRealTableName(is.getTableName());
-    // OneTable oneTable = oneQuery.tables.iterator().next();
-    // tableName = oneQuery.isJoin ? is.getTableName() :
-    // oneTable.getTableAlias();
-    // String tabAlias = oneQuery.isJoin ? oneQuery.tabMap.get(tableName) :
-    // oneTable.getTableAlias();
-    // if (tabAlias != null) {
-    // tableName = tabAlias;
-    // }
-    // }
-    // String columnName = is.getColumnName();
-    //
-    // Integer i = 0;
-    // try {
-    // i = meta.getIndex(tableName, columnName);
-    // if (i == null) {
-    // i = meta.getIndex(tableName, is.getAlias());
-    // }
-    // } catch (Exception ex) {
-    // throw new IllegalArgumentException(ex);
-    // }
-    // if (i == null) {
-    // throw new IllegalArgumentException("not supported yet");
-    // }
-    // columns.set(i, is);
-    // }
-    // oneQuery.columns = columns;
-    // }
-
     public boolean isAutoCommit() throws SQLException {
         return myTransaction.autoCommit;
     }
 
-    public void executeUpdate(ExecutionContext executionContext, IPut put, Table table, IndexMeta meta)
-                                                                                                       throws SQLException {
+    public void executeUpdate(ExecutionContext executionContext, IPut put, ITable table, IndexMeta meta)
+                                                                                                        throws SQLException {
 
         MysqlPlanVisitorImpl visitor = new MysqlPlanVisitorImpl(put, null, null, true);
         put.accept(visitor);
@@ -255,7 +208,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
     // }
 
     public My_Transaction transaction(ExecutionContext executionContext) throws SQLException {
-        Transaction tra = executionContext.getTransaction();
+        ITransaction tra = executionContext.getTransaction();
         My_Transaction myTrans = null;
         if (tra != null) {
             // 有事务，使用事务jdbcHandler

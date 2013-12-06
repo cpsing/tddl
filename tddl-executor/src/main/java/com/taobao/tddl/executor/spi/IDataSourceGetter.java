@@ -8,7 +8,7 @@ import javax.sql.DataSource;
  * @author mengshi.sunmengshi 2013-11-27 下午3:56:48
  * @since 5.1.0
  */
-public interface DataSourceGetter {
+public interface IDataSourceGetter {
 
     DataSource getDataSource(String group);
 }

@@ -1,12 +1,12 @@
 package com.taobao.tddl.repo.mysql.handler;
 
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.handler.IndexNestedLoopJoinHandler;
 import com.taobao.tddl.executor.handler.MergeHandler;
 import com.taobao.tddl.executor.handler.NestedLoopJoinHandler;
 import com.taobao.tddl.executor.handler.SortMergeJoinHandler;
-import com.taobao.tddl.executor.spi.CommandExecutorFactory;
-import com.taobao.tddl.executor.spi.CommandHandler;
-import com.taobao.tddl.executor.spi.ExecutionContext;
+import com.taobao.tddl.executor.spi.ICommandHandlerFactory;
+import com.taobao.tddl.executor.spi.ICommandHandler;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IPut;
 import com.taobao.tddl.optimizer.core.plan.IPut.PUT_TYPE;
@@ -19,7 +19,7 @@ import com.taobao.tddl.optimizer.core.plan.query.IQuery;
  * @author mengshi.sunmengshi 2013-12-5 下午6:18:33
  * @since 5.1.0
  */
-public class CommandExecutorFactoryMyImp implements CommandExecutorFactory {
+public class CommandExecutorFactoryMyImp implements ICommandHandlerFactory {
 
     private QueryMyHandler CONDENSABLE_JOIN_HANDLER;
 
@@ -36,18 +36,18 @@ public class CommandExecutorFactoryMyImp implements CommandExecutorFactory {
         CONDENSABLE_JOIN_HANDLER = new QueryMyHandler();
     }
 
-    private final CommandHandler INSERT_HANDLER;
-    private final CommandHandler UPDATE_HANDLER;
-    private final CommandHandler DELETE_HANDLER;
-    private final CommandHandler REPLACE_HANDLER;
-    private final CommandHandler QUERY_HANDLER;
-    private final CommandHandler MERGE_HANDLER;
-    private final CommandHandler INDEX_NEST_LOOP_JOIN_HANDLER;
-    private final CommandHandler NEST_LOOP_JOIN_HANDLER;
-    private final CommandHandler SORT_MERGE_JOIN_HANDLER;
+    private final ICommandHandler INSERT_HANDLER;
+    private final ICommandHandler UPDATE_HANDLER;
+    private final ICommandHandler DELETE_HANDLER;
+    private final ICommandHandler REPLACE_HANDLER;
+    private final ICommandHandler QUERY_HANDLER;
+    private final ICommandHandler MERGE_HANDLER;
+    private final ICommandHandler INDEX_NEST_LOOP_JOIN_HANDLER;
+    private final ICommandHandler NEST_LOOP_JOIN_HANDLER;
+    private final ICommandHandler SORT_MERGE_JOIN_HANDLER;
 
     @Override
-    public CommandHandler getCommandHandler(IDataNodeExecutor executor, ExecutionContext executionContext) {
+    public ICommandHandler getCommandHandler(IDataNodeExecutor executor, ExecutionContext executionContext) {
         if (executor instanceof IQuery) {
             return QUERY_HANDLER;
         } else if (executor instanceof IMerge) {

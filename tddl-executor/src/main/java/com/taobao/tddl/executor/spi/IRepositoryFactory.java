@@ -1,5 +1,7 @@
 package com.taobao.tddl.executor.spi;
 
+import com.taobao.tddl.executor.repo.RepositoryConfig;
+
 
 /**
  * @author mengshi.sunmengshi 2013-12-6 上午11:21:43
@@ -7,6 +9,6 @@ package com.taobao.tddl.executor.spi;
  */
 public interface IRepositoryFactory {
 
-    Repository buildReponsitory(RepositoryConfig conf);
+    IRepository buildReponsitory(RepositoryConfig conf);
 
 }

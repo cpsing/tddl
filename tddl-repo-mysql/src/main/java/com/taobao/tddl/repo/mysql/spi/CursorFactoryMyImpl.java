@@ -3,11 +3,11 @@ package com.taobao.tddl.repo.mysql.spi;
 import java.util.List;
 
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.spi.CursorFactoryDefaultImpl;
-import com.taobao.tddl.executor.spi.ExecutionContext;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.repo.mysql.cursor.SchematicMyCursor;
 

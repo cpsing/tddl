@@ -5,7 +5,7 @@
  *
  */
 
-package com.taobao.tddl.executor.spi;
+package com.taobao.tddl.executor.common;
 
 import com.alibaba.cobar.parser.ast.stmt.dml.DMLSelectStatement.LockMode;
 

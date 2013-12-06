@@ -5,13 +5,13 @@ import java.util.List;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.ExceptionErrorCodeUtils;
 import com.taobao.tddl.executor.codec.CodecFactory;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.function.ExtraFunction;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.executor.spi.ExecutionContext;
 import com.taobao.tddl.executor.spi.ITHLog;
-import com.taobao.tddl.executor.spi.Table;
-import com.taobao.tddl.executor.spi.Transaction;
+import com.taobao.tddl.executor.spi.ITable;
+import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
@@ -26,8 +26,9 @@ public class ReplaceHandler extends PutHandlerCommon {
     }
 
     @Override
-    protected int executePut(ExecutionContext executionContext, IPut put, Table table, IndexMeta meta) throws Exception {
-        Transaction transaction = executionContext.getTransaction();
+    protected int executePut(ExecutionContext executionContext, IPut put, ITable table, IndexMeta meta)
+                                                                                                       throws Exception {
+        ITransaction transaction = executionContext.getTransaction();
         int affect_rows = 0;
         CloneableRecord key = CodecFactory.getInstance(CodecFactory.FIXED_LENGTH)
             .getCodec(meta.getKeyColumns())
@@ -63,18 +64,18 @@ public class ReplaceHandler extends PutHandlerCommon {
             }
         }
         if (put.getPutType() == IPut.PUT_TYPE.INSERT) {
-            CloneableRecord value1 = table.get(transaction, key, meta, executionContext.getDbName());
+            CloneableRecord value1 = table.get(executionContext, key, meta, executionContext.getDbName());
             if (value1 != null) {
                 throw new TddlException(ExceptionErrorCodeUtils.Duplicate_entry, "exception insert existed :" + key);
             }
         }
         ITHLog iThLog = transaction.getHistoryLog();
         if (iThLog != null) {
-            CloneableRecord old = table.get(transaction, key, meta, executionContext.getDbName());
+            CloneableRecord old = table.get(executionContext, key, meta, executionContext.getDbName());
             prepare(transaction, table, null, key, value, PUT_TYPE.REPLACE);
         }
 
-        table.put(transaction, key, value, meta, executionContext.getDbName());
+        table.put(executionContext, key, value, meta, executionContext.getDbName());
         affect_rows++;
         return affect_rows;
 

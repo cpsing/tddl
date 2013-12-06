@@ -1,4 +1,4 @@
-package com.taobao.tddl.repo.mysql;
+package com.taobao.tddl.repo.mysql.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,10 +6,9 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import com.taobao.tddl.executor.cursor.Cursor;
-import com.taobao.tddl.executor.spi.DataSourceGetter;
-import com.taobao.tddl.executor.spi.ExecutionContext;
-import com.taobao.tddl.executor.spi.Transaction;
+import com.taobao.tddl.executor.common.ExecutionContext;
+import com.taobao.tddl.executor.spi.IDataSourceGetter;
+import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
@@ -18,7 +17,6 @@ import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
-import com.taobao.tddl.repo.mysql.spi.My_Condensable;
 import com.taobao.tddl.repo.mysql.spi.My_JdbcHandler;
 import com.taobao.tddl.repo.mysql.spi.My_Transaction;
 
@@ -26,14 +24,7 @@ import com.taobao.tddl.repo.mysql.spi.My_Transaction;
  * @author mengshi.sunmengshi 2013-12-5 下午6:08:32
  * @since 5.1.0
  */
-public class CursorMyUtils {
-
-    public static String getGroupNodeName(Cursor cursor) {
-        if (cursor instanceof My_Condensable) {
-            return ((My_Condensable) cursor).getGroupNodeName();
-        }
-        return null;
-    }
+public class MysqlRepoUtils {
 
     public static List<IOrderBy> buildOrderBy(IDataNodeExecutor executor, IndexMeta indexMeta) {
         IQueryTree query = ((IQueryTree) executor);
@@ -61,26 +52,19 @@ public class CursorMyUtils {
             orderBy = ExecUtils.getOrderBy(indexMeta);
         }
         List<IOrderBy> orderbys = ExecUtils.copyOrderBys(orderBy);
-        // TODO: shenxun 这里是否应该去掉？
-        // if(tableName != null && !tableName.isEmpty())
-        // {
-        // for(IOrderBy orderby : orderbys)
-        // {
-        // orderby.getColumn().setTableName(tableName);
-        // }
-        // }
+
         return orderbys;
 
     }
 
-    public static My_JdbcHandler getJdbcHandler(DataSourceGetter dsGetter, IDataNodeExecutor executor,
+    public static My_JdbcHandler getJdbcHandler(IDataSourceGetter dsGetter, IDataNodeExecutor executor,
                                                 ExecutionContext executionContext) {
         DataSource ds;
         My_JdbcHandler jdbcHandler = new My_JdbcHandler(executionContext);
 
         ds = dsGetter.getDataSource(executor.getDataNode());
         My_Transaction my_transaction = null;
-        Transaction txn = executionContext.getTransaction();
+        ITransaction txn = executionContext.getTransaction();
         if (txn != null) {
             if (txn instanceof My_Transaction) {
                 my_transaction = (My_Transaction) txn;

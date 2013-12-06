@@ -2,12 +2,12 @@ package com.taobao.tddl.repo.mysql.spi;
 
 import java.sql.SQLException;
 
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.executor.spi.ExecutionContext;
-import com.taobao.tddl.executor.spi.Table;
+import com.taobao.tddl.executor.spi.ITable;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.plan.IPut;
 
@@ -143,7 +143,7 @@ public interface GeneralQueryHandler {
      * @return
      * @throws SQLException
      */
-    public void executeUpdate(ExecutionContext executionContext, IPut put, Table table, IndexMeta meta)
+    public void executeUpdate(ExecutionContext executionContext, IPut put, ITable table, IndexMeta meta)
                                                                                                        throws SQLException;
 
     /**

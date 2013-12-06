@@ -1,5 +1,6 @@
 package com.taobao.tddl.executor.spi;
 
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 
 /**
@@ -12,7 +13,7 @@ import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
  * 
  * @author whisper
  */
-public interface CommandExecutorFactory {
+public interface ICommandHandlerFactory {
 
-    CommandHandler getCommandHandler(IDataNodeExecutor executor, ExecutionContext executionContext);
+    ICommandHandler getCommandHandler(IDataNodeExecutor executor, ExecutionContext executionContext);
 }

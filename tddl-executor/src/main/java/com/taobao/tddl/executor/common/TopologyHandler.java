@@ -1,7 +1,9 @@
-package com.taobao.tddl.executor.spi;
+package com.taobao.tddl.executor.common;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import com.taobao.tddl.executor.spi.IGroupExecutor;
 
 /**
  * group以及其对应的执行器
@@ -11,25 +13,25 @@ import java.util.Map;
  */
 public class TopologyHandler {
 
-    private final Map<String/* group key */, RemotingExecutor> executorMap = new HashMap<String, RemotingExecutor>();
+    private final Map<String/* group key */, IGroupExecutor> executorMap = new HashMap<String, IGroupExecutor>();
 
-    public Map<String, RemotingExecutor> getExecutorMap() {
+    public Map<String, IGroupExecutor> getExecutorMap() {
         return executorMap;
     }
 
-    public RemotingExecutor putOne(String groupKey, RemotingExecutor remotingExecutor) {
-        return putOne(groupKey, remotingExecutor, true);
+    public IGroupExecutor putOne(String groupKey, IGroupExecutor groupExecutor) {
+        return putOne(groupKey, groupExecutor, true);
     }
 
-    public RemotingExecutor putOne(String groupKey, RemotingExecutor remotingExecutor, boolean singleton) {
+    public IGroupExecutor putOne(String groupKey, IGroupExecutor groupExecutor, boolean singleton) {
         if (singleton && executorMap.containsKey(groupKey)) {
             throw new IllegalArgumentException("group key is already exists . group key : " + groupKey + " . map "
                                                + executorMap);
         }
-        return executorMap.put(groupKey, remotingExecutor);
+        return executorMap.put(groupKey, groupExecutor);
     }
 
-    public RemotingExecutor get(Object key) {
+    public IGroupExecutor get(Object key) {
         return executorMap.get(key);
     }
 

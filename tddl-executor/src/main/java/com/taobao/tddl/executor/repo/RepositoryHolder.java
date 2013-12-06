@@ -7,12 +7,12 @@ import java.util.Set;
 
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
-import com.taobao.tddl.executor.spi.Repository;
+import com.taobao.tddl.executor.spi.IRepository;
 
 public class RepositoryHolder {
 
     private final static Logger    logger     = LoggerFactory.getLogger(RepositoryHolder.class);
-    public Map<String, Repository> repository = new HashMap<String, Repository>();
+    public Map<String, IRepository> repository = new HashMap<String, IRepository>();
 
     public boolean containsKey(Object arg0) {
 
@@ -23,25 +23,25 @@ public class RepositoryHolder {
         return repository.containsValue(arg0);
     }
 
-    public Repository get(Object arg0) {
+    public IRepository get(Object arg0) {
 
         return repository.get(arg0);
     }
 
-    public Repository put(String arg0, Repository arg1) {
+    public IRepository put(String arg0, IRepository arg1) {
 
         return repository.put(arg0, arg1);
     }
 
-    public Set<Entry<String, Repository>> entrySet() {
+    public Set<Entry<String, IRepository>> entrySet() {
         return repository.entrySet();
     }
 
-    public Map<String, Repository> getRepository() {
+    public Map<String, IRepository> getRepository() {
         return repository;
     }
 
-    public void setRepository(Map<String, Repository> reponsitory) {
+    public void setRepository(Map<String, IRepository> reponsitory) {
         this.repository = reponsitory;
     }
 

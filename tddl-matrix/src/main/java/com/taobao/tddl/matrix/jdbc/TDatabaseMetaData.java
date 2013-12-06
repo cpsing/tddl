@@ -6,6 +6,10 @@ import java.sql.ResultSet;
 import java.sql.RowIdLifetime;
 import java.sql.SQLException;
 
+/**
+ * @author mengshi.sunmengshi 2013-12-6 下午3:38:38
+ * @since 5.1.0
+ */
 public class TDatabaseMetaData implements DatabaseMetaData {
 
     @Override

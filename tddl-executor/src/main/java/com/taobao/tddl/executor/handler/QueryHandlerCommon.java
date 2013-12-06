@@ -13,10 +13,10 @@ import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.ExecutorContext;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.impl.DistinctCursor;
-import com.taobao.tddl.executor.spi.ExecutionContext;
-import com.taobao.tddl.executor.spi.Repository;
+import com.taobao.tddl.executor.spi.IRepository;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.monitor.Monitor;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
@@ -219,7 +219,7 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
         List<IOrderBy> groupBycols = IQueryTree.getGroupBys();
         boolean closeResultCursor = executionContext.isCloseResultSet();
 
-        final Repository repo = executionContext.getCurrentRepository();
+        final IRepository repo = executionContext.getCurrentRepository();
 
         List retColumns = getEmptyListIfRetColumnIsNull(IQueryTree);
         List<IFunction> _agg = getAggregates(retColumns);
@@ -237,7 +237,7 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
     }
 
     protected ISchematicCursor executeAgg(ISchematicCursor cursor, IDataNodeExecutor executor,
-                                          boolean closeResultCursor, Repository repo, List<IFunction> aggregates,
+                                          boolean closeResultCursor, IRepository repo, List<IFunction> aggregates,
                                           List<IOrderBy> groupBycols, ExecutionContext executionContext)
                                                                                                         throws TddlException {
         List<ISelectable> _retColumns = null;
@@ -292,7 +292,7 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
                                               ExecutionContext executionContext, IQueryTree IQueryTree,
                                               boolean needOrderMatch) throws TddlException {
 
-        Repository repo = executionContext.getCurrentRepository();
+        IRepository repo = executionContext.getCurrentRepository();
         boolean hasOrderBy = ordersInRequest != null && !ordersInRequest.isEmpty();
         if (!hasOrderBy) {
             return cursor;
@@ -516,7 +516,7 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
         if (IQueryTree.getColumns() == null || IQueryTree.getColumns().isEmpty()) {
             return cursor;
         }
-        Repository repo = executionContext.getCurrentRepository();
+        IRepository repo = executionContext.getCurrentRepository();
         List<ISelectable> retColumns = IQueryTree.getColumns();
         // 过滤多其它不必要的select字段
         cursor = repo.getCursorFactory().columnAliasCursor(executionContext,
@@ -617,7 +617,7 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
     protected Future<ISchematicCursor> executeFuture(final ExecutionContext executionContext,
                                                      final IDataNodeExecutor query) throws TddlException {
         return ExecutorContext.getContext()
-            .getTransactionAsyncExecutor()
+            .getTopologyExecutor()
             .execByExecPlanNodeFuture(query, executionContext);
     }
 

@@ -1,8 +1,6 @@
 package com.taobao.tddl.executor;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Future;
 
 import com.taobao.tddl.common.exception.TddlException;
@@ -12,11 +10,11 @@ import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.AtomicNumberCreator;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.cursor.impl.QueryPlanResultCursor;
 import com.taobao.tddl.executor.exception.DataAccessException;
-import com.taobao.tddl.executor.spi.ExecutionContext;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.monitor.Monitor;
 import com.taobao.tddl.optimizer.OptimizerContext;
@@ -25,9 +23,9 @@ import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.exceptions.EmptyResultFilterException;
 
-public class TExecutor implements Lifecycle, ITransactionAsyncExecutor, ITransactionExecutor {
+public class MatrixExecutor implements Lifecycle, IExecutor {
 
-    private final static Logger logger = LoggerFactory.getLogger(TExecutor.class);
+    private final static Logger logger = LoggerFactory.getLogger(MatrixExecutor.class);
 
     private boolean             inited = false;
 
@@ -68,7 +66,7 @@ public class TExecutor implements Lifecycle, ITransactionAsyncExecutor, ITransac
             }
 
             ISchematicCursor sc = ExecutorContext.getContext()
-                .getTransactionExecutor()
+                .getTopologyExecutor()
                 .execByExecPlanNode(qc, executionContext);
 
             ResultCursor rc = this.wrapResultCursor(qc, sc, executionContext);
@@ -121,19 +119,6 @@ public class TExecutor implements Lifecycle, ITransactionAsyncExecutor, ITransac
         } else {
             return -1;
         }
-    }
-
-    private Map<String, Comparable> processTemporary(Map<String, Comparable> extraCmd, boolean useTemparyTable) {
-        if (useTemparyTable) {
-            if (extraCmd == null) {
-                extraCmd = new HashMap<String, Comparable>(2);
-            }
-            Comparable comp = extraCmd.get(ExtraCmd.ExecutionExtraCmd.ALLOW_TEMPORARY_TABLE);
-            if (comp == null) {
-                extraCmd.put(ExtraCmd.ExecutionExtraCmd.ALLOW_TEMPORARY_TABLE, "TRUE");
-            }
-        }
-        return extraCmd;
     }
 
     public IDataNodeExecutor parseAndOptimize(String sql, ExecutionContext executionContext) throws TddlException {

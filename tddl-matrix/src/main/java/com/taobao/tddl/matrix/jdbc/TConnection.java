@@ -28,10 +28,10 @@ import java.util.Set;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.utils.TStringUtil;
-import com.taobao.tddl.executor.TExecutor;
+import com.taobao.tddl.executor.MatrixExecutor;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.cursor.impl.ResultSetCursor;
-import com.taobao.tddl.executor.spi.ExecutionContext;
 import com.taobao.tddl.matrix.jdbc.utils.ExceptionUtils;
 
 /**
@@ -40,7 +40,7 @@ import com.taobao.tddl.matrix.jdbc.utils.ExceptionUtils;
  */
 public class TConnection implements Connection {
 
-    private TExecutor        executor         = null;
+    private MatrixExecutor        executor         = null;
     private TDataSource      ds;
     private ExecutionContext executionContext = null;
     private Set<TStatement>  openedStatements = new HashSet<TStatement>(2);

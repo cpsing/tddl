@@ -5,7 +5,7 @@
  *
  */
 
-package com.taobao.tddl.executor.spi;
+package com.taobao.tddl.executor.common;
 
 import java.util.StringTokenizer;
 

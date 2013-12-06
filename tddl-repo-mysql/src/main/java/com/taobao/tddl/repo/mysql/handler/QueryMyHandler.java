@@ -6,12 +6,12 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.common.utils.TStringUtil;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.handler.QueryHandler;
-import com.taobao.tddl.executor.spi.CommandHandler;
-import com.taobao.tddl.executor.spi.DataSourceGetter;
-import com.taobao.tddl.executor.spi.ExecutionContext;
+import com.taobao.tddl.executor.spi.ICommandHandler;
+import com.taobao.tddl.executor.spi.IDataSourceGetter;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
@@ -19,11 +19,11 @@ import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
-import com.taobao.tddl.repo.mysql.CursorMyUtils;
 import com.taobao.tddl.repo.mysql.cursor.SchematicMyCursor;
 import com.taobao.tddl.repo.mysql.spi.DatasourceMySQLImplement;
 import com.taobao.tddl.repo.mysql.spi.My_Cursor;
 import com.taobao.tddl.repo.mysql.spi.My_JdbcHandler;
+import com.taobao.tddl.repo.mysql.utils.MysqlRepoUtils;
 
 /**
  * mysql 查询逻辑
@@ -31,9 +31,9 @@ import com.taobao.tddl.repo.mysql.spi.My_JdbcHandler;
  * @author mengshi.sunmengshi 2013-12-6 上午11:26:49
  * @since 5.1.0
  */
-public class QueryMyHandler extends QueryHandler implements CommandHandler {
+public class QueryMyHandler extends QueryHandler implements ICommandHandler {
 
-    protected DataSourceGetter dsGetter;
+    protected IDataSourceGetter dsGetter;
 
     public QueryMyHandler(){
         super();
@@ -46,7 +46,7 @@ public class QueryMyHandler extends QueryHandler implements CommandHandler {
         if (!canComposeOneSql(executor)) return super.handle(executor, executionContext);
 
         IndexMeta indexMeta = null;
-        My_JdbcHandler jdbcHandler = CursorMyUtils.getJdbcHandler(dsGetter, executor, executionContext);
+        My_JdbcHandler jdbcHandler = MysqlRepoUtils.getJdbcHandler(dsGetter, executor, executionContext);
 
         ICursorMeta meta = ExecUtils.convertToICursorMeta((IQueryTree) executor);
 
@@ -61,7 +61,7 @@ public class QueryMyHandler extends QueryHandler implements CommandHandler {
         if (executor instanceof IJoin) {
             orderBy = ((IJoin) executor).getOrderBys();
         } else {
-            orderBy = CursorMyUtils.buildOrderBy(executor, indexMeta);
+            orderBy = MysqlRepoUtils.buildOrderBy(executor, indexMeta);
         }
 
         orderBy = ExecUtils.copyOrderBys(orderBy);

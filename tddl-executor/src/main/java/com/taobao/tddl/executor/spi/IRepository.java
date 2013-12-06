@@ -3,6 +3,8 @@ package com.taobao.tddl.executor.spi;
 import java.util.Map;
 
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.executor.common.TransactionConfig;
+import com.taobao.tddl.executor.repo.RepositoryConfig;
 import com.taobao.tddl.optimizer.config.Group;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 
@@ -12,7 +14,7 @@ import com.taobao.tddl.optimizer.config.table.TableMeta;
  * @author mengshi.sunmengshi 2013-11-27 下午3:59:13
  * @since 5.1.0
  */
-public interface Repository {
+public interface IRepository {
 
     /**
      * 获取一个表对象 ，在任何sql操作中都会根据table schema找到对应的数据库实例对象的。 表对象包含核心数据和对应的二级索引。
@@ -21,7 +23,7 @@ public interface Repository {
      * @return
      * @throws Exception
      */
-    Table getTable(TableMeta meta, String groupNode, long requestID) throws TddlException;
+    ITable getTable(TableMeta meta, String groupNode, long requestID) throws TddlException;
 
     /**
      * 关闭存储引擎所使用的对象。
@@ -35,14 +37,14 @@ public interface Repository {
      * @return
      * @throws Exception
      */
-    Transaction beginTransaction(TransactionConfig conf) throws TddlException;
+    ITransaction beginTransaction(TransactionConfig conf) throws TddlException;
 
     /**
      * 获取所有的表对象
      * 
      * @return
      */
-    Map<String, Table> getTables();
+    Map<String, ITable> getTables();
 
     /**
      * 初始化时调用的方法。
@@ -78,15 +80,15 @@ public interface Repository {
      * 
      * @return
      */
-    CursorFactory getCursorFactory();
+    ICursorFactory getCursorFactory();
 
     // void cleanTempTable();
 
-    CommandExecutorFactory getCommandExecutorFactory();
+    ICommandHandlerFactory getCommandExecutorFactory();
 
     // DataSource getDataSource(String groupNode);
 
-    RemotingExecutor buildRemoting(Group group);
+    IGroupExecutor buildGroupExecutor(Group group);
 
-    TempTable createTempTable();
+    ITempTable createTempTable();
 }

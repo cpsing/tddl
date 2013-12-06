@@ -6,8 +6,8 @@ import java.util.List;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.ExceptionErrorCodeUtils;
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.executor.spi.ExecutionContext;
 
 /**
  * @author mengshi.sunmengshi 2013-11-29 下午1:38:39

@@ -3,6 +3,7 @@ package com.taobao.tddl.executor.spi;
 import java.util.List;
 
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.cursor.IANDCursor;
@@ -38,7 +39,7 @@ import com.taobao.tddl.optimizer.core.plan.query.IJoin;
  * 
  * @author whisper
  */
-public interface CursorFactory {
+public interface ICursorFactory {
 
     /**
      * 用来处理合并的cursor . 对应QueryNode里面的Merge node.

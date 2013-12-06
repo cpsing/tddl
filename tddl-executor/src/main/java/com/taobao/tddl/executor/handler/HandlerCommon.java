@@ -1,8 +1,8 @@
 package com.taobao.tddl.executor.handler;
 
 import com.taobao.tddl.common.exception.TddlException;
-import com.taobao.tddl.executor.spi.CommandHandler;
-import com.taobao.tddl.executor.spi.ExecutionContext;
+import com.taobao.tddl.executor.common.ExecutionContext;
+import com.taobao.tddl.executor.spi.ICommandHandler;
 import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.core.plan.IPut;
@@ -12,7 +12,7 @@ import com.taobao.tddl.optimizer.core.plan.query.IQuery;
  * @author mengshi.sunmengshi 2013-12-5 上午11:04:35
  * @since 5.1.0
  */
-public abstract class HandlerCommon implements CommandHandler {
+public abstract class HandlerCommon implements ICommandHandler {
 
     protected TableMeta getTableMeta(String tableName) {
         TableMeta ts = OptimizerContext.getContext().getSchemaManager().getTable(tableName);

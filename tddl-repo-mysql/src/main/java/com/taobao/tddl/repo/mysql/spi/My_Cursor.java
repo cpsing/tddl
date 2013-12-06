@@ -32,7 +32,11 @@ import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
 
-public class My_Cursor implements Cursor, My_Condensable {
+/**
+ * @author mengshi.sunmengshi 2013-12-6 下午6:13:21
+ * @since 5.1.0
+ */
+public class My_Cursor implements Cursor {
 
     protected My_JdbcHandler    myJdbcHandler;
     protected IDataNodeExecutor query;
@@ -90,8 +94,8 @@ public class My_Cursor implements Cursor, My_Condensable {
             return;
         }
         try {
-            String groupName = getGroupNodeName();
-            if (groupName == null) {
+
+            if (this.groupNodeName == null) {
                 // directlyExecuteSql = false;
                 throw new IllegalArgumentException("should not be here");
             } else {

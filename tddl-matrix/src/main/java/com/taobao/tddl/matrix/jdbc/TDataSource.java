@@ -12,7 +12,7 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.lifecycle.Lifecycle;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
-import com.taobao.tddl.executor.TExecutor;
+import com.taobao.tddl.executor.MatrixExecutor;
 import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.config.Matrix;
 import com.taobao.tddl.optimizer.config.MockRepoIndexManager;
@@ -37,7 +37,7 @@ public class TDataSource implements DataSource, Lifecycle {
     private String                  ruleFilePath         = null;
     private String                  machineTopologyFile  = null;
     private String                  schemaFile           = null;
-    private TExecutor               executor             = null;
+    private MatrixExecutor          executor             = null;
     private String                  appName              = null;
     private Map<String, Comparable> connectionProperties = new HashMap(2);
 
@@ -98,7 +98,7 @@ public class TDataSource implements DataSource, Lifecycle {
 
         inited = true;
 
-        this.executor = new TExecutor();
+        this.executor = new MatrixExecutor();
 
         SqlParseManager parser = new CobarSqlParseManager();
         CostBasedOptimizer optimizer = new CostBasedOptimizer();
@@ -174,7 +174,7 @@ public class TDataSource implements DataSource, Lifecycle {
         this.schemaFile = schemaFile;
     }
 
-    public TExecutor getExecutor() {
+    public MatrixExecutor getExecutor() {
         // TODO Auto-generated method stub
         return this.executor;
     }

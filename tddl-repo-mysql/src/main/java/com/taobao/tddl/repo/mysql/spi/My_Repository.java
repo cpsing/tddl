@@ -7,33 +7,34 @@ import javax.sql.DataSource;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.ExceptionErrorCodeUtils;
-import com.taobao.tddl.executor.spi.CommandExecutorFactory;
-import com.taobao.tddl.executor.spi.CursorFactory;
-import com.taobao.tddl.executor.spi.DataSourceGetter;
-import com.taobao.tddl.executor.spi.RemotingExecutor;
-import com.taobao.tddl.executor.spi.RepositoryConfig;
-import com.taobao.tddl.executor.spi.Repository;
-import com.taobao.tddl.executor.spi.Table;
-import com.taobao.tddl.executor.spi.TempTable;
-import com.taobao.tddl.executor.spi.Transaction;
-import com.taobao.tddl.executor.spi.TransactionConfig;
+import com.taobao.tddl.executor.common.TransactionConfig;
+import com.taobao.tddl.executor.repo.RepositoryConfig;
+import com.taobao.tddl.executor.spi.ICommandHandlerFactory;
+import com.taobao.tddl.executor.spi.ICursorFactory;
+import com.taobao.tddl.executor.spi.IDataSourceGetter;
+import com.taobao.tddl.executor.spi.IGroupExecutor;
+import com.taobao.tddl.executor.spi.IRepository;
+import com.taobao.tddl.executor.spi.ITable;
+import com.taobao.tddl.executor.spi.ITempTable;
+import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.group.jdbc.TGroupDataSource;
 import com.taobao.tddl.optimizer.config.Group;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
+import com.taobao.tddl.repo.mysql.executor.TddlGroupExecutor;
 import com.taobao.tddl.repo.mysql.handler.CommandExecutorFactoryMyImp;
 
-public class My_Repository implements Repository {
+public class My_Repository implements IRepository {
 
-    Map<String, Table>               tables   = new ConcurrentHashMap<String, Table>();
-    RepositoryConfig                       config;
+    Map<String, ITable>              tables   = new ConcurrentHashMap<String, ITable>();
+    RepositoryConfig                 config;
     private CursorFactoryMyImpl      cfm;
-    protected CommandExecutorFactory cef      = null;
-    protected DataSourceGetter       dsGetter = new DatasourceMySQLImplement();
+    protected ICommandHandlerFactory cef      = null;
+    protected IDataSourceGetter      dsGetter = new DatasourceMySQLImplement();
 
     @Override
-    public Table getTable(TableMeta meta, String groupNode, long requestID) throws TddlException {
+    public ITable getTable(TableMeta meta, String groupNode, long requestID) throws TddlException {
 
-        Table table = tables.get(groupNode);
+        ITable table = tables.get(groupNode);
         if (table == null) {
             synchronized (this) {
                 table = tables.get(groupNode);
@@ -58,17 +59,9 @@ public class My_Repository implements Repository {
         return table;
     }
 
-    // @Override
-    // public DataSource getDataSource(String groupNode)
-    // {
-    // DataSource ds = clientContext.getCurrentConfig().matrixTopology
-    // .getDsGroupMap().get(groupNode);
-    //
-    // return ds;
-    // }
-    public Table initTable(TableMeta meta, String groupNode) throws Exception {
+    public ITable initTable(TableMeta meta, String groupNode) throws Exception {
         DataSource ds = dsGetter.getDataSource(groupNode);
-        Table table = new My_Table(ds, meta, groupNode);
+        ITable table = new My_Table(ds, meta, groupNode);
         return table;
     }
 
@@ -78,14 +71,14 @@ public class My_Repository implements Repository {
     }
 
     @Override
-    public Transaction beginTransaction(TransactionConfig tc) throws TddlException {
+    public ITransaction beginTransaction(TransactionConfig tc) throws TddlException {
         My_Transaction my = new My_Transaction();
         my.beginTransaction();
         return my;
     }
 
     @Override
-    public Map<String, Table> getTables() {
+    public Map<String, ITable> getTables() {
         return null;
     }
 
@@ -99,12 +92,12 @@ public class My_Repository implements Repository {
     }
 
     @Override
-    public CursorFactory getCursorFactory() {
+    public ICursorFactory getCursorFactory() {
         return cfm;
     }
 
     @Override
-    public CommandExecutorFactory getCommandExecutorFactory() {
+    public ICommandHandlerFactory getCommandExecutorFactory() {
         return cef;
     }
 
@@ -126,38 +119,18 @@ public class My_Repository implements Repository {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    // @Override
-    // public boolean removeTable(TableMeta name) throws Exception {
-    // throw new UnsupportedOperationException("Not supported yet.");
-    // }
-    //
-    // @Override
-    // public int cleanLog() {
-    // return 0;
-    // }
-
-    // @Override
-    // public Table getTable(TableMeta meta, String groupNode,
-    // boolean isTempTable, long requestID) throws Exception {
-    // if (isTempTable) {
-    // throw new UnsupportedOperationException("can't create table ");
-    // }
-    // return this.getTable(meta, groupNode, requestID);
-    // }
-
     @Override
-    public RemotingExecutor buildRemoting(Group group) {
+    public IGroupExecutor buildGroupExecutor(Group group) {
         TGroupDataSource groupDS = new TGroupDataSource(group.getName(), group.getAppName());
         groupDS.init();
-        RemotingExecutor executor = new RemotingExecutor();
-        executor.setGroupName(group.getName());
+        TddlGroupExecutor executor = new TddlGroupExecutor();
+        executor.setGroup(group);
         executor.setRemotingExecutableObject(groupDS);
-        executor.setType(Group.GroupType.MYSQL_JDBC);
         return executor;
     }
 
     @Override
-    public TempTable createTempTable() {
+    public ITempTable createTempTable() {
         throw new UnsupportedOperationException("temp table is not supported by mysql repo");
     }
 }

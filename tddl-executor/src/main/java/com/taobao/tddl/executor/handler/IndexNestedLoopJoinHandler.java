@@ -6,9 +6,9 @@ import java.util.List;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.ExecutorContext;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
-import com.taobao.tddl.executor.spi.ExecutionContext;
-import com.taobao.tddl.executor.spi.Repository;
+import com.taobao.tddl.executor.spi.IRepository;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin;
@@ -31,7 +31,7 @@ public class IndexNestedLoopJoinHandler extends QueryHandlerCommon {
                                                ExecutionContext executionContext) throws TddlException {
         // 默认右节点是有索引的。
         IJoin join = (IJoin) executor;
-        Repository repo = executionContext.getCurrentRepository();
+        IRepository repo = executionContext.getCurrentRepository();
         IQueryTree leftQuery = join.getLeftNode();
 
         ISchematicCursor cursor_left = null;
@@ -40,11 +40,11 @@ public class IndexNestedLoopJoinHandler extends QueryHandlerCommon {
         try {
 
             cursor_left = ExecutorContext.getContext()
-                .getTransactionExecutor()
+                .getTopologyExecutor()
                 .execByExecPlanNode(leftQuery, executionContext);
 
             cursor_right = ExecutorContext.getContext()
-                .getTransactionExecutor()
+                .getTopologyExecutor()
                 .execByExecPlanNode(join.getRightNode(), executionContext);
 
         } catch (RuntimeException e) {

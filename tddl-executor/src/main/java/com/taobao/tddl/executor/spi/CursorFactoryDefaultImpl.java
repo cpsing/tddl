@@ -7,6 +7,7 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.ExecutorContext;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.cursor.IANDCursor;
@@ -57,7 +58,7 @@ import com.taobao.tddl.optimizer.core.plan.query.IJoin;
  * @since 5.1.0
  */
 @SuppressWarnings("rawtypes")
-public class CursorFactoryDefaultImpl implements CursorFactory {
+public class CursorFactoryDefaultImpl implements ICursorFactory {
 
     public CursorFactoryDefaultImpl(){
         super();
@@ -128,7 +129,7 @@ public class CursorFactoryDefaultImpl implements CursorFactory {
             if ("True".equalsIgnoreCase(GeneralUtil.getExtraCmd(executionContext.getExtraCmds(),
                 ExtraCmd.ExecutionExtraCmd.ALLOW_TEMPORARY_TABLE))) {
 
-                TempTable tt = ExecutorContext.getContext()
+                ITempTable tt = ExecutorContext.getContext()
                     .getRepositoryHolder()
                     .get(Group.GroupType.BDB_JE)
                     .createTempTable();

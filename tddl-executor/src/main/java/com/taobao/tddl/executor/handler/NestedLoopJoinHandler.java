@@ -2,9 +2,9 @@ package com.taobao.tddl.executor.handler;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.ExecutorContext;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
-import com.taobao.tddl.executor.spi.ExecutionContext;
-import com.taobao.tddl.executor.spi.Repository;
+import com.taobao.tddl.executor.spi.IRepository;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin;
@@ -20,15 +20,15 @@ public class NestedLoopJoinHandler extends QueryHandlerCommon {
                                        ExecutionContext executionContext) throws TddlException {
 
         IJoin join = (IJoin) executor;
-        Repository repo = executionContext.getCurrentRepository();
+        IRepository repo = executionContext.getCurrentRepository();
         IQueryTree leftQuery = join.getLeftNode();
 
         ISchematicCursor cursor_left = ExecutorContext.getContext()
-            .getTransactionExecutor()
+            .getTopologyExecutor()
             .execByExecPlanNode(leftQuery, executionContext);
 
         ISchematicCursor cursor_right = ExecutorContext.getContext()
-            .getTransactionExecutor()
+            .getTopologyExecutor()
             .execByExecPlanNode(join.getRightNode(), executionContext);
 
         cursor = repo.getCursorFactory().join_blockNestedLoopCursor(executionContext,

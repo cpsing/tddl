@@ -2,9 +2,9 @@ package com.taobao.tddl.executor.handler;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.ExecutorContext;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
-import com.taobao.tddl.executor.spi.ExecutionContext;
-import com.taobao.tddl.executor.spi.Repository;
+import com.taobao.tddl.executor.spi.IRepository;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin;
@@ -28,10 +28,10 @@ public class SortMergeJoinHandler extends QueryHandlerCommon {
         ISchematicCursor cursor_right = null;
         int left_match = -1;
         int right_match = -1;
-        Repository repo = executionContext.getCurrentRepository();
+        IRepository repo = executionContext.getCurrentRepository();
         // 查询左面节点。
         cursor_left = ExecutorContext.getContext()
-            .getTransactionExecutor()
+            .getTopologyExecutor()
             .execByExecPlanNode(leftQuery, executionContext);
         /*
          * 如果左边的join on 【columns】 里面的columns,和数据的自然排序相同，则可以直接使用。 否则，使用临时表。
@@ -49,7 +49,7 @@ public class SortMergeJoinHandler extends QueryHandlerCommon {
          * 同上
          */
         cursor_right = ExecutorContext.getContext()
-            .getTransactionExecutor()
+            .getTopologyExecutor()
             .execByExecPlanNode(leftQuery, executionContext);
         right_match = matchIndex(getOrderBy(join.getRightJoinOnColumns()), rightQuery.getOrderBys());
         if (right_match == NOT_MATCH) {

@@ -4,12 +4,12 @@ import java.util.List;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.ExecutorContext;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.impl.RangeCursor1;
-import com.taobao.tddl.executor.spi.ExecutionContext;
-import com.taobao.tddl.executor.spi.Repository;
-import com.taobao.tddl.executor.spi.Table;
-import com.taobao.tddl.executor.spi.Transaction;
+import com.taobao.tddl.executor.spi.IRepository;
+import com.taobao.tddl.executor.spi.ITable;
+import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
@@ -38,19 +38,17 @@ public class QueryHandler extends QueryHandlerCommon {
 
     IDataNodeExecutor executor, ExecutionContext executionContext) throws TddlException {
         List<IOrderBy> _orderBy = ((IQueryTree) executor).getOrderBys();
-        Repository repo = executionContext.getCurrentRepository();
+        IRepository repo = executionContext.getCurrentRepository();
         IDataNodeExecutor _subQuery = null;
-        Transaction transaction = executionContext.getTransaction();
+        ITransaction transaction = executionContext.getTransaction();
         IQuery query = (IQuery) executor;
         _subQuery = query.getSubQuery();
 
         if (_subQuery != null) {
             // 如果有subQuery,则按照subquery构建
-            cursor = ExecutorContext.getContext()
-                .getTransactionExecutor()
-                .execByExecPlanNode(_subQuery, executionContext);
+            cursor = ExecutorContext.getContext().getTopologyExecutor().execByExecPlanNode(_subQuery, executionContext);
         } else {
-            Table table = null;
+            ITable table = null;
             String indexName = query.getIndexName();
             IndexMeta meta = null;
             buildTableAndMeta(query, executionContext);
@@ -59,10 +57,7 @@ public class QueryHandler extends QueryHandlerCommon {
 
             if (cursor == null) {
                 if (meta != null) {
-                    cursor = table.getCursor(transaction,
-                        meta,
-                        repo.getRepoConfig().getDefaultTnxIsolation(),
-                        (IQuery) executor);
+                    cursor = table.getCursor(executionContext, meta, (IQuery) executor);
                     // cursor = repo.getCursorFactory().aliasCursor(cursor,
                     // table.getSchema().getTableName());
                 } else {
@@ -116,7 +111,7 @@ public class QueryHandler extends QueryHandlerCommon {
     }
 
     protected ISchematicCursor manageToBooleanRangeCursor(ExecutionContext executionContext, ISchematicCursor cursor,
-                                                          Repository repo, IFilter keyFilter) throws TddlException {
+                                                          IRepository repo, IFilter keyFilter) throws TddlException {
         IBooleanFilter bf = (IBooleanFilter) keyFilter;
         IColumn c = ExecUtils.getColumn(bf.getColumn());
         OPERATION op = bf.getOperation();
@@ -137,8 +132,8 @@ public class QueryHandler extends QueryHandlerCommon {
     }
 
     protected ISchematicCursor manageToReverseIndex(ExecutionContext executionContext, ISchematicCursor cursor,
-                                                    IDataNodeExecutor executor, Repository repo,
-                                                    Transaction transaction, Table table, IndexMeta meta,
+                                                    IDataNodeExecutor executor, IRepository repo,
+                                                    ITransaction transaction, ITable table, IndexMeta meta,
                                                     IFilter keyFilter) throws TddlException {
         throw new IllegalArgumentException("should not be here");
 
