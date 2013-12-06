@@ -2,6 +2,7 @@ package com.taobao.tddl.optimizer.config.table.parse;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.sql.Types;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -273,4 +274,58 @@ public class TableMetaParser {
 
         return Relationship.NONE;
     }
+
+    public static DATA_TYPE jdbcTypeToAndorType(int jdbcType) {
+        return getDataType(jdbcTypeToAndorTypeString(jdbcType));
+    }
+
+    public static String jdbcTypeToAndorTypeString(int jdbcType) {
+        String type = null;
+        switch (jdbcType) {
+            case Types.BIGINT:
+                type = "LONG";
+                break;
+            case Types.INTEGER:
+            case Types.DECIMAL:
+            case Types.TINYINT:
+            case Types.SMALLINT:
+            case Types.NUMERIC:
+                type = "INT";
+                break;
+            case Types.DATE:
+                type = "DATE";
+                break;
+            case Types.TIMESTAMP:
+                type = "TIMESTAMP";
+                break;
+            case Types.FLOAT:
+            case Types.REAL:
+            case Types.DOUBLE:
+                type = "DOUBLE";
+                break;
+            case Types.VARCHAR:
+            case Types.NCHAR:
+            case Types.NVARCHAR:
+            case Types.LONGNVARCHAR:
+            case Types.LONGVARCHAR:
+                type = "STRING";
+                break;
+            case Types.BINARY:
+            case Types.VARBINARY:
+            case Types.LONGVARBINARY:
+                type = "BYTES";
+                break;
+            case Types.CHAR:
+                type = "STRING";
+                break;
+            case Types.BLOB:
+                type = "BLOB";
+                break;
+            default:
+                type = null;
+        }
+
+        return type;
+    }
+
 }

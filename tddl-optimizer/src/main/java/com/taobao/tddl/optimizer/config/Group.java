@@ -20,6 +20,8 @@ public class Group {
 
     private String name;
 
+    private String appName;
+
     public enum GroupType {
         BDB_JE, MYSQL_JDBC, MYSQL_ASYNC_JDBC, JAVA_SKIPLIST, HBASE_CLIENT, TDHS_CLIENT, ORACLE_JDBC;
 
@@ -82,4 +84,13 @@ public class Group {
     public String toString() {
         return ToStringBuilder.reflectionToString(this, TddlToStringStyle.DEFAULT_STYLE);
     }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
 }

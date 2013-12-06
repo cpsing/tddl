@@ -15,6 +15,7 @@ import com.taobao.tddl.executor.ExecutorContext;
 import com.taobao.tddl.executor.codec.CodecFactory;
 import com.taobao.tddl.executor.codec.RecordCodec;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.executor.cursor.IMergeCursor;
@@ -22,7 +23,6 @@ import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.executor.spi.ExecutionContext;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
@@ -263,7 +263,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
 
                 ExecutionContext tempContext = new ExecutionContext();
                 tempContext.setCurrentRepository(executionContext.getCurrentRepository());
-                cursor = ExecutorContext.getContext().getTransactionExecutor().execByExecPlanNode(idne, tempContext);
+                cursor = ExecutorContext.getContext().getTopologyExecutor().execByExecPlanNode(idne, tempContext);
                 // 用于关闭，统一管理
                 this.returnColumns = cursor.getReturnColumns();
                 duplicateKeyMap = buildDuplicateKVPairMap(col, cursor);

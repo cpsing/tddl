@@ -1,6 +1,7 @@
 package com.taobao.tddl.executor.spi;
 
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 
@@ -9,7 +10,7 @@ import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
  * 
  * @author whisper
  */
-public interface CommandHandler {
+public interface ICommandHandler {
 
     /**
      * 处理对应的一个命令 具体请看实现

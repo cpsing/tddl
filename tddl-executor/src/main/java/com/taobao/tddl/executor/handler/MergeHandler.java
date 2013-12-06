@@ -10,14 +10,14 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.ExecutorContext;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.IAffectRowCursor;
 import com.taobao.tddl.executor.cursor.IMergeCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.impl.DistinctCursor;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.executor.spi.ExecutionContext;
-import com.taobao.tddl.executor.spi.Repository;
+import com.taobao.tddl.executor.spi.IRepository;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
@@ -44,7 +44,7 @@ public class MergeHandler extends QueryHandlerCommon {
         // todo: 处理聚合函数生成merge.
         // merge，多个相同schema cursor的合并操作。
         IMerge merge = (IMerge) executor;
-        Repository repo = executionContext.getCurrentRepository();
+        IRepository repo = executionContext.getCurrentRepository();
         List<IDataNodeExecutor> subNodes = merge.getSubNode();
         List<ISchematicCursor> subCursors = new ArrayList<ISchematicCursor>();
         if (QUERY_CONCURRENCY.CONCURRENT == merge.getQueryConcurrency()) {
@@ -116,7 +116,7 @@ public class MergeHandler extends QueryHandlerCommon {
         for (IDataNodeExecutor q : subNodes) {
 
             ISchematicCursor rc = ExecutorContext.getContext()
-                .getTransactionExecutor()
+                .getTopologyExecutor()
                 .execByExecPlanNode(q, executionContext);
             subCursors.add(rc);
         }
@@ -156,7 +156,7 @@ public class MergeHandler extends QueryHandlerCommon {
      * @throws TddlException
      */
     private ISchematicCursor executeMergeAgg(ISchematicCursor cursor, IDataNodeExecutor executor,
-                                             boolean closeResultCursor, Repository repo, List<IOrderBy> groupBycols,
+                                             boolean closeResultCursor, IRepository repo, List<IOrderBy> groupBycols,
                                              ExecutionContext executionContext) throws TddlException {
         List _retColumns = ((IQueryTree) executor).getColumns();
         if (_retColumns != null) {
@@ -186,7 +186,7 @@ public class MergeHandler extends QueryHandlerCommon {
     }
 
     protected ISchematicCursor executeAgg(ISchematicCursor cursor, IDataNodeExecutor executor,
-                                          boolean closeResultCursor, Repository repo, List<IFunction> aggregates,
+                                          boolean closeResultCursor, IRepository repo, List<IFunction> aggregates,
                                           List<IOrderBy> groupBycols, ExecutionContext executionContext)
                                                                                                         throws TddlException {
         return this.executeMergeAgg(cursor, executor, closeResultCursor, repo, groupBycols, executionContext);
@@ -196,7 +196,7 @@ public class MergeHandler extends QueryHandlerCommon {
     protected ISchematicCursor processOrderBy(ISchematicCursor cursor, List<IOrderBy> ordersInRequest,
                                               ExecutionContext executionContext, IQueryTree query,
                                               boolean needOrderMatch) throws TddlException {
-        Repository repo = executionContext.getCurrentRepository();
+        IRepository repo = executionContext.getCurrentRepository();
         // TODO shenxun: 临时表问题修复
         boolean hasOrderBy = ordersInRequest != null && !ordersInRequest.isEmpty();
         if (!hasOrderBy) {
@@ -246,7 +246,7 @@ public class MergeHandler extends QueryHandlerCommon {
          */
     }
 
-    private ISchematicCursor buildMergeSortCursor(ExecutionContext executionContext, IQueryTree query, Repository repo,
+    private ISchematicCursor buildMergeSortCursor(ExecutionContext executionContext, IQueryTree query, IRepository repo,
                                                   List<ISchematicCursor> cursors, boolean duplicated)
                                                                                                      throws TddlException {
         ISchematicCursor cursor;

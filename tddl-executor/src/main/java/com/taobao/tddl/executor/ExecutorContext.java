@@ -1,7 +1,9 @@
 package com.taobao.tddl.executor;
 
 import com.taobao.tddl.common.utils.thread.ThreadLocalMap;
+import com.taobao.tddl.executor.common.TopologyHandler;
 import com.taobao.tddl.executor.repo.RepositoryHolder;
+import com.taobao.tddl.executor.spi.ITopologyExecutor;
 
 /**
  * @author mengshi.sunmengshi 2013-12-4 下午6:16:32
@@ -9,11 +11,12 @@ import com.taobao.tddl.executor.repo.RepositoryHolder;
  */
 public class ExecutorContext {
 
-    private static final String       EXECUTOR_CONTEXT_KEY     = "_executor_context_";
+    private static final String EXECUTOR_CONTEXT_KEY = "_executor_context_";
 
-    private RepositoryHolder          repositoryHolder         = null;
-    private ITransactionExecutor      transactionExecutor      = null;
-    private ITransactionAsyncExecutor transactionAsyncExecutor = null;
+    private RepositoryHolder    repositoryHolder     = null;
+
+    private TopologyHandler     topologyHandler      = null;
+    private ITopologyExecutor   topologyExecutor     = null;
 
     public static ExecutorContext getContext() {
         return (ExecutorContext) ThreadLocalMap.get(EXECUTOR_CONTEXT_KEY);
@@ -31,20 +34,20 @@ public class ExecutorContext {
         this.repositoryHolder = repositoryHolder;
     }
 
-    public ITransactionExecutor getTransactionExecutor() {
-        return transactionExecutor;
+    public ITopologyExecutor getTopologyExecutor() {
+        return topologyExecutor;
     }
 
-    public void setTransactionExecutor(ITransactionExecutor transactionExecutor) {
-        this.transactionExecutor = transactionExecutor;
+    public void setTopologyExecutor(ITopologyExecutor topologyExecutor) {
+        this.topologyExecutor = topologyExecutor;
     }
 
-    public ITransactionAsyncExecutor getTransactionAsyncExecutor() {
-        return transactionAsyncExecutor;
+    public TopologyHandler getTopologyHandler() {
+        return topologyHandler;
     }
 
-    public void setTransactionAsyncExecutor(ITransactionAsyncExecutor transactionAsyncExecutor) {
-        this.transactionAsyncExecutor = transactionAsyncExecutor;
+    public void setTopologyHandler(TopologyHandler topologyHandler) {
+        this.topologyHandler = topologyHandler;
     }
 
 }

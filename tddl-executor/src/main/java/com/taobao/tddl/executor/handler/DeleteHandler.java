@@ -6,12 +6,12 @@ import java.util.List;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.ExecutorContext;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.executor.spi.ExecutionContext;
-import com.taobao.tddl.executor.spi.Table;
-import com.taobao.tddl.executor.spi.Transaction;
+import com.taobao.tddl.executor.spi.ITable;
+import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.plan.IPut;
@@ -25,14 +25,15 @@ public class DeleteHandler extends PutHandlerCommon {
 
     @SuppressWarnings("rawtypes")
     @Override
-    protected int executePut(ExecutionContext executionContext, IPut put, Table table, IndexMeta meta) throws Exception {
+    protected int executePut(ExecutionContext executionContext, IPut put, ITable table, IndexMeta meta)
+                                                                                                       throws Exception {
 
-        Transaction transaction = executionContext.getTransaction();
+        ITransaction transaction = executionContext.getTransaction();
         int affect_rows = 0;
         IPut delete = put;
         ISchematicCursor conditionCursor = null;
         conditionCursor = ExecutorContext.getContext()
-            .getTransactionExecutor()
+            .getTopologyExecutor()
             .execByExecPlanNode(delete.getQueryTree(), executionContext);
         IRowSet rowSet = null;
         try {
@@ -40,7 +41,7 @@ public class DeleteHandler extends PutHandlerCommon {
                 affect_rows++;
                 CloneableRecord key = ExecUtils.convertToClonableRecord(rowSet);
                 prepare(transaction, table, rowSet, null, null, PUT_TYPE.DELETE);
-                table.delete(transaction, key, meta, executionContext.getDbName());
+                table.delete(executionContext, key, meta, executionContext.getDbName());
             }
         } catch (Exception e) {
             throw e;

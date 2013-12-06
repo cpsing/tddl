@@ -1,8 +1,11 @@
-package com.taobao.tddl.executor.spi;
+package com.taobao.tddl.executor.common;
 
 import java.util.Map;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
+import com.taobao.tddl.executor.spi.IRepository;
+import com.taobao.tddl.executor.spi.ITable;
+import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 
 /**
@@ -20,7 +23,7 @@ public class ExecutionContext {
     /**
      * 当前运行时的存储对象
      */
-    private Repository             currentRepository;
+    private IRepository            currentRepository;
     /**
      * 是否创建事务
      */
@@ -33,7 +36,7 @@ public class ExecutionContext {
     /**
      * 当前事务
      */
-    private Transaction            transaction;
+    private ITransaction           transaction;
     /**
      * 当前查询所使用的IndexMeta/这个放这里不是非常明确，他其实和生命周期无关。只是为了统一返回值，所以放在一起。
      */
@@ -41,7 +44,7 @@ public class ExecutionContext {
     /**
      * 当前查询所使用的table
      */
-    private Table                  table;
+    private ITable                 table;
 
     String                         actualTable;
 
@@ -49,6 +52,7 @@ public class ExecutionContext {
 
     Map<String, Comparable>        extraCmds = null;
     Map<Integer, ParameterContext> params    = null;
+    String                         isolation = null;
 
     public ExecutionContext(){
 
@@ -62,11 +66,11 @@ public class ExecutionContext {
         this.transactionSequence = transactionSequence;
     }
 
-    public Repository getCurrentRepository() {
+    public IRepository getCurrentRepository() {
         return currentRepository;
     }
 
-    public void setCurrentRepository(Repository currentRepository) {
+    public void setCurrentRepository(IRepository currentRepository) {
         this.currentRepository = currentRepository;
     }
 
@@ -86,11 +90,11 @@ public class ExecutionContext {
         this.closeResultSet = closeResultSet;
     }
 
-    public Transaction getTransaction() {
+    public ITransaction getTransaction() {
         return transaction;
     }
 
-    public void setTransaction(Transaction transaction) {
+    public void setTransaction(ITransaction transaction) {
         this.transaction = transaction;
     }
 
@@ -102,11 +106,11 @@ public class ExecutionContext {
         this.meta = meta;
     }
 
-    public Table getTable() {
+    public ITable getTable() {
         return table;
     }
 
-    public void setTable(Table table) {
+    public void setTable(ITable table) {
         this.table = table;
     }
 
@@ -140,6 +144,14 @@ public class ExecutionContext {
 
     public void setParams(Map<Integer, ParameterContext> params) {
         this.params = params;
+    }
+
+    public String getIsolation() {
+        return isolation;
+    }
+
+    public void setIsolation(String isolation) {
+        this.isolation = isolation;
     }
 
 }

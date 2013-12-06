@@ -9,14 +9,14 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.codec.CodecFactory;
 import com.taobao.tddl.executor.common.CursorMetaImp;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.IValueFilterCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.executor.spi.CursorFactory;
-import com.taobao.tddl.executor.spi.ExecutionContext;
+import com.taobao.tddl.executor.spi.ICursorFactory;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
@@ -30,13 +30,13 @@ import com.taobao.tddl.optimizer.core.plan.query.IJoin;
  */
 public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor {
 
-    CursorFactory    cursorFactory    = null;
+    ICursorFactory    cursorFactory    = null;
     ExecutionContext executionContext = null;
     ICursorMeta      rightCursorMeta  = null;
     private IJoin    join;
 
     public BlockNestedtLoopCursor(ISchematicCursor leftCursor, ISchematicCursor rightCursor, List leftColumns,
-                                  List rightColumns, List columns, CursorFactory cursorFactory, IJoin join,
+                                  List rightColumns, List columns, ICursorFactory cursorFactory, IJoin join,
                                   ExecutionContext executionContext, List leftRetColumns, List rightRetColumns)
                                                                                                                throws Exception{
         super(leftCursor, rightCursor, leftColumns, rightColumns, columns, leftRetColumns, rightRetColumns, join);
@@ -52,7 +52,7 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor {
     }
 
     public BlockNestedtLoopCursor(ISchematicCursor leftCursor, ISchematicCursor rightCursor, List leftColumns,
-                                  List rightColumns, List columns, boolean prefix, CursorFactory cursorFactory,
+                                  List rightColumns, List columns, boolean prefix, ICursorFactory cursorFactory,
                                   List leftRetColumns, List rightRetColumns, IJoin join) throws Exception{
         super(leftCursor,
             rightCursor,

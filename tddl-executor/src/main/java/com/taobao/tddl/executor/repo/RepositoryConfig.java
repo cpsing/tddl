@@ -1,6 +1,6 @@
-package com.taobao.tddl.executor.spi;
+package com.taobao.tddl.executor.repo;
 
-public class RepoConfig {
+public class RepositoryConfig {
 
     public String getDefaultTnxIsolation() {
         // TODO Auto-generated method stub

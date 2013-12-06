@@ -16,7 +16,7 @@ public interface ITHLog {
     public void parepare(long transId, TableMeta table, IPut.PUT_TYPE putType, IRowSet oldRow, KVPair newRow)
                                                                                                              throws TddlRuntimeException;
 
-    public void rollback(Transaction trans) throws TddlRuntimeException;
+    public void rollback(ITransaction trans) throws TddlRuntimeException;
 
-    public void commit(Transaction trans) throws TddlRuntimeException;
+    public void commit(ITransaction trans) throws TddlRuntimeException;
 }

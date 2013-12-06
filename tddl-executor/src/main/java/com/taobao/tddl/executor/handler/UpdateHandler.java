@@ -7,13 +7,13 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.ExecutorContext;
 import com.taobao.tddl.executor.codec.CodecFactory;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.function.ExtraFunction;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.executor.spi.ExecutionContext;
-import com.taobao.tddl.executor.spi.Table;
-import com.taobao.tddl.executor.spi.Transaction;
+import com.taobao.tddl.executor.spi.ITable;
+import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
@@ -29,17 +29,17 @@ public class UpdateHandler extends PutHandlerCommon {
 
     @SuppressWarnings("rawtypes")
     @Override
-    protected int executePut(ExecutionContext executionContext, IPut put, Table table, IndexMeta meta)
-                                                                                                      throws TddlException {
+    protected int executePut(ExecutionContext executionContext, IPut put, ITable table, IndexMeta meta)
+                                                                                                       throws TddlException {
 
-        Transaction transaction = executionContext.getTransaction();
+        ITransaction transaction = executionContext.getTransaction();
         int affect_rows = 0;
         IPut update = put;
         ISchematicCursor conditionCursor = null;
         try {
 
             conditionCursor = ExecutorContext.getContext()
-                .getTransactionExecutor()
+                .getTopologyExecutor()
                 .execByExecPlanNode(update.getQueryTree(), executionContext);
 
             IRowSet kv = null;
@@ -86,7 +86,7 @@ public class UpdateHandler extends PutHandlerCommon {
                     }
                 }
                 prepare(transaction, table, kv, key, value, PUT_TYPE.UPDATE);
-                table.put(transaction, key, value, meta, executionContext.getDbName());
+                table.put(executionContext, key, value, meta, executionContext.getDbName());
             }
 
         } catch (TddlException ex) {

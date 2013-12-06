@@ -6,11 +6,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.taobao.tddl.common.jdbc.ParameterContext;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
+/**
+ * @author mengshi.sunmengshi 2013-12-6 下午3:38:43
+ * @since 5.1.0
+ */
 public class ExceptionUtils {
 
     public static StackTraceElement split                               = new StackTraceElement("------- one sql exceptions-----",
@@ -19,7 +22,7 @@ public class ExceptionUtils {
                                                                             0);
     public static final String      SQL_EXECUTION_ERROR_CONTEXT_LOG     = "SQL_EXECUTION_ERROR_CONTEXT_LOG";
     private static final String     SQL_EXECUTION_ERROR_CONTEXT_MESSAGE = "SQLException ,context is ";
-    private static final Log        log                                 = LogFactory.getLog(SQL_EXECUTION_ERROR_CONTEXT_LOG);
+    private static final Logger     log                                 = LoggerFactory.getLogger(SQL_EXECUTION_ERROR_CONTEXT_LOG);
 
     public static void throwSQLException(List<SQLException> exceptions, String sql, List<Object> args)
                                                                                                       throws SQLException {
@@ -192,7 +195,7 @@ public class ExceptionUtils {
      * @param message
      * @param sqlExceptions
      */
-    public static void printSQLExceptionToErrorLog(Log logger, String message, List<SQLException> sqlExceptions) {
+    public static void printSQLExceptionToErrorLog(Logger logger, String message, List<SQLException> sqlExceptions) {
         if (sqlExceptions != null && !sqlExceptions.isEmpty()) {
             for (SQLException sqlException : sqlExceptions) {
                 logger.error(message, sqlException);

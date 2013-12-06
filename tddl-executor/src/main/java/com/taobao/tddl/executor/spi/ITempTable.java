@@ -9,7 +9,7 @@ import com.taobao.tddl.optimizer.config.table.TableMeta;
  * @author mengshi.sunmengshi 2013-11-27 下午4:00:11
  * @since 5.1.0
  */
-public interface TempTable {
+public interface ITempTable {
 
     /**
      * 获取一个临时表对象
@@ -20,6 +20,6 @@ public interface TempTable {
      * @return
      * @throws Exception
      */
-    Table getTable(TableMeta meta, String groupNode, boolean isTempTable, long requestID) throws TddlException;
+    ITable getTable(TableMeta meta, String groupNode, boolean isTempTable, long requestID) throws TddlException;
 
 }

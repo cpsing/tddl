@@ -3,6 +3,7 @@ package com.taobao.tddl.executor.spi;
 import java.sql.SQLException;
 
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
@@ -15,7 +16,7 @@ import com.taobao.tddl.optimizer.core.plan.query.IQuery;
  * @author mengshi.sunmengshi 2013-11-27 下午3:59:42
  * @since 5.1.0
  */
-public interface Table {
+public interface ITable {
 
     /**
      * 获取表的描述信息数据。
@@ -32,8 +33,8 @@ public interface Table {
      * @param value
      * @throws Exception
      */
-    void put(Transaction txn, CloneableRecord key, CloneableRecord value, IndexMeta indexMeta, String dbName)
-                                                                                                             throws TddlException;
+    void put(ExecutionContext executionContext, CloneableRecord key, CloneableRecord value, IndexMeta indexMeta,
+             String dbName) throws TddlException;
 
     /**
      * 关闭table
@@ -47,7 +48,8 @@ public interface Table {
      * @param key
      * @throws Exception
      */
-    void delete(Transaction txn, CloneableRecord key, IndexMeta indexMeta, String dbName) throws TddlException;
+    void delete(ExecutionContext executionContext, CloneableRecord key, IndexMeta indexMeta, String dbName)
+                                                                                                           throws TddlException;
 
     /**
      * 获取一行数据。
@@ -56,7 +58,8 @@ public interface Table {
      * @param key
      * @return
      */
-    CloneableRecord get(Transaction txn, CloneableRecord key, IndexMeta indexMeta, String dbName) throws TddlException;
+    CloneableRecord get(ExecutionContext executionContext, CloneableRecord key, IndexMeta indexMeta, String dbName)
+                                                                                                                   throws TddlException;
 
     /**
      * 根据meta 源信息，获取一个表数据指针。这个指针应该是delegate的，这个方法不应该耗费太多资源。 cursor的隔离性
@@ -69,8 +72,8 @@ public interface Table {
      * @throws FetchException
      * @throws SQLException
      */
-    ISchematicCursor getCursor(Transaction txn, IndexMeta meta, String isolation, IQuery iQuery) throws TddlException;
+    ISchematicCursor getCursor(ExecutionContext executionContext, IndexMeta meta, IQuery iQuery) throws TddlException;
 
-    public ISchematicCursor getCursor(Transaction txn, IndexMeta indexMeta, String isolation, String indexMetaName)
-                                                                                                                   throws TddlException;
+    ISchematicCursor getCursor(ExecutionContext executionContext, IndexMeta indexMeta, String indexMetaName)
+                                                                                                            throws TddlException;
 }

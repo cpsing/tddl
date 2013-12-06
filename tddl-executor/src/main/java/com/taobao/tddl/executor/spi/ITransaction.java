@@ -11,7 +11,7 @@ import com.taobao.tddl.executor.cursor.Cursor;
  * @author mengshi.sunmengshi 2013-11-27 下午4:00:49
  * @since 5.1.0
  */
-public interface Transaction {
+public interface ITransaction {
 
     long getId();
 

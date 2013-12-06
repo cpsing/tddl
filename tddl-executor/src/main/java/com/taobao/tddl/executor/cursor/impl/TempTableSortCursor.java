@@ -13,18 +13,18 @@ import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.codec.CodecFactory;
 import com.taobao.tddl.executor.common.CursorMetaImp;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.common.KVPair;
+import com.taobao.tddl.executor.common.TransactionConfig.Isolation;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.ITempTableSortCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.rowset.IRowSetWrapper;
-import com.taobao.tddl.executor.spi.CursorFactory;
-import com.taobao.tddl.executor.spi.ExecutionContext;
-import com.taobao.tddl.executor.spi.Table;
-import com.taobao.tddl.executor.spi.TempTable;
-import com.taobao.tddl.executor.spi.TransactionConfig.Isolation;
+import com.taobao.tddl.executor.spi.ICursorFactory;
+import com.taobao.tddl.executor.spi.ITable;
+import com.taobao.tddl.executor.spi.ITempTable;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
@@ -47,16 +47,16 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
 
     protected static AtomicLong seed             = new AtomicLong(0);
     protected long              sizeProtection   = 100000;
-    protected CursorFactory     cursorFactory;
+    protected ICursorFactory    cursorFactory;
     boolean                     sortedDuplicates;
 
     private static final String identity         = "__identity__".toUpperCase();
 
     private boolean             inited           = false;
 
-    private final TempTable     repo;
+    private final ITempTable    repo;
     protected ISchematicCursor  tempTargetCursor = null;
-    Table                       targetTable      = null;
+    ITable                      targetTable      = null;
 
     protected ICursorMeta       returnMeta       = null;
     private long                requestID;
@@ -71,7 +71,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
      * @throws FetchException
      * @throws TddlException
      */
-    public TempTableSortCursor(CursorFactory cursorFactory, TempTable repo, ISchematicCursor cursor,
+    public TempTableSortCursor(ICursorFactory cursorFactory, ITempTable repo, ISchematicCursor cursor,
                                List<IOrderBy> orderBys, boolean sortedDuplicates, long requestID,
                                ExecutionContext executionContext) throws TddlException, TddlException{
         super(cursor, orderBys);
@@ -91,8 +91,8 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
 
     }
 
-    protected ISchematicCursor prepare(TempTable repo, ISchematicCursor cursor, List<IOrderBy> orderBys)
-                                                                                                        throws TddlException {
+    protected ISchematicCursor prepare(ITempTable repo, ISchematicCursor cursor, List<IOrderBy> orderBys)
+                                                                                                         throws TddlException {
 
         List<ColumnMeta> columns = new ArrayList<ColumnMeta>();
         List<ColumnMeta> values = new ArrayList<ColumnMeta>();
@@ -200,7 +200,9 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
             } while ((rowSet = cursor.next()) != null);
         }
 
-        ISchematicCursor ret = targetTable.getCursor(null, primary_meta, Isolation.READ_UNCOMMITTED, tableName);
+        ExecutionContext tmpContext = new ExecutionContext();
+        tmpContext.setIsolation(Isolation.READ_UNCOMMITTED);
+        ISchematicCursor ret = targetTable.getCursor(tmpContext, primary_meta, tableName);
 
         // 去除唯一标志
         List<ColumnMeta> retColumns = new ArrayList<ColumnMeta>();
@@ -212,11 +214,6 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
             }
         }
 
-        // List<ISelectable> columnsInReturn = ExecUtil
-        // .getIColumnsWithISelectable(retColumns
-        // .toArray(new ColumnMeta[0]));
-        // ret = cursorFactory.columnAliasCursor(ret, columnsInReturn,
-        // oldTableName);
         if (!orderBys.get(0).getDirection()) {
             ret = cursorFactory.reverseOrderCursor(executionContext, ret);
         }
@@ -308,11 +305,11 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
         return false;
     }
 
-    public CursorFactory getCursorFactory() {
+    public ICursorFactory getCursorFactory() {
         return cursorFactory;
     }
 
-    public void setCursorFactory(CursorFactory cursorFactory) {
+    public void setCursorFactory(ICursorFactory cursorFactory) {
         this.cursorFactory = cursorFactory;
 
     }

@@ -24,7 +24,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.taobao.tddl.common.jdbc.TExceptionUtils;
-
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.group.config.GroupIndex;
@@ -672,4 +671,16 @@ public class TGroupConnection implements Connection {
         throw new SQLException("not support exception");
     }
 
+    /**
+     * @return
+     */
+    public long getId() {
+
+    }
+
+    public Connection duplicate() throws SQLException {
+        if (this.tGroupDataSource == null) return null;
+
+        return this.tGroupDataSource.getConnection();
+    }
 }

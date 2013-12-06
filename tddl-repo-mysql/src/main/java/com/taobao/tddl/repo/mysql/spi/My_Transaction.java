@@ -1,6 +1,5 @@
 package com.taobao.tddl.repo.mysql.spi;
 
-import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,10 +18,16 @@ import org.apache.commons.logging.LogFactory;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.ExceptionErrorCodeUtils;
 import com.taobao.tddl.executor.common.AtomicNumberCreator;
+import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.spi.ITHLog;
-import com.taobao.tddl.executor.spi.Transaction;
+import com.taobao.tddl.executor.spi.ITransaction;
+import com.taobao.tddl.group.jdbc.TGroupConnection;
 
-public class My_Transaction implements Transaction {
+/**
+ * @author mengshi.sunmengshi 2013-12-6 上午11:31:29
+ * @since 5.1.0
+ */
+public class My_Transaction implements ITransaction {
 
     private AtomicNumberCreator             idGen                 = AtomicNumberCreator.getNewInstance();
     /**
@@ -79,16 +84,7 @@ public class My_Transaction implements Transaction {
             Connection conn = getNewConnection(groupName, ds);
             return conn;
         }
-        // if (stragety == Stragety.NONE) {
-        // Connection my_JdbcHandler = getConnection(groupName, ds, true);
-        // return my_JdbcHandler;
-        // } else if (stragety == Stragety.ALLOW_READ) {
-        // if (!strongConsistent &&
-        // !groupName.equalsIgnoreCase(transactionalNodeName)) {// 非强一致，又非事务用链接
-        // Connection my_JdbcHandler = getConnection(groupName, ds, true);
-        // return my_JdbcHandler;
-        // }
-        // }
+
         /*
          * 状态是强一致或ALLOW_READ 策略一致
          */
@@ -140,7 +136,7 @@ public class My_Transaction implements Transaction {
         return connection;
     }
 
-    public void commit() throws UstoreException {
+    public void commit() throws TddlException {
         try {
             if (connMap != null && !connMap.isEmpty()) {
                 for (List<Connection> conns : connMap.values()) {
@@ -151,7 +147,7 @@ public class My_Transaction implements Transaction {
             }
 
         } catch (SQLException e) {
-            throw new UstoreException(ExceptionErrorCodeUtils.UNKNOWN_EXCEPTION, e);
+            throw new TddlException(ExceptionErrorCodeUtils.UNKNOWN_EXCEPTION, e);
         } finally {
             this.close();
         }
@@ -159,7 +155,7 @@ public class My_Transaction implements Transaction {
         transactionalNodeName = null;
     }
 
-    public void rollback() throws UstoreException {
+    public void rollback() throws TddlException {
         try {
             if (connMap != null && !connMap.isEmpty()) {
                 for (List<Connection> conns : connMap.values()) {
@@ -169,7 +165,7 @@ public class My_Transaction implements Transaction {
                 }
             }
         } catch (SQLException e) {
-            throw new UstoreException(ExceptionErrorCodeUtils.UNKNOWN_EXCEPTION, e);
+            throw new TddlException(ExceptionErrorCodeUtils.UNKNOWN_EXCEPTION, e);
         } finally {
             this.close();
         }
@@ -234,8 +230,8 @@ public class My_Transaction implements Transaction {
         for (Connection con : conns) {
             // 后面的代码主要是为了从各种包装类里面取出真正的链接里面的query id。。。蛋略微痛。。
             // 弄掉TDDL包装
-            ConnectionImpl myconn = null;
-            myconn = getMySQLConnection(con, myconn);
+            TGroupConnection myconn = null;
+            myconn = getTGroupConnection(con);
             // Jboss包装
             // MySQL包装
             // 获取当前链接执行的ID
@@ -270,66 +266,19 @@ public class My_Transaction implements Transaction {
                 logger.debug("e", e);
             }
         }
-        // finally
-        // {
-        // con.close();
-        // }
-        // 链接关闭成功,提前终止查询。
+
     }
 
-    private static ConnectionImpl getMySQLConnection(Connection con, ConnectionImpl myconn) throws SQLException {
-        try {
-            if (con instanceof TConnectionWrapper) {
-                myconn = getMySQLConnectionFromTAtomConnection(con);
-            } else if (con instanceof TGroupConnection) {
-                TGroupConnection tgconnection = (TGroupConnection) con;
-                Field field = tgconnection.getClass().getDeclaredField("rBaseConnection");
-                field.setAccessible(true);
-                Connection atomConn = (Connection) field.get(tgconnection);
-                if (atomConn == null) {
-                    field = tgconnection.getClass().getDeclaredField("wBaseConnection");
-                    field.setAccessible(true);
-                    atomConn = (Connection) field.get(tgconnection);
-                }
-                myconn = getMySQLConnectionFromTAtomConnection(atomConn);
-
-            } else if (con instanceof WrappedConnection) {
-                myconn = getMySQLConnectionFromJbossConnection((WrappedConnection) con);
-            } else {
-                throw new IllegalArgumentException("not supported yet " + con.getClass().getName());
-            }
-            return myconn;
-        } catch (IllegalArgumentException e) {
-            throw new SQLException(e);
-        } catch (IllegalAccessException e) {
-            throw new SQLException(e);
-        } catch (NoSuchFieldException e) {
-            throw new SQLException(e);
+    private static TGroupConnection getTGroupConnection(Connection con) {
+        if (con instanceof TGroupConnection) {
+            return (TGroupConnection) con;
         }
-    }
 
-    public static ConnectionImpl getMySQLConnectionFromJbossConnection(WrappedConnection jbossConn) throws SQLException {
-        // Jboss包装
-        Connection wpedunderlying = jbossConn.getUnderlyingConnection();
-        // MySQL包装
-        ConnectionImpl myconn = (ConnectionImpl) wpedunderlying;
-        return myconn;
-    }
-
-    private static ConnectionImpl getMySQLConnectionFromTAtomConnection(Connection con) throws NoSuchFieldException,
-                                                                                       IllegalAccessException,
-                                                                                       SQLException {
-        ConnectionImpl myconn;
-        TConnectionWrapper conn = (TConnectionWrapper) con;
-        Field field = conn.getClass().getDeclaredField("targetConnection");
-        field.setAccessible(true);
-        WrappedConnection jbossConn = (WrappedConnection) field.get(conn);
-        myconn = getMySQLConnectionFromJbossConnection(jbossConn);
-        return myconn;
+        throw new RuntimeException("impossible,connection is not TGroupConnection:" + con.getClass());
     }
 
     @Override
-    public boolean isAutoCommit() throws UstoreException {
+    public boolean isAutoCommit() throws TddlException {
         return autoCommit;
     }
 
