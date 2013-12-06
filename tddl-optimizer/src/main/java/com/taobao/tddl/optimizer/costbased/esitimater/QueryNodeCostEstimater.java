@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
@@ -14,7 +15,7 @@ import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.costbased.esitimater.stat.KVIndexStat;
-import com.taobao.tddl.optimizer.costbased.esitimater.stat.TableColumnStat;
+import com.taobao.tddl.optimizer.costbased.esitimater.stat.TableStat;
 import com.taobao.tddl.optimizer.exceptions.StatisticsUnavailableException;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
 
@@ -41,21 +42,20 @@ public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
         } else if (query instanceof TableNode) {
             // 查询对象是一个物理表，则根据表的统计信息来获取初始行数
             isOnfly = false;
-            // TODO 拿到表统计信息
-            // TableStat stat = null;
-            // if (stat != null) {
-            // initRowCount = stat.getTableRows();
-            // } else {
-            index = ((TableNode) query).getIndexUsed();
-            initRowCount = 1000;
-            // throw new StatisticsUnavailableException();
-            // }
+            TableStat stat = OptimizerContext.getContext()
+                .getStatManager()
+                .getTable(((TableNode) query).getTableMeta().getTableName());
+
+            if (stat != null) {
+                initRowCount = stat.getTableRows();
+            } else {
+                index = ((TableNode) query).getIndexUsed();
+                initRowCount = 1000;
+            }
         }
 
         // 索引的选择度
         KVIndexStat indexStat = null;
-        // 列的柱状图
-        TableColumnStat columnStat = null;
 
         List<IFilter> valueFilters = FilterUtils.toDNFNode(query.getResultFilter());
         List<IFilter> keyFilters = FilterUtils.toDNFNode(query.getKeyFilter());
@@ -73,17 +73,16 @@ public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
                    && (Long) query.getLimitTo() != 0) {
             // 对于包含limit的查询，使用limit提供的结果
             rowCount = (Long) query.getLimitTo() - (Long) query.getLimitFrom();
-            scanRowCount = this.estimateRowCount(initRowCount, keyFilters, index, columnStat, indexStat);
-            scanRowCount = rowCount;
+            scanRowCount = this.estimateRowCount(initRowCount, keyFilters, index, indexStat);
         } else if (query.getLimitFrom() != null || query.getLimitTo() != null) {
-            rowCount = this.estimateRowCount(initRowCount, keyFilters, index, columnStat, indexStat) / 2;
+            rowCount = this.estimateRowCount(initRowCount, keyFilters, index, indexStat) / 2;
             scanRowCount = rowCount;
-            rowCount = this.estimateRowCount(rowCount, valueFilters, index, columnStat, indexStat);
+            rowCount = this.estimateRowCount(rowCount, valueFilters, index, indexStat);
         } else {
             // 对于其他情况，则根据约束条件进行推算
-            rowCount = this.estimateRowCount(initRowCount, keyFilters, index, columnStat, indexStat);
+            rowCount = this.estimateRowCount(initRowCount, keyFilters, index, indexStat);
             scanRowCount = rowCount;
-            rowCount = this.estimateRowCount(rowCount, valueFilters, index, columnStat, indexStat);
+            rowCount = this.estimateRowCount(rowCount, valueFilters, index, indexStat);
         }
 
         long networkCost = 0;
@@ -126,8 +125,7 @@ public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
     /**
      * 估算查询的row行数
      */
-    private long estimateRowCount(long oldCount, List<IFilter> filters, IndexMeta index, TableColumnStat columnStat,
-                                  KVIndexStat indexStat) {
+    private long estimateRowCount(long oldCount, List<IFilter> filters, IndexMeta index, KVIndexStat indexStat) {
         // indexMeta
         if (filters == null || filters.isEmpty()) {
             return oldCount;
@@ -135,8 +133,7 @@ public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
 
         Map<String, Double> columnAndColumnCountItSelectivity = new HashMap();
         if (index != null && indexStat != null) {
-            Double columnCountEveryKeyColumnSelect = ((double) index.getKeyColumns().size())
-                                                     * (1 / indexStat.getDistinct_keys());
+            Double columnCountEveryKeyColumnSelect = indexStat.getFactor();
             for (ColumnMeta cm : index.getKeyColumns()) {
                 columnAndColumnCountItSelectivity.put(cm.getName(), columnCountEveryKeyColumnSelect);
             }
@@ -148,11 +145,11 @@ public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
             if (f == null) {
                 break;
             }
+
             IBooleanFilter filter = (IBooleanFilter) f;
             Double selectivity = null;
             if (filter.getColumn() instanceof IColumn) {
                 String columnName = ((IColumn) filter.getColumn()).getColumnName();
-
                 if (columnAndColumnCountItSelectivity.containsKey(columnName)) {
                     selectivity = columnAndColumnCountItSelectivity.get(columnName);
                 }
@@ -166,5 +163,4 @@ public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
         }
         return count;
     }
-
 }

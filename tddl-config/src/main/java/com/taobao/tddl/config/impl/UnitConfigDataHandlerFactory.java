@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
+import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.config.ConfigDataHandler;
 import com.taobao.tddl.config.ConfigDataHandlerFactory;
 import com.taobao.tddl.config.ConfigDataListener;
@@ -60,7 +62,11 @@ public class UnitConfigDataHandlerFactory implements ConfigDataHandlerFactory {
         instance.setDataId(dataId);
         instance.setListeners(clearNullListener(configDataListenerList));
         instance.setConfig(config);
-        instance.init(); // 启动
+        try {
+            instance.init();// 启动
+        } catch (TddlException e) {
+            throw new TddlRuntimeException(e);
+        }
         return instance;
     }
 

@@ -1,6 +1,5 @@
 package com.taobao.tddl.optimizer.costbased.esitimater.stat;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -15,33 +14,31 @@ import com.taobao.tddl.common.utils.TddlToStringStyle;
 public class TableColumnStat {
 
     // 表名
-    private String             tablename;
+    private String             tableName;
     // 列的统计数据
-    private List<KVColumnStat> listColumnMeta;
+    private List<KVColumnStat> columnStats;
 
-    public TableColumnStat(String tablename){
-        super();
-        this.tablename = tablename;
-        this.listColumnMeta = new LinkedList<KVColumnStat>();
+    public List<KVColumnStat> getColumnStats() {
+        return columnStats;
     }
 
-    public List<KVColumnStat> getListcoColumnMeta() {
-        return listColumnMeta;
+    public void setColumnStats(List<KVColumnStat> columnStats) {
+        this.columnStats = columnStats;
     }
 
-    public void setListcoColumnMeta(List<KVColumnStat> listcoColumnMeta) {
-        this.listColumnMeta = listcoColumnMeta;
+    public String getTableName() {
+        return tableName;
     }
 
-    public String getTablename() {
-        return tablename;
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 
-    public void addColumnMeta(KVColumnStat columnMeta) {
-        if (columnMeta == null) {
+    public void addColumnStat(KVColumnStat columnStat) {
+        if (columnStat == null) {
             return;
         }
-        listColumnMeta.add(columnMeta);
+        columnStats.add(columnStat);
     }
 
     public String toString() {

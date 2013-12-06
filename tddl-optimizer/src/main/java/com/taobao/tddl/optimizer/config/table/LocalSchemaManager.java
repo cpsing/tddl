@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.TddlToStringStyle;
 import com.taobao.tddl.optimizer.config.table.parse.TableMetaParser;
@@ -23,12 +24,12 @@ public class LocalSchemaManager extends AbstractLifecycle implements SchemaManag
 
     protected Map<String, TableMeta> ss;
 
-    protected void doInit() {
+    protected void doInit() throws TddlException {
         super.doInit();
         ss = new ConcurrentHashMap<String, TableMeta>();
     }
 
-    protected void doDestory() {
+    protected void doDestory() throws TddlException {
         super.doDestory();
         ss.clear();
     }
@@ -45,7 +46,7 @@ public class LocalSchemaManager extends AbstractLifecycle implements SchemaManag
         return ss.values();
     }
 
-    public static LocalSchemaManager parseSchema(String data) {
+    public static LocalSchemaManager parseSchema(String data) throws TddlException {
         if (data == null || data.isEmpty()) {
             throw new IllegalArgumentException("schema is null");
         }
@@ -53,18 +54,13 @@ public class LocalSchemaManager extends AbstractLifecycle implements SchemaManag
         InputStream sis = null;
         try {
             sis = new ByteArrayInputStream(data.getBytes());
-            LocalSchemaManager schemaManager = new LocalSchemaManager();
-            List<TableMeta> schemaList = TableMetaParser.parse(sis);
-            for (TableMeta t : schemaList) {
-                schemaManager.putTable(t.getTableName(), t);
-            }
-            return schemaManager;
+            return parseSchema(sis);
         } finally {
             IOUtils.closeQuietly(sis);
         }
     }
 
-    public static LocalSchemaManager parseSchema(InputStream in) {
+    public static LocalSchemaManager parseSchema(InputStream in) throws TddlException {
         if (in == null) {
             throw new IllegalArgumentException("in is null");
         }

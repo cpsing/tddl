@@ -8,6 +8,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.taobao.tddl.common.exception.NotSupportException;
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.extension.ExtensionLoader;
 import com.taobao.tddl.optimizer.config.Group;
@@ -28,11 +29,11 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
     private LoadingCache<String, TableMeta> cache = null;
     private boolean                         useCache;
 
-    protected void doInit() {
+    protected void doInit() throws TddlException {
         if (!isDelegate) {
             delegate = ExtensionLoader.load(RepoSchemaManager.class, group.getType().name());
             delegate.setGroup(group);
-            delegate.setIsDelegate(true);
+            delegate.setDelegate(true);
             delegate.init();
 
             cache = CacheBuilder.newBuilder()
@@ -95,7 +96,7 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
         throw new NotSupportException("对应repo需要实现");
     }
 
-    protected void doDestory() {
+    protected void doDestory() throws TddlException {
         if (!isDelegate) {
             delegate.destory();
             cache.invalidateAll();
@@ -118,7 +119,7 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
         this.local = local;
     }
 
-    public void setIsDelegate(boolean isDelegate) {
+    public void setDelegate(boolean isDelegate) {
         this.isDelegate = isDelegate;
     }
 

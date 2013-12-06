@@ -1,5 +1,7 @@
 package com.taobao.tddl.optimizer.config.table;
 
+import java.io.Serializable;
+
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 
 /**
@@ -7,7 +9,7 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
  * 
  * @author whisper
  */
-public class ColumnMessage {
+public class ColumnMessage implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

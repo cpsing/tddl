@@ -42,8 +42,7 @@ public interface ConfigDataHandlerFactory {
      * @param config TDDL内部对handler提供的一些配置
      * @return 返回配置数据处理器实例
      */
-    ConfigDataHandler getConfigDataHandler(String dataId,
-                                                         List<ConfigDataListener> configDataListenerList,
-                                                         Executor executor, Map<String, Object> config);
+    ConfigDataHandler getConfigDataHandler(String dataId, List<ConfigDataListener> configDataListenerList,
+                                           Executor executor, Map<String, Object> config);
 
 }

@@ -13,6 +13,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.google.common.collect.Lists;
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.rule.exceptions.RouteCompareDiffException;
 import com.taobao.tddl.rule.model.MatcherResult;
 import com.taobao.tddl.rule.model.TargetDB;
@@ -29,7 +30,7 @@ public class RemoteRuleIntegration extends BaseRuleTest {
     }
 
     @AfterClass
-    public static void tearDown() {
+    public static void tearDown() throws TddlException {
         rule.destory();
     }
 

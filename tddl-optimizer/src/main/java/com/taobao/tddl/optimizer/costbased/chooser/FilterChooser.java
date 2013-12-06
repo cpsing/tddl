@@ -40,13 +40,14 @@ public class FilterChooser {
         if (!FilterUtils.isDNF(node.getWhereFilter())) {
             throw new IllegalArgumentException("not dnf!!! fuck!!\n" + node.getWhereFilter());
         }
+
         List<QueryTreeNode> subQueries = new LinkedList<QueryTreeNode>();
         List<List<IFilter>> DNFNodes = FilterUtils.toDNFNodesArray(node.getWhereFilter());
 
         for (List<IFilter> DNFNode : DNFNodes) {
             List columns = Arrays.asList(FilterUtils.toColumnFiltersMap(DNFNode).keySet().toArray());
             String tablename = node.getTableName();
-            IndexMeta index = findBestIndex(node.getIndexs(), columns, DNFNode, tablename, extraCmd);
+            IndexMeta index = IndexChooser.findBestIndex(node.getIndexs(), columns, DNFNode, tablename, extraCmd);
             if (index == null) {
                 index = node.getTableMeta().getPrimaryIndex();
             }
@@ -140,8 +141,4 @@ public class FilterChooser {
         return filters;
     }
 
-    private static IndexMeta findBestIndex(List<IndexMeta> indexs, List<ISelectable> columns, List<IFilter> filters,
-                                           String tablename, Map<String, Comparable> extraCmd) {
-        return IndexChooser.findBestIndex(indexs, columns, filters, tablename, extraCmd);
-    }
 }

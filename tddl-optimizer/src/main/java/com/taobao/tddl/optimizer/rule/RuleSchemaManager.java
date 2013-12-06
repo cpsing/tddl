@@ -7,6 +7,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.taobao.tddl.common.exception.NotSupportException;
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.optimizer.config.Group;
 import com.taobao.tddl.optimizer.config.Matrix;
@@ -35,7 +36,7 @@ public class RuleSchemaManager extends AbstractLifecycle implements SchemaManage
         this.matrix = matrix;
     }
 
-    protected void doInit() {
+    protected void doInit() throws TddlException {
         super.doInit();
         repos = CacheBuilder.newBuilder().build(new CacheLoader<Group, RepoSchemaManager>() {
 
@@ -50,7 +51,7 @@ public class RuleSchemaManager extends AbstractLifecycle implements SchemaManage
         });
     }
 
-    protected void doDestory() {
+    protected void doDestory() throws TddlException {
         super.doDestory();
 
         for (RepoSchemaManager repo : repos.asMap().values()) {

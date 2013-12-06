@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
@@ -105,7 +106,7 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
     private Cache<String, OptimizeResult> optimizedResults;
     private List<QueryPlanOptimizer>      afterOptimizers = new ArrayList<QueryPlanOptimizer>();
 
-    protected void doInit() {
+    protected void doInit() throws TddlException {
         // after处理
         afterOptimizers.add(new FuckAvgOptimizer());
         afterOptimizers.add(new ChooseTreadOptimizer());
@@ -132,7 +133,7 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
             .build();
     }
 
-    protected void doDestory() {
+    protected void doDestory() throws TddlException {
         optimizedResults.invalidateAll();
         sqlParseManager.destory();
     }

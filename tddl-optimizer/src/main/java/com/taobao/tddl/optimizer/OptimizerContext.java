@@ -4,6 +4,7 @@ import com.taobao.tddl.common.utils.thread.ThreadLocalMap;
 import com.taobao.tddl.optimizer.config.Matrix;
 import com.taobao.tddl.optimizer.config.table.IndexManager;
 import com.taobao.tddl.optimizer.config.table.SchemaManager;
+import com.taobao.tddl.optimizer.costbased.esitimater.stat.StatManager;
 import com.taobao.tddl.optimizer.rule.OptimizerRule;
 
 /**
@@ -26,6 +27,7 @@ public class OptimizerContext {
     private IndexManager        indexManager;
     private OptimizerRule       rule;
     private Optimizer           optimizer;
+    private StatManager         statManager;
 
     public static OptimizerContext getContext() {
         return (OptimizerContext) ThreadLocalMap.get(OPTIMIZER_CONTEXT_KEY);
@@ -73,6 +75,14 @@ public class OptimizerContext {
 
     public void setOptimizer(Optimizer optimizer) {
         this.optimizer = optimizer;
+    }
+
+    public StatManager getStatManager() {
+        return statManager;
+    }
+
+    public void setStatManager(StatManager statManager) {
+        this.statManager = statManager;
     }
 
 }

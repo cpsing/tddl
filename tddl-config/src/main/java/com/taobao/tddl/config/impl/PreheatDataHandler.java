@@ -3,6 +3,7 @@ package com.taobao.tddl.config.impl;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.config.ConfigDataListener;
 import com.taobao.tddl.config.impl.holder.ConfigHolderFactory;
@@ -23,7 +24,7 @@ public class PreheatDataHandler extends UnitConfigDataHandler {
     private String                dataId;
 
     @Override
-    public void doInit() {
+    public void doInit() throws TddlException {
         delagate = loadHandlerExtension();
         // 做一下数据预热
         if (delagate.initialData == null && ConfigHolderFactory.isInit(delagate.getAppName())) {
@@ -66,7 +67,7 @@ public class PreheatDataHandler extends UnitConfigDataHandler {
 
     }
 
-    protected void doDestory() {
+    protected void doDestory() throws TddlException {
         delagate.destory();
     }
 }

@@ -1,5 +1,7 @@
 package com.taobao.tddl.common.model.lifecycle;
 
+import com.taobao.tddl.common.exception.TddlException;
+
 /**
  * @author jianghang 2013-10-23 下午5:19:38
  * @since 5.1.0
@@ -9,7 +11,7 @@ public class AbstractLifecycle implements Lifecycle {
     private final Object       lock     = new Object();
     protected volatile boolean isInited = false;
 
-    public void init() {
+    public void init() throws TddlException {
         synchronized (lock) {
             if (isInited()) {
                 return;
@@ -19,7 +21,7 @@ public class AbstractLifecycle implements Lifecycle {
         }
     }
 
-    public void destory() {
+    public void destory() throws TddlException {
         synchronized (lock) {
             if (!isInited()) {
                 return;
@@ -34,10 +36,10 @@ public class AbstractLifecycle implements Lifecycle {
         return isInited;
     }
 
-    protected void doInit() {
+    protected void doInit() throws TddlException {
     }
 
-    protected void doDestory() {
+    protected void doDestory() throws TddlException {
     }
 
 }

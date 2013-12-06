@@ -13,6 +13,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.google.common.collect.Lists;
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.rule.BaseRuleTest.Choicer;
 import com.taobao.tddl.rule.exceptions.RouteCompareDiffException;
 import com.taobao.tddl.rule.exceptions.TddlRuleException;
@@ -40,7 +41,7 @@ public class LocalRuleTest {
     }
 
     @AfterClass
-    public static void tearDown() {
+    public static void tearDown() throws TddlException {
         rule.destory();
         mvrRule.destory();
     }

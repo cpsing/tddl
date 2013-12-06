@@ -8,6 +8,7 @@ import org.apache.commons.lang.BooleanUtils;
 
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
@@ -122,14 +123,10 @@ public class IndexChooser {
         Map<String, Double> columnAndColumnCountItSelectivity = new HashMap();
         KVIndexStat indexStat = null;
         if (index != null) {
-            // TODO indexStat =
-            // oc.getStatisticsManager().getStatistics(index.getName());
-            indexStat = new KVIndexStat(null, 0);
-
+            indexStat = OptimizerContext.getContext().getStatManager().getKVIndex(index.getName());
             if (indexStat != null) {
                 // 选择度越小，代表索引查找的代价更小，比如选择读为1时，即为精确查找，如果选择度趋向无穷大，即为全表扫描
-                Double columnCountEveryKeyColumnSelect = ((double) index.getKeyColumns().size())
-                                                         * (1 / indexStat.getDistinct_keys());
+                Double columnCountEveryKeyColumnSelect = indexStat.getFactor();
                 for (ColumnMeta cm : index.getKeyColumns()) {
                     columnAndColumnCountItSelectivity.put(cm.getName(), columnCountEveryKeyColumnSelect);
                 }

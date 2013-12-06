@@ -33,6 +33,9 @@ public class CostEsitimaterFactory {
 
     }
 
+    /**
+     * 参考derby数据库实现
+     */
     public static double selectivity(OPERATION operator) {
         if (operator == OPERATION.EQ) {
             return 0.1;

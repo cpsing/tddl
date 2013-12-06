@@ -12,6 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.rule.impl.GroovyRule;
 import com.taobao.tddl.rule.model.MatcherResult;
 import com.taobao.tddl.rule.model.TargetDB;
@@ -28,7 +29,7 @@ public class GroovyRuleTest extends BaseRuleTest {
     }
 
     @Test
-    public void test_equal() {
+    public void test_equal() throws TddlException {
         Rule<String> dbRule = new GroovyRule<String>("\"db\"+(#id,1,64# % 64).intdiv(4)");
         Rule<String> tbRule = new GroovyRule<String>("String.valueOf(#id,1,64# % 64)");
         TableRule vt = new TableRule();
@@ -52,7 +53,7 @@ public class GroovyRuleTest extends BaseRuleTest {
     }
 
     @Test
-    public void testUpdateIn() {
+    public void testUpdateIn() throws TddlException {
         Rule<String> dbRule = new GroovyRule<String>("\"db\"+(#id,1,64# % 64).intdiv(4)");
         Rule<String> tbRule = new GroovyRule<String>("String.valueOf(#id,1,64# % 64)");
         TableRule vt = new TableRule();
@@ -72,7 +73,7 @@ public class GroovyRuleTest extends BaseRuleTest {
     }
 
     @Test
-    public void testRange() throws ParseException {
+    public void testRange() throws ParseException, TddlException {
         Rule<String> dbRule = new GroovyRule<String>("\"db\"+(getCalendar(#time,1_month,2#).get(Calendar.MONTH)%2)");
         Rule<String> tbRule = new GroovyRule<String>("\"\"+getCalendar(#time,1_date,365#).get(Calendar.DATE)");
         TableRule vt = new TableRule();
@@ -95,7 +96,7 @@ public class GroovyRuleTest extends BaseRuleTest {
     }
 
     @Test
-    public void testNull() throws ParseException {
+    public void testNull() throws ParseException, TddlException {
         Rule<String> dbRule = new GroovyRule<String>("\"db\"+(#id,1,64#.toString())");
         Rule<String> tbRule = new GroovyRule<String>("#id,1,64#.toString()");
         TableRule vt = new TableRule();
