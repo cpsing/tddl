@@ -10,5 +10,5 @@ import javax.sql.DataSource;
  */
 public interface DataSourceGetter {
 
-    DataSource getDataSource(ExecutionContext executionContext, String group);
+    DataSource getDataSource(String group);
 }

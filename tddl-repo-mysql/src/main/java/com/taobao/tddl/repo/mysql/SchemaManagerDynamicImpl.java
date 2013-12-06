@@ -21,6 +21,9 @@ import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.repo.RepositoryHolder;
 import com.taobao.tddl.executor.spi.DataSourceGetter;
+import com.taobao.tddl.executor.spi.Repository;
+import com.taobao.tddl.optimizer.config.Group;
+import com.taobao.tddl.optimizer.config.table.TableMeta;
 
 /**
  * @author mengshi.sunmengshi 2013-12-5 下午6:18:14
@@ -29,10 +32,9 @@ import com.taobao.tddl.executor.spi.DataSourceGetter;
 public class SchemaManagerDynamicImpl extends SchemaManager {
 
     private final static Log logger                      = LogFactory.getLog(SchemaManagerDynamicImpl.class);
-    private AndorContext     oc                          = null;
     private final long       DEFAULT_SCHEMA_CLEAN_MINUTE = 10;
     private long             schemaCleanMinute           = DEFAULT_SCHEMA_CLEAN_MINUTE;
-    Map<String, TableSchema> schemas                     = new ConcurrentHashMap<String, TableSchema>();
+    Map<String, TableMeta>   schemas                     = new ConcurrentHashMap<String, TableMeta>();
     private Timer            timer;
     private DataSourceGetter dsGetter                    = null;
 

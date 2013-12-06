@@ -10,20 +10,7 @@ public class My_Convertor {
 
     public static IRowSet convert(ResultSet rs, ICursorMeta meta) {
         IRowSet rowSet = new ResultSetRowSet(meta, rs);
-        // int i = 1;
-        // for (; i <= size; i++) {
-        // try {
-        // Object obValue = rs.getObject(i);
-        // if (obValue instanceof BigDecimal) {
-        // obValue = ((BigDecimal) obValue).longValue();
-        // } else if (obValue instanceof BigInteger) {
-        // obValue = ((BigInteger) obValue).longValue();
-        // }
-        // rowSet.setObject(i-1, obValue);
-        // } catch (SQLException e) {
-        // e.printStackTrace();
-        // }
-        // }
+
         return rowSet;
     }
 }

@@ -1,61 +1,56 @@
-package com.taobao.ustore.jdbc.common.command.handler;
+package com.taobao.tddl.repo.mysql.handler;
 
 import java.util.List;
-import java.util.Map;
 
-import org.codehaus.groovy.util.StringUtil;
-
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.handler.QueryHandler;
 import com.taobao.tddl.executor.spi.CommandHandler;
 import com.taobao.tddl.executor.spi.DataSourceGetter;
 import com.taobao.tddl.executor.spi.ExecutionContext;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
+import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 import com.taobao.tddl.repo.mysql.CursorMyUtils;
 import com.taobao.tddl.repo.mysql.cursor.SchematicMyCursor;
+import com.taobao.tddl.repo.mysql.spi.DatasourceMySQLImplement;
 import com.taobao.tddl.repo.mysql.spi.My_Cursor;
 import com.taobao.tddl.repo.mysql.spi.My_JdbcHandler;
 
 /**
- * 这个Handler主要用于处理MySQL类似的逻辑。
+ * mysql 查询逻辑
  * 
- * @author Whisper
+ * @author mengshi.sunmengshi 2013-12-6 上午11:26:49
+ * @since 5.1.0
  */
 public class QueryMyHandler extends QueryHandler implements CommandHandler {
 
     protected DataSourceGetter dsGetter;
 
-    public QueryMyHandler(AndorContext commonConfig2){
-        super(commonConfig2);
+    public QueryMyHandler(){
+        super();
         dsGetter = new DatasourceMySQLImplement();
     }
 
     @SuppressWarnings("rawtypes")
     @Override
-    public ISchematicCursor handle(Map<String, Comparable> context, ISchematicCursor cursor,
-                                   IDataNodeExecutor executor, ExecutionContext executionContext) throws Exception {
-        if (!canComposeOneSql(executor)) return super.handle(context, cursor, executor, executionContext);
-        if (cursor != null) {
-            throw new UnsupportedOperationException();
-        }
+    public ISchematicCursor handle(IDataNodeExecutor executor, ExecutionContext executionContext) throws TddlException {
+        if (!canComposeOneSql(executor)) return super.handle(executor, executionContext);
+
         IndexMeta indexMeta = null;
-        My_JdbcHandler jdbcHandler = CursorMyUtils.getJdbcHandler(dsGetter, context, executor, executionContext);
+        My_JdbcHandler jdbcHandler = CursorMyUtils.getJdbcHandler(dsGetter, executor, executionContext);
 
-        ICursorMeta meta = GeneralUtil.convertToICursorMeta((IQueryCommon) executor);
+        ICursorMeta meta = ExecUtils.convertToICursorMeta((IQueryTree) executor);
 
-        My_Cursor my_cursor = new My_Cursor(jdbcHandler,
-            meta,
-            executor.getGroupDataNode(),
-            executor,
-            executor.isStreaming(),
-            this.andorContext);
+        My_Cursor my_cursor = new My_Cursor(jdbcHandler, meta, executor.getDataNode(), executor, executor.isStreaming());
 
         if (executor.getSql() != null) {
             // TODO shenxun : 排序信息似乎丢了啊。。
@@ -64,22 +59,21 @@ public class QueryMyHandler extends QueryHandler implements CommandHandler {
 
         List<IOrderBy> orderBy = null;
         if (executor instanceof IJoin) {
-            orderBy = ((IJoin) executor).getOrderBy();
-        } else
-        {
+            orderBy = ((IJoin) executor).getOrderBys();
+        } else {
             orderBy = CursorMyUtils.buildOrderBy(executor, indexMeta);
         }
-        
-        orderBy = GeneralUtil.copyOrderBys(orderBy);
+
+        orderBy = ExecUtils.copyOrderBys(orderBy);
 
         for (IOrderBy order : orderBy) {
-            if (((IQueryCommon) executor).getAlias() != null) {
-                order.getColumn().setTableName(((IQueryCommon) executor).getAlias());
+            if (((IQueryTree) executor).getAlias() != null) {
+                order.getColumn().setTableName(((IQueryTree) executor).getAlias());
             }
             if (order.getColumn().getAlias() != null) order.getColumn().setColumnName(order.getColumn().getAlias());
         }
 
-        if ("True".equalsIgnoreCase(GeneralUtil.getExtraCmd(context,
+        if ("True".equalsIgnoreCase(GeneralUtil.getExtraCmd(executionContext.getExtraCmds(),
             ExtraCmd.ExecutionExtraCmd.EXECUTE_QUERY_WHEN_CREATED))) {
             my_cursor.init();
         }
@@ -98,13 +92,13 @@ public class QueryMyHandler extends QueryHandler implements CommandHandler {
     protected boolean canComposeOneSql(IDataNodeExecutor executor) {
         if (executor instanceof IQuery) {
             IQuery iq = (IQuery) executor;
-            IQueryCommon iqc = iq.getSubQuery();
+            IQueryTree iqc = iq.getSubQuery();
             if (iqc == null) {
                 return true;
             }
-            String groupNode1 = iq.getGroupDataNode();
-            String groupNode2 = iqc.getGroupDataNode();
-            if (StringUtil.equals(groupNode1, groupNode2)) {
+            String groupNode1 = iq.getDataNode();
+            String groupNode2 = iqc.getDataNode();
+            if (TStringUtil.equals(groupNode1, groupNode2)) {
                 return isConsistent(iqc, groupNode1);
             } else {
                 return false;
@@ -114,15 +108,15 @@ public class QueryMyHandler extends QueryHandler implements CommandHandler {
         }
     }
 
-    private boolean isConsistent(IQueryCommon iqc, String groupNode1) {
+    private boolean isConsistent(IQueryTree iqc, String groupNode1) {
         if (iqc instanceof IQuery) {
             IQuery iq = (IQuery) iqc;
-            IQueryCommon iqc1 = iq.getSubQuery();
+            IQueryTree iqc1 = iq.getSubQuery();
             if (iqc1 == null) {
                 return true;
             } else {
-                String groupNode2 = iqc.getGroupDataNode();
-                if (StringUtil.equals(groupNode1, groupNode2)) {
+                String groupNode2 = iqc.getDataNode();
+                if (TStringUtil.equals(groupNode1, groupNode2)) {
                     return isConsistent(iqc, groupNode1);
                 } else {
                     return false;

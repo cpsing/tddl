@@ -1,7 +1,6 @@
 package com.taobao.tddl.repo.mysql.spi;
 
 import java.sql.SQLException;
-import java.util.Map;
 
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -89,7 +88,7 @@ public interface GeneralQueryHandler {
      * @return
      * @throws Exception
      */
-    public abstract boolean skipTo(CloneableRecord key, ICursorMeta indexMeta) throws Exception;
+    public abstract boolean skipTo(CloneableRecord key, ICursorMeta indexMeta) throws SQLException;
 
     /**
      * 指针下移 返回null则表示没有后项了
@@ -97,7 +96,7 @@ public interface GeneralQueryHandler {
      * @return
      * @throws Exception
      */
-    public abstract IRowSet next() throws Exception;
+    public abstract IRowSet next() throws SQLException;
 
     /**
      * 最开始的row
@@ -105,7 +104,7 @@ public interface GeneralQueryHandler {
      * @return
      * @throws Exception
      */
-    public abstract IRowSet first() throws Exception;
+    public abstract IRowSet first() throws SQLException;
 
     /**
      * 最后一个row
@@ -113,7 +112,7 @@ public interface GeneralQueryHandler {
      * @return
      * @throws Exception
      */
-    public abstract IRowSet last() throws Exception;
+    public abstract IRowSet last() throws SQLException;
 
     /**
      * 获取当前row
@@ -135,7 +134,7 @@ public interface GeneralQueryHandler {
      * @return
      * @throws Exception
      */
-    public abstract IRowSet prev() throws Exception;
+    public abstract IRowSet prev() throws SQLException;
 
     /**
      * 执行一个update语句
@@ -144,8 +143,8 @@ public interface GeneralQueryHandler {
      * @return
      * @throws SQLException
      */
-    public void executeUpdate(Map<String, Comparable> context, ExecutionContext executionContext, IPut put,
-                              Table table, IndexMeta meta) throws SQLException;
+    public void executeUpdate(ExecutionContext executionContext, IPut put, Table table, IndexMeta meta)
+                                                                                                       throws SQLException;
 
     /**
      * 执行一个update语句

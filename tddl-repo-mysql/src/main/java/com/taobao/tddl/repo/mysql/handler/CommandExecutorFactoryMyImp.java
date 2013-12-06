@@ -1,8 +1,5 @@
 package com.taobao.tddl.repo.mysql.handler;
 
-import java.util.Map;
-
-import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.handler.IndexNestedLoopJoinHandler;
 import com.taobao.tddl.executor.handler.MergeHandler;
 import com.taobao.tddl.executor.handler.NestedLoopJoinHandler;
@@ -50,8 +47,7 @@ public class CommandExecutorFactoryMyImp implements CommandExecutorFactory {
     private final CommandHandler SORT_MERGE_JOIN_HANDLER;
 
     @Override
-    public CommandHandler getCommandHandler(Map<String, Comparable> context, ISchematicCursor cursor,
-                                            IDataNodeExecutor executor, ExecutionContext executionContext) {
+    public CommandHandler getCommandHandler(IDataNodeExecutor executor, ExecutionContext executionContext) {
         if (executor instanceof IQuery) {
             return QUERY_HANDLER;
         } else if (executor instanceof IMerge) {
@@ -92,18 +88,10 @@ public class CommandExecutorFactoryMyImp implements CommandExecutorFactory {
         }
     }
 
-    public AndorContext getCommonConfig() {
-        return commonConfig;
-    }
-
-    public void setCommonConfig(AndorContext commonConfig) {
-        this.commonConfig = commonConfig;
-    }
-
     private boolean isCondensable(IDataNodeExecutor executor) {
         IJoin ijoin = (IJoin) executor;
-        String leftNode = ijoin.getLeftNode().getGroupDataNode();
-        String rightNode = ijoin.getRightNode().getGroupDataNode();
+        String leftNode = ijoin.getLeftNode().getDataNode();
+        String rightNode = ijoin.getRightNode().getDataNode();
         if (leftNode == null || rightNode == null) {
             return false;
         } else if (!leftNode.equals(rightNode)) {

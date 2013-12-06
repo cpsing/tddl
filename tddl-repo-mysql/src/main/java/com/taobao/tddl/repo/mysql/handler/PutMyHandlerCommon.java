@@ -35,9 +35,8 @@ public abstract class PutMyHandlerCommon extends HandlerCommon {
 
     public Log                 logger = LogFactory.getLog(PutMyHandlerCommon.class);
 
-    @SuppressWarnings("rawtypes")
-    public ISchematicCursor handle(ISchematicCursor cursor, IDataNodeExecutor executor,
-                                   ExecutionContext executionContext) throws Exception {
+    @Override
+    public ISchematicCursor handle(IDataNodeExecutor executor, ExecutionContext executionContext) throws TddlException {
         long time = System.currentTimeMillis();
         IPut put = (IPut) executor;
         My_JdbcHandler jdbcHandler = CursorMyUtils.getJdbcHandler(dsGetter, executor, executionContext);
@@ -61,7 +60,7 @@ public abstract class PutMyHandlerCommon extends HandlerCommon {
 
                 rollback(executionContext, transaction);
             }
-            throw e;
+            throw new TddlException(e);
         }
         time = Monitor.monitorAndRenewTime(Monitor.KEY1, Monitor.ServerPut, Monitor.Key3Success, time);
         return result;

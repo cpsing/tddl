@@ -16,12 +16,19 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.taobao.tddl.atom.jdbc.TConnectionWrapper;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.ExceptionErrorCodeUtils;
 import com.taobao.tddl.executor.common.AtomicNumberCreator;
+import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.spi.ITHLog;
 import com.taobao.tddl.executor.spi.Transaction;
+import com.taobao.tddl.group.jdbc.TGroupConnection;
 
+/**
+ * @author mengshi.sunmengshi 2013-12-6 上午11:31:29
+ * @since 5.1.0
+ */
 public class My_Transaction implements Transaction {
 
     private AtomicNumberCreator             idGen                 = AtomicNumberCreator.getNewInstance();

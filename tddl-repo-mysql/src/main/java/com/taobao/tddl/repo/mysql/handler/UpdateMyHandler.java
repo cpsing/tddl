@@ -1,19 +1,24 @@
 package com.taobao.tddl.repo.mysql.handler;
 
+import java.sql.SQLException;
+
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.spi.ExecutionContext;
 import com.taobao.tddl.executor.spi.Table;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.plan.IPut;
 import com.taobao.tddl.repo.mysql.spi.My_JdbcHandler;
-import com.taobao.tddl.repo.mysql.spi.My_Log;
 
 /**
  * @author mengshi.sunmengshi 2013-12-5 下午6:28:28
  * @since 5.1.0
  */
 public class UpdateMyHandler extends PutMyHandlerCommon {
+
+    private static final Logger log = LoggerFactory.getLogger(UpdateMyHandler.class);
 
     public UpdateMyHandler(){
         super();
@@ -24,9 +29,13 @@ public class UpdateMyHandler extends PutMyHandlerCommon {
     protected ISchematicCursor executePut(ExecutionContext executionContext, IPut put, Table table, IndexMeta meta,
                                           My_JdbcHandler myJdbcHandler) throws TddlException {
         if (put.getQueryTree() == null) {
-            My_Log.getLog().warn("注意，做了全表更新操作");
+            log.warn("注意，做了全表更新操作");
         }
-        myJdbcHandler.executeUpdate(context, executionContext, put, table, meta);
+        try {
+            myJdbcHandler.executeUpdate(executionContext, put, table, meta);
+        } catch (SQLException e) {
+            throw new TddlException(e);
+        }
         return myJdbcHandler.getResultCursor();
     }
 }

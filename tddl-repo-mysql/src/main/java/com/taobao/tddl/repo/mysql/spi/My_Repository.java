@@ -5,27 +5,33 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.ExceptionErrorCodeUtils;
 import com.taobao.tddl.executor.spi.CommandExecutorFactory;
 import com.taobao.tddl.executor.spi.CursorFactory;
 import com.taobao.tddl.executor.spi.DataSourceGetter;
 import com.taobao.tddl.executor.spi.RemotingExecutor;
+import com.taobao.tddl.executor.spi.RepositoryConfig;
 import com.taobao.tddl.executor.spi.Repository;
+import com.taobao.tddl.executor.spi.Table;
+import com.taobao.tddl.executor.spi.TempTable;
 import com.taobao.tddl.executor.spi.Transaction;
 import com.taobao.tddl.executor.spi.TransactionConfig;
+import com.taobao.tddl.group.jdbc.TGroupDataSource;
+import com.taobao.tddl.optimizer.config.Group;
+import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.repo.mysql.handler.CommandExecutorFactoryMyImp;
 
-public class My_Reponsitory implements Repository {
+public class My_Repository implements Repository {
 
-    protected AndorContext           commonRuntimeConfigHolder;
     Map<String, Table>               tables   = new ConcurrentHashMap<String, Table>();
-    ServerConfig                     config;
+    RepositoryConfig                       config;
     private CursorFactoryMyImpl      cfm;
     protected CommandExecutorFactory cef      = null;
     protected DataSourceGetter       dsGetter = new DatasourceMySQLImplement();
 
     @Override
-    public Table getTable(TableSchema meta, String groupNode, long requestID) throws Exception {
+    public Table getTable(TableMeta meta, String groupNode, long requestID) throws TddlException {
 
         Table table = tables.get(groupNode);
         if (table == null) {
@@ -35,9 +41,9 @@ public class My_Reponsitory implements Repository {
                     try {
                         table = initTable(meta, groupNode);
                     } catch (Exception ex) {
-                        throw new UstoreException(ExceptionErrorCodeUtils.Read_only, ex);
+                        throw new TddlException(ExceptionErrorCodeUtils.Read_only, ex);
                     }
-                    if (!meta.getTmp()) {
+                    if (!meta.isTmp()) {
                         tables.put(groupNode, table);
                     }
                 }
@@ -60,8 +66,8 @@ public class My_Reponsitory implements Repository {
     //
     // return ds;
     // }
-    public Table initTable(TableSchema meta, String groupNode) throws Exception {
-        DataSource ds = dsGetter.getDatasourceByGroupNode(commonRuntimeConfigHolder, groupNode);
+    public Table initTable(TableMeta meta, String groupNode) throws Exception {
+        DataSource ds = dsGetter.getDataSource(groupNode);
         Table table = new My_Table(ds, meta, groupNode);
         return table;
     }
@@ -72,7 +78,7 @@ public class My_Reponsitory implements Repository {
     }
 
     @Override
-    public Transaction beginTransaction(TransactionConfig tc) throws Exception {
+    public Transaction beginTransaction(TransactionConfig tc) throws TddlException {
         My_Transaction my = new My_Transaction();
         my.beginTransaction();
         return my;
@@ -83,7 +89,7 @@ public class My_Reponsitory implements Repository {
         return null;
     }
 
-    public QueryEngineCommonConf getServerConfig() {
+    public RepositoryConfig getRepoConfig() {
         return config;
     }
 
@@ -103,14 +109,12 @@ public class My_Reponsitory implements Repository {
     }
 
     @Override
-    public void init(ServerConfig conf, AndorContext commonConfig) {
+    public void init(RepositoryConfig conf) {
         this.config = conf;
 
-        this.commonRuntimeConfigHolder = commonConfig;
+        cfm = new CursorFactoryMyImpl();
 
-        cfm = new CursorFactoryMyImpl(this.commonRuntimeConfigHolder);
-
-        cef = new CommandExecutorFactoryMyImp(commonConfig);
+        cef = new CommandExecutorFactoryMyImp();
 
     }
 
@@ -118,12 +122,12 @@ public class My_Reponsitory implements Repository {
         return false;
     }
 
-    public void renameTable(TableSchema schema, String newName) throws Exception {
+    public void renameTable(TableMeta schema, String newName) throws Exception {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     // @Override
-    // public boolean removeTable(TableSchema name) throws Exception {
+    // public boolean removeTable(TableMeta name) throws Exception {
     // throw new UnsupportedOperationException("Not supported yet.");
     // }
     //
@@ -133,7 +137,7 @@ public class My_Reponsitory implements Repository {
     // }
 
     // @Override
-    // public Table getTable(TableSchema meta, String groupNode,
+    // public Table getTable(TableMeta meta, String groupNode,
     // boolean isTempTable, long requestID) throws Exception {
     // if (isTempTable) {
     // throw new UnsupportedOperationException("can't create table ");
@@ -143,17 +147,17 @@ public class My_Reponsitory implements Repository {
 
     @Override
     public RemotingExecutor buildRemoting(Group group) {
-        TGroupDataSource groupDS = new TGroupDataSource(group.getMy_groupName(), group.getMy_appName());
+        TGroupDataSource groupDS = new TGroupDataSource(group.getName(), group.getAppName());
         groupDS.init();
         RemotingExecutor executor = new RemotingExecutor();
-        executor.setGroupName(group.getGroupName());
+        executor.setGroupName(group.getName());
         executor.setRemotingExecutableObject(groupDS);
-        executor.setType(Group.MY_JDBC);
+        executor.setType(Group.GroupType.MYSQL_JDBC);
         return executor;
     }
 
     @Override
-    public AndorContext getCommonRuntimeConfigHolder() {
-        return commonRuntimeConfigHolder;
+    public TempTable createTempTable() {
+        throw new UnsupportedOperationException("temp table is not supported by mysql repo");
     }
 }

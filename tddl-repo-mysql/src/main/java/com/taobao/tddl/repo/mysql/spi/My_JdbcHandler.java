@@ -16,6 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.jdbc.ParameterMethod;
 import com.taobao.tddl.common.utils.logger.Logger;
@@ -202,8 +203,8 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         return myTransaction.autoCommit;
     }
 
-    public void executeUpdate(Map<String, Comparable> context, ExecutionContext executionContext, IPut put,
-                              Table table, IndexMeta meta) throws SQLException {
+    public void executeUpdate(ExecutionContext executionContext, IPut put, Table table, IndexMeta meta)
+                                                                                                       throws SQLException {
 
         MysqlPlanVisitorImpl visitor = new MysqlPlanVisitorImpl(put, null, null, true);
         put.accept(visitor);
@@ -441,7 +442,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
      * com.taobao.ustore.common.inner.ICursorMeta)
      */
     @Override
-    public boolean skipTo(CloneableRecord key, ICursorMeta indexMeta) throws TddlException {
+    public boolean skipTo(CloneableRecord key, ICursorMeta indexMeta) throws SQLException {
 
         checkInitedInRsNext();
         throw new RuntimeException("暂时不支持skip to");
@@ -463,9 +464,9 @@ public class My_JdbcHandler implements GeneralQueryHandler {
      * @see com.taobao.ustore.jdbc.mysql.generalQueryHandler#next()
      */
     @Override
-    public IRowSet next() throws TddlException {
+    public IRowSet next() throws SQLException {
         if (ds == null) {
-            throw new TddlException("数据源为空");
+            throw new TddlRuntimeException("数据源为空");
         }
 
         checkInitedInRsNext();
@@ -476,15 +477,12 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         } catch (Exception ex) {
             return null;
         }
-        try {
-            if (resultSet.next()) {
-                current = My_Convertor.convert(resultSet, cursorMeta);
-            } else {
-                current = null;
-            }
-        } catch (SQLException e) {
-            throw new TddlException(e);
+        if (resultSet.next()) {
+            current = My_Convertor.convert(resultSet, cursorMeta);
+        } else {
+            current = null;
         }
+
         return current;
     }
 
@@ -512,15 +510,11 @@ public class My_JdbcHandler implements GeneralQueryHandler {
      * @see com.taobao.ustore.jdbc.mysql.generalQueryHandler#first()
      */
     @Override
-    public IRowSet first() throws TddlException {
-        try {
-            resultSet.beforeFirst();
-            resultSet.next();
-            current = My_Convertor.convert(resultSet, cursorMeta);
-            return current;
-        } catch (SQLException e) {
-            throw new TddlException(e);
-        }
+    public IRowSet first() throws SQLException {
+        resultSet.beforeFirst();
+        resultSet.next();
+        current = My_Convertor.convert(resultSet, cursorMeta);
+        return current;
 
     }
 
@@ -529,15 +523,11 @@ public class My_JdbcHandler implements GeneralQueryHandler {
      * @see com.taobao.ustore.jdbc.mysql.generalQueryHandler#last()
      */
     @Override
-    public IRowSet last() throws TddlException {
-        try {
-            resultSet.afterLast();
-            resultSet.previous();
-            current = My_Convertor.convert(resultSet, cursorMeta);
-            return current;
-        } catch (SQLException e) {
-            throw new TddlException(e);
-        }
+    public IRowSet last() throws SQLException {
+        resultSet.afterLast();
+        resultSet.previous();
+        current = My_Convertor.convert(resultSet, cursorMeta);
+        return current;
 
     }
 
@@ -565,7 +555,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         return executionType != null;
     }
 
-    public void beforeFirst() throws TddlException {
+    public void beforeFirst() throws SQLException {
         this.closeResultSetAndConnection();
         this.executeQuery(cursorMeta, isStreaming);
         current = null;
@@ -579,29 +569,23 @@ public class My_JdbcHandler implements GeneralQueryHandler {
      * @see com.taobao.ustore.jdbc.mysql.generalQueryHandler#prev()
      */
     @Override
-    public IRowSet prev() throws TddlException {
+    public IRowSet prev() throws SQLException {
         if (ds == null) {
 
-            throw new TddlException("数据源为空");
+            throw new TddlRuntimeException("数据源为空");
         }
         if (!initPrev) {
             initPrev = true;
-            try {
-                return convertRowSet(resultSet.last());
-            } catch (SQLException e) {
-                throw new TddlException(e);
-            }
+            return convertRowSet(resultSet.last());
+
         }
         checkInitedInRsNext();
 
-        try {
-            return convertRowSet(resultSet.previous());
-        } catch (SQLException e) {
-            throw new TddlException(e);
-        }
+        return convertRowSet(resultSet.previous());
+
     }
 
-    protected IRowSet convertRowSet(boolean isOk) throws TddlException {
+    protected IRowSet convertRowSet(boolean isOk) throws SQLException {
         prev_kv = current;
         if (isOk) {
             current = My_Convertor.convert(resultSet, cursorMeta);
@@ -621,7 +605,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         return true;
     }
 
-    public IRowSet next(long timeout, TimeUnit unit) throws TddlException {
+    public IRowSet next(long timeout, TimeUnit unit) throws SQLException {
         // TODO shenxun : 如果真的需要可能需要用外部线程interrupted掉网络io等待。
         return next();
     }

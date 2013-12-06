@@ -1,19 +1,21 @@
 package com.taobao.tddl.executor.spi;
 
+import com.taobao.tddl.optimizer.config.Group;
+
 public class RemotingExecutor {
 
     /**
      * 对应的group名字
      */
-    private String groupName;
+    private String          groupName;
     /**
      * 类型
      */
-    private String type;
+    private Group.GroupType type;
     /**
      * 可能是个datasource ，也可能是个rpc客户端。放在一起的原因是
      */
-    private Object remotingExecutableObject;
+    private Object          remotingExecutableObject;
 
     public String getGroupName() {
         return groupName;
@@ -23,11 +25,11 @@ public class RemotingExecutor {
         this.groupName = groupName;
     }
 
-    public String getType() {
+    public Group.GroupType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Group.GroupType type) {
         this.type = type;
     }
 

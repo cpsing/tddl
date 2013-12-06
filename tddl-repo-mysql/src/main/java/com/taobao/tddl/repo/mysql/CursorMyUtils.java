@@ -78,7 +78,7 @@ public class CursorMyUtils {
         DataSource ds;
         My_JdbcHandler jdbcHandler = new My_JdbcHandler(executionContext);
 
-        ds = dsGetter.getDataSource(executionContext, executor.getDataNode());
+        ds = dsGetter.getDataSource(executor.getDataNode());
         My_Transaction my_transaction = null;
         Transaction txn = executionContext.getTransaction();
         if (txn != null) {
@@ -94,7 +94,6 @@ public class CursorMyUtils {
         jdbcHandler.setGroupName(executor.getDataNode());
         jdbcHandler.setStrongConsistent(false);
         jdbcHandler.setMyTransaction(my_transaction);
-        jdbcHandler.setExtraCmd(context);
         jdbcHandler.setPlan(executor);
         return jdbcHandler;
     }
