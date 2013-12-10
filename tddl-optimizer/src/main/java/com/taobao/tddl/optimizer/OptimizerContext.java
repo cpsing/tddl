@@ -1,7 +1,7 @@
 package com.taobao.tddl.optimizer;
 
+import com.taobao.tddl.common.model.Matrix;
 import com.taobao.tddl.common.utils.thread.ThreadLocalMap;
-import com.taobao.tddl.optimizer.config.Matrix;
 import com.taobao.tddl.optimizer.config.table.IndexManager;
 import com.taobao.tddl.optimizer.config.table.SchemaManager;
 import com.taobao.tddl.optimizer.rule.OptimizerRule;

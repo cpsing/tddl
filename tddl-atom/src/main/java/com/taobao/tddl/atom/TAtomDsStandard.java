@@ -5,6 +5,8 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import com.taobao.tddl.common.model.Atom;
+
 public interface TAtomDsStandard extends DataSource {
 
     /**
@@ -24,5 +26,9 @@ public interface TAtomDsStandard extends DataSource {
     public TAtomDbStatusEnum getDbStatus();
 
     public void destroyDataSource() throws Exception;
+
+    public void setAtom(Atom atom);
+
+    public Atom getAtom();
 
 }

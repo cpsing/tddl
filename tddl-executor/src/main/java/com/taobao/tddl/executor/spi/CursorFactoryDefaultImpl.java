@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.ExtraCmd;
+import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.ExecutorContext;
 import com.taobao.tddl.executor.common.ExecutionContext;
@@ -41,7 +42,6 @@ import com.taobao.tddl.executor.cursor.impl.SetOrderByCursor;
 import com.taobao.tddl.executor.cursor.impl.SortMergeJoinCursor1;
 import com.taobao.tddl.executor.cursor.impl.TempTableSortCursor;
 import com.taobao.tddl.executor.cursor.impl.ValueFilterCursor;
-import com.taobao.tddl.optimizer.config.Group;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;

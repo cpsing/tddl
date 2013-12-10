@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 
 import com.taobao.tddl.atom.common.TAtomConstants;
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.model.Atom;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.config.ConfigDataHandler;
@@ -20,17 +21,22 @@ import com.taobao.tddl.config.impl.ConfigDataHandlerCity;
  * 
  * @author qihao
  */
-public class DiamondDbPasswdManager implements DbPasswdManager {
+public class AtomPasswdManager implements DbPasswdManager {
 
-    private static Logger                     logger             = LoggerFactory.getLogger(DiamondDbPasswdManager.class);
+    private static Logger                     logger             = LoggerFactory.getLogger(AtomPasswdManager.class);
     private String                            passwdConfDataId;
     private String                            unitName;
     private ConfigDataHandlerFactory          configFactory;
     private ConfigDataHandler                 passwdHandler;
     private volatile List<ConfigDataListener> passwdConfListener = new ArrayList<ConfigDataListener>();
+    private Atom                              atom;
 
     public void init(String appName) {
-        configFactory = ConfigDataHandlerCity.getFactory(appName, unitName);
+        Map<String, String> localValues = null;
+        if (this.atom != null) {
+            localValues = atom.getProperties();
+        }
+        configFactory = ConfigDataHandlerCity.getFactory(appName, unitName, localValues);
         Map<String, Object> config = new HashMap<String, Object>();
         config.put("group", TAtomConstants.DEFAULT_DIAMOND_GROUP);
         passwdHandler = configFactory.getConfigDataHandler(passwdConfDataId,
@@ -69,5 +75,10 @@ public class DiamondDbPasswdManager implements DbPasswdManager {
         if (null != this.passwdHandler) {
             this.passwdHandler.destory();
         }
+    }
+
+    public void setAtom(Atom atom) {
+        this.atom = atom;
+
     }
 }

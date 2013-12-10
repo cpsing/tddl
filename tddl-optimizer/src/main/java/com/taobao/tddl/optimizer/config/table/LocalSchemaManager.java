@@ -12,6 +12,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.TddlToStringStyle;
+import com.taobao.tddl.config.ConfigDataHandler;
 import com.taobao.tddl.optimizer.config.table.parse.TableMetaParser;
 
 /**
@@ -20,6 +21,10 @@ import com.taobao.tddl.optimizer.config.table.parse.TableMetaParser;
  * @since 5.1.0
  */
 public class LocalSchemaManager extends AbstractLifecycle implements SchemaManager {
+
+    private ConfigDataHandler        schemaCdh;
+    private String                   schemaFilePath = null;
+    private String                   appName        = null;
 
     protected Map<String, TableMeta> ss;
 

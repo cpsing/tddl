@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.DataSource;
 
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.common.utils.ExceptionErrorCodeUtils;
 import com.taobao.tddl.executor.common.TransactionConfig;
 import com.taobao.tddl.executor.repo.RepositoryConfig;
@@ -18,7 +19,6 @@ import com.taobao.tddl.executor.spi.ITable;
 import com.taobao.tddl.executor.spi.ITempTable;
 import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.group.jdbc.TGroupDataSource;
-import com.taobao.tddl.optimizer.config.Group;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.repo.mysql.executor.TddlGroupExecutor;
 import com.taobao.tddl.repo.mysql.handler.CommandExecutorFactoryMyImp;
@@ -102,9 +102,10 @@ public class My_Repository implements IRepository {
     }
 
     @Override
-    public void init(RepositoryConfig conf) {
-        this.config = conf;
-
+    public void init() {
+        this.config = new RepositoryConfig();
+        this.config.setProperty(RepositoryConfig.DEFAULT_TXN_ISOLATION, "READ_COMMITTED");
+        this.config.setProperty(RepositoryConfig.IS_TRANSACTIONAL, "true");
         cfm = new CursorFactoryMyImpl();
 
         cef = new CommandExecutorFactoryMyImp();
@@ -122,7 +123,11 @@ public class My_Repository implements IRepository {
     @Override
     public IGroupExecutor buildGroupExecutor(Group group) {
         TGroupDataSource groupDS = new TGroupDataSource(group.getName(), group.getAppName());
+
+        groupDS.setGroup(group);
+
         groupDS.init();
+
         TddlGroupExecutor executor = new TddlGroupExecutor();
         executor.setGroup(group);
         executor.setRemotingExecutableObject(groupDS);

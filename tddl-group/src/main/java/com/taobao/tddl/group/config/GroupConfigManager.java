@@ -23,8 +23,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.tddl.atom.TAtomDataSource;
 import com.taobao.tddl.atom.TAtomDbStatusEnum;
 import com.taobao.tddl.atom.TAtomDsStandard;
+import com.taobao.tddl.common.model.Atom;
 import com.taobao.tddl.common.model.DBType;
 import com.taobao.tddl.common.model.DataSourceType;
+import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
@@ -62,11 +64,11 @@ import com.taobao.tddl.group.listener.DataSourceChangeListener;
  * @author yangzhu
  * @author linxuan refactor
  */
-public class ConfigManager {
+public class GroupConfigManager {
 
-    private static final Logger                                                    logger                = LoggerFactory.getLogger(ConfigManager.class);
+    private static final Logger                                                    logger                = LoggerFactory.getLogger(GroupConfigManager.class);
 
-    private final ConfigDataListener                                               configReceiver;                                                      // //动态接收Diamond推送过来的信息
+    private final ConfigDataListener                                               configReceiver;                                                           // //动态接收Diamond推送过来的信息
     private ConfigDataHandlerFactory                                               configFactory;
     private ConfigDataHandler                                                      globalHandler;
 
@@ -83,7 +85,7 @@ public class ConfigManager {
 
     private volatile GroupExtraConfig                                              groupExtraConfig      = new GroupExtraConfig();
 
-    public ConfigManager(TGroupDataSource tGroupDataSource){
+    public GroupConfigManager(TGroupDataSource tGroupDataSource){
         this.tGroupDataSource = tGroupDataSource;
         this.configReceiver = new ConfigReceiver();
         this.extraGroupConfigReceiver = new ExtraGroupConfigReceiver();
@@ -104,14 +106,25 @@ public class ConfigManager {
         // 单纯group ds批量效果不大，且同一个appName
         // initConfigHoderFactory();
 
-        configFactory = ConfigDataHandlerCity.getFactory(tGroupDataSource.getAppName(), tGroupDataSource.getUnitName());
+        Group group = this.tGroupDataSource.getGroup();
+
+        Map<String, String> localValues = null;
+
+        if (group != null) localValues = group.getProperties();
+
+        configFactory = ConfigDataHandlerCity.getFactory(tGroupDataSource.getAppName(),
+            tGroupDataSource.getUnitName(),
+            localValues);
         globalHandler = configFactory.getConfigDataHandler(tGroupDataSource.getFullDbGroupKey(), null);
 
         String dsWeightCommaStr = globalHandler.getData(tGroupDataSource.getConfigReceiveTimeout(),
             ConfigDataHandler.FIRST_CACHE_THEN_SERVER_STRATEGY);
 
         // extra config
-        extraFactory = ConfigDataHandlerCity.getFactory(tGroupDataSource.getAppName(), tGroupDataSource.getUnitName());
+        extraFactory = ConfigDataHandlerCity.getFactory(tGroupDataSource.getAppName(),
+            tGroupDataSource.getUnitName(),
+            localValues);
+
         extraHandler = extraFactory.getConfigDataHandler(tGroupDataSource.getDbGroupExtraConfigKey(), null);
         String extraConfig = extraHandler.getNullableData(tGroupDataSource.getConfigReceiveTimeout(),
             ConfigDataHandler.FIRST_CACHE_THEN_SERVER_STRATEGY);
@@ -146,10 +159,20 @@ public class ConfigManager {
         try {
 
             if (tGroupDataSource.getDataSourceType().equals(DataSourceType.DruidDataSource)) {
+
+                Atom atom = null;
+
+                if (this.tGroupDataSource.getGroup() != null) {
+                    atom = this.tGroupDataSource.getGroup().getAtom(dsKey);
+                }
+
                 TAtomDsStandard atomDataSource = new TAtomDataSource();
+
+                atomDataSource.setAtom(atom);
                 atomDataSource.init(appName, dsKey, unitName);
                 atomDataSource.setLogWriter(tGroupDataSource.getLogWriter());
                 atomDataSource.setLoginTimeout(tGroupDataSource.getLoginTimeout());
+
                 return atomDataSource;
             } else {
                 throw new IllegalArgumentException("do not have this datasource type : "
@@ -638,9 +661,9 @@ public class ConfigManager {
 
     private class ConfigReceiver implements ConfigDataListener {
 
-        private ConfigManager configManager;
+        private GroupConfigManager configManager;
 
-        public void setConfigManager(ConfigManager configManager) {
+        public void setConfigManager(GroupConfigManager configManager) {
             this.configManager = configManager;
         }
 

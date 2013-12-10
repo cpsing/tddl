@@ -12,8 +12,9 @@ import javax.sql.DataSource;
 import com.taobao.tddl.common.TddlConstants;
 import com.taobao.tddl.common.model.DBType;
 import com.taobao.tddl.common.model.DataSourceType;
+import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.common.utils.mbean.TddlMBeanServer;
-import com.taobao.tddl.group.config.ConfigManager;
+import com.taobao.tddl.group.config.GroupConfigManager;
 import com.taobao.tddl.group.dbselector.DBSelector;
 import com.taobao.tddl.group.exception.TGroupDataSourceException;
 import com.taobao.tddl.group.listener.DataSourceChangeListener;
@@ -39,14 +40,16 @@ import com.taobao.tddl.monitor.Monitor;
  */
 public class TGroupDataSource implements DataSource {
 
-    private ConfigManager     configManager;
+    private GroupConfigManager configManager;
 
     /**
      * 下面三个为一组，支持本地配置
      */
-    private String            dsKeyAndWeightCommaArray;
-    private DataSourceFetcher dataSourceFetcher;
-    private DBType            dbType = DBType.MYSQL;
+    private String             dsKeyAndWeightCommaArray;
+    private DataSourceFetcher  dataSourceFetcher;
+    private DBType             dbType = DBType.MYSQL;
+
+    private Group              group  = null;
 
     public TGroupDataSource(){
     }
@@ -83,11 +86,11 @@ public class TGroupDataSource implements DataSource {
                     return type == null ? dbType : type; // 如果dataSourceFetcher没dbType，用tgds的dbType
                 }
             };
-            List<DataSourceWrapper> dss = ConfigManager.buildDataSourceWrapper(dsKeyAndWeightCommaArray, wrapper);
+            List<DataSourceWrapper> dss = GroupConfigManager.buildDataSourceWrapper(dsKeyAndWeightCommaArray, wrapper);
             init(dss);
         } else {
             checkProperties();
-            configManager = new ConfigManager(this);
+            configManager = new GroupConfigManager(this);
             configManager.init();
         }
 
@@ -99,13 +102,13 @@ public class TGroupDataSource implements DataSource {
     }
 
     public void init(List<DataSourceWrapper> dataSourceWrappers) {
-        configManager = new ConfigManager(this);
+        configManager = new GroupConfigManager(this);
         configManager.init(dataSourceWrappers);
     }
 
     public static TGroupDataSource build(String groupKey, String dsWeights, DataSourceFetcher fetcher,
                                          DataSourceType dataSourceType) {
-        List<DataSourceWrapper> dss = ConfigManager.buildDataSourceWrapper(dsWeights, fetcher);
+        List<DataSourceWrapper> dss = GroupConfigManager.buildDataSourceWrapper(dsWeights, fetcher);
         TGroupDataSource tGroupDataSource = new TGroupDataSource();
         tGroupDataSource.setDataSourceType(dataSourceType);
         tGroupDataSource.setDbGroupKey(groupKey);
@@ -387,4 +390,13 @@ public class TGroupDataSource implements DataSource {
 
     }
 
+    public void setGroup(Group group)
+
+    {
+        this.group = group;
+    }
+
+    public Group getGroup() {
+        return this.group;
+    }
 }

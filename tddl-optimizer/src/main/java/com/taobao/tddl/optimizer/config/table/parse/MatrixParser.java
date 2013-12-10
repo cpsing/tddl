@@ -14,11 +14,11 @@ import org.w3c.dom.NodeList;
 
 import com.google.common.collect.Lists;
 import com.taobao.tddl.common.exception.NotSupportException;
+import com.taobao.tddl.common.model.Atom;
+import com.taobao.tddl.common.model.Group;
+import com.taobao.tddl.common.model.Matrix;
+import com.taobao.tddl.common.model.Group.GroupType;
 import com.taobao.tddl.common.utils.XmlHelper;
-import com.taobao.tddl.optimizer.config.Atom;
-import com.taobao.tddl.optimizer.config.Group;
-import com.taobao.tddl.optimizer.config.Group.GroupType;
-import com.taobao.tddl.optimizer.config.Matrix;
 
 /**
  * 解析matrix配置

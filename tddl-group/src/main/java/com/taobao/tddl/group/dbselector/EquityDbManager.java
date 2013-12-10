@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
-import com.taobao.tddl.group.config.ConfigManager;
+import com.taobao.tddl.group.config.GroupConfigManager;
 import com.taobao.tddl.group.config.GroupExtraConfig;
 import com.taobao.tddl.group.exception.NoMoreDataSourceException;
 import com.taobao.tddl.group.jdbc.DataSourceWrapper;
@@ -146,7 +146,7 @@ public class EquityDbManager extends AbstractDBSelector {
                 continue;
             }
             // TODO 有必要每次都检查DataSource的状态吗 检查一下数据源，如果是NA或往一个只读的库中写记录都要重试下一个数据源
-            if (!ConfigManager.isDataSourceAvailable(dsHolder.dsw, this.readable)) {
+            if (!GroupConfigManager.isDataSourceAvailable(dsHolder.dsw, this.readable)) {
                 excludeKeys.add(name);
                 i--; // 这次不算重试次数
                 continue;

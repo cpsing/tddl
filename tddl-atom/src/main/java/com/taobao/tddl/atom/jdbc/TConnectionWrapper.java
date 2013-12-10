@@ -36,6 +36,10 @@ public class TConnectionWrapper implements Connection {
         this.dataSourceWrapper = dataSourceWrapper;
     }
 
+    public Connection getTargetConnection() {
+        return targetConnection;
+    }
+
     public void clearWarnings() throws SQLException {
         this.targetConnection.clearWarnings();
     }

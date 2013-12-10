@@ -10,7 +10,7 @@ import org.junit.BeforeClass;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.jdbc.ParameterMethod;
-import com.taobao.tddl.optimizer.config.Matrix;
+import com.taobao.tddl.common.model.Matrix;
 import com.taobao.tddl.optimizer.config.MockRepoIndexManager;
 import com.taobao.tddl.optimizer.config.table.LocalSchemaManager;
 import com.taobao.tddl.optimizer.config.table.RepoSchemaManager;

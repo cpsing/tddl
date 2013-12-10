@@ -1,4 +1,4 @@
-package com.taobao.tddl.optimizer.config;
+package com.taobao.tddl.common.model;
 
 import java.util.HashMap;
 import java.util.Map;

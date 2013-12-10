@@ -9,12 +9,12 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.model.Matrix;
 import com.taobao.tddl.common.model.lifecycle.Lifecycle;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.MatrixExecutor;
 import com.taobao.tddl.optimizer.OptimizerContext;
-import com.taobao.tddl.optimizer.config.Matrix;
 import com.taobao.tddl.optimizer.config.MockRepoIndexManager;
 import com.taobao.tddl.optimizer.config.table.LocalSchemaManager;
 import com.taobao.tddl.optimizer.config.table.RepoSchemaManager;

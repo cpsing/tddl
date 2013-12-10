@@ -10,9 +10,10 @@ import com.taobao.tddl.executor.common.TransactionConfig;
 import com.taobao.tddl.executor.cursor.IAffectRowCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
+import com.taobao.tddl.executor.repo.RepositoryConfig;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.executor.spi.ITHLog;
 import com.taobao.tddl.executor.spi.IRepository;
+import com.taobao.tddl.executor.spi.ITHLog;
 import com.taobao.tddl.executor.spi.ITable;
 import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.monitor.Monitor;
@@ -44,7 +45,7 @@ public abstract class PutHandlerCommon extends HandlerCommon {
         try {
             if (transaction == null) {// 客户端没有用事务，这里手动加上。
                 IRepository repo = executionContext.getCurrentRepository();
-                if (repo.getRepoConfig().isTransactional()) {
+                if ("True".equalsIgnoreCase(repo.getRepoConfig().getProperty(RepositoryConfig.IS_TRANSACTIONAL))) {
                     transaction = repo.beginTransaction(getDefalutTransactionConfig(repo));
                     executionContext.setTransaction(transaction);
                     autoCommit = true;
@@ -93,7 +94,7 @@ public abstract class PutHandlerCommon extends HandlerCommon {
     }
 
     protected abstract int executePut(ExecutionContext executionContext, IPut put, ITable table, IndexMeta meta)
-                                                                                                               throws Exception;
+                                                                                                                throws Exception;
 
     protected void prepare(ITransaction transaction, ITable table, IRowSet oldkv, CloneableRecord key,
                            CloneableRecord value, IPut.PUT_TYPE putType) throws TddlException {
@@ -105,7 +106,7 @@ public abstract class PutHandlerCommon extends HandlerCommon {
 
     protected TransactionConfig getDefalutTransactionConfig(IRepository repo) {
         TransactionConfig tc = new TransactionConfig();
-        String isolation = repo.getRepoConfig().getDefaultTnxIsolation();
+        String isolation = repo.getRepoConfig().getProperty(RepositoryConfig.DEFAULT_TXN_ISOLATION);
         // READ_UNCOMMITTED|READ_COMMITTED|REPEATABLE_READ|SERIALIZABLE
         if ("READ_UNCOMMITTED".equals(isolation)) {
             tc.setReadUncommitted(true);

@@ -11,6 +11,7 @@ import com.taobao.tddl.atom.common.TAtomConstants;
 import com.taobao.tddl.atom.config.TAtomDsConfHandle;
 import com.taobao.tddl.atom.config.listener.AtomDbStatusListener;
 import com.taobao.tddl.atom.exception.AtomAlreadyInitException;
+import com.taobao.tddl.common.model.Atom;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
@@ -144,5 +145,15 @@ public class TAtomDataSource extends AbstractTAtomDataSource {
 
     protected DataSource getDataSource() throws SQLException {
         return this.dsConfHandle.getDataSource();
+    }
+
+    @Override
+    public Atom getAtom() {
+        return this.dsConfHandle.getAtom();
+    }
+
+    @Override
+    public void setAtom(Atom atom) {
+        this.dsConfHandle.setAtom(atom);
     }
 }

@@ -1,7 +1,7 @@
 package com.taobao.tddl.executor.spi;
 
+import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.executor.IExecutor;
-import com.taobao.tddl.optimizer.config.Group;
 
 /**
  * 用于主备切换等group操作

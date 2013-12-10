@@ -6,7 +6,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import com.taobao.tddl.group.config.ConfigManager;
+import com.taobao.tddl.group.config.GroupConfigManager;
 import com.taobao.tddl.group.config.GroupExtraConfig;
 import com.taobao.tddl.group.jdbc.DataSourceWrapper;
 
@@ -38,7 +38,7 @@ public class RuntimeWritableAtomDBSelector extends AbstractDBSelector {
 
     public DataSource select() {
         for (Map.Entry<String, DataSourceWrapper> e : dataSourceWrapperMap.entrySet())
-            if (ConfigManager.isDataSourceAvailable(e.getValue(), false)) return e.getValue();
+            if (GroupConfigManager.isDataSourceAvailable(e.getValue(), false)) return e.getValue();
         return null;
     }
 

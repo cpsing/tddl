@@ -3,9 +3,9 @@ package com.taobao.tddl.executor.spi;
 import java.util.Map;
 
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.executor.common.TransactionConfig;
 import com.taobao.tddl.executor.repo.RepositoryConfig;
-import com.taobao.tddl.optimizer.config.Group;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 
 /**
@@ -51,7 +51,7 @@ public interface IRepository {
      * 
      * @param conf
      */
-    void init(RepositoryConfig conf);
+    void init();
 
     /**
      * 获取当前存储引擎的一些配置信息。

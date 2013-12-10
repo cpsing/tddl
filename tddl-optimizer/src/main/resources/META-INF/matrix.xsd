@@ -78,12 +78,15 @@
 			<xs:documentation>property config</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
-			<xs:attribute name="name" type="xs:string" use="required">
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="value" type="xs:string" />
+			</xs:choice>
+			<xs:attribute name="name" type="xs:string" use="optional">
 				<xs:annotation>
 					<xs:documentation>property name</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
-			<xs:attribute name="value" type="xs:string" use="required">
+			<xs:attribute name="value" type="xs:string" use="optional">
 				<xs:annotation>
 					<xs:documentation>property value</xs:documentation>
 				</xs:annotation>

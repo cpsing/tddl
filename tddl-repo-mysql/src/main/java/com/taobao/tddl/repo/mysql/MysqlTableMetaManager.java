@@ -33,12 +33,10 @@ import com.taobao.tddl.executor.ExecutorContext;
 import com.taobao.tddl.executor.repo.RepositoryHolder;
 import com.taobao.tddl.executor.spi.IDataSourceGetter;
 import com.taobao.tddl.executor.spi.IRepository;
-import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.config.table.RepoSchemaManager;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.config.table.parse.TableMetaParser;
 import com.taobao.tddl.repo.mysql.spi.DatasourceMySQLImplement;
-import com.taobao.tddl.rule.model.TargetDB;
 
 /**
  * @author mengshi.sunmengshi 2013-12-5 下午6:18:14
@@ -67,22 +65,7 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
 
         IRepository repo = null;
 
-        String groupNode = null;
-
-        TargetDB target = OptimizerContext.getContext().getRule().shardAny(tablename);
-
-        if (target == null) {
-            throw new RuntimeException("table:" + tablename + " is not found in the rule\n" + "table:" + tablename
-                                       + " 在规则中不存在，无法构建meta");
-        }
-
-        groupNode = target.getDbIndex();
-
-        if (groupNode == null) return null;
-
-        String actualTableName = target.getTableNames().iterator().next();
-
-        DataSource ds = dsGetter.getDataSource(groupNode);
+        DataSource ds = dsGetter.getDataSource(this.getGroup().getName());
 
         if (ds == null) {
             logger.error("schema of " + tablename + " cannot be fetched");
@@ -96,11 +79,11 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
         try {
             conn = ds.getConnection();
             stmt = conn.createStatement();
-            rs = stmt.executeQuery("select * from " + actualTableName + " limit 1");
+            rs = stmt.executeQuery("select * from " + tablename + " limit 1");
             ResultSetMetaData rsmd = rs.getMetaData();
             DatabaseMetaData dbmd = conn.getMetaData();
 
-            return this.resultSetMetaToSchema(rsmd, dbmd, tablename, actualTableName);
+            return this.resultSetMetaToSchema(rsmd, dbmd, tablename, tablename);
 
         } catch (Exception e) {
             if (e instanceof SQLException) {

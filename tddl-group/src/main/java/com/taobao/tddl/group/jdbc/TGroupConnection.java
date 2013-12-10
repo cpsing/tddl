@@ -23,6 +23,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import com.alibaba.druid.pool.DruidPooledConnection;
+import com.mysql.jdbc.ConnectionImpl;
+import com.taobao.tddl.atom.jdbc.TConnectionWrapper;
+import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.jdbc.TExceptionUtils;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
@@ -672,9 +676,25 @@ public class TGroupConnection implements Connection {
     }
 
     /**
-     * @return
+     * @return thread id
      */
     public long getId() {
+
+        try {
+            Connection atomConnection = this.rBaseConnection;
+
+            if (atomConnection == null) atomConnection = this.wBaseConnection;
+
+            TConnectionWrapper conn = (TConnectionWrapper) atomConnection;
+
+            DruidPooledConnection druidConnection = (DruidPooledConnection) conn.getTargetConnection();
+
+            ConnectionImpl mysqlConn = (ConnectionImpl) druidConnection.getConnection();
+
+            return mysqlConn.getId();
+        } catch (Exception ex) {
+            throw new TddlRuntimeException("connection get thread id fail !", ex);
+        }
 
     }
 

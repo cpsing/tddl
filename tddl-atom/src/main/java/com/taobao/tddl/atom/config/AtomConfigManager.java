@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 
 import com.taobao.tddl.atom.common.TAtomConstants;
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.model.Atom;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.config.ConfigDataHandler;
@@ -20,9 +21,9 @@ import com.taobao.tddl.config.impl.ConfigDataHandlerCity;
  * 
  * @author qihao
  */
-public class DiamondDbConfManager implements DbConfManager {
+public class AtomConfigManager implements DbConfManager {
 
-    private static Logger                     logger               = LoggerFactory.getLogger(DiamondDbConfManager.class);
+    private static Logger                     logger               = LoggerFactory.getLogger(AtomConfigManager.class);
     private String                            globalConfigDataId;
     private String                            appConfigDataId;
     private String                            unitName;
@@ -31,11 +32,18 @@ public class DiamondDbConfManager implements DbConfManager {
     private ConfigDataHandler                 appDBHandler;
     private volatile List<ConfigDataListener> globalDbConfListener = new ArrayList<ConfigDataListener>();
     private volatile List<ConfigDataListener> appDbConfListener    = new ArrayList<ConfigDataListener>();
+    private Atom                              atom;
 
     public void init(String appName) {
-        configFactory = ConfigDataHandlerCity.getFactory(appName, unitName);
+        Map<String, String> localValues = null;
+        if (this.atom != null) {
+            localValues = atom.getProperties();
+        }
+        configFactory = ConfigDataHandlerCity.getFactory(appName, unitName, localValues);
+
         Map<String, Object> config = new HashMap<String, Object>();
         config.put("group", TAtomConstants.DEFAULT_DIAMOND_GROUP);
+
         globalHandler = configFactory.getConfigDataHandler(globalConfigDataId,
             globalDbConfListener,
             Executors.newSingleThreadScheduledExecutor(),
@@ -110,5 +118,10 @@ public class DiamondDbConfManager implements DbConfManager {
         if (null != this.appDBHandler) {
             this.appDBHandler.destory();
         }
+    }
+
+    public void setAtom(Atom atom) {
+        this.atom = atom;
+
     }
 }

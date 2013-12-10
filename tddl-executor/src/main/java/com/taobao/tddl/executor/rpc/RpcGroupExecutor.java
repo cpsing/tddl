@@ -3,11 +3,11 @@ package com.taobao.tddl.executor.rpc;
 import java.util.concurrent.Future;
 
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.spi.IGroupExecutor;
 import com.taobao.tddl.executor.spi.IRepository;
-import com.taobao.tddl.optimizer.config.Group;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 
 /**

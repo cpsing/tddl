@@ -8,9 +8,9 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.taobao.tddl.common.exception.NotSupportException;
+import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.extension.ExtensionLoader;
-import com.taobao.tddl.optimizer.config.Group;
 import com.taobao.tddl.optimizer.exceptions.OptimizerException;
 
 /**
