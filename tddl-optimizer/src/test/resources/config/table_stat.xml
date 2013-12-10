@@ -2,15 +2,15 @@
 <tableStats xmlns="https://github.com/tddl/tddl/schema/stat" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="https://github.com/tddl/tddl/schema/stat https://raw.github.com/tddl/tddl/master/tddl-optimizer/src/main/resources/META-INF/stat.xsd">
 	<tableStat>
-		<tableName>T1</tableName>
+		<tableName>TABLE1</tableName>
 		<tableRows>1000</tableRows>
 	</tableStat>
 	<tableStat>
-		<tableName>T2</tableName>
+		<tableName>TABLE2</tableName>
 		<tableRows>100000</tableRows>
 	</tableStat>
 	<tableStat>
-		<tableName>TEST</tableName>
+		<tableName>TABLE3</tableName>
 		<tableRows>999</tableRows>
 	</tableStat>
 </tableStats>

@@ -92,6 +92,7 @@ public class BaseOptimizerTest {
     @AfterClass
     public static void tearDown() throws TddlException {
         schemaManager.destory();
+        statManager.destory();
         parser.destory();
         optimizer.destory();
     }

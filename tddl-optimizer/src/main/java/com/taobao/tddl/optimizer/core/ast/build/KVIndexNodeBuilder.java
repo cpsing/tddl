@@ -41,7 +41,6 @@ public class KVIndexNodeBuilder extends QueryTreeNodeBuilder {
      * @param indexNode
      */
     public void buildSelected() {
-        this.getNode().getImplicitSelectable().clear();
         buildSelectedFromSelectableObject();
     }
 

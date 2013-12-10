@@ -20,7 +20,9 @@ import com.taobao.tddl.optimizer.utils.FilterUtils;
  * 将filter进行下推
  * 
  * <pre>
- * 如果条件中包含||条件则暂不优化，下推时会导致语义不正确
+ * a. 如果条件中包含||条件则暂不优化，下推时会导致语义不正确
+ * b. 如果条件中的column/value包含function，也不做下推 (比较麻烦，需要递归处理函数中的字段信息，同时检查是否符合下推条件，先简答处理)
+ * c. 如果条件中的column/value中的字段来自于子节点的函数查询，也不做下推
  * 
  * 几种场景：
  * 1. where条件尽可能提前到叶子节点，同时提取出joinFilter
@@ -83,32 +85,50 @@ public class FilterPusher {
 
         if (qtn instanceof QueryNode) {
             QueryNode qn = (QueryNode) qtn;
-            QueryTreeNode child = pushFilter(qn.getChild(), DNFNodeToPush);
-            if (canIgnore(qn)) {
-                return child;
-            } else {
-                qn.setChild(child);
-                return qn;
+            List<IFilter> DNFNodeToCurrent = new LinkedList<IFilter>();
+            if (DNFNodeToPush != null) {
+                for (IFilter node : DNFNodeToPush) {
+                    // 可能是多级节点，字段在select中，设置为select中的字段，这样才可以继续下推
+                    if (!tryPushColumn(node, qn.getChild())) {
+                        // 可能where条件是函数，暂时不下推
+                        DNFNodeToCurrent.add(node);
+                    }
+                }
+
+                DNFNodeToPush.removeAll(DNFNodeToCurrent);
             }
+
+            QueryTreeNode child = pushFilter(qn.getChild(), DNFNodeToPush);
+            // 针对不能下推的，合并到当前的where
+            IFilter node = FilterUtils.DNFToAndLogicTree(DNFNodeToCurrent);
+            if (node != null) {
+                qtn.query(FilterUtils.and(qtn.getWhereFilter(), (IFilter) node.copy()));
+            }
+
+            ((QueryNode) qtn).setChild(child);
+            qtn.build();
         } else if (qtn instanceof JoinNode) {
             JoinNode jn = (JoinNode) qtn;
             List<IFilter> DNFNodetoPushToLeft = new LinkedList<IFilter>();
             List<IFilter> DNFNodetoPushToRight = new LinkedList<IFilter>();
-
+            List<IFilter> DNFNodeToCurrent = new LinkedList<IFilter>();
             if (DNFNodeToPush != null) {
-                DNFNodeToPush = addJoinKeysFromDNFNodeAndRemoveIt(DNFNodeToPush, jn);
+                // 需要处理不能下推的条件
+                // 1. 处理a.id=b.id，左右两边都为column列
+                // 2. 处理a.id = b.id + 1，一边为column，一边为function
+                // 情况2这种不优化，直接当作where条件处理
+                findJoinKeysAndRemoveIt(DNFNodeToPush, jn);
+
                 for (IFilter node : DNFNodeToPush) {
-                    ISelectable c = (ISelectable) ((IBooleanFilter) node).getColumn();
-                    // 下推到左右节点
-                    if (jn.getLeftNode().hasColumn(c)) {
+                    if (tryPushColumn(node, jn.getLeftNode())) {
                         DNFNodetoPushToLeft.add(node);
-                    } else if (jn.getRightNode().hasColumn(c)) {
+                    } else if (tryPushColumn(node, jn.getRightNode())) {
                         DNFNodetoPushToRight.add(node);
                     } else {
-                        assert (false);// 不可能出现
+                        // 可能是函数，不继续下推
+                        DNFNodeToCurrent.add(node);
                     }
                 }
-
                 // 将左条件的表达式，推导到join filter的右条件上
                 DNFNodetoPushToRight.addAll(copyFilterToJoinOnColumns(DNFNodeToPush,
                     jn.getLeftKeys(),
@@ -116,6 +136,12 @@ public class FilterPusher {
 
                 // 将右条件的表达式，推导到join filter的左条件上
                 DNFNodetoPushToLeft.addAll(copyFilterToJoinOnColumns(DNFNodeToPush, jn.getRightKeys(), jn.getLeftKeys()));
+            }
+
+            // 针对不能下推的，合并到当前的where
+            IFilter node = FilterUtils.DNFToAndLogicTree(DNFNodeToCurrent);
+            if (node != null) {
+                qtn.query(FilterUtils.and(qtn.getWhereFilter(), (IFilter) node.copy()));
             }
 
             if (jn.isInnerJoin()) {
@@ -164,39 +190,46 @@ public class FilterPusher {
             return qtn;
         }
 
-        // 对于 or连接的条件，就不能下推了
-        IFilter filterInWhere = qtn.getOtherJoinOnFilter();
-        if (filterInWhere != null && FilterUtils.isDNF(filterInWhere)) {
-            List<IFilter> DNFNode = FilterUtils.toDNFNode(filterInWhere);
-            if (DNFNodeToPush == null) {
-                DNFNodeToPush = new ArrayList<IFilter>();
-            }
-
-            DNFNodeToPush.addAll(DNFNode);
-        }
         if (qtn instanceof QueryNode) {
             QueryNode qn = (QueryNode) qtn;
-            QueryTreeNode child = pushJoinOnFilter(qn.getChild(), DNFNodeToPush);
-            if (canIgnore(qn)) {
-                return child;
-            } else {
-                qn.setChild(child);
-                return qn;
+            if (DNFNodeToPush != null) {
+                // 如果是join/query/join，可能需要转一次select column，不然下推就会失败
+                for (IFilter node : DNFNodeToPush) {
+                    // 可能是多级节点，字段在select中，设置为select中的字段，这样才可以继续下推
+                    // 因为query不可能是顶级节点，只会是传递的中间状态，不需要处理DNFNodeToCurrent
+                    tryPushColumn(node, qn.getChild());
+                }
             }
+            QueryTreeNode child = pushJoinOnFilter(qn.getChild(), DNFNodeToPush);
+            ((QueryNode) qtn).setChild(child);
+            qtn.build();
+            return qn;
         } else if (qtn instanceof JoinNode) {
+            // 对于 or连接的条件，就不能下推了
+            IFilter filterInWhere = qtn.getOtherJoinOnFilter();
+            if (filterInWhere != null && FilterUtils.isDNF(filterInWhere)) {
+                List<IFilter> DNFNode = FilterUtils.toDNFNode(filterInWhere);
+                if (DNFNodeToPush == null) {
+                    DNFNodeToPush = new ArrayList<IFilter>();
+                }
+
+                DNFNodeToPush.addAll(DNFNode);
+            }
+
             JoinNode jn = (JoinNode) qtn;
             List<IFilter> DNFNodetoPushToLeft = new LinkedList<IFilter>();
             List<IFilter> DNFNodetoPushToRight = new LinkedList<IFilter>();
+            List<IFilter> DNFNodeToCurrent = new LinkedList<IFilter>();
 
             if (DNFNodeToPush != null) {
                 for (IFilter node : DNFNodeToPush) {
-                    ISelectable c = (ISelectable) ((IBooleanFilter) node).getColumn();
-                    if (jn.getLeftNode().hasColumn(c)) {
+                    if (tryPushColumn(node, jn.getLeftNode())) {
                         DNFNodetoPushToLeft.add(node);
-                    } else if (jn.getRightNode().hasColumn(c)) {
+                    } else if (tryPushColumn(node, jn.getRightNode())) {
                         DNFNodetoPushToRight.add(node);
                     } else {
-                        assert (false);
+                        // 可能是函数，不继续下推
+                        DNFNodeToCurrent.add(node);
                     }
                 }
 
@@ -208,6 +241,13 @@ public class FilterPusher {
                 // 将右条件的表达式，推导到join filter的左条件上
                 DNFNodetoPushToLeft.addAll(copyFilterToJoinOnColumns(DNFNodeToPush, jn.getRightKeys(), jn.getLeftKeys()));
             }
+
+            // 针对不能下推的，合并到当前的where，otherJoinOnFilter暂时不做清理，不需要做合并
+            // IFilter node = FilterUtils.DNFToAndLogicTree(DNFNodeToCurrent);
+            // if (node != null) {
+            // qtn.setOtherJoinOnFilter(FilterUtils.and(qtn.getOtherJoinOnFilter(),
+            // (IFilter) node.copy()));
+            // }
 
             pushJoinOnFilter(jn.getLeftNode(), DNFNodetoPushToLeft);
             pushJoinOnFilter(jn.getRightNode(), DNFNodetoPushToRight);
@@ -246,17 +286,16 @@ public class FilterPusher {
     /**
      * 将原本的Join的where条件中的a.id=b.id构建为join条件，并从where条件中移除
      */
-    private static List<IFilter> addJoinKeysFromDNFNodeAndRemoveIt(List<IFilter> DNFNode, JoinNode join)
-                                                                                                        throws QueryException {
+    private static void findJoinKeysAndRemoveIt(List<IFilter> DNFNode, JoinNode join) throws QueryException {
         // filter中可能包含join列,如id=id
         // 目前必须满足以下条件
         // 1、不包含or
         // 2、=连接
+        List<IFilter> joinFilters = new LinkedList();
         if (isFilterContainsColumnJoin(DNFNode)) {
             List<Object> leftJoinKeys = new ArrayList<Object>();
             List<Object> rightJoinKeys = new ArrayList<Object>();
 
-            List<IFilter> filtersToRemove = new LinkedList();
             for (IFilter sub : DNFNode) { // 一定是简单条件
                 ISelectable[] keys = getJoinKeysWithColumnJoin((IBooleanFilter) sub);
                 if (keys != null) {// 存在join column
@@ -265,7 +304,7 @@ public class FilterPusher {
                             if (join.getRightNode().hasColumn(keys[1])) {
                                 leftJoinKeys.add(keys[0]);
                                 rightJoinKeys.add(keys[1]);
-                                filtersToRemove.add(sub);
+                                joinFilters.add(sub);
                                 join.addJoinFilter((IBooleanFilter) sub);
                             } else {
                                 throw new IllegalArgumentException("join查询表右边不包含join column，请修改查询语句...");
@@ -278,7 +317,7 @@ public class FilterPusher {
                             if (join.getRightNode().hasColumn(keys[0])) {
                                 leftJoinKeys.add(keys[1]);
                                 rightJoinKeys.add(keys[0]);
-                                filtersToRemove.add(sub);
+                                joinFilters.add(sub);
                                 // 交换一下
                                 Object tmp = ((IBooleanFilter) sub).getColumn();
                                 ((IBooleanFilter) sub).setColumn(((IBooleanFilter) sub).getValue());
@@ -294,11 +333,10 @@ public class FilterPusher {
                 }
             }
 
-            DNFNode.removeAll(filtersToRemove);
+            DNFNode.removeAll(joinFilters);
         }
 
         join.build();
-        return DNFNode;
     }
 
     private static boolean isFilterContainsColumnJoin(List<IFilter> DNFNode) {
@@ -330,25 +368,35 @@ public class FilterPusher {
     }
 
     /**
-     * 判断一个QueryNode是否可以被删掉
+     * 尝试推一下column到子节点，会设置为查找到子节点上的column<br/>
+     * 比如需要下推字段，可能来自于子节点的select，所以需要先转化为子节点上的select信息，再下推
      */
-    private static boolean canIgnore(QueryNode qn) {
-        if (qn.getChild() == null) {
-            return false;
-        }
-        if (qn.getChild().isSubQuery()) {
-            return false;
-        }
-        if (qn.getLimitFrom() != null || qn.getLimitTo() != null) {
-            return false;
-        }
-        if (qn.getOrderBys() != null && !qn.getOrderBys().isEmpty()) {
-            return false;
-        }
-        if (qn.getWhereFilter() != null) {
-            return false;
+    private static boolean tryPushColumn(IFilter filter, QueryTreeNode qtn) {
+        return tryPushColumn(filter, true, qtn) && tryPushColumn(filter, false, qtn);
+    }
+
+    private static boolean tryPushColumn(IFilter filter, boolean isColumn, QueryTreeNode qtn) {
+        Comparable value = null;
+        if (isColumn) {
+            value = ((IBooleanFilter) filter).getColumn();
+        } else {
+            value = ((IBooleanFilter) filter).getValue();
         }
 
-        return true;
+        if (value instanceof ISelectable) {
+            ISelectable c = qtn.findColumn((ISelectable) value);
+            if (c instanceof IColumn) {
+                if (isColumn) {
+                    ((IBooleanFilter) filter).setColumn(c);
+                } else {
+                    ((IBooleanFilter) filter).setValue(c);
+                }
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
     }
 }

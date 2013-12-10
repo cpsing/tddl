@@ -24,14 +24,15 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.taobao.tddl.common.jdbc.TExceptionUtils;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.group.config.GroupIndex;
 import com.taobao.tddl.group.dbselector.DBSelector;
 import com.taobao.tddl.group.dbselector.DBSelector.AbstractDataSourceTryer;
 import com.taobao.tddl.group.dbselector.DBSelector.DataSourceTryer;
 import com.taobao.tddl.group.hint.GroupHintParser;
 import com.taobao.tddl.monitor.unit.UnitDeployProtect;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * 相关的JDBC规范： 1.
@@ -675,7 +676,8 @@ public class TGroupConnection implements Connection {
      * @return
      */
     public long getId() {
-
+        // TODO 需要实现
+        return 0;
     }
 
     public Connection duplicate() throws SQLException {

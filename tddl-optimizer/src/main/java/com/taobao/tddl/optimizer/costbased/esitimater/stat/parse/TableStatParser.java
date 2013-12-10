@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -48,7 +49,7 @@ public class TableStatParser {
         for (int i = 0; i < list.getLength(); i++) {
             Node item = list.item(i);
             if ("tableName".equals(item.getNodeName())) {
-                stat.setTableName(item.getFirstChild().getNodeValue());
+                stat.setTableName(StringUtils.upperCase(item.getFirstChild().getNodeValue()));
             } else if ("tableRows".equals(item.getNodeName())) {
                 stat.setTableRows(Long.valueOf(item.getFirstChild().getNodeValue()));
             }

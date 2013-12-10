@@ -104,13 +104,8 @@
 			<column name="score" type="long" />
 		</columns>
 		<primaryKey>id</primaryKey>
-		<secondaryIndexes>
-			<indexMeta name="second_idx" type="btree">
-				<keys>name</keys>
-				<values>id</values>
-			</indexMeta>
-		</secondaryIndexes>
 	</table>
+	
 	<table name="table4">
 		<columns>
 			<column name="id" type="long" />

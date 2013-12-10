@@ -84,7 +84,6 @@ import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.query.JoinNode;
-import com.taobao.tddl.optimizer.core.ast.query.QueryNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.core.expression.IBindVal;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
@@ -492,7 +491,10 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         tableNode = v.getTableNode();
         tableNode.setSubQuery(true);
         if (node.getAliasUnescapeUppercase() != null) {
-            this.tableNode = new QueryNode(this.tableNode);// 出现别名，一般只用在FROM表，直接做为QueryNode
+            if (tableNode.getAlias() != null) {
+                tableNode.setSubAlias(tableNode.getAlias());// 内部子查询的别名
+            }
+
             tableNode.alias(node.getAliasUnescapeUppercase());
         }
     }

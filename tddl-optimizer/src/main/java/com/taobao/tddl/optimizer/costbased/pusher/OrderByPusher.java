@@ -8,22 +8,32 @@ import com.taobao.tddl.optimizer.core.ast.ASTNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.query.JoinNode;
 import com.taobao.tddl.optimizer.core.ast.query.MergeNode;
+import com.taobao.tddl.optimizer.core.ast.query.QueryNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.core.ast.query.strategy.IndexNestedLoopJoin;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
+/**
+ * 将merge/join中的order by条件下推，包括隐式的order by条件，比如将groupBy转化为orderBy
+ * 
+ * <pre>
+ * a. 如果orderBy中包含function，也不做下推
+ * b. 如果orderBy中的的column字段来自于子节点的函数查询，也不做下推
+ * 
+ * 比如: tabl1.join(table2).on("table1.id=table2.id").orderBy("id")
+ * 转化为：table.orderBy(id).join(table2).on("table1.id=table2.id")
+ * 
+ * </pre>
+ * 
+ * @author jianghang 2013-12-10 下午5:33:16
+ * @since 5.1.0
+ */
 public class OrderByPusher {
 
     /**
-     * 将merge/join中的order by条件下推，包括隐式的order by条件，比如将groupBy转化为orderBy
-     * 
-     * <pre>
-     * 比如: tabl1.join(table2).on("table1.id=table2.id").orderBy("id")
-     * 转化为：table.orderBy(id).join(table2).on("table1.id=table2.id")
-     * 
-     * </pre>
+     * 详细优化见类描述 {@linkplain OrderByPusher}
      */
     public static QueryTreeNode optimize(QueryTreeNode qtn) {
         qtn = optimizeDistinct(qtn);
@@ -100,7 +110,6 @@ public class OrderByPusher {
     }
 
     private static QueryTreeNode pushOrderBy(QueryTreeNode qtn) {
-
         if (qtn instanceof MergeNode) {
             MergeNode merge = (MergeNode) qtn;
             if (!(merge.getChild() instanceof QueryTreeNode)) {
@@ -124,10 +133,8 @@ public class OrderByPusher {
                     ((QueryTreeNode) child).setOrderBys(standardOrder);
                 }
             }
-        }
-
-        // index nested loop中的order by，可以推到左节点
-        if (qtn instanceof JoinNode) {
+        } else if (qtn instanceof JoinNode) {
+            // index nested loop中的order by，可以推到左节点
             JoinNode join = (JoinNode) qtn;
             if (join.getJoinStrategy() instanceof IndexNestedLoopJoin) {
                 List<IOrderBy> orders = join.getImplicitOrderBys();
@@ -146,6 +153,8 @@ public class OrderByPusher {
                     join.getLeftNode().build();
                 }
             }
+        } else if (qtn instanceof QueryNode) {
+            // TODO 子查询
         }
 
         for (ASTNode child : ((QueryTreeNode) qtn).getChildren()) {

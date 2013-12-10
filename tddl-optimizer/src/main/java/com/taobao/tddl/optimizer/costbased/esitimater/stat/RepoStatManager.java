@@ -21,12 +21,14 @@ import com.taobao.tddl.optimizer.exceptions.OptimizerException;
  */
 public class RepoStatManager extends AbstractLifecycle implements StatManager {
 
+    private static TableStat                  nullTableStat   = new TableStat();
+    private static KVIndexStat                nullKVIndexStat = new KVIndexStat();
     private RepoStatManager                   delegate;
     private boolean                           isDelegate;
     private Group                             group;
     private LocalStatManager                  local;
-    private LoadingCache<String, KVIndexStat> kvIndexCache = null;
-    private LoadingCache<String, TableStat>   tableCache   = null;
+    private LoadingCache<String, KVIndexStat> kvIndexCache    = null;
+    private LoadingCache<String, TableStat>   tableCache      = null;
     private boolean                           useCache;
 
     protected void doInit() throws TddlException {
@@ -42,7 +44,12 @@ public class RepoStatManager extends AbstractLifecycle implements StatManager {
                 .build(new CacheLoader<String, KVIndexStat>() {
 
                     public KVIndexStat load(String tableName) throws Exception {
-                        return delegate.getKVIndex0(tableName);
+                        KVIndexStat result = delegate.getKVIndex0(tableName);
+                        if (result == null) {
+                            result = nullKVIndexStat;
+                        }
+
+                        return result;
                     }
                 });
 
@@ -52,10 +59,34 @@ public class RepoStatManager extends AbstractLifecycle implements StatManager {
                 .build(new CacheLoader<String, TableStat>() {
 
                     public TableStat load(String tableName) throws Exception {
-                        return delegate.getTable0(tableName);
+                        TableStat result = delegate.getTable0(tableName);
+                        if (result == null) {
+                            result = nullTableStat;
+                        }
+
+                        return result;
                     }
                 });
         }
+
+        if (local != null && !local.isInited()) {
+            local.init();
+        }
+    }
+
+    protected void doDestory() throws TddlException {
+        super.doDestory();
+
+        if (local != null && local.isInited()) {
+            local.destory();
+        }
+
+        if (!isDelegate) {
+            delegate.destory();
+            kvIndexCache.cleanUp();
+            tableCache.cleanUp();
+        }
+
     }
 
     public KVIndexStat getKVIndex(String indexName) {
@@ -67,7 +98,10 @@ public class RepoStatManager extends AbstractLifecycle implements StatManager {
         if (stat == null) {
             if (useCache) {
                 try {
-                    return kvIndexCache.get(indexName);
+                    stat = kvIndexCache.get(indexName);
+                    if (stat == nullKVIndexStat) {
+                        return null;
+                    }
                 } catch (ExecutionException e) {
                     throw new OptimizerException(e);
                 }
@@ -88,7 +122,10 @@ public class RepoStatManager extends AbstractLifecycle implements StatManager {
         if (stat == null) {
             if (useCache) {
                 try {
-                    return tableCache.get(tableName);
+                    stat = tableCache.get(tableName);
+                    if (stat == nullTableStat) {
+                        return null;
+                    }
                 } catch (ExecutionException e) {
                     throw new OptimizerException(e);
                 }

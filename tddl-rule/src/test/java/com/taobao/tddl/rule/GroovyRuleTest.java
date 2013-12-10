@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.AfterClass;
@@ -118,5 +119,31 @@ public class GroovyRuleTest extends BaseRuleTest {
         Assert.assertEquals(1, targetDb.get(0).getTableNames().size());
         Assert.assertEquals("dbnull", targetDb.get(0).getDbIndex());
         Assert.assertEquals("null", targetDb.get(0).getTableNames().iterator().next());
+    }
+
+    @Test
+    public void testDate() throws ParseException, TddlException {
+        Rule<String> dbRule = new GroovyRule<String>("\"db\"+(#id,1,64#.toString())");
+        Rule<String> tbRule = new GroovyRule<String>("(getCalendar(#gmt_create,1_date,31#).get(Calendar.DAY_OF_MONTH) % 32) - 1");
+        TableRule vt = new TableRule();
+        List<Rule<String>> dbRules = new ArrayList<Rule<String>>();
+        dbRules.add(dbRule);
+        vt.setDbShardRules(dbRules);
+        List<Rule<String>> tbRules = new ArrayList<Rule<String>>();
+        tbRules.add(tbRule);
+        vt.setTbShardRules(tbRules);
+        vt.init();
+        Choicer choicer = new Choicer();
+        choicer.addComparative("ID", new Comparative(Comparative.Equivalent, null));
+        choicer.addComparative("GMT_CREATE", new Comparative(Comparative.Equivalent, getDate(2013, 1, 32, 12, 12, 12)));
+        VirtualTableRuleMatcher vtrm = new VirtualTableRuleMatcher();
+        MatcherResult mr = vtrm.match(choicer, Lists.newArrayList(), vt, false);
+        List<TargetDB> targetDb = mr.getCalculationResult();
+        System.out.println(targetDb);
+    }
+
+    @SuppressWarnings("deprecation")
+    public Date getDate(int year, int month, int date, int hrs, int min, int sec) {
+        return new Date(year, month, date, hrs, min, sec);
     }
 }

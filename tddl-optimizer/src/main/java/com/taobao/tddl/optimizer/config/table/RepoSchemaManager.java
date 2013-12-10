@@ -97,10 +97,15 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
     }
 
     protected void doDestory() throws TddlException {
+        if (local != null && local.isInited()) {
+            local.destory();
+        }
+
         if (!isDelegate) {
             delegate.destory();
-            cache.invalidateAll();
+            cache.cleanUp();
         }
+
     }
 
     public void setUseCache(boolean useCache) {

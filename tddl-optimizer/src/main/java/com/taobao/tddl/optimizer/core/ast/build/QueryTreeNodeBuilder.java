@@ -107,8 +107,13 @@ public abstract class QueryTreeNodeBuilder {
         if (c.getTableName() != null) {
             // 对于TableNode如果别名存在别名
             if (node instanceof TableNode && (!(node instanceof KVIndexNode))) {
-                if (!(c.getTableName().equals(node.getAlias()) || c.getTableName()
-                    .equals(((TableNode) node).getTableName()))) {
+                boolean isSameName = c.getTableName().equals(node.getAlias())
+                                     || c.getTableName().equals(((TableNode) node).getTableName());
+                if (node.isSubQuery() && node.getSubAlias() != null) {
+                    isSameName |= c.getTableName().equals(node.getSubAlias());
+                }
+
+                if (!isSameName) {
                     throw new IllegalArgumentException("column: " + c.getFullName() + " is not existed in either "
                                                        + this.getNode().getName() + " or select clause");
                 }
@@ -140,11 +145,11 @@ public abstract class QueryTreeNodeBuilder {
         }
 
         if ((column instanceof IColumn) && !IColumn.STAR.equals(column.getColumnName())) {
-            node.addColumnsRefered(c); // refered不需要重复字段,select添加允许重复
+            node.addColumnsRefered(column); // refered不需要重复字段,select添加允许重复
         }
 
         if (column instanceof IFunction) {
-            buildFunction((IFunction) column);
+            buildFunction((IFunction) column, findInSelectList);
         }
 
         return column;
@@ -197,15 +202,15 @@ public abstract class QueryTreeNodeBuilder {
         this.buildFilter(this.getNode().getHavingFilter(), true);
     }
 
-    public void buildFunction() {
+    public void buildFunction(boolean findInSelectList) {
         for (ISelectable selected : getNode().getColumnsSelected()) {
             if (selected instanceof IFunction) {
-                this.buildFunction((IFunction) selected);
+                this.buildFunction((IFunction) selected, findInSelectList);
             }
         }
     }
 
-    public void buildFunction(IFunction f) {
+    public void buildFunction(IFunction f, boolean findInSelectList) {
         if (f.getArgs().size() == 0) {
             return;
         }
@@ -213,27 +218,45 @@ public abstract class QueryTreeNodeBuilder {
         List<Object> args = f.getArgs();
         for (int i = 0; i < args.size(); i++) {
             if (args.get(i) instanceof ISelectable) {
-                args.set(i, this.buildSelectable((ISelectable) args.get(i)));
+                args.set(i, this.buildSelectable((ISelectable) args.get(i), findInSelectList));
             }
         }
     }
 
-    public boolean hasColumn(ISelectable c) {
-        if (this.getColumnFromOtherNode(c, this.getNode()) != null) {
-            return true;
+    public ISelectable findColumn(ISelectable c) {
+        ISelectable column = this.findColumnFromOtherNode(c, this.getNode());
+        if (column == null) {
+            column = this.getSelectableFromChild(c);
         }
 
-        if (this.getSelectableFromChild(c) != null) {
-            return true;
+        return column;
+    }
+
+    /**
+     * 从select列表中查找字段，并根据查找的字段信息进行更新，比如更新tableName
+     */
+    public ISelectable getColumnFromOtherNode(ISelectable c, QueryTreeNode other) {
+        ISelectable res = findColumnFromOtherNode(c, other);
+        if (res == null) {
+            return null;
         }
 
-        return false;
+        if (c instanceof IColumn) {
+            // 如果是子表的结构，比如Join/Merge的子节点，字段的名字直接使用别名
+            if (other.getAlias() != null) {
+                c.setTableName(other.getAlias());
+            } else {
+                c.setTableName(res.getTableName());
+            }
+        }
+
+        return c;
     }
 
     /**
      * 从select列表中查找字段
      */
-    public ISelectable getColumnFromOtherNode(ISelectable c, QueryTreeNode other) {
+    public ISelectable findColumnFromOtherNode(ISelectable c, QueryTreeNode other) {
         if (c == null) {
             return c;
         }
@@ -246,7 +269,12 @@ public abstract class QueryTreeNodeBuilder {
         for (ISelectable selected : other.getColumnsSelected()) {
             boolean isThis = false;
             if (c.getTableName() != null) {
-                if (!(c.getTableName().equals(other.getAlias()) || c.getTableName().equals(selected.getTableName()))) {
+                boolean isSameName = c.getTableName().equals(other.getAlias())
+                                     || c.getTableName().equals(selected.getTableName());
+                if (other.isSubQuery() && other.getSubAlias() != null) {
+                    isSameName |= c.getTableName().equals(other.getSubAlias());
+                }
+                if (!isSameName) {
                     continue;
                 }
             }
@@ -264,19 +292,6 @@ public abstract class QueryTreeNodeBuilder {
             }
         }
 
-        if (res == null) {
-            return res;
-        }
-
-        if (c instanceof IColumn) {
-            // 如果是子表的结构，比如Join/Merge的子节点，字段的名字直接使用别名
-            if (other.getAlias() != null) {
-                c.setTableName(other.getAlias());
-            } else {
-                c.setTableName(res.getTableName());
-            }
-        }
-
-        return c;
+        return res;
     }
 }

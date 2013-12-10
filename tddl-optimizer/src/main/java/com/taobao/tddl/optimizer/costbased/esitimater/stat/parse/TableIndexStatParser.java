@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -49,7 +50,7 @@ public class TableIndexStatParser {
         for (int i = 0; i < list.getLength(); i++) {
             Node item = list.item(i);
             if ("tableName".equals(item.getNodeName())) {
-                stat.setTableName(item.getFirstChild().getNodeValue());
+                stat.setTableName(StringUtils.upperCase(item.getFirstChild().getNodeValue()));
             } else if ("indexStats".equals(item.getNodeName())) {
                 NodeList indexChilds = item.getChildNodes();
                 for (int j = 0; j < indexChilds.getLength(); j++) {
@@ -70,7 +71,7 @@ public class TableIndexStatParser {
         for (int i = 0; i < list.getLength(); i++) {
             Node item = list.item(i);
             if ("indexName".equals(item.getNodeName())) {
-                stat.setIndexName(item.getFirstChild().getNodeValue());
+                stat.setIndexName(StringUtils.upperCase(item.getFirstChild().getNodeValue()));
             } else if ("indexType".equals(item.getNodeName())) {
                 stat.setIndexType(Integer.valueOf(item.getFirstChild().getNodeValue()));
             } else if ("distinctKeys".equals(item.getNodeName())) {

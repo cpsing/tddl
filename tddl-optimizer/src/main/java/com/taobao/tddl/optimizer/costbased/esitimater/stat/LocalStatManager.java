@@ -85,6 +85,7 @@ public class LocalStatManager extends AbstractLifecycle implements StatManager {
 
         try {
             LocalStatManager statManager = new LocalStatManager();
+            statManager.init();
             List<TableStat> tableStatList = TableStatParser.parse(table);
             for (TableStat t : tableStatList) {
                 statManager.putTable(t.getTableName(), t);
@@ -97,6 +98,7 @@ public class LocalStatManager extends AbstractLifecycle implements StatManager {
                 }
             }
 
+            statManager.init();
             return statManager;
         } finally {
             IOUtils.closeQuietly(index);

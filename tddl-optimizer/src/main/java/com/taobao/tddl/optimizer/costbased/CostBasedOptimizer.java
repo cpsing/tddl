@@ -275,7 +275,7 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
 
     private QueryTreeNode optimizeQuery(QueryTreeNode qn, Map<String, Comparable> extraCmd) throws QueryException {
 
-        findAndChangeRightJoinToLeftJoin(qn);
+        qn = JoinPreProcessor.optimize(qn);
 
         // 预处理filter，比如过滤永假式/永真式
         qn = FilterPreProcessor.optimize(qn);
@@ -321,32 +321,6 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
     }
 
     // ============= helper method =============
-    /**
-     * 会遍历所有节点将right join的左右节点进行调换，转换成left join.
-     * 
-     * <pre>
-     * 比如 A right join B on A.id = B.id
-     * 转化为 B left join B on A.id = B.id
-     * </pre>
-     */
-    private void findAndChangeRightJoinToLeftJoin(QueryTreeNode qtn) {
-        for (ASTNode child : qtn.getChildren()) {
-            this.findAndChangeRightJoinToLeftJoin((QueryTreeNode) child);
-        }
-
-        if (qtn instanceof JoinNode && ((JoinNode) qtn).isRightOuterJoin()) {
-            /**
-             * 如果带有其他非column=column条件，不能做这种转换，否则语义改变
-             */
-            if (qtn.getOtherJoinOnFilter() != null) {
-                return;
-            }
-
-            JoinNode jn = (JoinNode) qtn;
-            jn.exchangeLeftAndRight();
-            jn.build();
-        }
-    }
 
     private ASTNode createMergeForJoin(ASTNode dne, Map<String, Comparable> extraCmd) {
         if (dne instanceof MergeNode) {

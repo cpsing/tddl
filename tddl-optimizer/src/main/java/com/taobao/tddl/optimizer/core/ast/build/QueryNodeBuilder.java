@@ -54,25 +54,6 @@ public class QueryNodeBuilder extends QueryTreeNodeBuilder {
     }
 
     public void buildSelected() {
-        this.getNode().getImplicitSelectable().clear();
-
-        // 如果没有给Merge指定select列，则从child中继承select列
-        if (this.getNode().getColumnsSelected() == null || this.getNode().getColumnsSelected().isEmpty()) {
-            List<ISelectable> childSelected = ((QueryTreeNode) this.getNode().getChildren().get(0)).getColumnsSelectedForParent();
-            this.getNode().select(childSelected);
-        }
-
-        if (this.getNode().getChildren() != null) {
-            for (int i = 0; i < this.getNode().getChildren().size(); i++) {
-                QueryTreeNode child = (QueryTreeNode) this.getNode().getChildren().get(i);
-                // merge的子节点需要把临时列也选上
-                if (child.getImplicitSelectable() != null && !child.getImplicitSelectable().isEmpty()) {
-                    child.select(child.getColumnsRefered());// 返回所有子列
-                    child.build();
-                }
-            }
-        }
-
         buildSelectedFromSelectableObject();
     }
 
@@ -144,46 +125,6 @@ public class QueryNodeBuilder extends QueryTreeNodeBuilder {
             return c;
         }
 
-        return this.getColumnFromOtherNode(c);
-    }
-
-    public ISelectable getColumnFromOtherNode(ISelectable c) {
-        ISelectable res = null;
-        QueryTreeNode child = this.getNode().getChild();
-        for (ISelectable selected : child.getColumnsSelected()) {
-            boolean isThis = false;
-            if (c.getTableName() != null) {
-                if (!(c.getTableName().equals(this.getNode().getAlias()))) {
-                    continue;
-                }
-            }
-
-            if (IColumn.STAR.equals(c.getColumnName())) {
-                return c;
-            }
-
-            // 若列别名存在，只比较别名
-            isThis = c.isSameName(selected);
-
-            if (isThis) {
-                res = selected;
-                break;
-            }
-        }
-
-        if (res == null) {
-            return res;
-        }
-
-        if (c instanceof IColumn) {
-            // 如果是子表的结构，比如Join/Merge的子节点，字段的名字直接使用别名
-            if (this.getNode().getAlias() != null) {
-                c.setTableName(this.getNode().getAlias());
-            } else {
-                c.setTableName(res.getTableName());
-            }
-        }
-
-        return c;
+        return this.getColumnFromOtherNode(c, this.getNode().getChild());
     }
 }
