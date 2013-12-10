@@ -19,6 +19,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.model.lifecycle.Lifecycle;
 import com.taobao.tddl.common.utils.TStringUtil;
@@ -218,6 +219,8 @@ public class TddlRuleConfig extends AbstractLifecycle implements Lifecycle {
 
     /**
      * 尝试订阅一下
+     * 
+     * @throws TddlException
      */
     private boolean dataSub(String dataId, String version, ConfigDataListener listener) {
         ConfigDataHandler ruleHandler = cdhf.getConfigDataHandler(dataId, listener);
@@ -233,7 +236,12 @@ public class TddlRuleConfig extends AbstractLifecycle implements Lifecycle {
                 return true;
             }
         } catch (Exception e) {
-            ruleHandler.destory();
+            try {
+                ruleHandler.destory();
+            } catch (TddlException e1) {
+                logger.error("destory failed!", e);
+            }
+
             logger.error("get diamond data error!", e);
         }
 
@@ -242,8 +250,10 @@ public class TddlRuleConfig extends AbstractLifecycle implements Lifecycle {
 
     /**
      * remove listeners
+     * 
+     * @throws TddlException
      */
-    public void doDestory() {
+    public void doDestory() throws TddlException {
         if (versionHandler != null) {
             versionHandler.destory();
         }
@@ -390,7 +400,11 @@ public class TddlRuleConfig extends AbstractLifecycle implements Lifecycle {
                 // 清理
                 for (String version : needRemove) {
                     ConfigDataHandler handler = ruleHandlers.get(version);
-                    handler.destory();
+                    try {
+                        handler.destory();
+                    } catch (TddlException e) {
+                        logger.error("destory failed!", e);
+                    }
                     ruleHandlers.remove(version);
                     vtrs.remove(version);
                     ruleStrs.remove(version);

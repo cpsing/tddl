@@ -21,16 +21,15 @@ public class ChooseTreadOptimizer implements QueryPlanOptimizer {
     public ChooseTreadOptimizer(){
     }
 
-    /**
-     * 如果设置了OptimizerExtraCmd.MergeConcurrent 并且值为True，则将所有的Merge变为并行
-     */
     @Override
     public IDataNodeExecutor optimize(IDataNodeExecutor dne, Map<Integer, ParameterContext> parameterSettings,
                                       Map<String, Comparable> extraCmd) {
 
         if (extraCmd != null && extraCmd.get("initThread") != null) this.allocThread(dne,
             (Integer) extraCmd.get("initThread"));
-        else this.allocThread(dne, 0);
+        else {
+            this.allocThread(dne, 0);
+        }
 
         return dne;
     }
@@ -44,7 +43,9 @@ public class ChooseTreadOptimizer implements QueryPlanOptimizer {
             }
 
         } else if (dne instanceof IQuery) {
-            if (((IQuery) dne).getSubQuery() != null) this.allocThread(((IQuery) dne).getSubQuery(), i + 1);
+            if (((IQuery) dne).getSubQuery() != null) {
+                this.allocThread(((IQuery) dne).getSubQuery(), i + 1);
+            }
 
         } else if (dne instanceof IMerge) {
             for (IDataNodeExecutor sub : ((IMerge) dne).getSubNode()) {

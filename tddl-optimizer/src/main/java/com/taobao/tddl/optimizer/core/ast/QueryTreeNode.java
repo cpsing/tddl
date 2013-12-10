@@ -57,32 +57,27 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
     /**
      * 包含所有子节点的filter，用于拼sql
      */
-    protected IFilter           allWhereFilter     = null;
+    protected IFilter           allWhereFilter  = null;
 
     /**
      * select查询中的列
      */
-    protected List<ISelectable> columnsSelected    = new ArrayList<ISelectable>();
-
-    /**
-     * 不在select中，但是出现在其它的地方，如order by中的列，where条件中的列，一些隐藏的列
-     */
-    protected List<ISelectable> implicitSelectable = new ArrayList<ISelectable>();
+    protected List<ISelectable> columnsSelected = new ArrayList<ISelectable>();
 
     /**
      * 依赖的所有列，可以理解为columnsSelected + implicitSelectable的总合
      */
-    protected List<ISelectable> columnsRefered     = new ArrayList<ISelectable>();
+    protected List<ISelectable> columnsRefered  = new ArrayList<ISelectable>();
 
     /**
      * 显式的由查询接口指定的orderBy，注意需要保证顺序
      */
-    protected List<IOrderBy>    orderBys           = new LinkedList<IOrderBy>();
+    protected List<IOrderBy>    orderBys        = new LinkedList<IOrderBy>();
 
     /**
      * 显式的由查询接口指定的group by，注意需要保证顺序
      */
-    protected List<IOrderBy>    groups             = new LinkedList<IOrderBy>();
+    protected List<IOrderBy>    groups          = new LinkedList<IOrderBy>();
 
     /**
      * having条件
@@ -92,22 +87,22 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
     /**
      * join的子节点
      */
-    protected List<ASTNode>     children           = new ArrayList<ASTNode>(2);
+    protected List<ASTNode>     children        = new ArrayList<ASTNode>(2);
 
     /**
      * 从哪里开始
      */
-    protected Comparable        limitFrom          = null;
+    protected Comparable        limitFrom       = null;
 
     /**
      * 到哪里结束
      */
-    protected Comparable        limitTo            = null;
+    protected Comparable        limitTo         = null;
 
     /**
      * filter in where
      */
-    protected IFilter           whereFilter        = null;
+    protected IFilter           whereFilter     = null;
 
     /**
      * 非column=column的join列
@@ -119,15 +114,20 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
      */
     protected String            alias;
 
-    protected boolean           consistent         = true;
+    /**
+     * 如果出现subQuery，内外都存在别名时，内部的别名为subAlias，外部使用的别名为alias
+     */
+    protected String            subAlias;
 
-    protected LOCK_MODEL        lockModel          = LOCK_MODEL.SHARED_LOCK;
+    protected boolean           consistent      = true;
+
+    protected LOCK_MODEL        lockModel       = LOCK_MODEL.SHARED_LOCK;
 
     /**
      * 当前节点是否为子查询
      */
-    protected boolean           subQuery           = false;
-    protected boolean           needBuild          = true;
+    protected boolean           subQuery        = false;
+    protected boolean           needBuild       = true;
     protected QUERY_CONCURRENCY queryConcurrency;
 
     /**
@@ -168,7 +168,6 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         this.havingFilter = OptimizerUtils.assignment(this.havingFilter, parameterSettings);
         this.resultFilter = OptimizerUtils.assignment(this.resultFilter, parameterSettings);
         this.columnsSelected = OptimizerUtils.assignment(this.columnsSelected, parameterSettings);
-        this.implicitSelectable = OptimizerUtils.assignment(implicitSelectable, parameterSettings);
         this.otherJoinOnFilter = OptimizerUtils.assignment(this.otherJoinOnFilter, parameterSettings);
         if (this.limitFrom instanceof IBindVal) {
             limitFrom = ((IBindVal) limitFrom).assignment(parameterSettings);
@@ -248,6 +247,12 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         return this;
     }
 
+    public QueryTreeNode subAlias(String alias) {
+        this.subAlias = alias;
+        setNeedBuild(true);
+        return this;
+    }
+
     public List<IOrderBy> getGroupBys() {
         return this.groups;
     }
@@ -319,14 +324,6 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         this.children.add(childNode);
     }
 
-    public List<ISelectable> getImplicitSelectable() {
-        return implicitSelectable;
-    }
-
-    public void setImplicitSelectable(List<ISelectable> implicitSelectable) {
-        this.implicitSelectable = implicitSelectable;
-    }
-
     public List<ISelectable> getColumnsSelected() {
         return columnsSelected;
     }
@@ -334,15 +331,6 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
     public QueryTreeNode setColumnsSelected(List<ISelectable> columnsSelected) {
         this.columnsSelected = columnsSelected;
         return this;
-    }
-
-    /**
-     * 添加一个不存在的字段
-     */
-    public void addImplicitSelectable(ISelectable selected) {
-        if (!implicitSelectable.contains(selected)) {
-            this.implicitSelectable.add(selected);
-        }
     }
 
     /**
@@ -367,7 +355,14 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
      * 判断一个字段是否存在于当前库
      */
     public boolean hasColumn(ISelectable c) {
-        return this.getBuilder().hasColumn(c);
+        return this.getBuilder().findColumn(c) != null;
+    }
+
+    /**
+     * 根据字段获取一下字段，查询的字段可能来自于select或者from
+     */
+    public ISelectable findColumn(ISelectable c) {
+        return this.getBuilder().findColumn(c);
     }
 
     public QueryTreeNode select(List<ISelectable> columnSelected) {
@@ -575,6 +570,18 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         return this;
     }
 
+    /**
+     * 设置别名，表级别
+     */
+    public QueryTreeNode setSubAlias(String string) {
+        this.subAlias(string);
+        return this;
+    }
+
+    public String getSubAlias() {
+        return subAlias;
+    }
+
     public boolean isSubQuery() {
         return subQuery;
     }
@@ -709,8 +716,8 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
      */
     protected void copySelfTo(QueryTreeNode to) {
         to.setAlias(this.alias);
+        to.setSubAlias(this.subAlias);
         to.columnsSelected = this.getColumnsSelected();
-        to.implicitSelectable = this.getImplicitSelectable();
         to.columnsRefered = this.getColumnsRefered();
         to.groups = this.getGroupBys();
         to.orderBys = this.getOrderBys();
@@ -732,8 +739,8 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
      */
     protected void deepCopySelfTo(QueryTreeNode to) {
         to.setAlias(this.alias);
+        to.setSubAlias(this.subAlias);
         to.columnsSelected = OptimizerUtils.deepCopySelectableList(this.getColumnsSelected());
-        to.implicitSelectable = OptimizerUtils.deepCopySelectableList(this.getImplicitSelectable());
         to.columnsRefered = OptimizerUtils.deepCopySelectableList(this.getColumnsRefered());
         to.groups = OptimizerUtils.deepCopyOrderByList(new ArrayList<IOrderBy>(this.getGroupBys()));
         to.orderBys = OptimizerUtils.deepCopyOrderByList(new ArrayList<IOrderBy>(this.getOrderBys()));

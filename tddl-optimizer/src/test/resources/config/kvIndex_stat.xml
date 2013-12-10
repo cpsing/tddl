@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<tableIndexStats xmlns="https://github.com/tddl/tddl/schema/stat" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://github.com/tddl/tddl/schema/stat https://raw.github.com/tddl/tddl/master/tddl-optimizer/src/main/resources/META-INF/stat.xsd">
+	<tableIndexStat>
+		<tableName>TABLE1</tableName>
+		<indexStats>
+			<indexStat>
+				<indexName>TABLE1._ID</indexName>
+				<indexType>0</indexType>
+				<distinctKeys>100000</distinctKeys>
+				<numRows>100000</numRows>
+				<factor>1.0</factor>
+			</indexStat>
+			<indexStat>
+				<indexName>TABLE1._NAME</indexName>
+				<indexType>0</indexType>
+				<distinctKeys>1000</distinctKeys>
+				<numRows>100000</numRows>
+				<factor>0.01</factor>
+			</indexStat>
+		</indexStats>
+	</tableIndexStat>
+	<tableIndexStat>
+		<tableName>TABLE2</tableName>
+		<indexStats>
+			<indexStat>
+				<indexName>TABLE2._ID</indexName>
+				<indexType>0</indexType>
+				<distinctKeys>100000</distinctKeys>
+				<numRows>100000</numRows>
+				<factor>1.0</factor>
+			</indexStat>
+			<indexStat>
+				<indexName>TABLE2._NAME</indexName>
+				<indexType>0</indexType>
+				<distinctKeys>1000</distinctKeys>
+				<numRows>100000</numRows>
+				<factor>0.01</factor>
+			</indexStat>
+		</indexStats>
+	</tableIndexStat>
+	
+	<tableIndexStat>
+		<tableName>TABLE3</tableName>
+		<indexStats>
+			<indexStat>
+				<indexName>TABLE3._ID</indexName>
+				<indexType>0</indexType>
+				<distinctKeys>1000</distinctKeys>
+				<numRows>1000</numRows>
+				<factor>1.0</factor>
+			</indexStat>
+		</indexStats>
+	</tableIndexStat>
+</tableIndexStats>

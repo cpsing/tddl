@@ -209,16 +209,8 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
      * @param indexNode
      */
     public void buildSelected() {
-        this.getNode().getImplicitSelectable().clear();
-
-        // 如果没有给Merge指定select列，则从child中继承select列
-        if (this.getNode().getColumnsSelected() == null || this.getNode().getColumnsSelected().isEmpty()) {
-            List<ISelectable> childSelected = ((QueryTreeNode) this.getNode().getChildren().get(0)).getColumnsSelectedForParent();
-            this.getNode().select(childSelected);
-        }
-
         buildSelectedFromSelectableObject();
-        this.buildFunction();
+        this.buildFunction(true);
     }
 
     private void buildSelectedFromSelectableObject() {

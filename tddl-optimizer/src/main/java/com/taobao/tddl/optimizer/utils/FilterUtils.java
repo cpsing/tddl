@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.google.common.collect.Lists;
@@ -238,7 +239,6 @@ public class FilterUtils {
         return columns;
     }
 
-
     /**
      * 非严格DNF检查，允许出现 Filter(A and B)
      */
@@ -312,7 +312,12 @@ public class FilterUtils {
         DNFNodes = mergeOrDNFNodes(mergeAndDNFNodesArray(DNFNodes));
         if (DNFNodes == null || DNFNodes.isEmpty() || DNFNodes.get(0) == null || DNFNodes.get(0).isEmpty()
             || DNFNodes.get(0).get(0) == null) {
-            return null;
+            // 返回常量true
+            IBooleanFilter f = ASTNodeFactory.getInstance().createBooleanFilter();
+            f.setOperation(OPERATION.CONSTANT);
+            f.setColumn("1");
+            f.setColumnName(ObjectUtils.toString("1"));
+            return f;
         } else {
             return DNFToOrLogicTree(DNFNodes);
         }
@@ -416,7 +421,7 @@ public class FilterUtils {
 
         IFilter treeNode = DNFToAndLogicTree(DNFNodes.get(0));
         for (int i = 1; i < DNFNodes.size(); i++) {
-            treeNode = and(treeNode, DNFToAndLogicTree(DNFNodes.get(i)));
+            treeNode = or(treeNode, DNFToAndLogicTree(DNFNodes.get(i)));
         }
         return treeNode;
     }

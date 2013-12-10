@@ -27,7 +27,35 @@ import com.taobao.tddl.optimizer.exceptions.QueryException;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
 
 /**
- * 优化一下join策略
+ * 优化一下join
+ * 
+ * <pre>
+ * 优化策略：
+ * 1. 选择合适的索引
+ * 2. 基于选择的索引，拆分where条件为key/indexValue/Result filter
+ * 3. 针对不至此or条件的引擎，拆分OR为两个TableNode，进行merge查询. (需要考虑重复数据去重)
+ * 4. 选择join策略
+ *     如果内表是一个TableNode，或者是一个紧接着TableNode的QueryNode
+ *     先只考虑约束条件，而不考虑Join条件分以下两种大类情况：
+ *     1.内表没有选定索引(约束条件里没有用到索引的列)
+ *       1.1内表进行Join的列不存在索引
+ *          策略：NestLoop，内表使用全表扫描
+ *       1.2内表进行Join的列存在索引
+ *          策略：IndexNestLoop,在Join列里面选择索引，原本的全表扫描会分裂成一个Join
+ *          
+ *     2.内表已经选定了索引（KeyFilter存在）
+ *       2.1内表进行Join的列不存在索引
+ *          策略：NestLoop，内表使用原来的索引
+ *       2.2内表进行Join的列存在索引
+ *          这种情况最为复杂，有两种方法
+ *              a. 放弃原来根据约束条件选择的索引，而使用Join列中得索引(如果有的话)，将约束条件全部作为ValueFilter，这样可以使用IndexNestLoop
+ *              b. 采用根据约束条件选择的索引，而不管Join列，这样只能使用NestLoop
+ *          如果内表经约束后的大小比较小，则可以使用方案二，反之，则应使用方案一,不过此开销目前很难估算。
+ *          或者枚举所有可能的情况，貌似也比较麻烦，暂时只采用方案二，实现简单一些。
+ * 5. 下推join/merge的order by条件
+ * 
+ * 如果设置了join节点顺序选择，会对可join的节点进行全排列，选择最合适的join，比如左表的数据最小
+ * </pre>
  */
 public class JoinChooser {
 
@@ -124,7 +152,55 @@ public class JoinChooser {
                 child = chooseStrategyAndIndexAndSplitQuery(child, extraCmd);
                 node.getChildren().set(i, child);
             }
+        }
 
+        if (node instanceof TableNode) {
+            // Query是对实体表进行查询
+            List<QueryTreeNode> ss = FilterChooser.splitByDNF((TableNode) node, extraCmd);
+            // 如果子查询中得某一个没有keyFilter，也即需要做全表扫描
+            // 那么其他的子查询也没必要用索引了，都使用全表扫描即可
+            // 直接把原来的约束条件作为valuefilter，全表扫描就行。
+            boolean isExistAQueryNeedTableScan = false;
+            for (QueryTreeNode s : ss) {
+                if (s instanceof TableNode && ((TableNode) s).isFullTableScan()) {
+                    isExistAQueryNeedTableScan = true;
+                }
+            }
+
+            if (isExistAQueryNeedTableScan) {
+                ((TableNode) node).setIndexQueryValueFilter(node.getWhereFilter());
+                ((TableNode) node).setKeyFilter(null);
+                node.setResultFilter(null);
+                ss.clear();
+                ss = null;
+                ((TableNode) node).setFullTableScan(true);
+            }
+
+            if (ss != null && ss.size() > 1) {
+                MergeNode merge = new MergeNode();
+                merge.alias(ss.get(0).getAlias());
+                // limit操作在merge完成
+                for (QueryTreeNode s : ss) {
+                    merge.merge(s);
+                }
+
+                merge.setUnion(true);
+                merge.build();
+                return merge;
+            } else if (ss != null && ss.size() == 1) {
+                return ss.get(0);
+            }
+
+            // 全表扫描可以扫描包含所有选择列的索引
+            IndexMeta indexWithAllColumnsSelected = IndexChooser.findBestIndexByAllColumnsSelected(((TableNode) node).getTableMeta(),
+                ((TableNode) node).getColumnsRefered(),
+                extraCmd);
+
+            if (indexWithAllColumnsSelected != null) {
+                ((TableNode) node).useIndex(indexWithAllColumnsSelected);
+            }
+            return node;
+        } else if (node instanceof JoinNode) {
             // 如果Join是OuterJoin，则不区分内外表，只能使用NestLoop或者SortMerge，暂时只使用SortMerge
             // if (((JoinNode) node).isOuterJoin()) {
             // ((JoinNode) node).setJoinStrategy(new BlockNestedLoopJoin(oc));
@@ -168,7 +244,7 @@ public class JoinChooser {
                         tablename = innerNode.getAlias();
                     }
                     // 找到对应join字段的索引
-                    IndexMeta index = IndexChooser.findBestIndex((((TableNode) innerNode).getIndexs()),
+                    IndexMeta index = IndexChooser.findBestIndex((((TableNode) innerNode).getTableMeta()),
                         ((JoinNode) node).getRightKeys(),
                         Collections.<IFilter> emptyList(),
                         tablename,
@@ -177,7 +253,7 @@ public class JoinChooser {
                     List<List<IFilter>> DNFNodes = FilterUtils.toDNFNodesArray(innerNode.getWhereFilter());
                     if (DNFNodes.size() == 1) {
                         // 即使索引没有选择主键，但是有的filter依旧会在s主键上进行，作为valueFilter，所以要把主键也传进去
-                        Map<FilterType, IFilter> filters = FilterChooser.optimize(DNFNodes.get(0),
+                        Map<FilterType, IFilter> filters = FilterChooser.splitByIndex(DNFNodes.get(0),
                             (TableNode) innerNode);
                         ((TableNode) innerNode).setKeyFilter(filters.get(FilterType.IndexQueryKeyFilter));
                         ((TableNode) innerNode).setResultFilter(filters.get(FilterType.ResultFilter));
@@ -217,52 +293,6 @@ public class JoinChooser {
 
             } else { // 这种情况也属于case 2，先使用NestLoop...
                 ((JoinNode) node).setJoinStrategy(new IndexNestedLoopJoin());
-            }
-
-            return node;
-        } else if (node instanceof TableNode) {
-            // Query是对实体表进行查询
-            List<QueryTreeNode> ss = FilterChooser.optimize((TableNode) node, extraCmd);
-            // 如果子查询中得某一个没有keyFilter，也即需要做全表扫描
-            // 那么其他的子查询也没必要用索引了，都使用全表扫描即可
-            // 直接把原来的约束条件作为valuefilter，全表扫描就行。
-            boolean isExistAQueryNeedTableScan = false;
-            for (QueryTreeNode s : ss) {
-                if (s instanceof TableNode && ((TableNode) s).isFullTableScan()) {
-                    isExistAQueryNeedTableScan = true;
-                }
-            }
-
-            if (isExistAQueryNeedTableScan) {
-                ((TableNode) node).setIndexQueryValueFilter(node.getWhereFilter());
-                ((TableNode) node).setKeyFilter(null);
-                node.setResultFilter(null);
-                ss.clear();
-                ss = null;
-                ((TableNode) node).setFullTableScan(true);
-            }
-
-            if (ss != null && ss.size() > 1) {
-                MergeNode merge = new MergeNode();
-                merge.alias(ss.get(0).getAlias());
-                // limit操作在merge完成
-                for (QueryTreeNode s : ss) {
-                    merge.merge(s);
-                }
-
-                merge.setUnion(true);
-                merge.build();
-                return merge;
-            } else if (ss != null && ss.size() == 1) {
-                return ss.get(0);
-            }
-
-            // 全表扫描可以扫描包含所有选择列的索引
-            IndexMeta indexWithAllColumnsSelected = IndexChooser.findIndexWithAllColumnsSelected(((TableNode) node).getIndexs(),
-                (TableNode) node);
-
-            if (indexWithAllColumnsSelected != null) {
-                ((TableNode) node).useIndex(indexWithAllColumnsSelected);
             }
             return node;
         } else {

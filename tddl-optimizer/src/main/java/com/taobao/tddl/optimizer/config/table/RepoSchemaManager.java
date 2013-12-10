@@ -32,7 +32,7 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
         if (!isDelegate) {
             delegate = ExtensionLoader.load(RepoSchemaManager.class, group.getType().name());
             delegate.setGroup(group);
-            delegate.setIsDelegate(true);
+            delegate.setDelegate(true);
             delegate.init();
 
             cache = CacheBuilder.newBuilder()
@@ -96,10 +96,15 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
     }
 
     protected void doDestory() {
+        if (local != null && local.isInited()) {
+            local.destory();
+        }
+
         if (!isDelegate) {
             delegate.destory();
-            cache.invalidateAll();
+            cache.cleanUp();
         }
+
     }
 
     public void setUseCache(boolean useCache) {
@@ -118,7 +123,7 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
         this.local = local;
     }
 
-    public void setIsDelegate(boolean isDelegate) {
+    public void setDelegate(boolean isDelegate) {
         this.isDelegate = isDelegate;
     }
 

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.DBType;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.model.lifecycle.Lifecycle;
@@ -20,16 +21,16 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  */
 public class VirtualTableRoot extends AbstractLifecycle implements Lifecycle {
 
-    private static final Logger                    logger           = LoggerFactory.getLogger(VirtualTableRoot.class);
-    protected String                               dbType           = "MYSQL";
+    private static final Logger                 logger           = LoggerFactory.getLogger(VirtualTableRoot.class);
+    protected String                            dbType           = "MYSQL";
     protected Map<String/* 小写key */, TableRule> virtualTableMap;
-    protected Map<String/* 小写key */, String>       dbIndexMap;
+    protected Map<String/* 小写key */, String>    dbIndexMap;
 
-    protected String                               defaultDbIndex;
-    protected boolean                              needIdInGroup    = false;
-    protected boolean                              completeDistinct = false;
+    protected String                            defaultDbIndex;
+    protected boolean                           needIdInGroup    = false;
+    protected boolean                           completeDistinct = false;
 
-    public void init() {
+    public void init() throws TddlException {
         for (Map.Entry<String, TableRule> entry : virtualTableMap.entrySet()) {
             logger.warn("virtual table start to init :" + entry.getKey());
             TableRule vtab = entry.getValue();

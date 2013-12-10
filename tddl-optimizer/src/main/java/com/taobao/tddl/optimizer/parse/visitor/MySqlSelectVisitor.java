@@ -20,6 +20,7 @@ import com.alibaba.cobar.parser.visitor.EmptySQLASTVisitor;
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
+import com.taobao.tddl.optimizer.core.ast.query.QueryNode;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
@@ -86,14 +87,15 @@ public class MySqlSelectVisitor extends EmptySQLASTVisitor {
 
     private void handleFrom(TableReferences tables) {
         List<TableReference> trs = tables.getTableReferenceList();
-        for (TableReference tr : trs) {
+        for (int i = 0; i < trs.size(); i++) {
+            TableReference tr = trs.get(i);
             MySqlExprVisitor mtv = new MySqlExprVisitor();
             tr.accept(mtv);
             if (this.tableNode == null) {
                 this.tableNode = mtv.getTableNode();
-                // if (this.tableNode.isSubQuery()) {
-                // this.tableNode = new QueryNode(this.tableNode);
-                // }
+                if (this.tableNode.isSubQuery() && i == trs.size() - 1) {
+                    this.tableNode = new QueryNode(this.tableNode);
+                }
             } else {
                 this.tableNode = this.tableNode.join(mtv.getTableNode());
             }

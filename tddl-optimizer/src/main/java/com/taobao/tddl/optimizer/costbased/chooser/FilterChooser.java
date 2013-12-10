@@ -20,7 +20,7 @@ import com.taobao.tddl.optimizer.utils.FilterUtils;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
 
 /**
- * 限制分离器 简单来说 一个查询 A = 1 and B = 2 <br/>
+ * 条件分离器 简单来说 一个查询 A = 1 and B = 2 <br/>
  * 需要分析出哪些是key filter?哪些是 post filter( ResultFilter) <br/>
  * 在这里进行分离 key filter就是能走索引的那些filter，post filter就是必须遍历结果集的那些filter
  * 
@@ -32,7 +32,8 @@ public class FilterChooser {
     /**
      * 根据where中的所有条件按照or进行分隔，生成多个query请求. (主要考虑部分存储引擎不支持or语法)
      */
-    public static List<QueryTreeNode> optimize(TableNode node, Map<String, Comparable> extraCmd) throws QueryException {
+    public static List<QueryTreeNode> splitByDNF(TableNode node, Map<String, Comparable> extraCmd)
+                                                                                                  throws QueryException {
         if (node.getWhereFilter() == null) {
             return new LinkedList<QueryTreeNode>();
         }
@@ -40,13 +41,14 @@ public class FilterChooser {
         if (!FilterUtils.isDNF(node.getWhereFilter())) {
             throw new IllegalArgumentException("not dnf!!! fuck!!\n" + node.getWhereFilter());
         }
+
         List<QueryTreeNode> subQueries = new LinkedList<QueryTreeNode>();
         List<List<IFilter>> DNFNodes = FilterUtils.toDNFNodesArray(node.getWhereFilter());
 
         for (List<IFilter> DNFNode : DNFNodes) {
             List columns = Arrays.asList(FilterUtils.toColumnFiltersMap(DNFNode).keySet().toArray());
             String tablename = node.getTableName();
-            IndexMeta index = findBestIndex(node.getIndexs(), columns, DNFNode, tablename, extraCmd);
+            IndexMeta index = IndexChooser.findBestIndex(node.getTableMeta(), columns, DNFNode, tablename, extraCmd);
             if (index == null) {
                 index = node.getTableMeta().getPrimaryIndex();
             }
@@ -57,7 +59,7 @@ public class FilterChooser {
                 subQuery.setFullTableScan(true);
             }
 
-            Map<FilterType, IFilter> filters = optimize(DNFNode, subQuery);
+            Map<FilterType, IFilter> filters = splitByIndex(DNFNode, subQuery);
             subQuery.setKeyFilter(filters.get(FilterType.IndexQueryKeyFilter));
             subQuery.setResultFilter(filters.get(FilterType.ResultFilter));
             subQuery.setIndexQueryValueFilter(filters.get(FilterType.IndexQueryValueFilter));
@@ -70,10 +72,10 @@ public class FilterChooser {
     /**
      * 将一组filter，根据索引信息拆分为key/indexValue/Value几种分组，keyFilter可以下推到叶子节点减少数据返回
      */
-    public static Map<FilterType, IFilter> optimize(List<IFilter> DNFNode, TableNode table) {
-        IndexMeta index = table.getIndexUsed();
+    public static Map<FilterType, IFilter> splitByIndex(List<IFilter> DNFNode, TableNode table) {
         Map<FilterType, IFilter> filters = new HashMap();
         Map<Comparable, List<IFilter>> columnAndItsFilters = FilterUtils.toColumnFiltersMap(DNFNode);
+        IndexMeta index = table.getIndexUsed();
         if (index == null) {
             index = table.getTableMeta().getPrimaryIndex();
         }
@@ -140,8 +142,4 @@ public class FilterChooser {
         return filters;
     }
 
-    private static IndexMeta findBestIndex(List<IndexMeta> indexs, List<ISelectable> columns, List<IFilter> filters,
-                                           String tablename, Map<String, Comparable> extraCmd) {
-        return IndexChooser.findBestIndex(indexs, columns, filters, tablename, extraCmd);
-    }
 }

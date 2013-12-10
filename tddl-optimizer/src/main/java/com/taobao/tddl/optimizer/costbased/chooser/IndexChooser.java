@@ -1,6 +1,5 @@
 package com.taobao.tddl.optimizer.costbased.chooser;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,10 +7,9 @@ import org.apache.commons.lang.BooleanUtils;
 
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.optimizer.config.table.ColumnMeta;
+import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
-import com.taobao.tddl.optimizer.core.ast.query.TableNode;
-import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
+import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
@@ -21,19 +19,27 @@ import com.taobao.tddl.optimizer.utils.FilterUtils;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
 
 /**
+ * 索引选择
+ * 
+ * <pre>
+ * 索引选择策略：
+ * 1. 根据选择条件查询，计算出开销最小
+ * 2. 根据选择的列，找出全覆盖的索引 (顺序和查询顺序一致，前缀查询)
+ * </pre>
+ * 
  * @author Dreamond
  */
 public class IndexChooser {
 
     private static final int initialScore = 10000;
 
-    public static IndexMeta findBestIndex(List<IndexMeta> indexs, List<ISelectable> columns, List<IFilter> filters,
+    public static IndexMeta findBestIndex(TableMeta tableMeta, List<ISelectable> columns, List<IFilter> filters,
                                           String tablename, Map<String, Comparable> extraCmd) {
-        String ifChooseIndex = GeneralUtil.getExtraCmd(extraCmd, ExtraCmd.OptimizerExtraCmd.ChooseIndex);
-        if (BooleanUtils.toBoolean(ifChooseIndex) == false) {
+        if (!chooseIndex(extraCmd)) {
             return null;
         }
 
+        List<IndexMeta> indexs = tableMeta.getIndexs();
         if (indexs.isEmpty()) {
             return null;
         }
@@ -51,14 +57,24 @@ public class IndexChooser {
                 continue;
             }
 
+            KVIndexStat kvIndexStat = OptimizerContext.getContext()
+                .getStatManager()
+                .getKVIndex(indexs.get(i).getName());
             List<ISelectable> indexColumns = OptimizerUtils.columnMetaListToIColumnList(indexs.get(i).getKeyColumns(),
                 tablename);
-
             for (int j = 0; j < indexColumns.size(); j++) {
-                if (columns.contains(indexColumns.get(j))) {
-                    scores[i] = (int) estimateRowCount(scores[i],
+                boolean isContain = false;
+                if (columnFilters.isEmpty()) {// 此时以columns为准
+                    isContain = columns.contains(indexColumns.get(j));
+                } else {
+                    isContain = columnFilters.containsKey(indexColumns.get(j));
+                }
+
+                if (isContain) {
+                    scores[i] = (int) CostEsitimaterFactory.estimateRowCount(scores[i],
                         columnFilters.get(((IColumn) indexColumns.get(j))),
-                        indexs.get(i));
+                        indexs.get(i),
+                        kvIndexStat);
                     scores[i] -= 1; // 命中一个主键字段
                 } else {
                     break;
@@ -88,75 +104,33 @@ public class IndexChooser {
     }
 
     /**
-     * 如果某个索引包含所有选择列，并且包含的无关列最少则选择该索引
+     * 根据查询字段，查找一个索引包含所有选择列，并且包含的无关列最少则选择该索引
      */
-    public static IndexMeta findIndexWithAllColumnsSelected(List<IndexMeta> indexs, TableNode qn) {
-        IndexMeta indexChoosed = null;
-        int theIndexOfTheIndexWithLeastColumns = -1;
-        int theLeastColumnsNumber = Integer.MAX_VALUE;
-        List<ISelectable> queryColumns = qn.getColumnsRefered();
-        for (int i = 0; i < indexs.size(); i++) {
-            List<ISelectable> indexColumns = OptimizerUtils.columnMetaListToIColumnList(indexs.get(i).getKeyColumns(),
-                indexs.get(i).getTableName());
+    public static IndexMeta findBestIndexByAllColumnsSelected(TableMeta tableMeta, List<ISelectable> queryColumns,
+                                                              Map<String, Comparable> extraCmd) {
+        if (!chooseIndex(extraCmd)) {
+            return null;
+        }
 
+        IndexMeta indexChoosed = null;
+        int theLeastColumnsNumber = Integer.MAX_VALUE;
+        List<IndexMeta> indexs = tableMeta.getIndexs();
+        for (int i = 0; i < indexs.size(); i++) {
+            List<ISelectable> indexColumns = OptimizerUtils.columnMetaListToIColumnList(indexs.get(i).getKeyColumns());
             if (indexColumns.containsAll(queryColumns)) {
                 if (theLeastColumnsNumber > indexs.get(i).getKeyColumns().size()) {
                     theLeastColumnsNumber = indexs.get(i).getKeyColumns().size();
-                    theIndexOfTheIndexWithLeastColumns = i;
+                    indexChoosed = indexs.get(i);
                 }
             }
         }
 
-        if (theIndexOfTheIndexWithLeastColumns != -1) {
-            indexChoosed = indexs.get(theIndexOfTheIndexWithLeastColumns);
-        }
         return indexChoosed;
     }
 
-    private static long estimateRowCount(long oldCount, List<IFilter> filters, IndexMeta index) {
-        // indexMeta
-        if (filters == null || filters.isEmpty()) {
-            return oldCount;
-        }
-
-        Map<String, Double> columnAndColumnCountItSelectivity = new HashMap();
-        KVIndexStat indexStat = null;
-        if (index != null) {
-            // TODO indexStat =
-            // oc.getStatisticsManager().getStatistics(index.getName());
-            indexStat = new KVIndexStat(null, 0);
-
-            if (indexStat != null) {
-                // 选择度越小，代表索引查找的代价更小，比如选择读为1时，即为精确查找，如果选择度趋向无穷大，即为全表扫描
-                Double columnCountEveryKeyColumnSelect = ((double) index.getKeyColumns().size())
-                                                         * (1 / indexStat.getDistinct_keys());
-                for (ColumnMeta cm : index.getKeyColumns()) {
-                    columnAndColumnCountItSelectivity.put(cm.getName(), columnCountEveryKeyColumnSelect);
-                }
-            }
-        }
-
-        long count = oldCount;
-        // 每出现一个运算符，都把现在的行数乘上一个系数
-        for (IFilter filter : filters) {
-            Double selectivity = null;
-            IColumn column = null;
-            if (((IBooleanFilter) filter).getColumn() instanceof IColumn) {
-                column = (IColumn) ((IBooleanFilter) filter).getColumn();
-            } else if (((IBooleanFilter) filter).getValue() instanceof IColumn) {
-                column = (IColumn) ((IBooleanFilter) filter).getValue();
-            }
-
-            if (column != null) {
-                selectivity = columnAndColumnCountItSelectivity.get(column.getColumnName());
-                if (selectivity == null) {
-                    selectivity = CostEsitimaterFactory.selectivity(filter.getOperation()); // 使用默认值
-                }
-
-                count *= selectivity;
-            }
-        }
-
-        return count;
+    private static boolean chooseIndex(Map<String, Comparable> extraCmd) {
+        String ifChooseIndex = GeneralUtil.getExtraCmd(extraCmd, ExtraCmd.OptimizerExtraCmd.ChooseIndex);
+        return BooleanUtils.toBoolean(ifChooseIndex);
     }
+
 }

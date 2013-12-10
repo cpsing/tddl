@@ -5,7 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 
+import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.ASTNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.query.JoinNode;
@@ -129,20 +132,36 @@ public class FilterPreProcessor {
         List<List<IFilter>> newDNFfilter = new ArrayList<List<IFilter>>();
         for (List<IFilter> andDNFfilter : DNFfilter) {
             boolean isShortest = false;
+            List<IFilter> newAndDNFfilter = new ArrayList<IFilter>();
             for (IFilter one : andDNFfilter) {
                 if (one.getOperation() == OPERATION.CONSTANT) {
-                    boolean flag = BooleanUtils.toBoolean(((IBooleanFilter) one).getColumn().toString());
-                    if (flag) {
-                        return one; // 直接返回true
+                    boolean flag = false;
+                    String value = ((IBooleanFilter) one).getColumn().toString();
+                    if (StringUtils.isNumeric(value)) {
+                        flag = BooleanUtils.toBoolean(Integer.valueOf(value));
                     } else {
+                        flag = BooleanUtils.toBoolean(((IBooleanFilter) one).getColumn().toString());
+                    }
+                    if (!flag) {
                         isShortest = true;
                         break;
                     }
+                } else {
+                    newAndDNFfilter.add(one);
                 }
             }
 
-            if (!isShortest) {// 针对非false的情况
-                newDNFfilter.add(andDNFfilter);
+            if (!isShortest) {
+                if (newAndDNFfilter.isEmpty()) {
+                    // 代表出现为true or xxx，直接返回true
+                    IBooleanFilter f = ASTNodeFactory.getInstance().createBooleanFilter();
+                    f.setOperation(OPERATION.CONSTANT);
+                    f.setColumn("1");
+                    f.setColumnName(ObjectUtils.toString("1"));
+                    return f;
+                } else {// 针对非false的情况
+                    newDNFfilter.add(newAndDNFfilter);
+                }
             }
         }
 

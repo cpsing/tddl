@@ -18,7 +18,7 @@ public class KVColumnStat {
     // 列名
     private String               columnName;
     // 采样大小
-    private long                 num_rows;
+    private long                 numRows;
     // 不同列值个数的统计
     private Map<Integer, Long>   valueHistogramMap;
     // 不同列值个数的百分比
@@ -26,7 +26,7 @@ public class KVColumnStat {
 
     public KVColumnStat(String columnName, long realsampleRows){
         this.columnName = columnName;
-        this.num_rows = realsampleRows;
+        this.numRows = realsampleRows;
         this.valuePercentMap = new HashMap<Integer, Double>();
     }
 
@@ -35,7 +35,7 @@ public class KVColumnStat {
     }
 
     public long getNum_rows() {
-        return num_rows;
+        return numRows;
     }
 
     public Map<Integer, Long> getValueHistogramMap() {
@@ -50,7 +50,7 @@ public class KVColumnStat {
         for (Iterator<Integer> iterator = valueHistogramMap.keySet().iterator(); iterator.hasNext();) {
             int key = iterator.next();
             Long value = valueHistogramMap.get(key);
-            Double percent = Double.valueOf(value) / Double.valueOf(num_rows);
+            Double percent = Double.valueOf(value) / Double.valueOf(numRows);
             valuePercentMap.put(key, percent);
         }
     }

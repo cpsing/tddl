@@ -60,7 +60,6 @@ public class TableNodeBuilder extends QueryTreeNodeBuilder {
      * 构建列信息
      */
     public void buildSelected() {
-        this.getNode().getImplicitSelectable().clear();
         buildSelectedFromSelectableObject();
     }
 

@@ -33,7 +33,9 @@ public class QueryNode extends QueryTreeNode {
         this.builder = new QueryNodeBuilder(this);
         this.whereFilter = filter;
         this.setChild(child);
-        child.setSubQuery(true);// 默认设置为subQuery
+        if (child != null) {
+            child.setSubQuery(true);// 默认设置为subQuery
+        }
     }
 
     public QueryTreeNode getChild() {
@@ -124,9 +126,8 @@ public class QueryNode extends QueryTreeNode {
     }
 
     public QueryNode deepCopy() {
-        QueryNode newTableNode = new QueryNode(null);
+        QueryNode newTableNode = new QueryNode((QueryTreeNode) this.getChild().deepCopy());
         this.deepCopySelfTo(newTableNode);
-        newTableNode.setChild((QueryTreeNode) this.getChild().deepCopy());
         newTableNode.setNeedBuild(false);
         return newTableNode;
     }

@@ -6,8 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.google.common.collect.Maps;
-import com.taobao.tddl.rule.virtualnode.PartitionFunction;
-import com.taobao.tddl.rule.virtualnode.TableSlotMap;
+import com.taobao.tddl.common.exception.TddlException;
 
 public class TableSlotMapTest {
 
@@ -34,7 +33,7 @@ public class TableSlotMapTest {
     }
 
     @Test
-    public void testPartition() {
+    public void testPartition() throws TddlException {
         TableSlotMap slot = new TableSlotMap();
         PartitionFunction keyFunc = new PartitionFunction();
         keyFunc.setFirstValue(-1);

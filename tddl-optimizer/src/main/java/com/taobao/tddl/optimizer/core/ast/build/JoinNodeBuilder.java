@@ -78,7 +78,6 @@ public class JoinNodeBuilder extends QueryTreeNodeBuilder {
         }
         List<IBooleanFilter> otherJoinOnFilters = new ArrayList(this.getNode().getJoinFilter().size());
         for (IBooleanFilter f : this.getNode().getJoinFilter()) {
-
             ISelectable leftKey = null;
             if (f.getColumn() != null && f.getColumn() instanceof ISelectable) {
                 leftKey = this.getColumnFromOtherNode((ISelectable) f.getColumn(), this.getNode().getLeftNode());
@@ -131,7 +130,6 @@ public class JoinNodeBuilder extends QueryTreeNodeBuilder {
      * @param indexNode
      */
     public void buildSelected() {
-        this.getNode().getImplicitSelectable().clear();
         buildSelectedFromSelectableObject();
     }
 

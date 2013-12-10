@@ -18,6 +18,7 @@ import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.dml.DeleteNode;
 import com.taobao.tddl.optimizer.core.ast.dml.InsertNode;
 import com.taobao.tddl.optimizer.core.ast.dml.UpdateNode;
+import com.taobao.tddl.optimizer.core.ast.query.JoinNode;
 import com.taobao.tddl.optimizer.core.ast.query.KVIndexNode;
 import com.taobao.tddl.optimizer.core.ast.query.QueryNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
@@ -947,7 +948,7 @@ public class SqlParserTest extends BaseOptimizerTest {
         QueryTreeNode qnExpected = table1.select("NAME");
 
         TableNode table2 = new TableNode("TABLE2");
-        table2.alias("B").select("*").query("B.ID=1");
+        table2.alias("C").setSubAlias("B").select("*").query("B.ID=1");
         table2.groupBy("SCHOOL");
         table2.having("COUNT(*) > 1");
         table2.orderBy("ID", false);
@@ -955,7 +956,7 @@ public class SqlParserTest extends BaseOptimizerTest {
         table2.setSubQuery(true);
 
         QueryNode subQuery = new QueryNode(table2);
-        subQuery.alias("C").select("C.NAME");
+        subQuery.select("C.NAME");
 
         IColumn column = ASTNodeFactory.getInstance().createColumn().setColumnName("NAME");
         IBooleanFilter filter = ASTNodeFactory.getInstance()
@@ -975,9 +976,9 @@ public class SqlParserTest extends BaseOptimizerTest {
         qn.build();
 
         TableNode table1 = new TableNode("TABLE1");
-        table1.alias("A").query("A.ID=1");
+        table1.subAlias("A").alias("B").query("A.ID=1");
         QueryTreeNode qnExpected = new QueryNode(table1);
-        qnExpected.alias("B").select("NAME");
+        qnExpected.select("NAME");
         qnExpected.build();
         assertEquals(qn, qnExpected);
     }
@@ -991,6 +992,48 @@ public class SqlParserTest extends BaseOptimizerTest {
         qn.build();
 
         System.out.println(qn);
+    }
+
+    @Test
+    public void testQuery_join子查询_join表() throws SqlParserException, QueryException {
+        String sql = "SELECT * FROM (SELECT A.ID,A.NAME FROM TABLE1 A JOIN TABLE2 B ON A.ID=B.ID WHERE A.NAME=1) C JOIN TABLE3 D ON C.ID = D.ID";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+
+        System.out.println(qn);
+        Assert.assertTrue(((JoinNode) qn).getLeftNode() instanceof JoinNode);
+    }
+
+    @Test
+    public void testQuery_join子查询() throws SqlParserException, QueryException {
+        String sql = "SELECT * FROM (SELECT A.ID,A.NAME FROM TABLE1 A JOIN TABLE2 B ON A.ID=B.ID WHERE A.NAME=1) C WHERE C.ID = 6";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+
+        // System.out.println(qn);
+        // 第一级是QueryNode
+        // 第二级是JoinNode
+        Assert.assertTrue(qn instanceof QueryNode);
+        Assert.assertTrue(((QueryNode) qn).getChild() instanceof JoinNode);
+    }
+
+    @Test
+    public void testQuery_join_子查询_多级组合() throws SqlParserException, QueryException {
+        String joinSql = "SELECT TABLE1.ID,TABLE1.NAME FROM TABLE1 JOIN TABLE2 ON TABLE1.ID=TABLE1.ID WHERE TABLE1.NAME=1";
+        String subsql = "SELECT * FROM (" + joinSql + " ) S WHERE S.NAME = 1";
+        String sql = "SELECT * FROM (" + subsql + ") B , (" + subsql + ") C WHERE NAME = 6 AND B.ID = C.ID";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+
+        // System.out.println(qn);
+        // 第一级是JoinNode
+        // 第二级是QuerNode / QueryNode
+        // 第三级是JoinNode / JoinNode
+        Assert.assertTrue(qn instanceof JoinNode);
+        Assert.assertTrue(((JoinNode) qn).getLeftNode() instanceof QueryNode);
+        Assert.assertTrue(((JoinNode) qn).getRightNode() instanceof QueryNode);
+        Assert.assertTrue(((QueryNode) ((JoinNode) qn).getLeftNode()).getChild() instanceof JoinNode);
+        Assert.assertTrue(((QueryNode) ((JoinNode) qn).getRightNode()).getChild() instanceof JoinNode);
     }
 
     // ==================================================
