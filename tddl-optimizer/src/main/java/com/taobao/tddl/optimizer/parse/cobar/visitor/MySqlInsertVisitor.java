@@ -1,42 +1,46 @@
-package com.taobao.tddl.optimizer.parse.visitor;
+package com.taobao.tddl.optimizer.parse.cobar.visitor;
 
 import java.util.List;
 
+import com.alibaba.cobar.parser.ast.expression.misc.QueryExpression;
 import com.alibaba.cobar.parser.ast.expression.primary.Identifier;
 import com.alibaba.cobar.parser.ast.expression.primary.RowExpression;
-import com.alibaba.cobar.parser.ast.stmt.dml.DMLReplaceStatement;
+import com.alibaba.cobar.parser.ast.stmt.dml.DMLInsertStatement;
 import com.alibaba.cobar.parser.visitor.EmptySQLASTVisitor;
 import com.taobao.tddl.common.exception.NotSupportException;
-import com.taobao.tddl.optimizer.core.ast.dml.PutNode;
+import com.taobao.tddl.optimizer.core.ast.dml.InsertNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 
-/**
- * replace处理
- * 
- * @since 5.1.0
- */
-public class MySqlReplaceIntoVisitor extends EmptySQLASTVisitor {
+public class MySqlInsertVisitor extends EmptySQLASTVisitor {
 
-    private PutNode replaceNode;
+    private InsertNode insertNode;
 
-    public void visit(DMLReplaceStatement node) {
+    public void visit(DMLInsertStatement node) {
         TableNode table = getTableNode(node);
         String insertColumns = this.getInsertColumnsStr(node);
         List<RowExpression> exprList = node.getRowList();
         if (exprList != null && exprList.size() == 1) {
             RowExpression expr = exprList.get(0);
             Comparable[] iv = getRowValue(expr);
-            this.replaceNode = table.put(insertColumns, iv);
+            this.insertNode = table.insert(insertColumns, iv);
         } else {
             throw new NotSupportException("could not support multi row values.");
         }
+
+        // 暂时不支持子表的查询
+        QueryExpression subQuery = node.getSelect();
+        if (subQuery != null) {
+            throw new NotSupportException("could not support insert into select");
+        }
     }
 
-    private TableNode getTableNode(DMLReplaceStatement node) {
-        return new TableNode(node.getTable().getIdTextUpUnescape());
+    private TableNode getTableNode(DMLInsertStatement node) {
+        TableNode table = null;
+        table = new TableNode(node.getTable().getIdTextUpUnescape());
+        return table;
     }
 
-    private String getInsertColumnsStr(DMLReplaceStatement node) {
+    private String getInsertColumnsStr(DMLInsertStatement node) {
         List<Identifier> columnNames = node.getColumnNameList();
         StringBuilder sb = new StringBuilder("");
         if (columnNames != null && columnNames.size() != 0) {
@@ -59,10 +63,11 @@ public class MySqlReplaceIntoVisitor extends EmptySQLASTVisitor {
             Object obj = mv.getColumnOrValue();
             iv[i] = (Comparable) obj;
         }
+
         return iv;
     }
 
-    public PutNode getReplaceNode() {
-        return replaceNode;
+    public InsertNode getInsertNode() {
+        return insertNode;
     }
 }

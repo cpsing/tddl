@@ -20,7 +20,7 @@ import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.exceptions.EmptyResultFilterException;
-import com.taobao.tddl.optimizer.parse.visitor.MySqlExprVisitor;
+import com.taobao.tddl.optimizer.parse.cobar.visitor.MySqlExprVisitor;
 import com.taobao.tddl.optimizer.utils.range.AndRangeProcessor;
 import com.taobao.tddl.optimizer.utils.range.OrRangeProcessor;
 

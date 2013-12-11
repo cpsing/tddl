@@ -1,4 +1,4 @@
-package com.taobao.tddl.optimizer.parse.visitor;
+package com.taobao.tddl.optimizer.parse.cobar.visitor;
 
 import com.alibaba.cobar.parser.ast.expression.Expression;
 import com.alibaba.cobar.parser.ast.stmt.dml.DMLDeleteStatement;

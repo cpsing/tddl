@@ -263,6 +263,15 @@ public class SqlParserTest extends BaseOptimizerTest {
     }
 
     @Test
+    public void testQuery_多表join() throws Exception {
+        String sql = "SELECT * FROM TABLE1 JOIN TABLE2 LEFT JOIN TABLE3 ON (TABLE3.ID=TABLE2.ID) LEFT JOIN TABLE4 ON (TABLE4.ID=TABLE1.ID) WHERE TABLE2.ID= TABLE4.ID";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+
+        Assert.assertTrue(qn instanceof JoinNode);
+    }
+
+    @Test
     public void testQuery_正常orderby() throws Exception {
         String sql = "SELECT ID,NAME FROM TABLE1 WHERE ID=1 ORDER BY ID";
         QueryTreeNode qn = query(sql);

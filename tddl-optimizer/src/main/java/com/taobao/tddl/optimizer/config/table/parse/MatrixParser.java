@@ -16,8 +16,8 @@ import com.google.common.collect.Lists;
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.model.Atom;
 import com.taobao.tddl.common.model.Group;
-import com.taobao.tddl.common.model.Matrix;
 import com.taobao.tddl.common.model.Group.GroupType;
+import com.taobao.tddl.common.model.Matrix;
 import com.taobao.tddl.common.utils.XmlHelper;
 
 /**
@@ -126,6 +126,18 @@ public class MatrixParser {
             if ("property".equals(item.getNodeName())) {
                 Node nameNode = item.getAttributes().getNamedItem("name");
                 Node valueNode = item.getAttributes().getNamedItem("value");
+                if (nameNode == null || valueNode == null) {
+                    NodeList itemChildNodes = item.getChildNodes();
+                    for (int j = 0; j < itemChildNodes.getLength(); j++) {
+                        Node itemChild = itemChildNodes.item(j);
+                        if ("name".equals(itemChild.getNodeName())) {
+                            nameNode = itemChild.getFirstChild();
+                        } else if ("value".equals(itemChild.getNodeName())) {
+                            valueNode = itemChild.getFirstChild();
+                        }
+                    }
+                }
+
                 result.put(nameNode.getNodeValue(), valueNode.getNodeValue());
             }
         }

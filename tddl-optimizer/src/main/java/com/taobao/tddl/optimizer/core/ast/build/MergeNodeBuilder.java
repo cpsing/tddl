@@ -41,29 +41,52 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
         this.buildOrderBy();
         this.buildHaving();
         this.buildLimit();
-        this.pushSelect();
-        this.pushAggregateFunction();
+        this.buildFunction();
     }
 
     /**
-     * max(id)+min(id)，要把聚合函数推到子节点去
+     * <pre>
+     * 1. max(id)+min(id)，要把聚合函数单独推到子节点去(比如max(id),min(id))，然后在父节点留一个scalar函数进行计算
+     * 2. substring(),to_date()等简单scalar函数(不包含条件1的函数)，推到子节点去，然后在父节点留一个字段，而不是函数
+     * </pre>
      */
-    private void pushAggregateFunction() {
-        List<IFunction> aggregateInScalar = new ArrayList();
+    public void buildFunction() {
+        super.buildFunction();
+
+        List<IFunction> aggregateInScalar = new ArrayList<IFunction>();
+        List<ISelectable> simpleScalar = new ArrayList<ISelectable>();
         for (ISelectable s : this.getNode().getColumnsSelected()) {
             if (s instanceof IFunction) {
                 if (IFunction.FunctionType.Aggregate.equals(((IFunction) s).getFunctionType())) {
                     continue;
+                } else {
+                    List<IFunction> argsAggregateFunctions = this.findAggregateFunctionsInScalar((IFunction) s);
+                    if (!argsAggregateFunctions.isEmpty()) {
+                        aggregateInScalar.addAll(argsAggregateFunctions);
+                    } else {
+                        simpleScalar.add((ISelectable) s);
+                    }
                 }
-
-                aggregateInScalar.addAll(this.findAggregateFunctionsInScalar((IFunction) s));
             }
+        }
+
+        // case 2，删除父节点的简单scalar函数
+        this.getNode().getColumnsSelected().removeAll(simpleScalar);
+        for (ISelectable f : simpleScalar) {
+            IColumn scalarColumn = ASTNodeFactory.getInstance().createColumn();
+            if (f.getAlias() != null) {
+                scalarColumn.setColumnName(f.getAlias());
+            }
+            scalarColumn.setTableName(f.getTableName());
+            scalarColumn.setDistinct(f.isDistinct());
+            scalarColumn.setIsNot(f.isNot());
+            this.getNode().addColumnsSelected(buildSelectable(scalarColumn, true));
         }
 
         List<ISelectable> toRemove = new ArrayList();
         for (ISelectable s : ((QueryTreeNode) this.getNode().getChild()).getColumnsSelected()) {
             if (s instanceof IFunction && IFunction.FunctionType.Scalar.equals(((IFunction) s).getFunctionType())) {
-                if (!this.findAggregateFunctionsInScalar((IFunction) s).isEmpty()) {
+                if (!this.findAggregateFunctionsInScalar((IFunction) s).isEmpty()) { // scalar里存在聚合函数
                     toRemove.add(s);
                 }
             }
@@ -75,8 +98,9 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
                 // 只添加min(id) ,max(id)的独立函数
                 ((QueryTreeNode) child).addColumnsSelected(f);
             }
-        }
 
+            child.build();
+        }
     }
 
     private List<IFunction> findAggregateFunctionsInScalar(IFunction s) {
@@ -131,31 +155,23 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
 
     }
 
-    private void pushSelect() {
-        // 不存在临时列，无需下推
-        if (this.getNode().getGroupBys().isEmpty() && this.getNode().getOrderBys().isEmpty()) {
-            return;
-        }
-
-        // 将orderBy/groupBy下推
-        for (ASTNode child : this.getNode().getChildren()) {
-            List<IOrderBy> orderByAndGroupBy = new ArrayList(((QueryTreeNode) child).getOrderBys());
-            orderByAndGroupBy.addAll(((QueryTreeNode) child).getGroupBys());
-            for (IOrderBy order : orderByAndGroupBy) {
-                ((QueryTreeNode) child).addColumnsSelected(order.getColumn());
-            }
-        }
-
-    }
-
     private void buildLimit() {
         // 将子节点的limit条件转移到父节点
-        this.getNode().setLimitFrom(((QueryTreeNode) this.getNode().getChild()).getLimitFrom());
-        this.getNode().setLimitTo(((QueryTreeNode) this.getNode().getChild()).getLimitTo());
+        // 不能出现多级的merge节点都带着limit
+        Comparable from = ((QueryTreeNode) this.getNode().getChild()).getLimitFrom();
+        Comparable to = ((QueryTreeNode) this.getNode().getChild()).getLimitTo();
 
-        for (ASTNode s : this.getNode().getChildren()) {
-            ((QueryTreeNode) s).setLimitFrom(null);
-            ((QueryTreeNode) s).setLimitTo(null);
+        this.getNode().setLimitFrom(from);
+        this.getNode().setLimitTo(to);
+
+        if (from instanceof Long && to instanceof Long) {
+            if ((from != null && (Long) from != -1) || (to != null && (Long) to != -1)) {
+                for (ASTNode s : this.getNode().getChildren()) {
+                    // 底下采取limit 0,from+to逻辑，上层来过滤
+                    ((QueryTreeNode) s).setLimitFrom(0L);
+                    ((QueryTreeNode) s).setLimitTo((Long) from + (Long) to);
+                }
+            }
         }
     }
 
@@ -176,6 +192,8 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
                 }
             }
         }
+
+        super.buildOrderBy();
     }
 
     public void buildGroupBy() {
@@ -195,6 +213,8 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
                 }
             }
         }
+
+        super.buildGroupBy();
     }
 
     private void buildAlias() {
@@ -210,7 +230,6 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
      */
     public void buildSelected() {
         buildSelectedFromSelectableObject();
-        this.buildFunction(true);
     }
 
     private void buildSelectedFromSelectableObject() {
@@ -227,7 +246,9 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
                 delete.add(selected);
             }
         }
-        if (!delete.isEmpty()) this.getNode().getColumnsSelected().removeAll(delete);
+        if (!delete.isEmpty()) {
+            this.getNode().getColumnsSelected().removeAll(delete);
+        }
 
         for (ISelectable selected : delete) {
             // 遇到*就把所有列再添加一遍
@@ -259,6 +280,9 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
             }
         }
 
+        for (int i = 0; i < getNode().getColumnsSelected().size(); i++) {
+            getNode().getColumnsSelected().set(i, this.buildSelectable(getNode().getColumnsSelected().get(i)));
+        }
     }
 
     public ISelectable getSelectableFromChild(ISelectable c) {
@@ -273,6 +297,7 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
 
         ISelectable s = this.getColumnFromOtherNode(c, child);
         if (s == null) {
+            // 下推select
             for (int i = 0; i < this.getNode().getChildren().size(); i++) {
                 QueryTreeNode sub = (QueryTreeNode) this.getNode().getChildren().get(i);
                 sub.addColumnsSelected(c);
@@ -280,18 +305,6 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
             s = this.getColumnFromOtherNode(c, child);
         }
         return s;
-    }
-
-    public void buildFunction(IFunction f) {
-        for (Object arg : f.getArgs()) {
-            if (arg instanceof IFunction) {
-                this.buildSelectable((ISelectable) arg);
-            } else if (arg instanceof ISelectable) {
-                if (((ISelectable) arg).isDistinct()) {// 比如count(distinct id)
-                    this.buildSelectable((ISelectable) arg);
-                }
-            }
-        }
     }
 
 }

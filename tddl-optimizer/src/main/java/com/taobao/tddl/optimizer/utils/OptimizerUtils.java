@@ -31,7 +31,7 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.expression.bean.BindVal;
 import com.taobao.tddl.optimizer.core.expression.bean.NullValue;
-import com.taobao.tddl.optimizer.parse.visitor.MySqlExprVisitor;
+import com.taobao.tddl.optimizer.parse.cobar.visitor.MySqlExprVisitor;
 import com.taobao.tddl.rule.exceptions.TddlRuleException;
 
 /**

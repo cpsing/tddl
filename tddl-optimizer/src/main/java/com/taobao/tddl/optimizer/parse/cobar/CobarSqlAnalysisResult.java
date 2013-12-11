@@ -32,11 +32,11 @@ import com.taobao.tddl.optimizer.core.ast.dml.PutNode;
 import com.taobao.tddl.optimizer.core.ast.dml.UpdateNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.parse.SqlAnalysisResult;
-import com.taobao.tddl.optimizer.parse.visitor.MySqlDeleteVisitor;
-import com.taobao.tddl.optimizer.parse.visitor.MySqlInsertVisitor;
-import com.taobao.tddl.optimizer.parse.visitor.MySqlReplaceIntoVisitor;
-import com.taobao.tddl.optimizer.parse.visitor.MySqlSelectVisitor;
-import com.taobao.tddl.optimizer.parse.visitor.MySqlUpdateVisitor;
+import com.taobao.tddl.optimizer.parse.cobar.visitor.MySqlDeleteVisitor;
+import com.taobao.tddl.optimizer.parse.cobar.visitor.MySqlInsertVisitor;
+import com.taobao.tddl.optimizer.parse.cobar.visitor.MySqlReplaceIntoVisitor;
+import com.taobao.tddl.optimizer.parse.cobar.visitor.MySqlSelectVisitor;
+import com.taobao.tddl.optimizer.parse.cobar.visitor.MySqlUpdateVisitor;
 
 /**
  * 基于cobar构造的parse结果

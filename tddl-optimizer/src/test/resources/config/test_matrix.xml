@@ -11,7 +11,9 @@
 	<!-- hbase group -->
 	<group name="andor_hbase_group" type="HBASE_CLIENT">
 		<properties>
-			<property name="mysql_groupName" value="andor_hbase_group" />
+			<property name="mysql_groupName">
+				<value>andor_hbase_group</value>
+			</property>
 			<property name="mysql_appName" value="andor_hbase_qatest" />
 			<property name="hbase.zookeeper.quorum" value="10.20.144.51" />
 			<property name="hbase.zookeeper.property.clientPort" value="2181" />

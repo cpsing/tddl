@@ -387,9 +387,9 @@ public class FilterPusher {
             ISelectable c = qtn.findColumn((ISelectable) value);
             if (c instanceof IColumn) {
                 if (isColumn) {
-                    ((IBooleanFilter) filter).setColumn(c);
+                    ((IBooleanFilter) filter).setColumn(c.copy());
                 } else {
-                    ((IBooleanFilter) filter).setValue(c);
+                    ((IBooleanFilter) filter).setValue(c.copy());
                 }
                 return true;
             } else {

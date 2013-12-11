@@ -123,19 +123,18 @@ public abstract class QueryTreeNodeBuilder {
 
         ISelectable column = null;
         ISelectable columnFromMeta = null;
-        // 临时列中也不存在，则新建一个临时列
-        columnFromMeta = this.getSelectableFromChild(c);
-        if (columnFromMeta != null) {
-            column = columnFromMeta;
-            // 直接从子类的table定义中获取表字段，然后根据当前column状态，设置alias和distinct
-            column.setAlias(c.getAlias());
-            column.setDistinct(c.isDistinct());
-        }
 
-        if (findInSelectList) {
+        if (findInSelectList) { // 优先查找select
             ISelectable columnFromSelected = getColumnFromSelecteList(c);
             if (columnFromSelected != null) {
                 column = columnFromSelected;
+            }
+        }
+
+        if (column == null) {// 查找table meta
+            columnFromMeta = this.getSelectableFromChild(c);
+            if (columnFromMeta != null) {
+                column = columnFromMeta;
             }
         }
 
@@ -143,6 +142,10 @@ public abstract class QueryTreeNodeBuilder {
             throw new IllegalArgumentException("column: " + c.getFullName() + " is not existed in either "
                                                + this.getNode().getName() + " or select clause");
         }
+
+        // 直接从子类的table定义中获取表字段，然后根据当前column状态，设置alias和distinct
+        column.setAlias(c.getAlias());
+        column.setDistinct(c.isDistinct());
 
         if ((column instanceof IColumn) && !IColumn.STAR.equals(column.getColumnName())) {
             node.addColumnsRefered(column); // refered不需要重复字段,select添加允许重复
@@ -202,10 +205,10 @@ public abstract class QueryTreeNodeBuilder {
         this.buildFilter(this.getNode().getHavingFilter(), true);
     }
 
-    public void buildFunction(boolean findInSelectList) {
+    public void buildFunction() {
         for (ISelectable selected : getNode().getColumnsSelected()) {
             if (selected instanceof IFunction) {
-                this.buildFunction((IFunction) selected, findInSelectList);
+                this.buildFunction((IFunction) selected, false);
             }
         }
     }

@@ -79,14 +79,14 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:choice maxOccurs="unbounded">
-				<xs:element name="value" type="xs:string" />
+				<xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="1"/>
 			</xs:choice>
-			<xs:attribute name="name" type="xs:string" use="optional">
+			<xs:attribute name="name" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>property name</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
-			<xs:attribute name="value" type="xs:string" use="optional">
+			<xs:attribute name="value" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>property value</xs:documentation>
 				</xs:annotation>

@@ -1,4 +1,4 @@
-package com.taobao.tddl.optimizer.parse.visitor;
+package com.taobao.tddl.optimizer.parse.cobar.visitor;
 
 import java.util.List;
 

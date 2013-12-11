@@ -71,17 +71,14 @@ public class MergeJoinMergeOptimizer implements QueryPlanOptimizer {
     }
 
     private IQueryTree processJoin(IJoin j, boolean isExpandLeft, boolean isExpandRight) {
-        // 如果一个节点包含limit，group by，order by等条件，
-        // 则不能展开
-        if (j.getLeftNode().getLimitFrom() != null || j.getLeftNode().getLimitTo() != null
-            || (j.getLeftNode().getGroupBys() != null && !j.getLeftNode().getGroupBys().isEmpty())
-            || (j.getLeftNode().getOrderBys() != null && !j.getLeftNode().getGroupBys().isEmpty())) {
+        // 如果一个节点包含limit，group by，order by等条件，则不能展开
+        if (!canExpand(j)) {
+            // join节点可能自己存在limit
             isExpandLeft = false;
-        }
-
-        if (j.getRightNode().getLimitFrom() != null || j.getRightNode().getLimitTo() != null
-            || (j.getRightNode().getGroupBys() != null && !j.getRightNode().getGroupBys().isEmpty())
-            || (j.getRightNode().getOrderBys() != null && !j.getRightNode().getOrderBys().isEmpty())) {
+            isExpandRight = false;
+        } else if (!canExpand(j.getLeftNode())) {
+            isExpandLeft = false;
+        } else if (!canExpand(j.getRightNode())) {
             isExpandRight = false;
         }
 
@@ -99,6 +96,17 @@ public class MergeJoinMergeOptimizer implements QueryPlanOptimizer {
     private IJoin mergeJoinMerge(IJoin j) {
         // j.setJoinType(JoinType.SORT_MERGE_JOIN);
         return j;
+    }
+
+    private boolean canExpand(IQueryTree query) {
+        // 如果一个节点包含limit，group by，order by等条件
+        if (query.getLimitFrom() != null || query.getLimitTo() != null
+            || (query.getGroupBys() != null && !query.getGroupBys().isEmpty())
+            || (query.getOrderBys() != null && !query.getGroupBys().isEmpty())) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**
