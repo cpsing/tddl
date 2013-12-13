@@ -100,4 +100,5 @@ public interface TddlTableRule extends Lifecycle {
      * @return
      */
     public MatcherResult route(String vtab, String condition, String version);
+
 }

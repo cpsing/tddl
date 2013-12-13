@@ -60,4 +60,11 @@ public interface VirtualTableRule<D, T> {
     public boolean isBroadcast();
 
     public String getJoinGroup();
+
+    // ==================== 获取rule的一些信息，比如分区字段 =================
+
+    /**
+     * 获取当前默认版本，逻辑表的分区字段，如果存在多个规则时，返回多个规则分区字段的总和
+     */
+    public List<String> getShardColumns();
 }

@@ -165,4 +165,5 @@ public class TddlRule extends TddlRuleConfig implements TddlTableRule {
             return this.comparativeMap.get(colName);
         }
     }
+
 }

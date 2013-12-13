@@ -464,19 +464,19 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         return this.join(new TableNode(rightNode));
     }
 
-    public QueryTreeNode join(String rightTable, String rightFilter, String leftKey, String rightKey) {
+    public JoinNode join(String rightTable, String rightFilter, String leftKey, String rightKey) {
         return this.join(new TableNode(rightTable).query(rightFilter)).addJoinKeys(leftKey, rightKey);
     }
 
-    public QueryTreeNode join(String rightTable, String rightFilter) {
+    public JoinNode join(String rightTable, String rightFilter) {
         return this.join(new TableNode(rightTable).query(rightFilter));
     }
 
-    public QueryTreeNode join(String rightTable, String leftKey, String rightKey) {
+    public JoinNode join(String rightTable, String leftKey, String rightKey) {
         return this.join(new TableNode(rightTable)).addJoinKeys(leftKey, rightKey);
     }
 
-    public QueryTreeNode join(QueryTreeNode rightNode, String leftKey, String rightKey) {
+    public JoinNode join(QueryTreeNode rightNode, String leftKey, String rightKey) {
         return this.join(rightNode).addJoinKeys(leftKey, rightKey);
     }
 

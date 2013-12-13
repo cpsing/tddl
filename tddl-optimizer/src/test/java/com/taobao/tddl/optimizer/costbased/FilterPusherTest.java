@@ -17,6 +17,22 @@ import com.taobao.tddl.optimizer.utils.OptimizerUtils;
 public class FilterPusherTest extends BaseOptimizerTest {
 
     @Test
+    public void test_where中OR条件不可下推() {
+        TableNode table1 = new TableNode("TABLE1");
+        TableNode table2 = new TableNode("TABLE2");
+
+        JoinNode join = table1.join(table2);
+        join.query("(TABLE1.ID>5 OR TABLE2.ID<10) AND TABLE1.NAME = TABLE2.NAME");
+        join.build();
+        FilterPreProcessor.optimize(join);
+        FilterPusher.optimize(join);
+
+        Assert.assertEquals(null, join.getLeftNode().getWhereFilter());
+        Assert.assertEquals(null, join.getRightNode().getWhereFilter());
+        Assert.assertTrue(join.getJoinFilter().isEmpty());
+    }
+
+    @Test
     public void test_where条件下推() {
         TableNode table1 = new TableNode("TABLE1");
         TableNode table2 = new TableNode("TABLE2");

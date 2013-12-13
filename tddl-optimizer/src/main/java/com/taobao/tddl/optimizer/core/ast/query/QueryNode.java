@@ -119,7 +119,7 @@ public class QueryNode extends QueryTreeNode {
     }
 
     public QueryNode copy() {
-        QueryNode newTableNode = new QueryNode(null);
+        QueryNode newTableNode = new QueryNode((QueryTreeNode) this.getChild().copy());
         this.copySelfTo(newTableNode);
         newTableNode.setNeedBuild(false);
         return newTableNode;

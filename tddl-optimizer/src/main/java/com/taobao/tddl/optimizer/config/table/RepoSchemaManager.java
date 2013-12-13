@@ -45,7 +45,6 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
         public String logicalTableName;
         public String actualTableName;
 
-        @Override
         public int hashCode() {
             return logicalTableName.hashCode();
         }

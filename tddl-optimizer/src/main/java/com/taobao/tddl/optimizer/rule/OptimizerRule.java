@@ -99,7 +99,6 @@ public class OptimizerRule {
         }
 
         return targetsMatched;
-
     }
 
     /**
@@ -148,6 +147,11 @@ public class OptimizerRule {
     public boolean isBroadCast(String logicTable) {
         TableRule table = getTableRule(logicTable);
         return table.isBroadcast();
+    }
+
+    public List<String> getSharedColumns(String logicTable) {
+        TableRule table = getTableRule(logicTable);
+        return table.getShardColumns();
     }
 
     private TableRule getTableRule(String logicTable) {

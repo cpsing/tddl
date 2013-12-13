@@ -28,7 +28,7 @@ public abstract class ExpressionRule<T> implements Rule<T> {
     /**
      * 当前规则需要用到的参数
      */
-    protected final Map<String/* 小写列名 */, RuleColumn> parameters;
+    protected final Map<String/* 大写列名 */, RuleColumn> parameters;
     protected final Set<RuleColumn>                   parameterSet;    // 规则列
 
     /**
