@@ -35,8 +35,8 @@ public class ConfigDataHandlerCity {
         return new UnitConfigDataHandlerFactory(unitName, appName);
     }
 
-    public static ConfigDataHandlerFactory getFileFactory() {
-        return new UnitConfigDataHandlerFactory();
+    public static ConfigDataHandlerFactory getFileFactory(String appName) {
+        return new FileConfigDataHandlerFactory("", "appName", null);
     }
 
 }

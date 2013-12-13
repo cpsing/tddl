@@ -49,6 +49,7 @@ public class TddlGroupExecutor implements IGroupExecutor {
     public ISchematicCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext)
                                                                                                        throws TddlException {
 
+        executionContext.setCurrentRepository(repo);
         getTransaction(executionContext, qc);
 
         ISchematicCursor returnCursor = null;

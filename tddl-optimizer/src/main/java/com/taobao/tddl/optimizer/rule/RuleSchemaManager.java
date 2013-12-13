@@ -11,9 +11,9 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.common.model.Matrix;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
-import com.taobao.tddl.optimizer.config.table.LocalSchemaManager;
 import com.taobao.tddl.optimizer.config.table.RepoSchemaManager;
 import com.taobao.tddl.optimizer.config.table.SchemaManager;
+import com.taobao.tddl.optimizer.config.table.StaticSchemaManager;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.exceptions.OptimizerException;
 import com.taobao.tddl.rule.model.TargetDB;
@@ -27,9 +27,9 @@ public class RuleSchemaManager extends AbstractLifecycle implements SchemaManage
 
     private OptimizerRule                          rule;
     private Matrix                                 matrix;
-    private LocalSchemaManager                     local;
-    private boolean                                useCache;
-    private LoadingCache<Group, RepoSchemaManager> repos = null;
+    private StaticSchemaManager                    local;
+    private boolean                                useCache = true;
+    private LoadingCache<Group, RepoSchemaManager> repos    = null;
 
     public RuleSchemaManager(OptimizerRule rule, Matrix matrix){
         this.rule = rule;
@@ -38,6 +38,8 @@ public class RuleSchemaManager extends AbstractLifecycle implements SchemaManage
 
     protected void doInit() throws TddlException {
         super.doInit();
+
+        if (local != null) local.init();
         repos = CacheBuilder.newBuilder().build(new CacheLoader<Group, RepoSchemaManager>() {
 
             public RepoSchemaManager load(Group group) throws Exception {
@@ -45,6 +47,7 @@ public class RuleSchemaManager extends AbstractLifecycle implements SchemaManage
                 repo.setGroup(group);
                 repo.setLocal(local);
                 repo.setUseCache(useCache);
+                repo.setRule(rule);
                 repo.init();
                 return repo;
             }
@@ -60,20 +63,29 @@ public class RuleSchemaManager extends AbstractLifecycle implements SchemaManage
     }
 
     public TableMeta getTable(String tableName) {
+
+        TableMeta meta = null;
+        if (local != null) {// 本地如果开启了，先找本地
+            meta = local.getTable(tableName);
+        }
+
+        if (meta != null) return meta;
+
         TargetDB targetDB = rule.shardAny(tableName);
         Group group = matrix.getGroup(targetDB.getDbIndex()); // 先找到group
         try {
-            return repos.get(group).getTable(targetDB.getTableNames().iterator().next());
+            return repos.get(group).getTable(tableName, targetDB.getTableNames().iterator().next());
         } catch (ExecutionException e) {
             throw new OptimizerException(e);
         }
     }
 
     public void putTable(String tableName, TableMeta tableMeta) {
-        throw new NotSupportException();
+        if (local != null) local.putTable(tableName, tableMeta);
     }
 
     public Collection<TableMeta> getAllTables() {
+        if (local != null) return local.getAllTables();
         throw new NotSupportException();
     }
 
@@ -81,7 +93,7 @@ public class RuleSchemaManager extends AbstractLifecycle implements SchemaManage
         this.rule = rule;
     }
 
-    public void setLocal(LocalSchemaManager local) {
+    public void setLocal(StaticSchemaManager local) {
         this.local = local;
     }
 

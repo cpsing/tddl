@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.commons.lang.BooleanUtils;
 
 import com.taobao.tddl.common.model.ExtraCmd;
+import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode.FilterType;
@@ -301,6 +302,6 @@ public class JoinChooser {
     }
 
     private static boolean isOptimizeJoinOrder(Map<String, Comparable> extraCmd) {
-        return BooleanUtils.toBoolean(extraCmd.get(ExtraCmd.OptimizerExtraCmd.ChooseJoin).toString());
+        return BooleanUtils.toBoolean(GeneralUtil.getExtraCmd(extraCmd, ExtraCmd.OptimizerExtraCmd.ChooseJoin));
     }
 }

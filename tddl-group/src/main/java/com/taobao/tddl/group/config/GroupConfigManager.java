@@ -166,6 +166,12 @@ public class GroupConfigManager {
                     atom = this.tGroupDataSource.getGroup().getAtom(dsKey);
                 }
 
+                if (atom == null) {
+                    atom = new Atom();
+                    atom.setName(dsKey);
+                    this.tGroupDataSource.getGroup().getAtoms().add(atom);
+                }
+
                 TAtomDsStandard atomDataSource = new TAtomDataSource();
 
                 atomDataSource.setAtom(atom);

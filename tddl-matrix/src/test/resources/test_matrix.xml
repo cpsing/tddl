@@ -11,18 +11,19 @@
 		</properties>
 
 		<atom name="andor_show_group0_atom0">
-			<property name="com.taobao.tddl.atom.global.andor_show_group0_atom0">
-				<value>
+			<properties>
+				<property name="com.taobao.tddl.atom.global.andor_show_group0_atom0">
+					<value>
 					ip=10.232.31.21
 					port=3306
 					dbName=andor_show
 					dbType=mysql
 					dbStatus=RW
 				</value>
-			</property>
-			<property
-				name="com.taobao.tddl.atom.app.andor_show.andor_show_group0_atom0">
-				<value>
+				</property>
+				<property
+					name="com.taobao.tddl.atom.app.andor_show.andor_show_group0_atom0">
+					<value>
 					userName=andor
 					minPoolSize=20
 					maxPoolSize=40
@@ -34,11 +35,12 @@
 					writeRestrictTimes=0
 					timeSliceInMillis=0
 				</value>
-			</property>
+				</property>
 
-			<property name="com.taobao.tddl.atom.passwd.andor_show.mysql.andor">
-				<value>encPasswd=364e198e1cfa74ef</value>
-			</property>
+				<property name="com.taobao.tddl.atom.passwd.andor_show.mysql.andor">
+					<value>encPasswd=364e198e1cfa74ef</value>
+				</property>
+			</properties>
 		</atom>
 
 		<atom name="">
@@ -48,28 +50,5 @@
 		</atom>
 	</group>
 
-	<group name="andor_group_1" type="MYSQL_JDBC">
-	</group>
-
-	<!-- hbase group -->
-	<group name="andor_hbase_group" type="HBASE_CLIENT">
-		<properties>
-			<property name="mysql_groupName" value="andor_hbase_group" />
-			<property name="mysql_appName" value="andor_hbase_qatest" />
-			<property name="hbase.zookeeper.quorum" value="10.20.144.51" />
-			<property name="hbase.zookeeper.property.clientPort" value="2181" />
-			<property name="zookeeper.znode.parent" value="/hbase_tesla" />
-		</properties>
-	</group>
-
-	<group name="andor_hbase_group2" type="HBASE_CLIENT">
-		<properties>
-			<property name="mysql_groupName" value="andor_hbase_group2" />
-			<property name="mysql_appName" value="andor_hbase_qatest" />
-			<property name="hbase.zookeeper.quorum"
-				value="10.232.98.74,10.232.98.75,10.232.98.76,10.232.98.77,10.232.98.7" />
-			<property name="hbase.zookeeper.property.clientPort" value="2181" />
-			<property name="zookeeper.znode.parent" value="/hbase-rd-test-0.94" />
-		</properties>
-	</group>
+	
 </matrix>

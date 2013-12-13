@@ -7,8 +7,8 @@ import java.net.ServerSocket;
 import java.util.Enumeration;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 public class AddressUtils {
 
@@ -38,7 +38,8 @@ public class AddressUtils {
     private static boolean isValidHostAddress(InetAddress address) {
         if (address == null || address.isLoopbackAddress()) return false;
         String name = address.getHostAddress();
-        return (name != null && !EMPTY_IP.equals(name) && !LOCALHOST_IP.equals(name) && IP_PATTERN.matcher(name).matches());
+        return (name != null && !EMPTY_IP.equals(name) && !LOCALHOST_IP.equals(name) && IP_PATTERN.matcher(name)
+            .matches());
     }
 
     public static String getHostIp() {

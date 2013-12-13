@@ -29,5 +29,31 @@
 			<artifactId>tddl-executor</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		
+				<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>tddl-repo-mysql</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+				<!-- Test libs -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+				<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>tddl-config-diamond</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+						<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>tddl-client</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

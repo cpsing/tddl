@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="https://github.com/tddl/tddl/schema/stat" xmlns="https://github.com/tddl/tddl/schema/stat" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	
+	<xs:element name="tableStats">
+        <xs:annotation>
+        	<xs:documentation>tableStats config</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice maxOccurs="unbounded">
+            	<xs:element ref="tableStat" maxOccurs="unbounded" />
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="tableStat">
+        <xs:annotation>
+        	<xs:documentation>tableStat config</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice maxOccurs="unbounded">
+            	<xs:element ref="tableName" maxOccurs="1" />
+            	<xs:element ref="tableRows" maxOccurs="1" />
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+	
+	<xs:element name="tableIndexStats">
+        <xs:annotation>
+        	<xs:documentation>KVIndexStats config</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice maxOccurs="unbounded">
+            	<xs:element ref="tableIndexStat" maxOccurs="unbounded" />
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="tableIndexStat">
+		<xs:annotation>
+			<xs:documentation>KVIndexStat config</xs:documentation>
+		</xs:annotation>
+        <xs:complexType>
+        	<xs:choice maxOccurs="unbounded">
+        		<xs:element ref="tableName" maxOccurs="1" />
+        		<xs:element ref="indexStats" maxOccurs="1" />
+        	</xs:choice>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="tableName" type="xs:string">
+        <xs:annotation>
+        	<xs:documentation>tableName config</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    
+    <xs:element name="tableRows" type="xs:string">
+        <xs:annotation>
+        	<xs:documentation>tableRows config</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    
+     <xs:element name="indexStats">
+        <xs:annotation>
+        	<xs:documentation>KVIndexStats config</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+        	<xs:choice maxOccurs="unbounded">
+        		<xs:element ref="indexStat" maxOccurs="unbounded" />
+        	</xs:choice>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="indexStat">
+        <xs:complexType>
+       		<xs:choice maxOccurs="unbounded">
+	        	<xs:element name="indexName" type="xs:string" >
+	        		<xs:annotation>
+	        			<xs:documentation>index name</xs:documentation>
+	        		</xs:annotation>
+	        	</xs:element>
+	        	<xs:element name="indexType" type="xs:string" >
+        		<xs:annotation>
+        			<xs:documentation>index type</xs:documentation>
+        		</xs:annotation>
+	        	</xs:element>
+	        	<xs:element name="distinctKeys" type="xs:string" >
+	        		<xs:annotation>
+	        			<xs:documentation>distinct keys</xs:documentation>
+	        		</xs:annotation>
+	        	</xs:element>
+	        	<xs:element name="numRows" type="xs:string" >
+	        		<xs:annotation>
+	        			<xs:documentation>num rows</xs:documentation>
+	        		</xs:annotation>
+	        	</xs:element>
+	        	<xs:element name="factor" type="xs:string">
+	        		<xs:annotation>
+	        			<xs:documentation>factor</xs:documentation>
+	        		</xs:annotation>
+	        	</xs:element>
+        	</xs:choice>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

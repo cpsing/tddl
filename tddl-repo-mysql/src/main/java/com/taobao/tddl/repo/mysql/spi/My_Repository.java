@@ -123,7 +123,6 @@ public class My_Repository implements IRepository {
     @Override
     public IGroupExecutor buildGroupExecutor(Group group) {
         TGroupDataSource groupDS = new TGroupDataSource(group.getName(), group.getAppName());
-
         groupDS.setGroup(group);
 
         groupDS.init();
@@ -131,6 +130,7 @@ public class My_Repository implements IRepository {
         TddlGroupExecutor executor = new TddlGroupExecutor();
         executor.setGroup(group);
         executor.setRemotingExecutableObject(groupDS);
+        executor.setRepository(this);
         return executor;
     }
 

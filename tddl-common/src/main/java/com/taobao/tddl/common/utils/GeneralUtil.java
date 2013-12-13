@@ -1,5 +1,10 @@
 package com.taobao.tddl.common.utils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -175,6 +180,44 @@ public class GeneralUtil {
 
         first.setStackTrace(stes.toArray(new StackTraceElement[stes.size()]));
         return first;
+    }
+
+    public static InputStream getInputStream(String fileName) throws FileNotFoundException {
+
+        String rootClassPath = GeneralUtil.class.getResource("/").getPath();
+        String tempClassFileName = null;
+        if (fileName.startsWith("/")) {
+            // root class path 结尾以"/" 结尾，所以去掉一个/
+            tempClassFileName = rootClassPath + fileName.substring(1);
+        } else {
+            tempClassFileName = rootClassPath + fileName;
+        }
+        InputStream in = getInputStreamInner(tempClassFileName);
+        if (in != null) {
+            return in;
+        }
+        return getInputStreamInner(fileName);
+    }
+
+    private static InputStream getInputStreamInner(String fileName) throws FileNotFoundException {
+        URL url = GeneralUtil.class.getClassLoader().getResource(fileName);
+        String path = "";
+        if (url != null) {
+            path = url.getFile();
+            if (new File(path).isDirectory()) {
+                throw new IllegalArgumentException("file is directory." + path);
+            }
+        }
+        InputStream in;
+        File file = new File(fileName);
+        if (!file.exists()) {
+            return null;
+        }
+        if (file.isDirectory()) {
+            throw new IllegalArgumentException("file is directory" + path);
+        }
+        in = new FileInputStream(file);
+        return in;
     }
 
 }

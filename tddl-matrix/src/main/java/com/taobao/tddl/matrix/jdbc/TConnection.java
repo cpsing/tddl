@@ -28,11 +28,13 @@ import java.util.Set;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.utils.TStringUtil;
+import com.taobao.tddl.executor.ExecutorContext;
 import com.taobao.tddl.executor.MatrixExecutor;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.cursor.impl.ResultSetCursor;
 import com.taobao.tddl.matrix.jdbc.utils.ExceptionUtils;
+import com.taobao.tddl.optimizer.OptimizerContext;
 
 /**
  * @author mengshi.sunmengshi 2013-11-22 下午3:26:06
@@ -40,7 +42,7 @@ import com.taobao.tddl.matrix.jdbc.utils.ExceptionUtils;
  */
 public class TConnection implements Connection {
 
-    private MatrixExecutor        executor         = null;
+    private MatrixExecutor   executor         = null;
     private TDataSource      ds;
     private ExecutionContext executionContext = null;
     private Set<TStatement>  openedStatements = new HashSet<TStatement>(2);
@@ -231,7 +233,8 @@ public class TConnection implements Connection {
      */
     public ResultSet executeSQL(String sql, Map<Integer, ParameterContext> context, TStatement stmt,
                                 Map<String, Comparable> extraCmd) throws SQLException {
-
+        ExecutorContext.setContext(this.ds.getConfigHolder().getExecutorContext());
+        OptimizerContext.setContext(this.ds.getConfigHolder().getOptimizerContext());
         ResultCursor resultCursor;
         ResultSet rs = null;
         extraCmd.putAll(buildExtraCommand(sql));

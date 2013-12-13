@@ -18,21 +18,17 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.taobao.tddl.executor.ExecutorContext;
-import com.taobao.tddl.executor.repo.RepositoryHolder;
+import com.taobao.tddl.common.utils.extension.Activate;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.spi.IDataSourceGetter;
-import com.taobao.tddl.executor.spi.IRepository;
 import com.taobao.tddl.optimizer.config.table.RepoSchemaManager;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.config.table.parse.TableMetaParser;
@@ -42,33 +38,36 @@ import com.taobao.tddl.repo.mysql.spi.DatasourceMySQLImplement;
  * @author mengshi.sunmengshi 2013-12-5 下午6:18:14
  * @since 5.1.0
  */
+@Activate(name = "MYSQL_JDBC")
 public class MysqlTableMetaManager extends RepoSchemaManager {
 
-    private final static Log  logger                      = LogFactory.getLog(MysqlTableMetaManager.class);
-    private final long        DEFAULT_SCHEMA_CLEAN_MINUTE = 10;
-    private IDataSourceGetter dsGetter                    = new DatasourceMySQLImplement();
+    private final static Logger logger   = LoggerFactory.getLogger(MysqlTableMetaManager.class);
+    private IDataSourceGetter   dsGetter = new DatasourceMySQLImplement();
+
+    public MysqlTableMetaManager(){
+        this.setUseCache(false);
+    }
 
     /**
      * 需要各Repo来实现
      * 
      * @param tableName
      */
-    protected TableMeta getTable0(String tableName) {
+    @Override
+    protected TableMeta getTable0(String logicalTableName, String actualTableName) {
 
-        TableMeta ts = fetchSchema(tableName);
+        TableMeta ts = fetchSchema(logicalTableName, actualTableName);
 
         return ts;
     }
 
-    private TableMeta fetchSchema(String tablename) {
-        RepositoryHolder holder = ExecutorContext.getContext().getRepositoryHolder();
-
-        IRepository repo = null;
+    private TableMeta fetchSchema(String logicalTableName, String actualTableName) {
 
         DataSource ds = dsGetter.getDataSource(this.getGroup().getName());
 
         if (ds == null) {
-            logger.error("schema of " + tablename + " cannot be fetched");
+            logger.error("schema of " + logicalTableName + " cannot be fetched, datasource is null, group name is "
+                         + this.getGroup().getName());
             return null;
         }
 
@@ -79,11 +78,11 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
         try {
             conn = ds.getConnection();
             stmt = conn.createStatement();
-            rs = stmt.executeQuery("select * from " + tablename + " limit 1");
+            rs = stmt.executeQuery("select * from " + actualTableName + " limit 1");
             ResultSetMetaData rsmd = rs.getMetaData();
             DatabaseMetaData dbmd = conn.getMetaData();
 
-            return this.resultSetMetaToSchema(rsmd, dbmd, tablename, tablename);
+            return this.resultSetMetaToSchema(rsmd, dbmd, logicalTableName, actualTableName);
 
         } catch (Exception e) {
             if (e instanceof SQLException) {
@@ -93,14 +92,14 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
                         ResultSetMetaData rsmd = rs.getMetaData();
                         DatabaseMetaData dbmd = conn.getMetaData();
 
-                        return this.resultSetMetaToSchema(rsmd, dbmd, tablename, actualTableName);
+                        return this.resultSetMetaToSchema(rsmd, dbmd, logicalTableName, actualTableName);
                     } catch (SQLException e1) {
                         e1.printStackTrace();
                     }
 
                 }
             }
-            logger.error("schema of " + tablename + " cannot be fetched", e);
+            logger.error("schema of " + logicalTableName + " cannot be fetched", e);
             return null;
         } finally {
 
@@ -118,18 +117,20 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
 
     }
 
+    public static String xmlHead = "<tables xmlns=\"https://github.com/tddl/tddl/schema/table\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://github.com/tddl/tddl/schema/table https://raw.github.com/tddl/tddl/master/tddl-optimizer/src/main/resources/META-INF/table.xsd\">";
+
     public static TableMeta resultSetMetaToSchema(ResultSetMetaData rsmd, DatabaseMetaData dbmd,
                                                   String logicalTableName, String actualTableName) {
 
         String xml = resultSetMetaToSchemaXml(rsmd, dbmd, logicalTableName, actualTableName);
 
         if (xml == null) return null;
+        xml = xml.replaceFirst("<tables>", xmlHead);
+
         List<TableMeta> ts = null;
-        try {
-            ts = TableMetaParser.parse(xml);
-        } catch (Exception e) {
-            return null;
-        }
+
+        ts = TableMetaParser.parse(xml);
+
         if (ts != null && !ts.isEmpty()) return ts.get(0);
 
         return null;
@@ -139,13 +140,15 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
                                                   String logicalTableName, String actualTableName) {
 
         try {
+
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = null;
-            try {
-                builder = dbf.newDocumentBuilder();
-            } catch (Exception e) {
-            }
+            // buil
+
+            builder = dbf.newDocumentBuilder();
+
             Document doc = builder.newDocument();
+
             Element tables = doc.createElement("tables");
             doc.appendChild(tables); // 将根元素添加到文档上
             Element table = doc.createElement("table");
@@ -189,13 +192,12 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
                 String content = baos.toString();
                 return content;
             } catch (Exception e) {
-                logger.error("", e);
-                e.printStackTrace();
+                logger.error("fetch schema error", e);
             }
 
             return null;
         } catch (Exception ex) {
-            logger.error("", ex);
+            logger.error("fetch schema error", ex);
             return null;
         }
 
@@ -205,13 +207,13 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
         try {
             Source source = new DOMSource(doc);
             Result result = new StreamResult(w);
+
             Transformer xformer = TransformerFactory.newInstance().newTransformer();
             xformer.setOutputProperty(OutputKeys.INDENT, "yes");
             xformer.setOutputProperty(OutputKeys.ENCODING, encoding);
+            xformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
             xformer.transform(source, result);
-        } catch (TransformerConfigurationException e) {
-            e.printStackTrace();
-        } catch (TransformerException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

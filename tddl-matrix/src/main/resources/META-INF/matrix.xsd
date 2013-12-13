@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="https://github.com/tddl/tddl/schema/matrix"
+	xmlns="https://github.com/tddl/tddl/schema/matrix" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+
+    <xs:element name="matrix">
+		<xs:annotation>
+			<xs:documentation>matrix config</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element ref="group" minOccurs="0" maxOccurs="unbounded" />
+				<xs:element ref="properties" minOccurs="0" maxOccurs="1" />
+			</xs:choice>
+			
+			<xs:attribute name="name" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>group name</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="group">
+		<xs:annotation>
+			<xs:documentation>group config</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element ref="atom" minOccurs="0" maxOccurs="unbounded" />
+				<xs:element ref="properties" minOccurs="0" maxOccurs="1" />
+			</xs:choice>
+
+			<xs:attribute name="name" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>group name</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			
+			<xs:attribute name="type" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>group name</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="atom">
+		<xs:annotation>
+			<xs:documentation>atom config</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element ref="properties" minOccurs="0" maxOccurs="1" />
+			</xs:choice>
+
+			<xs:attribute name="name" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>group name</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="properties">
+		<xs:annotation>
+			<xs:documentation>properties config</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element ref="property" minOccurs="0" maxOccurs="unbounded" />
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="property">
+		<xs:annotation>
+			<xs:documentation>property config</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			</xs:choice>
+			<xs:attribute name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>property name</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="value" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>property value</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

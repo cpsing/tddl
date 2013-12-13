@@ -5,7 +5,7 @@ import java.util.concurrent.Future;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.ExtraCmd;
-import com.taobao.tddl.common.model.lifecycle.Lifecycle;
+import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
@@ -23,11 +23,9 @@ import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.exceptions.EmptyResultFilterException;
 
-public class MatrixExecutor implements Lifecycle, IExecutor {
+public class MatrixExecutor extends AbstractLifecycle implements IExecutor {
 
     private final static Logger logger = LoggerFactory.getLogger(MatrixExecutor.class);
-
-    private boolean             inited = false;
 
     /**
      * client端核心流程 解析 优化 执行
@@ -132,23 +130,6 @@ public class MatrixExecutor implements Lifecycle, IExecutor {
             .optimizeAndAssignment(sql, executionContext.getParams(), executionContext.getExtraCmds(), cache);
 
         return qc;
-    }
-
-    @Override
-    public void init() throws TddlException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void destory() throws TddlException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public boolean isInited() {
-        return this.inited;
     }
 
     @Override

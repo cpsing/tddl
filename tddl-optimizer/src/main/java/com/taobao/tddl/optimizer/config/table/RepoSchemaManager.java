@@ -9,10 +9,12 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.extension.ExtensionLoader;
 import com.taobao.tddl.optimizer.exceptions.OptimizerException;
+import com.taobao.tddl.optimizer.rule.OptimizerRule;
 
 /**
  * 基于repo的{@linkplain SchemaManager}的委托实现
@@ -22,47 +24,87 @@ import com.taobao.tddl.optimizer.exceptions.OptimizerException;
  */
 public class RepoSchemaManager extends AbstractLifecycle implements SchemaManager {
 
-    private RepoSchemaManager               delegate;
-    private boolean                         isDelegate;
-    private LocalSchemaManager              local;
-    private Group                           group;
-    private LoadingCache<String, TableMeta> cache = null;
-    private boolean                         useCache;
+    private RepoSchemaManager                                  delegate;
+    private boolean                                            isDelegate;
+    private StaticSchemaManager                                local;
+    private Group                                              group;
+    private LoadingCache<LogicalAndActualTableName, TableMeta> cache = null;
+    private boolean                                            useCache;
+    protected OptimizerRule                                    rule  = null;
+
+    public void setRule(OptimizerRule rule) {
+        this.rule = rule;
+    }
+
+    public OptimizerRule getRule() {
+        return this.rule;
+    }
+
+    public static class LogicalAndActualTableName {
+
+        public String logicalTableName;
+        public String actualTableName;
+
+        @Override
+        public int hashCode() {
+            return logicalTableName.hashCode();
+        }
+
+        public boolean equals(Object o) {
+            return logicalTableName.equals(((LogicalAndActualTableName) o).logicalTableName);
+        }
+    }
 
     protected void doInit() throws TddlException {
+
+        if (local != null) local.init();
         if (!isDelegate) {
             delegate = ExtensionLoader.load(RepoSchemaManager.class, group.getType().name());
             delegate.setGroup(group);
             delegate.setDelegate(true);
+            delegate.setRule(rule);
             delegate.init();
 
             cache = CacheBuilder.newBuilder()
                 .maximumSize(1000)
                 .expireAfterWrite(30000, TimeUnit.MILLISECONDS)
-                .build(new CacheLoader<String, TableMeta>() {
+                .build(new CacheLoader<LogicalAndActualTableName, TableMeta>() {
 
-                    public TableMeta load(String tableName) throws Exception {
-                        return delegate.getTable0(tableName);
+                    public TableMeta load(LogicalAndActualTableName tableName) throws Exception {
+
+                        if (tableName.actualTableName == null) {
+                            throw new TddlRuntimeException("table " + tableName.logicalTableName
+                                                           + " cannot fetched without a actual tableName");
+                        }
+                        return delegate.getTable0(tableName.logicalTableName, tableName.actualTableName);
                     }
                 });
         }
     }
 
     public final TableMeta getTable(String tableName) {
+        return getTable(tableName, null);
+    }
+
+    public final TableMeta getTable(String logicalTableName, String actualTableName) {
         TableMeta meta = null;
         if (local != null) {// 本地如果开启了，先找本地
-            meta = local.getTable(tableName);
+            meta = local.getTable(logicalTableName);
         }
 
         if (meta == null) {// 本地没有
             if (useCache) {
                 try {
-                    return cache.get(tableName);
+
+                    LogicalAndActualTableName t = new LogicalAndActualTableName();
+                    t.logicalTableName = logicalTableName;
+                    t.actualTableName = actualTableName;
+                    return cache.get(t);
                 } catch (ExecutionException e) {
                     throw new OptimizerException(e);
                 }
             } else {
-                return delegate.getTable0(tableName);
+                return delegate.getTable0(logicalTableName, actualTableName);
             }
         }
 
@@ -73,7 +115,10 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
         if (local != null) {// 本地如果开启了，先处理本地
             local.putTable(tableName, tableMeta);
         } else if (useCache) {
-            cache.put(tableName, tableMeta);
+
+            LogicalAndActualTableName t = new LogicalAndActualTableName();
+            t.logicalTableName = tableName;
+            cache.put(t, tableMeta);
         } else {
             delegate.putTable(tableName, tableMeta);
         }
@@ -91,8 +136,9 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
      * 需要各Repo来实现
      * 
      * @param tableName
+     * @param actualTableName
      */
-    protected TableMeta getTable0(String tableName) {
+    protected TableMeta getTable0(String logicalTableName, String actualTableName) {
         throw new NotSupportException("对应repo需要实现");
     }
 
@@ -120,7 +166,7 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
         return group;
     }
 
-    public void setLocal(LocalSchemaManager local) {
+    public void setLocal(StaticSchemaManager local) {
         this.local = local;
     }
 

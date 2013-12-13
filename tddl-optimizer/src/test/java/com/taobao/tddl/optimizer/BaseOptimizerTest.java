@@ -13,7 +13,7 @@ import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.jdbc.ParameterMethod;
 import com.taobao.tddl.common.model.Matrix;
 import com.taobao.tddl.optimizer.config.MockRepoIndexManager;
-import com.taobao.tddl.optimizer.config.table.LocalSchemaManager;
+import com.taobao.tddl.optimizer.config.table.StaticSchemaManager;
 import com.taobao.tddl.optimizer.config.table.RepoSchemaManager;
 import com.taobao.tddl.optimizer.config.table.parse.MatrixParser;
 import com.taobao.tddl.optimizer.costbased.CostBasedOptimizer;
@@ -51,7 +51,7 @@ public class BaseOptimizerTest {
 
         rule = new OptimizerRule(tddlRule);
 
-        LocalSchemaManager localSchemaManager = LocalSchemaManager.parseSchema(Thread.currentThread()
+        StaticSchemaManager localSchemaManager = StaticSchemaManager.parseSchema(Thread.currentThread()
             .getContextClassLoader()
             .getResourceAsStream(table_file));
 

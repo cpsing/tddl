@@ -13,7 +13,7 @@ public class ExecutorContext {
 
     private static final String EXECUTOR_CONTEXT_KEY = "_executor_context_";
 
-    private RepositoryHolder    repositoryHolder     = null;
+    private RepositoryHolder    repositoryHolder     = new RepositoryHolder();
 
     private TopologyHandler     topologyHandler      = null;
     private ITopologyExecutor   topologyExecutor     = null;

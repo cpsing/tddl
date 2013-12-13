@@ -84,7 +84,7 @@ public class MonitorConfig {
                 try {
                     p.load(new ByteArrayInputStream(data.getBytes()));
                 } catch (Exception e) {
-                    logger.error("[tddlConfigListener] 无法解析推送的配置：" + data, e);
+                    logger.error("[tddlConfigListener] 无法解析推送的配置,dataid:" + dataId + ", data:" + data, e);
                     return;
                 }
 

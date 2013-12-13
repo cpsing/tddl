@@ -27,7 +27,6 @@ import com.taobao.tddl.optimizer.config.table.parse.MatrixParser;
 public class TopologyHandler extends AbstractLifecycle {
 
     final static Logger                                      logger            = LoggerFactory.getLogger(TopologyHandler.class);
-    public final static MessageFormat                        TOPOLOGY          = new MessageFormat("com.taobao.and_orV0.{0}_MACHINE_TAPOLOGY");
     private final Map<String/* group key */, IGroupExecutor> executorMap       = new HashMap<String, IGroupExecutor>();
     private String                                           appName;
     private String                                           unitName;
@@ -35,6 +34,7 @@ public class TopologyHandler extends AbstractLifecycle {
     private ConfigDataHandler                                cdh               = null;
     private Matrix                                           matrix;
     public final static MessageFormat                        topologyNullError = new MessageFormat("get topology info error, appName is:{0}, unitName is:{1}, filePath is: {2}, dataId is: {3}");
+    public final static MessageFormat                        TOPOLOGY          = new MessageFormat("com.taobao.and_orV0.{0}_MACHINE_TAPOLOGY");
 
     public TopologyHandler(String appName, String unitName, String topologyFilePath){
         super();
@@ -50,17 +50,18 @@ public class TopologyHandler extends AbstractLifecycle {
     protected void doInit() {
 
         if (topologyFilePath != null) {
-            cdh = ConfigDataHandlerCity.getFileFactory().getConfigDataHandler(topologyFilePath,
+            cdh = ConfigDataHandlerCity.getFileFactory(appName).getConfigDataHandler(topologyFilePath,
                 new TopologyListener(this));
         } else {
-            cdh = ConfigDataHandlerCity.getFactory(appName, unitName).getConfigDataHandler(TOPOLOGY.format(appName),
-                new TopologyListener(this));
+            cdh = ConfigDataHandlerCity.getFactory(appName, unitName)
+                .getConfigDataHandler(TOPOLOGY.format(new Object[] { appName }), new TopologyListener(this));
         }
         String data = cdh.getData(ConfigDataHandler.GET_DATA_TIMEOUT, ConfigDataHandler.FIRST_SERVER_STRATEGY);
 
         if (data == null) {
-            throw new TddlRuntimeException(topologyNullError.format(new Object[] { appName, unitName, topologyFilePath,
-                    TOPOLOGY.format(appName) }));
+            String dataid = TOPOLOGY.format(new Object[] { appName });
+            throw new TddlRuntimeException(topologyNullError.format(new String[] { appName, unitName, topologyFilePath,
+                    dataid }));
         }
 
         Matrix matrix = MatrixParser.parse(data);
@@ -68,6 +69,7 @@ public class TopologyHandler extends AbstractLifecycle {
         this.matrix = matrix;
 
         for (Group group : matrix.getGroups()) {
+            group.setAppName(this.appName);
             IRepository repo = ExecutorContext.getContext()
                 .getRepositoryHolder()
                 .getOrCreateRepository(group.getType().toString());

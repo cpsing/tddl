@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.utils.TddlToStringStyle;
 
 /**
@@ -65,8 +64,8 @@ public class Group {
                 return atom;
             }
         }
-
-        throw new TddlRuntimeException("not found atomName : " + atomName);
+        return null;
+        // throw new TddlRuntimeException("not found atomName : " + atomName);
     }
 
     public void setAtoms(List<Atom> atoms) {
