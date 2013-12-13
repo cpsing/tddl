@@ -264,6 +264,7 @@ public class TableNode extends QueryTreeNode {
                 // 回表是IndexNestedLoop
                 join.setJoinStrategy(new IndexNestedLoopJoin());
                 join.setAlias(this.getAlias());
+                join.setSubAlias(this.getSubAlias());
                 join.having(OptimizerUtils.copyFilter(this.getHavingFilter()));
                 join.setOtherJoinOnFilter(OptimizerUtils.copyFilter(this.getOtherJoinOnFilter()));
                 join.build();

@@ -130,7 +130,7 @@ public class OptimizerRule {
         return root.getDefaultDbIndex();
     }
 
-    public boolean isSameRule(String t1, String t2) {
+    public boolean isJoinGroup(String t1, String t2) {
         String t1Rule = getJoinGroup(t1);
         String t2Rule = getJoinGroup(t2);
         if (t1 == null || t2 == null) {

@@ -110,7 +110,11 @@ public class IndexMeta implements Serializable, Cloneable {
     }
 
     public String getName() {
-        return name;
+        if (isPrimaryKeyIndex) {
+            return tableName; // 如果是主键索引，直接返回逻辑表名
+        } else {
+            return name; // 否则返回索引名，逻辑表名+字段
+        }
     }
 
     public List<ColumnMeta> getKeyColumns() {

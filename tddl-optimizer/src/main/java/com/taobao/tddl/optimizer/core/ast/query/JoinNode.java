@@ -269,6 +269,7 @@ public class JoinNode extends QueryTreeNode {
             leftJoinRightIndexJoinRightKey.setLimitTo(this.getLimitTo());
 
             leftJoinRightIndexJoinRightKey.setAlias(this.getAlias());
+            leftJoinRightIndexJoinRightKey.setSubAlias(this.getSubAlias());
             leftJoinRightIndexJoinRightKey.executeOn(this.getDataNode());
 
             if (this.isCrossJoin()) {

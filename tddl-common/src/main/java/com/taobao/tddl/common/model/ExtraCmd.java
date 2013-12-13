@@ -34,14 +34,14 @@ public class ExtraCmd {
         public final static String ExpandRight              = "ExpandRight";
 
         /**
-         * 强制优化成join merge join
-         */
-        public final static String JoinMergeJoin            = "JOIN_MERGE_JOIN";
-
-        /**
          * 智能优化join merge join
          */
         public final static String JoinMergeJoinJudgeByRule = "JoinMergeJoinJudgeByRule";
+
+        /**
+         * 强制优化成join merge join
+         */
+        public final static String JoinMergeJoin            = "JoinMergeJoin";
     }
 
     public static class ExecutionExtraCmd {

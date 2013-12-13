@@ -276,6 +276,27 @@ public class FilterUtils {
     }
 
     /**
+     * 是否为一简单合取式
+     */
+    public static boolean isCNFNode(IFilter node) {
+        if (node == null) {
+            return false;
+        }
+
+        if (node.getOperation().equals(OPERATION.AND)) {
+            for (IFilter f : ((ILogicalFilter) node).getSubFilter())
+                if (!isCNFNode(f)) {
+                    return false;
+                }
+
+        } else if (node.getOperation().equals(OPERATION.OR)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * 判断是否为and/or的组合节点
      */
     private static boolean isLogicalNode(IFilter node) {

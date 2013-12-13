@@ -15,7 +15,7 @@ public class RuleTest extends BaseOptimizerTest {
 
     @Test
     public void testIsSameRule() {
-        Assert.assertTrue(rule.isSameRule("STUDENT._ID", "STUDENT._ID"));
+        Assert.assertTrue(rule.isJoinGroup("STUDENT._ID", "STUDENT._ID"));
     }
 
     @Test
