@@ -14,9 +14,10 @@ import com.taobao.tddl.optimizer.exceptions.QueryException;
  */
 public abstract class ASTNode<RT extends ASTNode> implements Comparable {
 
-    protected String dataNode = null; // 数据处理节点,比如group name
-    protected Object extra;
-    protected String sql;
+    protected String  dataNode  = null; // 数据处理节点,比如group name
+    protected Object  extra;            // 比如唯一标识，join merge join中使用
+    protected boolean broadcast = false; // 是否为广播表
+    protected String  sql;
 
     /**
      * <pre>
@@ -62,6 +63,14 @@ public abstract class ASTNode<RT extends ASTNode> implements Comparable {
 
     public void setExtra(Object obj) {
         this.extra = obj;
+    }
+
+    public boolean isBroadcast() {
+        return broadcast;
+    }
+
+    public void setBroadcast(boolean broadcast) {
+        this.broadcast = broadcast;
     }
 
     public int compareTo(Object arg) {

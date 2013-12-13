@@ -73,7 +73,7 @@ public class FilterPusher {
 
         // 对于or连接的条件，就不能下推了
         IFilter filterInWhere = qtn.getWhereFilter();
-        if (filterInWhere != null && FilterUtils.isDNF(filterInWhere)) {
+        if (filterInWhere != null && FilterUtils.isCNFNode(filterInWhere)) {
             List<IFilter> DNFNode = FilterUtils.toDNFNode(filterInWhere);
             qtn.query((IFilter) null);// 清空where条件
             if (DNFNodeToPush == null) {
@@ -175,9 +175,7 @@ public class FilterPusher {
      * 
      * <pre>
      * 如： tabl1.join(table2).on("table1.id>10&&table2.id<5") 
-     * 优化成: able1.query("table1.id>10").join(table2.query("table2.id<5")) t但如果条件中包含
-     * 
-     * ||条件则暂不优化
+     * 优化成: able1.query("table1.id>10").join(table2.query("table2.id<5")) t但如果条件中包含||条件则暂不优化
      * </pre>
      */
     private static QueryTreeNode pushJoinOnFilter(QueryTreeNode qtn, List<IFilter> DNFNodeToPush) throws QueryException {
@@ -190,32 +188,44 @@ public class FilterPusher {
             return qtn;
         }
 
+        // 对于 or连接的条件，就不能下推了
+        IFilter filterInOtherJoin = qtn.getOtherJoinOnFilter();
+        if (filterInOtherJoin != null && FilterUtils.isCNFNode(filterInOtherJoin)) {
+            List<IFilter> DNFNode = FilterUtils.toDNFNode(filterInOtherJoin);
+            if (DNFNodeToPush == null) {
+                DNFNodeToPush = new ArrayList<IFilter>();
+            }
+
+            DNFNodeToPush.addAll(DNFNode);
+        }
+
         if (qtn instanceof QueryNode) {
             QueryNode qn = (QueryNode) qtn;
+            List<IFilter> DNFNodeToCurrent = new LinkedList<IFilter>();
             if (DNFNodeToPush != null) {
                 // 如果是join/query/join，可能需要转一次select column，不然下推就会失败
                 for (IFilter node : DNFNodeToPush) {
                     // 可能是多级节点，字段在select中，设置为select中的字段，这样才可以继续下推
                     // 因为query不可能是顶级节点，只会是传递的中间状态，不需要处理DNFNodeToCurrent
-                    tryPushColumn(node, qn.getChild());
+                    if (!tryPushColumn(node, qn.getChild())) {
+                        // 可能where条件是函数，暂时不下推
+                        DNFNodeToCurrent.add(node);
+                    }
                 }
+
+                DNFNodeToPush.removeAll(DNFNodeToCurrent);
             }
+
             QueryTreeNode child = pushJoinOnFilter(qn.getChild(), DNFNodeToPush);
+            // 针对不能下推的，合并到当前的where
+            IFilter node = FilterUtils.DNFToAndLogicTree(DNFNodeToCurrent);
+            if (node != null) {
+                qtn.query(FilterUtils.and(qtn.getOtherJoinOnFilter(), (IFilter) node.copy()));
+            }
             ((QueryNode) qtn).setChild(child);
             qtn.build();
             return qn;
         } else if (qtn instanceof JoinNode) {
-            // 对于 or连接的条件，就不能下推了
-            IFilter filterInWhere = qtn.getOtherJoinOnFilter();
-            if (filterInWhere != null && FilterUtils.isDNF(filterInWhere)) {
-                List<IFilter> DNFNode = FilterUtils.toDNFNode(filterInWhere);
-                if (DNFNodeToPush == null) {
-                    DNFNodeToPush = new ArrayList<IFilter>();
-                }
-
-                DNFNodeToPush.addAll(DNFNode);
-            }
-
             JoinNode jn = (JoinNode) qtn;
             List<IFilter> DNFNodetoPushToLeft = new LinkedList<IFilter>();
             List<IFilter> DNFNodetoPushToRight = new LinkedList<IFilter>();
@@ -234,12 +244,20 @@ public class FilterPusher {
                 }
 
                 // 将左条件的表达式，推导到join filter的右条件上
-                DNFNodetoPushToRight.addAll(copyFilterToJoinOnColumns(DNFNodeToPush,
-                    jn.getLeftKeys(),
-                    jn.getRightKeys()));
+                // 比如: table a left join table b on (a.id = b.id and b.id = 1)
+                // 这时对应的b.id = 1的条件不能推导到左表，否则语义不对
+                if (jn.isInnerJoin() || jn.isLeftOuterJoin()) {
+                    DNFNodetoPushToRight.addAll(copyFilterToJoinOnColumns(DNFNodeToPush,
+                        jn.getLeftKeys(),
+                        jn.getRightKeys()));
+                }
 
-                // 将右条件的表达式，推导到join filter的左条件上
-                DNFNodetoPushToLeft.addAll(copyFilterToJoinOnColumns(DNFNodeToPush, jn.getRightKeys(), jn.getLeftKeys()));
+                if (jn.isInnerJoin() || jn.isRightOuterJoin()) {
+                    // 将右条件的表达式，推导到join filter的左条件上
+                    DNFNodetoPushToLeft.addAll(copyFilterToJoinOnColumns(DNFNodeToPush,
+                        jn.getRightKeys(),
+                        jn.getLeftKeys()));
+                }
             }
 
             // 针对不能下推的，合并到当前的where，otherJoinOnFilter暂时不做清理，不需要做合并

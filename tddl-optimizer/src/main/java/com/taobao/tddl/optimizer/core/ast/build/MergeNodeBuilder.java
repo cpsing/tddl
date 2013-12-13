@@ -71,17 +71,18 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
         }
 
         // case 2，删除父节点的简单scalar函数
-        this.getNode().getColumnsSelected().removeAll(simpleScalar);
-        for (ISelectable f : simpleScalar) {
-            IColumn scalarColumn = ASTNodeFactory.getInstance().createColumn();
-            if (f.getAlias() != null) {
-                scalarColumn.setColumnName(f.getAlias());
-            }
-            scalarColumn.setTableName(f.getTableName());
-            scalarColumn.setDistinct(f.isDistinct());
-            scalarColumn.setIsNot(f.isNot());
-            this.getNode().addColumnsSelected(buildSelectable(scalarColumn, true));
-        }
+        // this.getNode().getColumnsSelected().removeAll(simpleScalar);
+        // for (ISelectable f : simpleScalar) {
+        // IColumn scalarColumn = ASTNodeFactory.getInstance().createColumn();
+        // if (f.getAlias() != null) {
+        // scalarColumn.setColumnName(f.getAlias());
+        // }
+        // scalarColumn.setTableName(f.getTableName());
+        // scalarColumn.setDistinct(f.isDistinct());
+        // scalarColumn.setIsNot(f.isNot());
+        // this.getNode().addColumnsSelected(buildSelectable(scalarColumn,
+        // true));
+        // }
 
         List<ISelectable> toRemove = new ArrayList();
         for (ISelectable s : ((QueryTreeNode) this.getNode().getChild()).getColumnsSelected()) {
@@ -254,7 +255,6 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
             // 遇到*就把所有列再添加一遍
             // select *,id这样的语法最后会有两个id列，mysql是这样的
             QueryTreeNode child = (QueryTreeNode) this.getNode().getChild();
-
             for (ISelectable selectedFromChild : child.getColumnsSelected()) {
                 if (selected.getTableName() != null) {
                     if (!selected.getTableName().equals(selectedFromChild.getTableName())) {

@@ -64,6 +64,11 @@ public class OrderByPusher {
 
     /**
      * 处理Merge节点的distinct处理，需要底下节点先做排序
+     * 
+     * <pre>
+     * 排序优先级：
+     * groupBy > orderby > distinct
+     * </pre>
      */
     private static QueryTreeNode optimizeDistinct(QueryTreeNode qtn) {
         for (ASTNode child : ((QueryTreeNode) qtn).getChildren()) {
