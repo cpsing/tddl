@@ -181,7 +181,7 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
     }
 
     protected void deepCopySelfTo(DMLNode to) {
-        to.columns = OptimizerUtils.deepCopySelectableList(this.columns);
+        to.columns = OptimizerUtils.copySelectables(this.columns);
         if (this.values != null) {
             to.values = new ArrayList(this.values.size());
 

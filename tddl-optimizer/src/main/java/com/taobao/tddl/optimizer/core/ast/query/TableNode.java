@@ -103,14 +103,15 @@ public class TableNode extends QueryTreeNode {
             keyIndexQuery.alias(this.getName());
             keyIndexQuery.setLimitFrom(this.getLimitFrom());
             keyIndexQuery.setLimitTo(this.getLimitTo());
-            keyIndexQuery.select(OptimizerUtils.copySelectables(this.getColumnsSelected()));
-            keyIndexQuery.setGroupBys(OptimizerUtils.copyOrderBys(this.getGroupBys()));
-            keyIndexQuery.setOrderBys(OptimizerUtils.copyOrderBys(this.getOrderBys()));
-            keyIndexQuery.having(OptimizerUtils.copyFilter(this.getHavingFilter()));
-            keyIndexQuery.setOtherJoinOnFilter(OptimizerUtils.copyFilter(this.getOtherJoinOnFilter()));
-            keyIndexQuery.keyQuery(OptimizerUtils.copyFilter(this.getKeyFilter()));
-            keyIndexQuery.valueQuery(FilterUtils.and(OptimizerUtils.copyFilter(this.getIndexQueryValueFilter()),
-                OptimizerUtils.copyFilter(this.getResultFilter())));
+            keyIndexQuery.select(OptimizerUtils.copySelectables(this.getColumnsSelected(), keyIndexQuery.getAlias()));
+            keyIndexQuery.setGroupBys(OptimizerUtils.copyOrderBys(this.getGroupBys(), keyIndexQuery.getAlias()));
+            keyIndexQuery.setOrderBys(OptimizerUtils.copyOrderBys(this.getOrderBys(), keyIndexQuery.getAlias()));
+            keyIndexQuery.having(OptimizerUtils.copyFilter(this.getHavingFilter(), keyIndexQuery.getAlias()));
+            keyIndexQuery.setOtherJoinOnFilter(OptimizerUtils.copyFilter(this.getOtherJoinOnFilter(),
+                keyIndexQuery.getAlias()));
+            keyIndexQuery.keyQuery(OptimizerUtils.copyFilter(this.getKeyFilter(), keyIndexQuery.getAlias()));
+            keyIndexQuery.valueQuery(FilterUtils.and(OptimizerUtils.copyFilter(this.getIndexQueryValueFilter(),
+                keyIndexQuery.getAlias()), OptimizerUtils.copyFilter(this.getResultFilter(), keyIndexQuery.getAlias())));
             keyIndexQuery.executeOn(this.getDataNode());
             keyIndexQuery.setSubQuery(this.isSubQuery());
             keyIndexQuery.setFullTableScan(this.isFullTableScan());
@@ -122,8 +123,8 @@ public class TableNode extends QueryTreeNode {
 
             KVIndexNode indexQuery = new KVIndexNode(this.getIndexUsed().getName());
             indexQuery.alias(indexUsed.getNameWithOutDot());
-            indexQuery.keyQuery(OptimizerUtils.copyFilter(this.getKeyFilter()));
-            indexQuery.valueQuery(OptimizerUtils.copyFilter(this.getIndexQueryValueFilter()));
+            indexQuery.keyQuery(OptimizerUtils.copyFilter(this.getKeyFilter(), indexQuery.getAlias()));
+            indexQuery.valueQuery(OptimizerUtils.copyFilter(this.getIndexQueryValueFilter(), indexQuery.getAlias()));
             // 索引是否都包含在查询字段中
             boolean isIndexCover = true;
             List<ISelectable> allColumnsRefered = this.getColumnsRefered();
@@ -144,18 +145,19 @@ public class TableNode extends QueryTreeNode {
             indexQuery.select(indexQuerySelected);
             // 索引覆盖的情况下，只需要返回索引查询
             if (isIndexCover) {
-                indexQuery.select(OptimizerUtils.copySelectables(this.getColumnsSelected()));
-                indexQuery.setOrderBys(OptimizerUtils.copyOrderBys(this.getOrderBys()));
-                indexQuery.setGroupBys(OptimizerUtils.copyOrderBys(this.getGroupBys()));
+                indexQuery.select(OptimizerUtils.copySelectables(this.getColumnsSelected(), indexQuery.getAlias()));
+                indexQuery.setOrderBys(OptimizerUtils.copyOrderBys(this.getOrderBys(), indexQuery.getAlias()));
+                indexQuery.setGroupBys(OptimizerUtils.copyOrderBys(this.getGroupBys(), indexQuery.getAlias()));
                 indexQuery.setLimitFrom(this.getLimitFrom());
                 indexQuery.setLimitTo(this.getLimitTo());
                 indexQuery.executeOn(this.getDataNode());
                 indexQuery.alias(this.getName());
                 indexQuery.setSubQuery(this.isSubQuery());
-                indexQuery.having(OptimizerUtils.copyFilter(this.getHavingFilter()));
-                indexQuery.valueQuery(FilterUtils.and(OptimizerUtils.copyFilter(this.getIndexQueryValueFilter()),
-                    OptimizerUtils.copyFilter(this.getResultFilter())));
-                indexQuery.setOtherJoinOnFilter(OptimizerUtils.copyFilter(this.getOtherJoinOnFilter()));
+                indexQuery.having(OptimizerUtils.copyFilter(this.getHavingFilter(), indexQuery.getAlias()));
+                indexQuery.valueQuery(FilterUtils.and(OptimizerUtils.copyFilter(this.getIndexQueryValueFilter(),
+                    indexQuery.getAlias()), OptimizerUtils.copyFilter(this.getResultFilter(), indexQuery.getAlias())));
+                indexQuery.setOtherJoinOnFilter(OptimizerUtils.copyFilter(this.getOtherJoinOnFilter(),
+                    indexQuery.getAlias()));
                 indexQuery.build();
                 return indexQuery;
             } else {
@@ -218,14 +220,7 @@ public class TableNode extends QueryTreeNode {
                 if (this.getAlias() == null) {
                     columns = OptimizerUtils.copySelectables(this.getColumnsSelected());
                 } else {
-                    for (ISelectable s : this.getColumnsSelected()) {
-                        ISelectable a = s.copy().setTableName(this.getAlias());
-                        if (a instanceof IFunction && this.getAlias() != null) {
-                            this.findColumnInFunctionArgAndSetTableNameAsAlias((IFunction) a.copy());
-                        }
-
-                        columns.add(a);
-                    }
+                    columns = OptimizerUtils.copySelectables(this.getColumnsSelected(), this.getAlias());
                 }
 
                 join.select(columns);
@@ -270,20 +265,6 @@ public class TableNode extends QueryTreeNode {
                 join.build();
                 return join;
             }
-        }
-    }
-
-    // select count(id) from table1 as t1
-    // ->select count(t1.id)
-    private void findColumnInFunctionArgAndSetTableNameAsAlias(IFunction f) {
-        for (Object arg : f.getArgs()) {
-            if (arg instanceof ISelectable) {
-                ((ISelectable) arg).setTableName(this.getAlias());
-                if (arg instanceof IFunction) {
-                    this.findColumnInFunctionArgAndSetTableNameAsAlias((IFunction) arg);
-                }
-            }
-
         }
     }
 

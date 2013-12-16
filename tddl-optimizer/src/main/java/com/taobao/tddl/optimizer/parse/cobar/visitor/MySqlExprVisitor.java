@@ -141,13 +141,14 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         node.getOperand().accept(leftEvi);
         ibf.setColumn(leftEvi.getColumnOrValue());
         if (node.getMode() == ComparisionIsExpression.IS_NULL) {
-            ibf.setOperation(OPERATION.IS);
-            ibf.setValue(NullValue.getNullValue());
+            ibf.setOperation(OPERATION.IS_NULL);
+            // ibf.setValue(NullValue.getNullValue());
             ibf.setIsNot(false);
         } else if (node.getMode() == ComparisionIsExpression.IS_NOT_NULL) {
-            ibf.setOperation(OPERATION.IS);
-            ibf.setValue(NullValue.getNullValue());
-            ibf.setIsNot(true);
+            ibf.setOperation(OPERATION.IS_NOT_NULL);
+            // ibf.setValue(NullValue.getNullValue());
+            // ibf.setIsNot(true);
+            ibf.setIsNot(false);
         } else if (node.getMode() == ComparisionIsExpression.IS_FALSE) {
             ibf.setOperation(OPERATION.IS);
             ibf.setValue(false);

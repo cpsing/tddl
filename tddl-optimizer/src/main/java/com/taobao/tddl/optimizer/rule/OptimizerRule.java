@@ -9,7 +9,6 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
-import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
@@ -129,29 +128,19 @@ public class OptimizerRule {
         return root.getDefaultDbIndex();
     }
 
-    public boolean isJoinGroup(String t1, String t2) {
-        String t1Rule = getJoinGroup(t1);
-        String t2Rule = getJoinGroup(t2);
-        if (t1 == null || t2 == null) {
-            return false;
-        }
-
-        return TStringUtil.equals(t1Rule, t2Rule);
-    }
-
     public String getJoinGroup(String logicTable) {
         TableRule table = getTableRule(logicTable);
-        return table.getJoinGroup();
+        return table != null ? table.getJoinGroup() : null;// 没找到表规则，默认为单库
     }
 
     public boolean isBroadCast(String logicTable) {
         TableRule table = getTableRule(logicTable);
-        return table.isBroadcast();
+        return table != null ? table.isBroadcast() : false;// 没找到表规则，默认为单库，所以不是广播表
     }
 
     public List<String> getSharedColumns(String logicTable) {
         TableRule table = getTableRule(logicTable);
-        return table.getShardColumns();
+        return table != null ? table.getShardColumns() : new ArrayList<String>();// 没找到表规则，默认为单库
     }
 
     private TableRule getTableRule(String logicTable) {

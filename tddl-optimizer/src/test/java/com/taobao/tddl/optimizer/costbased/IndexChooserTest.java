@@ -46,7 +46,7 @@ public class IndexChooserTest extends BaseOptimizerTest {
             extraCmd);
 
         Assert.assertNotNull(index);
-        Assert.assertEquals(index.getName(), "TABLE1._ID");
+        Assert.assertEquals(index.getName(), "TABLE1");
     }
 
     /**

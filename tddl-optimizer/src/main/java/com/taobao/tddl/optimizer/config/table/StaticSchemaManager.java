@@ -15,13 +15,14 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.TddlToStringStyle;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.config.ConfigDataHandler;
 import com.taobao.tddl.config.ConfigDataHandlerFactory;
 import com.taobao.tddl.config.ConfigDataListener;
 import com.taobao.tddl.config.impl.ConfigDataHandlerCity;
 import com.taobao.tddl.optimizer.config.table.parse.TableMetaParser;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * 有schema文件的schemamanager实现
@@ -63,7 +64,9 @@ public class StaticSchemaManager extends AbstractLifecycle implements SchemaMana
             logger.warn("schema file is not assigned");
         }
 
-        if (appName == null && schemaFilePath == null) return;
+        if (appName == null && schemaFilePath == null) {
+            return;
+        }
 
         ConfigDataHandlerFactory factory = null;
         String dataId = null;
@@ -74,7 +77,6 @@ public class StaticSchemaManager extends AbstractLifecycle implements SchemaMana
             factory = ConfigDataHandlerCity.getFactory(appName, unitName);
         } else {
             factory = ConfigDataHandlerCity.getFileFactory(appName);
-
             dataId = schemaFilePath;
         }
 

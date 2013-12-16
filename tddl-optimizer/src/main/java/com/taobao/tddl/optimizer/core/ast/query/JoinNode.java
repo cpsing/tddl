@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.ASTNode;
@@ -207,6 +206,7 @@ public class JoinNode extends QueryTreeNode {
     public QueryTreeNode convertToJoinIfNeed() {
         super.convertToJoinIfNeed(); // 首先执行一次TableNode处理，生成join
 
+        // 如果右边是子查询，join策略为block，不做调整
         if (!(this.getJoinStrategy() instanceof IndexNestedLoopJoin)) {
             return this;
         }
@@ -214,7 +214,7 @@ public class JoinNode extends QueryTreeNode {
         QueryTreeNode right = this.getRightNode();
 
         // 如果右边是一个IQuery，就按正常的方法生成JoinNode即可
-        if (right instanceof TableNode || right instanceof MergeNode) {
+        if (right instanceof TableNode || right instanceof QueryNode || right instanceof MergeNode) {
             return this;
         }
 
@@ -229,11 +229,13 @@ public class JoinNode extends QueryTreeNode {
             JoinNode leftJoinRightIndex = left.join(rightIndexQuery);
             leftJoinRightIndex.setJoinStrategy(new IndexNestedLoopJoin());
 
+            // 复制join的右字段，修正一下表名
             List<ISelectable> rightIndexJoinOnColumns = OptimizerUtils.copySelectables(this.getRightKeys());
             if (rightIndexQuery.getAlias() != null) {
                 setColumnsTableName(rightIndexJoinOnColumns, rightIndexQuery.getAlias());
             }
 
+            // 添加left join index的条件
             for (int i = 0; i < this.getLeftKeys().size(); i++) {
                 leftJoinRightIndex.addJoinKeys(this.getLeftKeys().get(i), rightIndexJoinOnColumns.get(i));
             }
@@ -241,11 +243,13 @@ public class JoinNode extends QueryTreeNode {
             leftJoinRightIndex.setLeftRightJoin(this.leftOuter, this.rightOuter);
             leftJoinRightIndex.executeOn(this.getDataNode());
             List<ISelectable> leftJoinRightIndexColumns = new LinkedList();
+            // 复制left的查询
             List<ISelectable> leftJoinColumns = OptimizerUtils.copySelectables(left.getColumnsSelected());
             if (left.getAlias() != null) {
                 setColumnsTableName(leftJoinColumns, left.getAlias());
             }
 
+            // 复制index的查询
             List<ISelectable> rightIndexColumns = OptimizerUtils.copySelectables(rightIndexQuery.getColumnsSelected());
             if (rightIndexQuery.getAlias() != null) {
                 setColumnsTableName(rightIndexColumns, rightIndexQuery.getAlias());
@@ -253,13 +257,19 @@ public class JoinNode extends QueryTreeNode {
 
             leftJoinRightIndexColumns.addAll(leftJoinColumns);
             leftJoinRightIndexColumns.addAll(rightIndexColumns);
+            // left + index的查询做为新的join查询字段
             leftJoinRightIndex.select(leftJoinRightIndexColumns);
-            JoinNode leftJoinRightIndexJoinRightKey = leftJoinRightIndex.join(rightKeyQuery);
 
-            leftJoinRightIndexJoinRightKey.setJoinStrategy(new IndexNestedLoopJoin());
+            // (left join index) join key构建
+            JoinNode leftJoinRightIndexJoinRightKey = leftJoinRightIndex.join(rightKeyQuery);
+            leftJoinRightIndexJoinRightKey.setJoinStrategy(new IndexNestedLoopJoin()); // 也是走index
             for (int i = 0; i < ((JoinNode) right).getLeftKeys().size(); i++) {
                 leftJoinRightIndexJoinRightKey.addJoinKeys(((JoinNode) right).getLeftKeys().get(i),
                     ((JoinNode) right).getRightKeys().get(i));
+            }
+
+            if (rightIndexQuery.getAlias() != null) {
+                setColumnsTableName(leftJoinRightIndexJoinRightKey.getLeftKeys(), rightIndexQuery.getAlias());
             }
 
             leftJoinRightIndexJoinRightKey.setLeftRightJoin(this.leftOuter, this.rightOuter);
@@ -267,13 +277,12 @@ public class JoinNode extends QueryTreeNode {
             leftJoinRightIndexJoinRightKey.setConsistent(true);
             leftJoinRightIndexJoinRightKey.setLimitFrom(this.getLimitFrom());
             leftJoinRightIndexJoinRightKey.setLimitTo(this.getLimitTo());
-
             leftJoinRightIndexJoinRightKey.setAlias(this.getAlias());
             leftJoinRightIndexJoinRightKey.setSubAlias(this.getSubAlias());
             leftJoinRightIndexJoinRightKey.executeOn(this.getDataNode());
 
             if (this.isCrossJoin()) {
-                leftJoinRightIndexJoinRightKey.select(new ArrayList(0));// 查全表所有字段
+                leftJoinRightIndexJoinRightKey.select(new ArrayList(0));// 查全表所有字段，build的时候会补充
             } else {
                 List<ISelectable> columns = OptimizerUtils.copySelectables(this.getColumnsSelected());
                 leftJoinRightIndexJoinRightKey.select(columns);
@@ -282,12 +291,12 @@ public class JoinNode extends QueryTreeNode {
             leftJoinRightIndexJoinRightKey.setResultFilter(this.getResultFilter());
             leftJoinRightIndexJoinRightKey.setOtherJoinOnFilter(this.getOtherJoinOnFilter());
             leftJoinRightIndexJoinRightKey.setSubQuery(this.isSubQuery());
-
-            leftJoinRightIndexJoinRightKey.setAllWhereFilter(this.allWhereFilter);
+            leftJoinRightIndexJoinRightKey.setAllWhereFilter(this.getAllWhereFilter());
+            leftJoinRightIndexJoinRightKey.build();
             return leftJoinRightIndexJoinRightKey;
-        } else {
-            throw new NotSupportException();
         }
+
+        return this;
     }
 
     private List<ISelectable> setColumnsTableName(List<ISelectable> columns, String tablename) {
@@ -419,7 +428,7 @@ public class JoinNode extends QueryTreeNode {
     public JoinNode deepCopy() {
         JoinNode newJoinNode = new JoinNode();
         this.deepCopySelfTo(newJoinNode);
-        newJoinNode.setJoinFilter(OptimizerUtils.deepCopyFilterList(this.getJoinFilter()));
+        newJoinNode.setJoinFilter(OptimizerUtils.copyFilter(this.getJoinFilter()));
         newJoinNode.setJoinStrategy(this.getJoinStrategy());
         newJoinNode.setLeftNode((QueryTreeNode) this.getLeftNode().deepCopy());
         newJoinNode.setRightNode((QueryTreeNode) this.getRightNode().deepCopy());

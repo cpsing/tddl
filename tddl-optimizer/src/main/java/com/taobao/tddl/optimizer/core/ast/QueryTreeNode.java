@@ -740,10 +740,10 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
     protected void deepCopySelfTo(QueryTreeNode to) {
         to.setAlias(this.alias);
         to.setSubAlias(this.subAlias);
-        to.columnsSelected = OptimizerUtils.deepCopySelectableList(this.getColumnsSelected());
-        to.columnsRefered = OptimizerUtils.deepCopySelectableList(this.getColumnsRefered());
-        to.groups = OptimizerUtils.deepCopyOrderByList(new ArrayList<IOrderBy>(this.getGroupBys()));
-        to.orderBys = OptimizerUtils.deepCopyOrderByList(new ArrayList<IOrderBy>(this.getOrderBys()));
+        to.columnsSelected = OptimizerUtils.copySelectables(this.getColumnsSelected());
+        to.columnsRefered = OptimizerUtils.copySelectables(this.getColumnsRefered());
+        to.groups = OptimizerUtils.copyOrder(new ArrayList<IOrderBy>(this.getGroupBys()));
+        to.orderBys = OptimizerUtils.copyOrder(new ArrayList<IOrderBy>(this.getOrderBys()));
         to.whereFilter = (IFilter) (this.whereFilter == null ? null : this.whereFilter.copy());
         to.havingFilter = (IFilter) (this.havingFilter == null ? null : havingFilter.copy());
         to.keyFilter = (IFilter) (this.keyFilter == null ? null : keyFilter.copy());

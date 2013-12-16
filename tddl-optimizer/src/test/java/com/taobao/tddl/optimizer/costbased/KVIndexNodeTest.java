@@ -13,7 +13,7 @@ public class KVIndexNodeTest extends BaseOptimizerTest {
     @Test
     public void testNormal() throws QueryException {
 
-        KVIndexNode studentID = new KVIndexNode("STUDENT._ID");
+        KVIndexNode studentID = new KVIndexNode("TABLE1");
         studentID.select("ID,NAME,SCHOOL");
         studentID.keyQuery("ID=1");
         studentID.valueQuery("SCHOOL=1 AND NAME = 333");
@@ -25,12 +25,12 @@ public class KVIndexNodeTest extends BaseOptimizerTest {
 
     @Test
     public void testJoin() throws QueryException {
-        KVIndexNode studentID = new KVIndexNode("STUDENT._ID");
-        studentID.alias("STUDENT");
+        KVIndexNode studentID = new KVIndexNode("TABLE1");
+        studentID.alias("TABLE1");
         studentID.select("ID,NAME,SCHOOL");
 
-        KVIndexNode studentName = new KVIndexNode("STUDENT._NAME");
-        studentName.alias("STUDENT._NAME");
+        KVIndexNode studentName = new KVIndexNode("TABLE1._NAME");
+        studentName.alias("TABLE1._NAME");
         studentName.select("ID,NAME");
         studentName.keyQuery("NAME=1");
 

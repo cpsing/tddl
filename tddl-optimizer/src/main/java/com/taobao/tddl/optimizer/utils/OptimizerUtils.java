@@ -23,6 +23,7 @@ import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
+import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
@@ -164,7 +165,7 @@ public class OptimizerUtils {
         return news;
     }
 
-    public static List<IBooleanFilter> deepCopyFilterList(List<IBooleanFilter> filters) {
+    public static List<IBooleanFilter> copyFilter(List<IBooleanFilter> filters) {
         if (filters == null) {
             return null;
         }
@@ -176,7 +177,7 @@ public class OptimizerUtils {
         return newFilters;
     }
 
-    public static List<IOrderBy> deepCopyOrderByList(ArrayList<IOrderBy> orders) {
+    public static List<IOrderBy> copyOrder(List<IOrderBy> orders) {
         if (orders == null) {
             return null;
         }
@@ -191,17 +192,92 @@ public class OptimizerUtils {
 
     }
 
-    public static List<ISelectable> deepCopySelectableList(List<ISelectable> selectableList) {
-        if (selectableList == null) {
+    public static List<ISelectable> copySelectables(List<ISelectable> selects, String tableName) {
+        if (selects == null) {
             return null;
         }
 
-        List<ISelectable> newSelectable = new ArrayList<ISelectable>(selectableList.size());
-        for (ISelectable s : selectableList) {
-            newSelectable.add(s.copy());
+        List<ISelectable> news = new ArrayList(selects.size());
+        for (ISelectable s : selects) {
+            ISelectable a = s.copy().setTableName(tableName);
+            if (a instanceof IFunction) {
+                setFunction((IFunction) a, tableName);
+            } else if (a instanceof IFilter) {
+                setFilter((IFilter) a, tableName);
+            }
+
+            news.add(a);
         }
 
-        return newSelectable;
+        return news;
+    }
+
+    public static List<IOrderBy> copyOrderBys(List<IOrderBy> orderBys, String tableName) {
+        if (orderBys == null) {
+            return null;
+        }
+
+        List<IOrderBy> news = new ArrayList(orderBys.size());
+        for (IOrderBy o : orderBys) {
+            IOrderBy a = o.deepCopy().setTableName(null);
+            if (a.getColumn() instanceof IFunction) {
+                setFunction((IFunction) a, tableName);
+            } else if (a.getColumn() instanceof IFilter) {
+                setFilter((IFilter) a, tableName);
+            }
+
+            news.add(a);
+        }
+
+        return news;
+    }
+
+    public static IFilter copyFilter(IFilter filter, String tableName) {
+        if (filter == null) {
+            return null;
+        }
+
+        IFilter newFilter = (IFilter) filter.copy();
+        setFilter(newFilter, tableName);
+        return newFilter;
+    }
+
+    private static void setFunction(IFunction f, String tableName) {
+        for (Object arg : f.getArgs()) {
+            if (arg instanceof ISelectable) {
+                ((ISelectable) arg).setTableName(tableName);
+                if (arg instanceof IFunction) {
+                    setFunction((IFunction) arg, tableName);
+                }
+            }
+
+        }
+    }
+
+    private static void setFilter(IFilter f, String tableName) {
+        if (f instanceof IBooleanFilter) {
+            Comparable column = ((IBooleanFilter) f).getColumn();
+            if (column instanceof IColumn) {
+                ((IColumn) column).setTableName(tableName);
+            } else if (column instanceof IFunction) {
+                setFunction((IFunction) column, tableName);
+            } else if (column instanceof IFilter) {
+                setFilter((IFilter) column, tableName);
+            }
+
+            Comparable value = ((IBooleanFilter) f).getValue();
+            if (value instanceof IColumn) {
+                ((IColumn) value).setTableName(tableName);
+            } else if (value instanceof IFunction) {
+                setFunction((IFunction) value, tableName);
+            } else if (value instanceof IFilter) {
+                setFilter((IFilter) value, tableName);
+            }
+        } else if (f instanceof ILogicalFilter) {
+            for (IFilter sf : ((ILogicalFilter) f).getSubFilter()) {
+                setFilter(sf, tableName);
+            }
+        }
     }
 
     /**

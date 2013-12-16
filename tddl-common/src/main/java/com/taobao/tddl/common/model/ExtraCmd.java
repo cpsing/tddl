@@ -20,6 +20,21 @@ public class ExtraCmd {
         public final static String ChooseJoin               = "ChooseJoin";
 
         /**
+         * 为true时，会将or条件转化为index merge
+         */
+        public final static String ChooseIndexMerge         = "ChooseIndexMerge";
+
+        /**
+         * 智能优化join merge join
+         */
+        public final static String JoinMergeJoinJudgeByRule = "JoinMergeJoinJudgeByRule";
+
+        /**
+         * 强制优化成join merge join
+         */
+        public final static String JoinMergeJoin            = "JoinMergeJoin";
+
+        /**
          * 为true时，Merge将并行执行
          */
         public final static String MergeConcurrent          = "MergeConcurrent";
@@ -32,16 +47,6 @@ public class ExtraCmd {
         public final static String ExpandLeft               = "ExpandLeft";
 
         public final static String ExpandRight              = "ExpandRight";
-
-        /**
-         * 智能优化join merge join
-         */
-        public final static String JoinMergeJoinJudgeByRule = "JoinMergeJoinJudgeByRule";
-
-        /**
-         * 强制优化成join merge join
-         */
-        public final static String JoinMergeJoin            = "JoinMergeJoin";
     }
 
     public static class ExecutionExtraCmd {

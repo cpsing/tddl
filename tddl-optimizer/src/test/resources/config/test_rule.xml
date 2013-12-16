@@ -18,6 +18,7 @@
 				<entry key="table6" value-ref="table6" />
 				<entry key="table6._name" value-ref="table6._name" />
 				<entry key="table7" value-ref="table7" />
+				<entry key="table8" value-ref="table8" />
 			</map>
 		</property>
 	</bean>
@@ -151,5 +152,11 @@
 		<property name="dbNamePattern" value="andor_group_0" />
 		<property name="tbNamePattern" value="table7" />
 		<property name="broadcast" value="true" />
+	</bean>
+	
+	<bean id="table8" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_group_0" />
+		<property name="tbNamePattern" value="table8" />
 	</bean>
 </beans>

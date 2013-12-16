@@ -110,7 +110,7 @@ public class QueryNodeCostEstimater implements QueryTreeCostEstimater {
         }
 
         for (IFilter filter : filters) {
-            if (filter.getOperation() != OPERATION.IS_NULL && filter.getOperation() != OPERATION.EQ) {
+            if (filter.getOperation() == OPERATION.IS && filter.getOperation() != OPERATION.EQ) {
                 return false;
             }
         }

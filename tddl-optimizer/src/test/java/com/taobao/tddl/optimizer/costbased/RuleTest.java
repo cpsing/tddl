@@ -2,7 +2,6 @@ package com.taobao.tddl.optimizer.costbased;
 
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import com.google.common.collect.Maps;
@@ -12,11 +11,6 @@ import com.taobao.tddl.optimizer.exceptions.QueryException;
 import com.taobao.tddl.optimizer.exceptions.SqlParserException;
 
 public class RuleTest extends BaseOptimizerTest {
-
-    @Test
-    public void testIsSameRule() {
-        Assert.assertTrue(rule.isJoinGroup("STUDENT._ID", "STUDENT._ID"));
-    }
 
     @Test
     public void testQueryNoCondition() throws SqlParserException, QueryException {

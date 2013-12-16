@@ -23,9 +23,9 @@ public interface IOrderBy extends CanVisit {
 
     public String getAlias();
 
-    public void setTableName(String alias);
+    public IOrderBy setTableName(String alias);
 
-    public void setColumnName(String alias);
+    public IOrderBy setColumnName(String alias);
 
     public String getTableName();
 

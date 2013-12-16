@@ -69,19 +69,24 @@ public class OptimizerToString {
             }
 
             IBooleanFilter bf = (IBooleanFilter) filter;
-            if (bf.getColumn() != null && (bf.getValue() != null || bf.getValues() != null)) {
+            if (bf.getColumn() != null) {
                 if (bf.getOperation().equals(OPERATION.IN)) {
                     builder.append(getColumnName(bf, inden, needTable))
                         .append(" ")
-                        .append(bf.getOperation().getOPERATIONString())
-                        .append(" ")
-                        .append(getValueName(bf, inden, needTable, true));
+                        .append(bf.getOperation().getOPERATIONString());
+
                 } else {
                     builder.append(getColumnName(bf, inden, needTable))
                         .append(" ")
-                        .append(bf.getOperation().getOPERATIONString())
-                        .append(" ")
-                        .append(getValueName(bf, inden, needTable, false));
+                        .append(bf.getOperation().getOPERATIONString());
+                }
+
+                if (bf.getValue() != null || bf.getValues() != null) {
+                    if (bf.getOperation().equals(OPERATION.IN)) {
+                        builder.append(" ").append(getValueName(bf, inden, needTable, true));
+                    } else {
+                        builder.append(" ").append(getValueName(bf, inden, needTable, false));
+                    }
                 }
             } else {
                 builder.append(getColumnName(bf, inden, needTable));

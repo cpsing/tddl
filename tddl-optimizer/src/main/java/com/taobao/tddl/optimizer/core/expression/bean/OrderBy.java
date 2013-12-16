@@ -60,12 +60,14 @@ public class OrderBy implements IOrderBy {
         return this.column.getAlias();
     }
 
-    public void setTableName(String alias) {
+    public IOrderBy setTableName(String alias) {
         this.column.setTableName(alias);
+        return this;
     }
 
-    public void setColumnName(String alias) {
+    public IOrderBy setColumnName(String alias) {
         this.column.setColumnName(alias);
+        return this;
     }
 
     public String getTableName() {

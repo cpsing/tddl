@@ -21,6 +21,7 @@ import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
+import com.taobao.tddl.optimizer.costbased.FilterSpliter;
 import com.taobao.tddl.optimizer.costbased.esitimater.Cost;
 import com.taobao.tddl.optimizer.costbased.esitimater.CostEsitimaterFactory;
 import com.taobao.tddl.optimizer.costbased.pusher.OrderByPusher;
@@ -78,7 +79,7 @@ public class JoinChooser {
      * 所以需要先对子查询进行优化，再对外层查询进行优化，回溯完成
      * </pre>
      */
-    public static void optimizeSubQuery(QueryTreeNode qtn, Map<String, Comparable> extraCmd) throws QueryException {
+    private static void optimizeSubQuery(QueryTreeNode qtn, Map<String, Comparable> extraCmd) throws QueryException {
         if (qtn instanceof QueryNode) {
             QueryNode qn = (QueryNode) qtn;
             if (qn.getChild() != null) {
@@ -100,7 +101,7 @@ public class JoinChooser {
     /**
      * 优化一棵查询树,以QueryNode为叶子终止,子节点单独进行优化
      */
-    public static QueryTreeNode optimizeJoin(QueryTreeNode qtn, Map<String, Comparable> extraCmd) {
+    private static QueryTreeNode optimizeJoin(QueryTreeNode qtn, Map<String, Comparable> extraCmd) {
         // 暂时跳过可能存在的聚合函数
         if (!(qtn instanceof TableNode || qtn instanceof JoinNode)) {
             qtn.getChildren().set(0, optimize((QueryTreeNode) qtn.getChildren().get(0), extraCmd));
@@ -156,8 +157,15 @@ public class JoinChooser {
         }
 
         if (node instanceof TableNode) {
+            if (!isOptimizeIndexMerge(extraCmd)) {
+                // 判断是否要处理OR转化为index merge，比如mysql可以push
+                // 比如hbase/bdb这一类，OR条件目前只能是主键索引，由执行器层面去解决
+                // 如果涉及多字段时就需要拆分为index merge，同时做uniq
+                return node;
+            }
+
             // Query是对实体表进行查询
-            List<QueryTreeNode> ss = FilterChooser.splitByDNF((TableNode) node, extraCmd);
+            List<QueryTreeNode> ss = FilterSpliter.splitByDNF((TableNode) node, extraCmd);
             // 如果子查询中得某一个没有keyFilter，也即需要做全表扫描
             // 那么其他的子查询也没必要用索引了，都使用全表扫描即可
             // 直接把原来的约束条件作为valuefilter，全表扫描就行。
@@ -190,17 +198,19 @@ public class JoinChooser {
                 return merge;
             } else if (ss != null && ss.size() == 1) {
                 return ss.get(0);
+            } else {
+                // 出现了ss为null，即代表需要全表扫描
+                // 查找可以包含所有选择列的索引
+                IndexMeta indexWithAllColumnsSelected = IndexChooser.findBestIndexByAllColumnsSelected(((TableNode) node).getTableMeta(),
+                    ((TableNode) node).getColumnsRefered(),
+                    extraCmd);
+
+                if (indexWithAllColumnsSelected != null) {
+                    ((TableNode) node).useIndex(indexWithAllColumnsSelected);
+                }
+                return node;
             }
 
-            // 全表扫描可以扫描包含所有选择列的索引
-            IndexMeta indexWithAllColumnsSelected = IndexChooser.findBestIndexByAllColumnsSelected(((TableNode) node).getTableMeta(),
-                ((TableNode) node).getColumnsRefered(),
-                extraCmd);
-
-            if (indexWithAllColumnsSelected != null) {
-                ((TableNode) node).useIndex(indexWithAllColumnsSelected);
-            }
-            return node;
         } else if (node instanceof JoinNode) {
             // 如果Join是OuterJoin，则不区分内外表，只能使用NestLoop或者SortMerge，暂时只使用SortMerge
             // if (((JoinNode) node).isOuterJoin()) {
@@ -254,7 +264,7 @@ public class JoinChooser {
                     List<List<IFilter>> DNFNodes = FilterUtils.toDNFNodesArray(innerNode.getWhereFilter());
                     if (DNFNodes.size() == 1) {
                         // 即使索引没有选择主键，但是有的filter依旧会在s主键上进行，作为valueFilter，所以要把主键也传进去
-                        Map<FilterType, IFilter> filters = FilterChooser.splitByIndex(DNFNodes.get(0),
+                        Map<FilterType, IFilter> filters = FilterSpliter.splitByIndex(DNFNodes.get(0),
                             (TableNode) innerNode);
                         ((TableNode) innerNode).setKeyFilter(filters.get(FilterType.IndexQueryKeyFilter));
                         ((TableNode) innerNode).setResultFilter(filters.get(FilterType.ResultFilter));
@@ -303,5 +313,9 @@ public class JoinChooser {
 
     private static boolean isOptimizeJoinOrder(Map<String, Comparable> extraCmd) {
         return BooleanUtils.toBoolean(GeneralUtil.getExtraCmd(extraCmd, ExtraCmd.OptimizerExtraCmd.ChooseJoin));
+    }
+
+    private static boolean isOptimizeIndexMerge(Map<String, Comparable> extraCmd) {
+        return BooleanUtils.toBoolean(GeneralUtil.getExtraCmd(extraCmd, ExtraCmd.OptimizerExtraCmd.ChooseIndexMerge));
     }
 }

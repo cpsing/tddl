@@ -108,8 +108,8 @@ public class KVIndexNodeBuilder extends QueryTreeNodeBuilder {
         if (c.getTableName() != null) {
             if ((!c.getTableName().equals(this.getNode().getIndexName()))
                 && (!c.getTableName().equals(this.getNode().getAlias()))) {
-                // 貌似不应该再去匹配tableName，不然一旦一张表的两个索引进行join时，查询字段就会串了
-                // && (!c.getTableName().equals(this.getNode().getTableName()))
+                // && (!c.getTableName().equals(this.getNode().getTableName())))
+                // {
                 return null;
             }
         }

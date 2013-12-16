@@ -14,7 +14,7 @@ public class MockRepoIndexManager extends AbstractLifecycle implements IndexMana
     }
 
     public IndexMeta getIndexByName(String name) {
-        int index = name.indexOf("\\.");
+        int index = name.indexOf(".");
         if (index < 0) {
             index = name.length();
         }
