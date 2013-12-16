@@ -1,5 +1,6 @@
 package com.taobao.tddl.rule;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +12,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.taobao.tddl.common.model.DBType;
+import com.taobao.tddl.rule.Rule.RuleColumn;
 import com.taobao.tddl.rule.impl.EnumerativeRule;
 import com.taobao.tddl.rule.model.AdvancedParameter;
 import com.taobao.tddl.rule.utils.RuleUtils;
@@ -78,6 +80,7 @@ public class TableRule extends VirtualTableSupport implements VirtualTableRule {
 
     protected List<Rule<String>> dbShardRules;
     protected List<Rule<String>> tbShardRules;
+    protected List<String>       shardColumns;                // 分库字段
     protected Object             outerContext;
 
     /**
@@ -123,6 +126,9 @@ public class TableRule extends VirtualTableSupport implements VirtualTableRule {
                 this.tbNamePattern = this.virtualTbName;
             }
         }
+
+        // 构造一下分区字段
+        buildShardColumns();
 
         // 基于rule计算一下拓扑结构
         initActualTopology();
@@ -296,6 +302,29 @@ public class TableRule extends VirtualTableSupport implements VirtualTableRule {
         return ep.toString();
     }
 
+    private void buildShardColumns() {
+        Set<String> shardColumns = new HashSet<String>();
+        if (null != dbShardRules) {
+            for (Rule<String> rule : dbShardRules) {
+                Map<String, RuleColumn> columRule = rule.getRuleColumns();
+                if (null != columRule && !columRule.isEmpty()) {
+                    shardColumns.addAll(columRule.keySet());
+                }
+            }
+        }
+
+        if (null != tbShardRules) {
+            for (Rule<String> rule : tbShardRules) {
+                Map<String, RuleColumn> columRule = rule.getRuleColumns();
+                if (null != columRule && !columRule.isEmpty()) {
+                    shardColumns.addAll(columRule.keySet());
+                }
+            }
+        }
+
+        this.shardColumns = new ArrayList<String>(shardColumns);// 没有表配置，代表没有走分区
+    }
+
     // ===================== setter / getter ====================
 
     public void setDbRuleArray(List<String> dbRules) {
@@ -453,5 +482,9 @@ public class TableRule extends VirtualTableSupport implements VirtualTableRule {
 
     public void setJoinGroup(String joinGroup) {
         this.joinGroup = joinGroup;
+    }
+
+    public List<String> getShardColumns() {
+        return shardColumns;
     }
 }

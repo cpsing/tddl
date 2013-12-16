@@ -9,6 +9,7 @@ import com.taobao.tddl.executor.common.TransactionConfig;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.handler.HandlerCommon;
 import com.taobao.tddl.executor.record.CloneableRecord;
+import com.taobao.tddl.executor.repo.RepositoryConfig;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.spi.IDataSourceGetter;
 import com.taobao.tddl.executor.spi.IRepository;
@@ -101,7 +102,7 @@ public abstract class PutMyHandlerCommon extends HandlerCommon {
 
     protected TransactionConfig getDefalutTransactionConfig(IRepository repo) {
         TransactionConfig tc = new TransactionConfig();
-        String isolation = repo.getRepoConfig().getDefaultTnxIsolation();
+        String isolation = repo.getRepoConfig().getProperty(RepositoryConfig.DEFAULT_TXN_ISOLATION);
         // READ_UNCOMMITTED|READ_COMMITTED|REPEATABLE_READ|SERIALIZABLE
         if ("READ_UNCOMMITTED".equals(isolation)) {
             tc.setReadUncommitted(true);

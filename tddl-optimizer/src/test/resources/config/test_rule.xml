@@ -5,53 +5,151 @@
 		<property name="dbType" value="MYSQL" />
 		<property name="tableRules">
 			<map>
-				<entry key="STUDENT" value-ref="STUDENT" />
-				<entry key="STUDENT._ID" value-ref="STUDENT._ID" />
-				<entry key="STUDENT._NAME" value-ref="STUDENT._NAME" />
-				<entry key="STUDENT._SCHOOL" value-ref="STUDENT._SCHOOL" />
+				<entry key="table1" value-ref="table1" />
+				<entry key="table1._name" value-ref="table1._name" />
+				<entry key="table2" value-ref="table2" />
+				<entry key="table2._name" value-ref="table2._name" />
+				<entry key="table3" value-ref="table3" />
+				<entry key="table3._name" value-ref="table3._name" />
+				<entry key="table4" value-ref="table4" />
+				<entry key="table4._name" value-ref="table4._name" />
+				<entry key="table5" value-ref="table5" />
+				<entry key="table5._name" value-ref="table5._name" />
+				<entry key="table6" value-ref="table6" />
+				<entry key="table6._name" value-ref="table6._name" />
+				<entry key="table7" value-ref="table7" />
 			</map>
 		</property>
 	</bean>
 	
-	<bean id="STUDENT" class="com.taobao.tddl.rule.TableRule">
+	<bean id="table1" class="com.taobao.tddl.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_group_{0}" />
 		<property name="dbRuleArray">
-			<value>Math.abs(Long.valueOf(#id,1,4#) %4).intdiv(2)</value>
+			<value>Math.abs(Long.valueOf(#id,1,8#) % 8).intdiv(2)</value>
 		</property>
-		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,4#)) % 4" /> 
-		<property name="tbNamePattern" value="student{00}" />
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,8#)) % 8" /> 
+		<property name="tbNamePattern" value="table1_{00}" />
 	</bean>
 	
-	<bean id="STUDENT._ID" class="com.taobao.tddl.rule.TableRule">
+	<bean id="table1._name" class="com.taobao.tddl.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_group_{0}" />
 		<property name="dbRuleArray">
-			<value>Math.abs(Long.valueOf(#id,1,4#) %4).intdiv(2)</value>
+			<value>Math.abs(Long.valueOf(#id,1,8#) % 8).intdiv(2)</value>
 		</property>
-		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,4#)) % 4" /> 
-		<property name="tbNamePattern" value="student._id{00}" />
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,8#)) % 8" /> 
+		<property name="tbNamePattern" value="table1._name_{00}" />
 	</bean>
 	
-	<bean id="STUDENT._NAME" class="com.taobao.tddl.rule.TableRule">
+	<bean id="table2" class="com.taobao.tddl.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_group_{0}" />
 		<property name="dbRuleArray">
-			<value>Math.abs(Long.valueOf(#id,1,4#) %4).intdiv(2)</value>
+			<value>Math.abs(Long.valueOf(#id,1,8#) % 8).intdiv(2)</value>
 		</property>
-		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,4#)) % 4" /> 
-		<property name="tbNamePattern" value="student._name_{00}" />
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,8#)) % 8" /> 
+		<property name="tbNamePattern" value="table2_{00}" />
 	</bean>
 	
-	<bean id="STUDENT._SCHOOL" class="com.taobao.tddl.rule.TableRule">
+	<bean id="table2._name" class="com.taobao.tddl.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_group_{0}" />
 		<property name="dbRuleArray">
-			<value>Math.abs(Long.valueOf(#id,1,4#) %4).intdiv(2)</value>
+			<value>Math.abs(Long.valueOf(#id,1,8#) % 8).intdiv(2)</value>
+		</property>
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,8#)) % 8" /> 
+		<property name="tbNamePattern" value="table2._name_{00}" />
+	</bean>
+	
+	<bean id="table3" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_group_{0}" />
+		<property name="dbRuleArray">
+			<value>Math.abs(Long.valueOf(#id,1,8#) % 8).intdiv(2)</value>
+		</property>
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,8#)) % 8" /> 
+		<property name="tbNamePattern" value="table3_{00}" />
+	</bean>
+	
+	<bean id="table3._name" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_group_{0}" />
+		<property name="dbRuleArray">
+			<value>Math.abs(Long.valueOf(#id,1,8#) % 8).intdiv(2)</value>
+		</property>
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,8#)) % 8" /> 
+		<property name="tbNamePattern" value="table3._name_{00}" />
+	</bean>
+	
+	<bean id="table4" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_group_{0}" />
+		<property name="dbRuleArray">
+			<value>Math.abs(Long.valueOf(#id,1,8#) % 8).intdiv(2)</value>
+		</property>
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,8#)) % 8" /> 
+		<property name="tbNamePattern" value="table4_{00}" />
+	</bean>
+	
+	<bean id="table4._name" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_group_{0}" />
+		<property name="dbRuleArray">
+			<value>Math.abs(Long.valueOf(#id,1,8#) % 8).intdiv(2)</value>
+		</property>
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,8#)) % 8" /> 
+		<property name="tbNamePattern" value="table4._name_{00}" />
+	</bean>
+	
+	<bean id="table5" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_group_{0}" />
+		<property name="dbRuleArray">
+			<value>Math.abs(Long.valueOf(#id,1,8#) % 8).intdiv(2)</value>
+		</property>
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,8#)) % 8" /> 
+		<property name="tbNamePattern" value="table5_{00}" />
+		<property name="joinGroup" value="other" />
+	</bean>
+	
+	<bean id="table5._name" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_group_{0}" />
+		<property name="dbRuleArray">
+			<value>Math.abs(Long.valueOf(#id,1,8#) % 8).intdiv(2)</value>
+		</property>
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,8#)) % 8" /> 
+		<property name="tbNamePattern" value="table5._name_{00}" />
+		<property name="joinGroup" value="other" />
+	</bean>
+	
+	<bean id="table6" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_group_{0}" />
+		<property name="dbRuleArray">
+			<value>Math.abs(Long.valueOf(#id,1,4#) % 4).intdiv(2)</value>
 		</property>
 		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,4#)) % 4" /> 
-		<property name="tbNamePattern" value="studentschool{00}" />
+		<property name="tbNamePattern" value="table6_{00}" />
+		<property name="joinGroup" value="other" />
+	</bean>
+	
+	<bean id="table6._name" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_group_{0}" />
+		<property name="dbRuleArray">
+			<value>Math.abs(Long.valueOf(#id,1,4#) % 4).intdiv(2)</value>
+		</property>
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,4#)) % 4" /> 
+		<property name="tbNamePattern" value="table6._name_{00}" />
+		<property name="joinGroup" value="other" />
+	</bean>
+	
+	<bean id="table7" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_group_0" />
+		<property name="tbNamePattern" value="table7" />
+		<property name="broadcast" value="true" />
 	</bean>
 </beans>
-
-

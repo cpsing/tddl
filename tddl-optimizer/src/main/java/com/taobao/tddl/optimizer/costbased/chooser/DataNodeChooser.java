@@ -17,6 +17,7 @@ import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.optimizer.OptimizerContext;
+import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.ASTNode;
@@ -123,7 +124,7 @@ public class DataNodeChooser {
             if (chooseJoinMergeJoinForce(extraCmd)) {
                 isPartitionOnPartition = true;// 强制开启
             } else if (chooseJoinMergeJoinByRule(extraCmd)) {
-                isPartitionOnPartition = getJoinOnPartitionFilters(join) != null; // 根据规则判断
+                isPartitionOnPartition = isJoinOnPartition(join).flag; // 根据规则判断
             }
 
             // 处理子节点
@@ -158,7 +159,7 @@ public class DataNodeChooser {
                     ((MergeNode) right).merge(join.getRightNode());
                     ((MergeNode) right).setSharded(false);
                     join.getRightNode().executeOn("undecided");
-
+                    right.setBroadcast(false);
                     right.build();
                     join.setRightNode(right);
                 }
@@ -167,7 +168,6 @@ public class DataNodeChooser {
             String dataNode = join.getLeftNode().getDataNode();
             // 对于未决的IndexNestedLoop，join应该在左节点执行
             if (right instanceof MergeNode && !((MergeNode) right).isSharded()) {
-                dataNode = join.getLeftNode().getDataNode();
                 join.executeOn(dataNode);
                 right.executeOn(join.getDataNode());
             } else {
@@ -561,41 +561,43 @@ public class DataNodeChooser {
 
         List<IBooleanFilter> joinFilters;
         String               joinGroup;
-        boolean              flag;       // 成功还是失败
+        boolean              broadcast = false;
+        boolean              flag      = false; // 成功还是失败
     }
 
     /**
      * 找到join条件完全是分区键的filter，返回null代表没找到，否则返回join条件
      */
-    private static PartitionJoinResult getJoinOnPartitionFilters(JoinNode join) {
+    private static PartitionJoinResult isJoinOnPartition(JoinNode join) {
         QueryTreeNode left = join.getLeftNode();
         QueryTreeNode right = join.getRightNode();
 
-        PartitionJoinResult leftResult = getJoinOnPartitionGroup(join.getLeftKeys(), left);
+        PartitionJoinResult leftResult = isJoinOnPartitionOneSide(join.getLeftKeys(), left);
         if (!leftResult.flag) {
             return leftResult;
         }
 
-        PartitionJoinResult rightResult = getJoinOnPartitionGroup(join.getRightKeys(), right);
+        PartitionJoinResult rightResult = isJoinOnPartitionOneSide(join.getRightKeys(), right);
         if (!rightResult.flag) {
             return leftResult;
         }
 
         PartitionJoinResult result = new PartitionJoinResult();
-        result.flag = StringUtils.equalsIgnoreCase(leftResult.joinGroup, rightResult.joinGroup);
+        result.broadcast = leftResult.broadcast || rightResult.broadcast;
+        result.flag = StringUtils.equalsIgnoreCase(leftResult.joinGroup, rightResult.joinGroup) || result.broadcast;
         result.joinGroup = leftResult.joinGroup;
         result.joinFilters = join.getJoinFilter();
         return result;
     }
 
     /**
-     * 判断joinColumns是否和当前节点的分区键完全匹配
+     * 判断一个joinNode的左或则右节点的joinColumns是否和当前节点的分区键完全匹配
      */
-    private static PartitionJoinResult getJoinOnPartitionGroup(List<ISelectable> joinColumns, QueryTreeNode qtn) {
+    private static PartitionJoinResult isJoinOnPartitionOneSide(List<ISelectable> joinColumns, QueryTreeNode qtn) {
         PartitionJoinResult result = new PartitionJoinResult();
         // 递归拿左边的树
         if (qtn instanceof JoinNode) {
-            result = getJoinOnPartitionFilters((JoinNode) qtn);
+            result = isJoinOnPartition((JoinNode) qtn);
             if (!result.flag) {// 递归失败，直接返回
                 result.flag = false;
                 return result;
@@ -629,28 +631,52 @@ public class DataNodeChooser {
                 }
             }
             // 获取当前表的分区字段
-            return getJoinOnPartitionGroup(newJoinColumns, (QueryTreeNode) qtn.getChild());
+            return isJoinOnPartitionOneSide(newJoinColumns, (QueryTreeNode) qtn.getChild());
         } else if (qtn instanceof MergeNode) {
             result.flag = false;
             return result; // 直接返回，不处理
         } else {
+            if (OptimizerContext.getContext().getRule().isBroadCast(((KVIndexNode) qtn).getKvIndexName())) {
+                result.flag = true;
+                result.broadcast = true;
+                return result;
+            }
+
             // KVIndexNode
-            List<ISelectable> partitionColumns = OptimizerUtils.columnMetaListToIColumnList(((KVIndexNode) qtn).getIndex()
-                .getPartitionColumns(),
-                qtn.getAlias());
+            List<String> shardColumns = OptimizerContext.getContext()
+                .getRule()
+                .getSharedColumns(((KVIndexNode) qtn).getKvIndexName());
+            List<ColumnMeta> columns = new ArrayList<ColumnMeta>();
+            TableMeta tableMeta = ((KVIndexNode) qtn).getTableMeta();
+            for (String shardColumn : shardColumns) {
+                columns.add(tableMeta.getColumn(shardColumn));
+            }
+
+            String tableName = ((KVIndexNode) qtn).getTableName();
+            if (qtn.getAlias() != null) {
+                tableName = qtn.getAlias();
+            }
+
+            List<ISelectable> partitionColumns = OptimizerUtils.columnMetaListToIColumnList(columns, tableName);
+
+            if (partitionColumns.isEmpty()) {
+                result.flag = false;// 没有分库键
+                return result;
+            }
 
             // 要求joinColumns必须包含所有的partitionColumns
             for (ISelectable partitionColumn : partitionColumns) {
                 boolean isFound = false;
                 for (ISelectable joinColumn : joinColumns) {
-                    if (partitionColumn.isSameName(joinColumn)) {
+                    if (joinColumn.isSameName(partitionColumn)) {
                         isFound = true;
                         break;
                     }
                 }
 
                 if (!isFound) {
-                    return null;
+                    result.flag = false;// 没有分库键
+                    return result;
                 }
             }
 
@@ -714,20 +740,22 @@ public class DataNodeChooser {
             for (QueryTreeNode r : rights) {
                 JoinNode newj = join.copy();
                 QueryTreeNode newL = left.copy();
-                newL.executeOn(r.getDataNode());// 广播表的执行节点跟着右边走
+                setExecuteOn(newL, r.getDataNode());// 广播表的执行节点跟着右边走
                 newj.setLeftNode(newL);
                 newj.setRightNode(r);
                 newj.executeOn(r.getDataNode());
+                newj.setExtra(r.getExtra());
                 joins.add(newj);
             }
         } else if (rightBroadCast) {
             for (QueryTreeNode l : lefts) {
                 QueryTreeNode newR = right.copy();
-                newR.executeOn(l.getDataNode());// 广播表的执行节点跟着右边走
+                setExecuteOn(newR, l.getDataNode());// 广播表的执行节点跟着右边走
                 JoinNode newj = join.copy();
                 newj.setLeftNode(l);
                 newj.setRightNode(newR);
                 newj.executeOn(l.getDataNode());
+                newj.setExtra(l.getExtra());
                 joins.add(newj);
             }
         } else {
@@ -742,6 +770,7 @@ public class DataNodeChooser {
                 newj.setLeftNode(l);
                 newj.setRightNode(r);
                 newj.executeOn(l.getDataNode());
+                newj.setExtra(l.getExtra()); // 因为left/right的extra相同，只要选择一个即可
                 joins.add(newj);
             }
         }
@@ -763,6 +792,17 @@ public class DataNodeChooser {
     }
 
     /**
+     * 递归设置executeOn
+     */
+    private static void setExecuteOn(QueryTreeNode qtn, String dataNode) {
+        for (ASTNode node : qtn.getChildren()) {
+            setExecuteOn((QueryTreeNode) node, dataNode);
+        }
+
+        qtn.executeOn(dataNode);
+    }
+
+    /**
      * 根据表名提取唯一标识
      * 
      * <pre>
@@ -772,7 +812,7 @@ public class DataNodeChooser {
      *    此时executeNode就是库名，已经可以唯一确定一张表
      * </pre>
      */
-    public static String getIdentifierExtra(KVIndexNode child) {
+    private static String getIdentifierExtra(KVIndexNode child) {
         String tableName = child.getActualTableName();
         if (tableName == null) {
             tableName = child.getIndexName();

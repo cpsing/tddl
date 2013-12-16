@@ -11,8 +11,8 @@ public class MockRepoSchemaManager extends RepoSchemaManager {
         // DO NOTHGING
     }
 
-    protected TableMeta getTable0(String tableName) {
-        return super.getTable0(tableName);
+    protected TableMeta getTable0(String logicalTableName, String actualTableName) {
+        return super.getTable0(logicalTableName, actualTableName);
     }
 
 }
