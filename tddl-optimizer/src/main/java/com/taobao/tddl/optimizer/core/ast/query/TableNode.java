@@ -198,7 +198,7 @@ public class TableNode extends QueryTreeNode {
                 }
                 keyQuery.select(keyQuerySelected);
                 // mengshi 如果valueFilter中有index中的列，实际应该在indexQuery中做
-                keyQuery.valueQuery(OptimizerUtils.copyFilter(this.getResultFilter()));
+                keyQuery.valueQuery(OptimizerUtils.copyFilter(this.getResultFilter(), keyQuery.getAlias()));
 
                 JoinNode join = indexQuery.join(keyQuery);
                 // 按照PK进行join

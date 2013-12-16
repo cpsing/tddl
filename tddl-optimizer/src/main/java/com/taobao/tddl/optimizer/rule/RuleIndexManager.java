@@ -18,7 +18,11 @@ public class RuleIndexManager extends AbstractLifecycle implements IndexManager 
     }
 
     public IndexMeta getIndexByName(String name) {
-        String tableName = name.substring(0, name.indexOf("."));
+        int index = name.indexOf(".");
+        if (index < 0) {
+            index = name.length();
+        }
+        String tableName = name.substring(0, index);
         return schemaManager.getTable(tableName).getIndexMeta(name);
     }
 }
