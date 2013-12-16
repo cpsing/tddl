@@ -1045,6 +1045,40 @@ public class SqlParserTest extends BaseOptimizerTest {
         Assert.assertTrue(((QueryNode) ((JoinNode) qn).getRightNode()).getChild() instanceof JoinNode);
     }
 
+    public void testQuery_join_子查询_in模式() throws SqlParserException, QueryException {
+        String sql = "SELECT * FROM TABLE1 WHERE ID IN (SELECT ID FROM TABLE2)";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+        System.out.println(qn);
+    }
+
+    // @Test
+    public void testQuery_join_子查询_exist模式() throws SqlParserException, QueryException {
+        // ExistsPrimary
+        String sql = "SELECT * FROM TABLE1 WHERE EXISTS (SELECT ID FROM TABLE2)";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+        System.out.println(qn);
+    }
+
+    // @Test
+    public void testQuery_join_子查询_all模式() throws SqlParserException, QueryException {
+        // SubqueryAllExpression
+        String sql = "SELECT * FROM TABLE1 WHERE ID > ALL (SELECT ID FROM TABLE2)";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+        System.out.println(qn);
+    }
+
+    // @Test
+    public void testQuery_join_子查询_any模式() throws SqlParserException, QueryException {
+        // SubqueryAnyExpression
+        String sql = "SELECT * FROM TABLE1 WHERE ID > ANY (SELECT ID FROM TABLE2)";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+        System.out.println(qn);
+    }
+
     // ==================================================
 
     private QueryTreeNode query(String sql) throws SqlParserException {

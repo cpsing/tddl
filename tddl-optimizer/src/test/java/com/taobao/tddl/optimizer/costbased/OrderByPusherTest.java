@@ -9,8 +9,8 @@ import com.taobao.tddl.optimizer.core.ast.query.JoinNode;
 import com.taobao.tddl.optimizer.core.ast.query.MergeNode;
 import com.taobao.tddl.optimizer.core.ast.query.QueryNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
-import com.taobao.tddl.optimizer.core.ast.query.strategy.IndexNestedLoopJoin;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
+import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinStrategy;
 import com.taobao.tddl.optimizer.costbased.pusher.OrderByPusher;
 
 public class OrderByPusherTest extends BaseOptimizerTest {
@@ -94,7 +94,7 @@ public class OrderByPusherTest extends BaseOptimizerTest {
         table2.alias("B");
 
         JoinNode join = table1.join(table2);
-        join.setJoinStrategy(new IndexNestedLoopJoin());
+        join.setJoinStrategy(JoinStrategy.INDEX_NEST_LOOP);
         join.orderBy("A.ID");
         join.orderBy("A.NAME");
         join.build();
@@ -116,7 +116,7 @@ public class OrderByPusherTest extends BaseOptimizerTest {
         table2.alias("B");
 
         JoinNode join = table1.join(table2);
-        join.setJoinStrategy(new IndexNestedLoopJoin());
+        join.setJoinStrategy(JoinStrategy.INDEX_NEST_LOOP);
         join.orderBy("A.NAME");
         join.orderBy("A.SCHOOL");
         join.build();
@@ -136,7 +136,7 @@ public class OrderByPusherTest extends BaseOptimizerTest {
         table2.alias("B");
 
         JoinNode join = table1.join(table2);
-        join.setJoinStrategy(new IndexNestedLoopJoin());
+        join.setJoinStrategy(JoinStrategy.INDEX_NEST_LOOP);
         join.orderBy("A.ID");
         join.orderBy("A.NAME");
         join.build();
@@ -156,7 +156,7 @@ public class OrderByPusherTest extends BaseOptimizerTest {
         table2.alias("B");
 
         JoinNode join = table1.join(table2);
-        join.setJoinStrategy(new IndexNestedLoopJoin());
+        join.setJoinStrategy(JoinStrategy.INDEX_NEST_LOOP);
         join.select("A.ID AS CID, (A.NAME + A.SCHOOL) AS NAME");
         join.orderBy("CID ");
         join.orderBy("NAME"); // 这里的name为select中的函数
@@ -173,7 +173,7 @@ public class OrderByPusherTest extends BaseOptimizerTest {
         TableNode table2 = new TableNode("TABLE2");
 
         JoinNode join = table1.join(table2);
-        join.setJoinStrategy(new IndexNestedLoopJoin());
+        join.setJoinStrategy(JoinStrategy.INDEX_NEST_LOOP);
         join.alias("S").select("TABLE1.ID AS ID , TABLE1.NAME AS NAME , TABLE2.SCHOOL AS SCHOOL");
         join.build();
 
@@ -188,7 +188,7 @@ public class OrderByPusherTest extends BaseOptimizerTest {
         queryB.build();
 
         JoinNode nextJoin = queryA.join(queryB);
-        nextJoin.setJoinStrategy(new IndexNestedLoopJoin());
+        nextJoin.setJoinStrategy(JoinStrategy.INDEX_NEST_LOOP);
         nextJoin.orderBy("B.ID ASC");
         nextJoin.orderBy("B.NAME DESC");
         nextJoin.build();

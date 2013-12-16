@@ -508,8 +508,8 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
                 keyFilterStr = visitor.getString();
             }
 
-            if (query.getResultSetFilter() != null) {
-                MysqlPlanVisitorImpl visitor = this.getNewVisitor(query.getResultSetFilter());
+            if (query.getValueFilter() != null) {
+                MysqlPlanVisitorImpl visitor = this.getNewVisitor(query.getValueFilter());
                 resultFilterStr = visitor.getString();
             }
 
@@ -688,8 +688,8 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
             keyFilterStr = visitor.getString();
         }
 
-        if (query.getResultSetFilter() != null) {
-            MysqlPlanVisitorImpl visitor = this.getNewVisitor(query.getResultSetFilter());
+        if (query.getValueFilter() != null) {
+            MysqlPlanVisitorImpl visitor = this.getNewVisitor(query.getValueFilter());
             resultFilterStr = visitor.getString();
         }
 
@@ -725,8 +725,8 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
             keyFilterStr = visitor.getString();
         }
 
-        if (query.getResultSetFilter() != null) {
-            MysqlPlanVisitorImpl visitor = this.getNewVisitor(query.getResultSetFilter());
+        if (query.getValueFilter() != null) {
+            MysqlPlanVisitorImpl visitor = this.getNewVisitor(query.getValueFilter());
             resultFilterStr = visitor.getString();
         }
 

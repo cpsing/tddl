@@ -2,9 +2,13 @@ package com.taobao.tddl.optimizer.costbased.after;
 
 import java.util.Map;
 
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
+
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ExtraCmd;
-import com.taobao.tddl.common.utils.TStringUtil;
+import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin;
@@ -28,47 +32,81 @@ public class MergeConcurrentOptimizer implements QueryPlanOptimizer {
     @Override
     public IDataNodeExecutor optimize(IDataNodeExecutor dne, Map<Integer, ParameterContext> parameterSettings,
                                       Map<String, Comparable> extraCmd) {
-        boolean mergeConcurrentBool = false;
-        if (!(extraCmd == null) && !extraCmd.isEmpty()) {
-            Comparable mergeConcurrent = extraCmd.get(ExtraCmd.OptimizerExtraCmd.MergeConcurrent);
-            if (mergeConcurrent != null) {
-                if (mergeConcurrent instanceof String) {
-                    mergeConcurrentBool = Boolean.valueOf(TStringUtil.trim(String.valueOf(mergeConcurrent)));
-                } else if (mergeConcurrent instanceof Boolean) {
-                    mergeConcurrentBool = (Boolean) mergeConcurrent;
-                }
-            }
-        }
-
-        if (dne instanceof IQueryTree && mergeConcurrentBool) {
-            this.findMergeAndSetConcurrent(dne, mergeConcurrentBool);
-        }
+        this.findMergeAndSetConcurrent(dne, extraCmd);
 
         return dne;
     }
 
-    private void findMergeAndSetConcurrent(IDataNodeExecutor dne, boolean mergeConcurrentBool) {
+    private void findMergeAndSetConcurrent(IDataNodeExecutor dne, Map<String, Comparable> extraCmd) {
         if (dne instanceof IMerge) {
-            if (mergeConcurrentBool) {
+            if (isMergeConcurrent(extraCmd, (IMerge) dne)) {
                 ((IMerge) dne).setQueryConcurrency(QUERY_CONCURRENCY.CONCURRENT);
             } else {
                 ((IMerge) dne).setQueryConcurrency(QUERY_CONCURRENCY.SEQUENTIAL);
             }
 
             for (IDataNodeExecutor child : ((IMerge) dne).getSubNode()) {
-                this.findMergeAndSetConcurrent(child, mergeConcurrentBool);
+                this.findMergeAndSetConcurrent(child, extraCmd);
             }
         }
 
         if (dne instanceof IJoin) {
-            this.findMergeAndSetConcurrent(((IJoin) dne).getLeftNode(), mergeConcurrentBool);
-            this.findMergeAndSetConcurrent(((IJoin) dne).getRightNode(), mergeConcurrentBool);
+            this.findMergeAndSetConcurrent(((IJoin) dne).getLeftNode(), extraCmd);
+            this.findMergeAndSetConcurrent(((IJoin) dne).getRightNode(), extraCmd);
         }
 
         if (dne instanceof IQuery && ((IQuery) dne).getSubQuery() != null) {
-            this.findMergeAndSetConcurrent(((IQuery) dne).getSubQuery(), mergeConcurrentBool);
+            this.findMergeAndSetConcurrent(((IQuery) dne).getSubQuery(), extraCmd);
+
+        }
+    }
+
+    private static boolean isMergeConcurrent(Map<String, Comparable> extraCmd, IMerge query) {
+        String value = ObjectUtils.toString(GeneralUtil.getExtraCmd(extraCmd,
+            ExtraCmd.OptimizerExtraCmd.MergeConcurrent));
+        if (StringUtils.isEmpty(value)) {
+            if ((query.getLimitFrom() != null || query.getLimitTo() != null)) {
+                if (query.getOrderBys() == null && query.getOrderBys().isEmpty()) {
+                    // 存在limit，但不存在order by时不允许走并行
+                    return false;
+                }
+            } else if ((query.getOrderBys() == null && query.getOrderBys().isEmpty())
+                       && (query.getGroupBys() == null && query.getGroupBys().isEmpty())
+                       && query.getHavingFilter() == null) {
+                if (isNoFilter(query)) {
+                    // 没有其他的order by / group by / having /
+                    // where等条件时，就是个简单的select *
+                    // from xxx，暂时也不做并行
+                    return false;
+                }
+            }
+
+            return true;
+        } else {
+            return BooleanUtils.toBoolean(value);
+        }
+    }
+
+    private static boolean isNoFilter(IQueryTree dne) {
+        if (dne instanceof IMerge) {
+            for (IDataNodeExecutor child : ((IMerge) dne).getSubNode()) {
+                return isNoFilter((IQueryTree) child);
+            }
+        }
+
+        if (dne instanceof IJoin) {
+            return isNoFilter(((IJoin) dne).getLeftNode()) && isNoFilter(((IJoin) dne).getRightNode());
+        }
+
+        if (dne instanceof IQuery) {
+            if (((IQuery) dne).getSubQuery() != null) {
+                return isNoFilter(((IQuery) dne).getSubQuery());
+            } else {
+                return ((IQuery) dne).getKeyFilter() == null && ((IQuery) dne).getValueFilter() == null;
+            }
 
         }
 
+        return true;
     }
 }

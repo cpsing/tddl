@@ -693,7 +693,7 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
                 }
 
                 for (int i = this.getOrderBys().size(); i < this.getGroupBys().size(); i++) {
-                    orderByCombineWithGroupBy.add(this.getGroupBys().get(i).deepCopy());
+                    orderByCombineWithGroupBy.add(this.getGroupBys().get(i).copy());
                 }
 
                 return orderByCombineWithGroupBy;

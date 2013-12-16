@@ -25,7 +25,6 @@ import com.taobao.tddl.optimizer.core.ast.dml.DeleteNode;
 import com.taobao.tddl.optimizer.core.ast.dml.InsertNode;
 import com.taobao.tddl.optimizer.core.ast.dml.PutNode;
 import com.taobao.tddl.optimizer.core.ast.dml.UpdateNode;
-import com.taobao.tddl.optimizer.core.ast.query.strategy.IndexNestedLoopJoin;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
@@ -33,6 +32,7 @@ import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
+import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinStrategy;
 import com.taobao.tddl.optimizer.exceptions.QueryException;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
@@ -122,9 +122,6 @@ public class TableNode extends QueryTreeNode {
             List<ISelectable> indexQuerySelected = new ArrayList<ISelectable>();
 
             KVIndexNode indexQuery = new KVIndexNode(this.getIndexUsed().getName());
-            indexQuery.alias(indexUsed.getNameWithOutDot());
-            indexQuery.keyQuery(OptimizerUtils.copyFilter(this.getKeyFilter(), indexQuery.getAlias()));
-            indexQuery.valueQuery(OptimizerUtils.copyFilter(this.getIndexQueryValueFilter(), indexQuery.getAlias()));
             // 索引是否都包含在查询字段中
             boolean isIndexCover = true;
             List<ISelectable> allColumnsRefered = this.getColumnsRefered();
@@ -145,13 +142,15 @@ public class TableNode extends QueryTreeNode {
             indexQuery.select(indexQuerySelected);
             // 索引覆盖的情况下，只需要返回索引查询
             if (isIndexCover) {
+                indexQuery.alias(this.getName());
+                indexQuery.keyQuery(OptimizerUtils.copyFilter(this.getKeyFilter(), indexQuery.getAlias()));
+                indexQuery.valueQuery(OptimizerUtils.copyFilter(this.getIndexQueryValueFilter(), indexQuery.getAlias()));
                 indexQuery.select(OptimizerUtils.copySelectables(this.getColumnsSelected(), indexQuery.getAlias()));
                 indexQuery.setOrderBys(OptimizerUtils.copyOrderBys(this.getOrderBys(), indexQuery.getAlias()));
                 indexQuery.setGroupBys(OptimizerUtils.copyOrderBys(this.getGroupBys(), indexQuery.getAlias()));
                 indexQuery.setLimitFrom(this.getLimitFrom());
                 indexQuery.setLimitTo(this.getLimitTo());
                 indexQuery.executeOn(this.getDataNode());
-                indexQuery.alias(this.getName());
                 indexQuery.setSubQuery(this.isSubQuery());
                 indexQuery.having(OptimizerUtils.copyFilter(this.getHavingFilter(), indexQuery.getAlias()));
                 indexQuery.valueQuery(FilterUtils.and(OptimizerUtils.copyFilter(this.getIndexQueryValueFilter(),
@@ -161,6 +160,10 @@ public class TableNode extends QueryTreeNode {
                 indexQuery.build();
                 return indexQuery;
             } else {
+                indexQuery.alias(indexUsed.getNameWithOutDot());
+                indexQuery.keyQuery(OptimizerUtils.copyFilter(this.getKeyFilter(), indexQuery.getAlias()));
+                indexQuery.valueQuery(OptimizerUtils.copyFilter(this.getIndexQueryValueFilter(), indexQuery.getAlias()));
+
                 // 不是索引覆盖的情况下，需要回表，就是索引查询和主键查询
                 IndexMeta pk = this.getTableMeta().getPrimaryIndex();
                 // 由于按照主键join，主键也是被引用的列
@@ -216,52 +219,24 @@ public class TableNode extends QueryTreeNode {
                     join.addJoinFilter(eq);
                 }
 
-                List<ISelectable> columns = new ArrayList<ISelectable>();
-                if (this.getAlias() == null) {
-                    columns = OptimizerUtils.copySelectables(this.getColumnsSelected());
-                } else {
-                    columns = OptimizerUtils.copySelectables(this.getColumnsSelected(), this.getAlias());
+                String tableName = this.getTableName();
+                if (this.getAlias() != null) {
+                    tableName = this.getAlias();
                 }
-
-                join.select(columns);
-                List<IOrderBy> orderBys = new ArrayList<IOrderBy>(this.getOrderBys().size());
-                for (IOrderBy o : this.getOrderBys()) {
-                    IOrderBy newO = o.deepCopy();
-                    if (o.getColumn().getAlias() != null) {
-                        newO.getColumn().setColumnName(o.getColumn().getAlias());
-                    }
-                    if (this.getAlias() != null) {
-                        newO.getColumn().setTableName(this.getAlias());
-                    }
-                    orderBys.add(newO);
-                }
-
-                join.setOrderBys(orderBys);
-                List<IOrderBy> groupBys = new ArrayList<IOrderBy>(this.getGroupBys().size());
-                for (IOrderBy group : this.getGroupBys()) {
-                    IOrderBy newG = group.copy();
-                    if (group.getAlias() != null) {
-                        newG.setColumnName(group.getAlias());
-                    }
-
-                    if (this.getAlias() != null) {
-                        newG.setTableName(this.getAlias());
-                    }
-                    groupBys.add(newG);
-                }
-
+                join.select(OptimizerUtils.copySelectables(this.getColumnsSelected(), tableName));
+                join.setOrderBys(OptimizerUtils.copyOrderBys(this.getOrderBys(), tableName));
+                join.setGroupBys(OptimizerUtils.copyOrderBys(this.getGroupBys(), tableName));
                 join.setUsedForIndexJoinPK(true);
-                join.setGroupBys(groupBys);
                 join.setLimitFrom(this.getLimitFrom());
                 join.setLimitTo(this.getLimitTo());
                 join.executeOn(this.getDataNode());
                 join.setSubQuery(this.isSubQuery());
                 // 回表是IndexNestedLoop
-                join.setJoinStrategy(new IndexNestedLoopJoin());
+                join.setJoinStrategy(JoinStrategy.INDEX_NEST_LOOP);
                 join.setAlias(this.getAlias());
                 join.setSubAlias(this.getSubAlias());
-                join.having(OptimizerUtils.copyFilter(this.getHavingFilter()));
-                join.setOtherJoinOnFilter(OptimizerUtils.copyFilter(this.getOtherJoinOnFilter()));
+                join.having(OptimizerUtils.copyFilter(this.getHavingFilter(), tableName));
+                join.setOtherJoinOnFilter(OptimizerUtils.copyFilter(this.getOtherJoinOnFilter(), tableName));
                 join.build();
                 return join;
             }

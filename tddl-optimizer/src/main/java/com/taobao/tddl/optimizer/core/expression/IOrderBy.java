@@ -35,8 +35,6 @@ public interface IOrderBy extends CanVisit {
 
     public String toStringWithInden(int inden);
 
-    public IOrderBy deepCopy();
-
     public IOrderBy copy();
 
 }

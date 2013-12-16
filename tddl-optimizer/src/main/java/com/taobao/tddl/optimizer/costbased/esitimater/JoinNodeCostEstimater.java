@@ -2,7 +2,7 @@ package com.taobao.tddl.optimizer.costbased.esitimater;
 
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.query.JoinNode;
-import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinType;
+import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinStrategy;
 import com.taobao.tddl.optimizer.exceptions.StatisticsUnavailableException;
 
 /**
@@ -47,7 +47,7 @@ public class JoinNodeCostEstimater implements QueryTreeCostEstimater {
         }
 
         // 如果是IndexNestLoop，则数据还在磁盘上
-        if (join.getJoinStrategy().getType() == JoinType.INDEX_NEST_LOOP) {
+        if (join.getJoinStrategy() == JoinStrategy.INDEX_NEST_LOOP) {
             cost.setDiskIO(leftCost.getRowCount());
             isOnFly = false;
             scanRowCount = leftCost.getScanCount() + rightCost.getScanCount();

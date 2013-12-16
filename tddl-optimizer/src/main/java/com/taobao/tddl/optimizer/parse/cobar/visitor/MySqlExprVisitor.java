@@ -655,7 +655,6 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
             }
             filter.setValues(values);
         } else if (ex instanceof QueryExpression) {
-            // TODO 处理id in (subquery)
             throw new NotSupportException("not support inExpression with subquery");
         }
 

@@ -134,7 +134,7 @@ public class OptimizerUtils {
 
         List<IOrderBy> news = new ArrayList(orders.size());
         for (IOrderBy c : orders) {
-            news.add(c.deepCopy());
+            news.add(c.copy());
         }
 
         return news;
@@ -185,7 +185,7 @@ public class OptimizerUtils {
         List<IOrderBy> newOrders = new ArrayList<IOrderBy>(orders.size());
 
         for (IOrderBy o : orders) {
-            newOrders.add(o.deepCopy());
+            newOrders.add(o.copy());
         }
 
         return newOrders;
@@ -219,11 +219,11 @@ public class OptimizerUtils {
 
         List<IOrderBy> news = new ArrayList(orderBys.size());
         for (IOrderBy o : orderBys) {
-            IOrderBy a = o.deepCopy().setTableName(null);
+            IOrderBy a = o.copy().setTableName(null);
             if (a.getColumn() instanceof IFunction) {
-                setFunction((IFunction) a, tableName);
+                setFunction((IFunction) a.getColumn(), tableName);
             } else if (a.getColumn() instanceof IFilter) {
-                setFilter((IFilter) a, tableName);
+                setFilter((IFilter) a.getColumn(), tableName);
             }
 
             news.add(a);

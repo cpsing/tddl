@@ -14,13 +14,11 @@ import com.taobao.tddl.optimizer.core.ast.ASTNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.build.JoinNodeBuilder;
 import com.taobao.tddl.optimizer.core.ast.build.QueryTreeNodeBuilder;
-import com.taobao.tddl.optimizer.core.ast.query.strategy.BlockNestedLoopJoin;
-import com.taobao.tddl.optimizer.core.ast.query.strategy.IndexNestedLoopJoin;
-import com.taobao.tddl.optimizer.core.ast.query.strategy.JoinStrategy;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin;
+import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinStrategy;
 import com.taobao.tddl.optimizer.exceptions.QueryException;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
@@ -31,7 +29,7 @@ public class JoinNode extends QueryTreeNode {
     /**
      * join 策略
      */
-    private JoinStrategy         joinStrategy          = new BlockNestedLoopJoin();
+    private JoinStrategy         joinStrategy          = JoinStrategy.NEST_LOOP_JOIN;
 
     /**
      * <pre>
@@ -141,8 +139,8 @@ public class JoinNode extends QueryTreeNode {
 
         List<IOrderBy> orders = new ArrayList();
         // index nested loop以左表顺序为准
-        if (this.getJoinStrategy() instanceof IndexNestedLoopJoin
-            || this.getJoinStrategy() instanceof BlockNestedLoopJoin) {
+        if (this.getJoinStrategy() == JoinStrategy.INDEX_NEST_LOOP
+            || this.getJoinStrategy() == JoinStrategy.NEST_LOOP_JOIN) {
             orders = this.getLeftNode().getImplicitOrderBys();
         } else {
             // sort merge的话，以join列为准
@@ -200,14 +198,36 @@ public class JoinNode extends QueryTreeNode {
     }
 
     public IJoin toDataNodeExecutor() throws QueryException {
-        return this.getJoinStrategy().getQuery(this, null);
+        IJoin join = ASTNodeFactory.getInstance().createJoin();
+        join.setRightNode(this.getRightNode().toDataNodeExecutor());
+        join.setLeftNode(this.getLeftNode().toDataNodeExecutor());
+        join.setJoinStrategy(this.getJoinStrategy());
+        join.setLeftOuter(this.getLeftOuter()).setRightOuter(this.getRightOuter());
+        join.setJoinOnColumns((this.getLeftKeys()), (this.getRightKeys()));
+        join.setOrderBys(this.getOrderBys());
+        join.setLimitFrom(this.getLimitFrom()).setLimitTo(this.getLimitTo());
+        join.executeOn(this.getDataNode()).setConsistent(true);
+        join.setValueFilter(this.getResultFilter());
+        join.having(this.getHavingFilter());
+        join.setAlias(this.getAlias());
+        join.setGroupBys(this.getGroupBys());
+        join.setIsSubQuery(this.isSubQuery());
+        join.setOtherJoinOnFilter(this.getOtherJoinOnFilter());
+        if (this.isCrossJoin()) {
+            join.setColumns(new ArrayList(0)); // 查询所有字段
+        } else {
+            join.setColumns((this.getColumnsSelected()));
+        }
+
+        join.setWhereFilter(this.getAllWhereFilter());
+        return join;
     }
 
     public QueryTreeNode convertToJoinIfNeed() {
         super.convertToJoinIfNeed(); // 首先执行一次TableNode处理，生成join
 
         // 如果右边是子查询，join策略为block，不做调整
-        if (!(this.getJoinStrategy() instanceof IndexNestedLoopJoin)) {
+        if (!(this.getJoinStrategy() == JoinStrategy.INDEX_NEST_LOOP)) {
             return this;
         }
 
@@ -227,13 +247,11 @@ public class JoinNode extends QueryTreeNode {
             QueryTreeNode rightKeyQuery = ((JoinNode) right).getRightNode();
 
             JoinNode leftJoinRightIndex = left.join(rightIndexQuery);
-            leftJoinRightIndex.setJoinStrategy(new IndexNestedLoopJoin());
+            leftJoinRightIndex.setJoinStrategy(JoinStrategy.INDEX_NEST_LOOP);
 
             // 复制join的右字段，修正一下表名
-            List<ISelectable> rightIndexJoinOnColumns = OptimizerUtils.copySelectables(this.getRightKeys());
-            if (rightIndexQuery.getAlias() != null) {
-                setColumnsTableName(rightIndexJoinOnColumns, rightIndexQuery.getAlias());
-            }
+            List<ISelectable> rightIndexJoinOnColumns = OptimizerUtils.copySelectables(this.getRightKeys(),
+                rightIndexQuery.getName());
 
             // 添加left join index的条件
             for (int i = 0; i < this.getLeftKeys().size(); i++) {
@@ -244,16 +262,12 @@ public class JoinNode extends QueryTreeNode {
             leftJoinRightIndex.executeOn(this.getDataNode());
             List<ISelectable> leftJoinRightIndexColumns = new LinkedList();
             // 复制left的查询
-            List<ISelectable> leftJoinColumns = OptimizerUtils.copySelectables(left.getColumnsSelected());
-            if (left.getAlias() != null) {
-                setColumnsTableName(leftJoinColumns, left.getAlias());
-            }
+            List<ISelectable> leftJoinColumns = OptimizerUtils.copySelectables(left.getColumnsSelected(),
+                left.getName());
 
             // 复制index的查询
-            List<ISelectable> rightIndexColumns = OptimizerUtils.copySelectables(rightIndexQuery.getColumnsSelected());
-            if (rightIndexQuery.getAlias() != null) {
-                setColumnsTableName(rightIndexColumns, rightIndexQuery.getAlias());
-            }
+            List<ISelectable> rightIndexColumns = OptimizerUtils.copySelectables(rightIndexQuery.getColumnsSelected(),
+                rightIndexQuery.getName());
 
             leftJoinRightIndexColumns.addAll(leftJoinColumns);
             leftJoinRightIndexColumns.addAll(rightIndexColumns);
@@ -262,14 +276,12 @@ public class JoinNode extends QueryTreeNode {
 
             // (left join index) join key构建
             JoinNode leftJoinRightIndexJoinRightKey = leftJoinRightIndex.join(rightKeyQuery);
-            leftJoinRightIndexJoinRightKey.setJoinStrategy(new IndexNestedLoopJoin()); // 也是走index
-            for (int i = 0; i < ((JoinNode) right).getLeftKeys().size(); i++) {
-                leftJoinRightIndexJoinRightKey.addJoinKeys(((JoinNode) right).getLeftKeys().get(i),
-                    ((JoinNode) right).getRightKeys().get(i));
-            }
+            leftJoinRightIndexJoinRightKey.setJoinStrategy(JoinStrategy.INDEX_NEST_LOOP); // 也是走index
 
-            if (rightIndexQuery.getAlias() != null) {
-                setColumnsTableName(leftJoinRightIndexJoinRightKey.getLeftKeys(), rightIndexQuery.getAlias());
+            List<ISelectable> leftKeys = OptimizerUtils.copySelectables(((JoinNode) right).getLeftKeys(),
+                rightIndexQuery.getName());
+            for (int i = 0; i < leftKeys.size(); i++) {
+                leftJoinRightIndexJoinRightKey.addJoinKeys(leftKeys.get(i), ((JoinNode) right).getRightKeys().get(i));
             }
 
             leftJoinRightIndexJoinRightKey.setLeftRightJoin(this.leftOuter, this.rightOuter);
@@ -284,9 +296,9 @@ public class JoinNode extends QueryTreeNode {
             if (this.isCrossJoin()) {
                 leftJoinRightIndexJoinRightKey.select(new ArrayList(0));// 查全表所有字段，build的时候会补充
             } else {
-                List<ISelectable> columns = OptimizerUtils.copySelectables(this.getColumnsSelected());
-                leftJoinRightIndexJoinRightKey.select(columns);
+                leftJoinRightIndexJoinRightKey.setColumnsSelected(this.getColumnsSelected());
             }
+
             leftJoinRightIndexJoinRightKey.setGroupBys(this.getGroupBys());
             leftJoinRightIndexJoinRightKey.setResultFilter(this.getResultFilter());
             leftJoinRightIndexJoinRightKey.setOtherJoinOnFilter(this.getOtherJoinOnFilter());
@@ -299,22 +311,15 @@ public class JoinNode extends QueryTreeNode {
         return this;
     }
 
-    private List<ISelectable> setColumnsTableName(List<ISelectable> columns, String tablename) {
-        for (ISelectable c : columns) {
-            c.setTableName(tablename);
-        }
-
-        return columns;
-    }
-
     // ===================== setter / getter =========================
 
     public JoinStrategy getJoinStrategy() {
-        return joinStrategy;
+        return this.joinStrategy;
     }
 
-    public void setJoinStrategy(JoinStrategy joinStrategy) {
+    public JoinNode setJoinStrategy(JoinStrategy joinStrategy) {
         this.joinStrategy = joinStrategy;
+        return this;
     }
 
     public List<IBooleanFilter> getJoinFilter() {

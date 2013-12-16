@@ -23,16 +23,16 @@ public interface IQueryTree<RT extends IQueryTree> extends IDataNodeExecutor<RT>
      * 
      * @return
      */
-    public IFilter getResultSetFilter();
+    public IFilter getValueFilter();
 
     /**
      * valueFilter 简单来说就是对所有数据，一行一行进行检索的filter.
      * 可以保证所有bool条件都能够查询，但性能较慢，一般来说尽可能先使用key filter之后再使用value filter
      * 
-     * @param value_filter
+     * @param valueFilter
      * @return
      */
-    public RT setValueFilter(IFilter value_filter);
+    public RT setValueFilter(IFilter valueFilter);
 
     /**
      * 当前查询中应该使用的查询列。只有在这个出现的列，才会被允许展现
@@ -131,22 +131,26 @@ public interface IQueryTree<RT extends IQueryTree> extends IDataNodeExecutor<RT>
     public RT assignment(Map<Integer, ParameterContext> parameterSettings);
 
     /**
-     * 在处理join的时候，会出现未决节点 比如 数据IDX_PRI: pk - > col1,col2,col3. 数据按照pk进行切分
-     * 索引IDX_COL1: col1->pk 数据按照col1进行切分 那么索引查找的时候，会生成一个join 先查询IDX_COL1.
-     * 然后根据IDX_COL1的"结果"，来决定应该去哪些pk索引的数据节点上进行查询（因为IDX_PRI也是分了多个机器的）。
-     * 所以这时候IDX_PRI是不能预先知道自己在这次查询中应该去查哪些节点的。 这时候。 针对IDX_PRI的查询节点，就是未决节点。
-     * 这时候canMerge为true.
+     * <pre>
+     * 在处理join的时候，会出现未决节点 比如 数据IDX_PRI: pk - > col1,col2,col3. 
+     * 数据按照pk进行切分索引IDX_COL1: col1->pk 数据按照col1进行切分 
+     * 1. 那么索引查找的时候，会生成一个join 先查询IDX_COL1.
+     * 2. 然后根据IDX_COL1的"结果"，来决定应该去哪些pk索引的数据节点上进行查询（因为IDX_PRI也是分了多个机器的）。
+     * 所以这时候IDX_PRI是不能预先知道自己在这次查询中应该去查哪些节点的。 这时候。 针对IDX_PRI的查询节点，就是未决节点,这时候canMerge为true.
+     * </pre>
      * 
      * @param canMerge
      */
     public RT setCanMerge(Boolean canMerge);
 
     /**
-     * 在处理join的时候，会出现未决节点 比如 数据IDX_PRI: pk - > col1,col2,col3. 数据按照pk进行切分
-     * 索引IDX_COL1: col1->pk 数据按照col1进行切分 那么索引查找的时候，会生成一个join 先查询IDX_COL1.
-     * 然后根据IDX_COL1的"结果"，来决定应该去哪些pk索引的数据节点上进行查询（因为IDX_PRI也是分了多个机器的）。
-     * 所以这时候IDX_PRI是不能预先知道自己在这次查询中应该去查哪些节点的。 这时候。 针对IDX_PRI的查询节点，就是未决节点。
-     * 这时候canMerge为true.
+     * <pre>
+     * 在处理join的时候，会出现未决节点 比如 数据IDX_PRI: pk - > col1,col2,col3. 
+     * 数据按照pk进行切分索引IDX_COL1: col1->pk 数据按照col1进行切分 
+     * 1. 那么索引查找的时候，会生成一个join 先查询IDX_COL1.
+     * 2. 然后根据IDX_COL1的"结果"，来决定应该去哪些pk索引的数据节点上进行查询（因为IDX_PRI也是分了多个机器的）。
+     * 所以这时候IDX_PRI是不能预先知道自己在这次查询中应该去查哪些节点的。 这时候。 针对IDX_PRI的查询节点，就是未决节点,这时候canMerge为true.
+     * </pre>
      * 
      * @return
      */

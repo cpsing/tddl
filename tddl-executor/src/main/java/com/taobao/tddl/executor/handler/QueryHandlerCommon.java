@@ -529,11 +529,11 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
     protected ISchematicCursor processValueFilter(ISchematicCursor cursor, final ExecutionContext executionContext,
                                                   IQueryTree IQueryTree) throws TddlException {
         // 接着处理valueFilter
-        IFilter _valueFilter = IQueryTree.getResultSetFilter();
+        IFilter _valueFilter = IQueryTree.getValueFilter();
         if (_valueFilter != null) {
             cursor = executionContext.getCurrentRepository()
                 .getCursorFactory()
-                .valueFilterCursor(executionContext, (ISchematicCursor) cursor, IQueryTree.getResultSetFilter());
+                .valueFilterCursor(executionContext, (ISchematicCursor) cursor, IQueryTree.getValueFilter());
         }
         return cursor;
     }

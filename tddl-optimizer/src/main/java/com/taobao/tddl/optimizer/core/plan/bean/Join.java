@@ -41,9 +41,9 @@ public class Join extends QueryTree implements IJoin {
      */
     protected IFilter           otherJoinOnFilter;
     /**
-     * join的类型 ，具体请看对应解说
+     * join的策略 ，具体请看对应解说
      */
-    protected JoinType          joinType;
+    protected JoinStrategy      joinStrategy;
     /**
      * 左outer join,即使右表没有匹配的对应行，也输出左行 默认是false,也就是内联join
      */
@@ -59,7 +59,7 @@ public class Join extends QueryTree implements IJoin {
         copySelfTo((QueryTree) join);
         join.setJoinNodes(this.getLeftNode(), this.getRightNode());
         join.setJoinOnColumns(this.getLeftJoinOnColumns(), this.getRightJoinOnColumns());
-        join.setJoinType(this.getJoinType());
+        join.setJoinStrategy(this.getJoinStrategy());
         join.setLeftOuter(this.getLeftOuter());
         join.setRightOuter(this.getRightOuter());
         join.setOtherJoinOnFilter((IFilter) (otherJoinOnFilter == null ? null : otherJoinOnFilter.copy()));
@@ -138,13 +138,13 @@ public class Join extends QueryTree implements IJoin {
         return rightColumns;
     }
 
-    public IJoin setJoinType(JoinType joinType) {
-        this.joinType = joinType;
+    public IJoin setJoinStrategy(JoinStrategy joinStrategy) {
+        this.joinStrategy = joinStrategy;
         return this;
     }
 
-    public JoinType getJoinType() {
-        return joinType;
+    public JoinStrategy getJoinStrategy() {
+        return joinStrategy;
     }
 
     public Boolean getLeftOuter() {
@@ -201,7 +201,7 @@ public class Join extends QueryTree implements IJoin {
         if (this.leftOuter && !this.rightOuter) appendField(sb, "type", "left outter join", tabContent);
         if (!this.leftOuter && !this.rightOuter) appendField(sb, "type", "outter join", tabContent);
 
-        appendField(sb, "valueFilter", printFilterString(this.getResultSetFilter()), tabContent);
+        appendField(sb, "valueFilter", printFilterString(this.getValueFilter()), tabContent);
         appendField(sb, "otherJoinOnFilter", printFilterString(this.getOtherJoinOnFilter()), tabContent);
         appendField(sb, "having", printFilterString(this.getHavingFilter()), tabContent);
         if (!(this.getLimitFrom() != null && this.getLimitFrom().equals(-1L) && this.getLimitTo() != null && this.getLimitTo()
@@ -217,7 +217,7 @@ public class Join extends QueryTree implements IJoin {
         appendField(sb, "queryConcurrency", this.getQueryConcurrency(), tabContent);
         appendField(sb, "columns", this.getColumns(), tabContent);
         appendField(sb, "groupBys", this.getGroupBys(), tabContent);
-        appendField(sb, "strategy", this.getJoinType(), tabContent);
+        appendField(sb, "strategy", this.getJoinStrategy(), tabContent);
         appendField(sb, "executeOn", this.getDataNode(), tabContent);
 
         // if(this.getThread()!=null)

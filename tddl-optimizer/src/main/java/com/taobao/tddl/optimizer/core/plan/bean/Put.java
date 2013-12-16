@@ -191,10 +191,6 @@ public class Put<RT extends IPut> extends DataNodeExecutor<RT> implements IPut<R
         appendField(sb, "subRequestID", this.getSubRequestID(), tabContent);
         appendField(sb, "thread", this.getThread(), tabContent);
         appendField(sb, "hostname", this.getRequestHostName(), tabContent);
-        // appendField(sb, "requestID",
-        // this.getRequestID(), tabContent);
-        // appendField(sb, "subRequestID",
-        // this.getSubRequestID(), tabContent);
 
         if (this.getQueryTree() != null) {
             appendln(sb, tabContent + "query:");

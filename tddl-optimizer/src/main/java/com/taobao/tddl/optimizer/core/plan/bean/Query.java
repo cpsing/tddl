@@ -119,7 +119,7 @@ public class Query extends QueryTree implements IQuery {
         }
         appendField(sb, "tableName", this.getTableName(), tabContent);
         appendField(sb, "keyFilter", printFilterString(this.getKeyFilter()), tabContent);
-        appendField(sb, "resultFilter", printFilterString(this.getResultSetFilter()), tabContent);
+        appendField(sb, "resultFilter", printFilterString(this.getValueFilter()), tabContent);
         appendField(sb, "having", printFilterString(this.getHavingFilter()), tabContent);
         if (!(this.getLimitFrom() != null && this.getLimitFrom().equals(-1L) && this.getLimitTo() != null && this.getLimitTo()
             .equals(-1L))) {

@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.taobao.tddl.common.exception.NotSupportException;
@@ -37,7 +38,7 @@ import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinType;
+import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinStrategy;
 import com.taobao.tddl.optimizer.costbased.esitimater.Cost;
 import com.taobao.tddl.optimizer.costbased.esitimater.CostEsitimaterFactory;
 import com.taobao.tddl.optimizer.exceptions.EmptyResultFilterException;
@@ -145,9 +146,7 @@ public class DataNodeChooser {
             join.setLeftNode(left);
             // NestedLoop情况下
             // 如果右边是多个表，则分库需要再执行层根据左边的结果做
-            if (!(right instanceof MergeNode && (join.getJoinStrategy().getType().equals(JoinType.INDEX_NEST_LOOP) || join.getJoinStrategy()
-                .getType()
-                .equals(JoinType.NEST_LOOP_JOIN)))) {
+            if (!(right instanceof MergeNode && (join.getJoinStrategy() == JoinStrategy.INDEX_NEST_LOOP || join.getJoinStrategy() == JoinStrategy.NEST_LOOP_JOIN))) {
                 join.setRightNode(right);
             } else {
                 if (right.isSubQuery()) {
@@ -548,12 +547,18 @@ public class DataNodeChooser {
     }
 
     private static boolean chooseJoinMergeJoinByRule(Map<String, Comparable> extraCmd) {
-        String choose = GeneralUtil.getExtraCmd(extraCmd, ExtraCmd.OptimizerExtraCmd.JoinMergeJoinJudgeByRule);
-        return BooleanUtils.toBoolean(choose);
+        String choose = ObjectUtils.toString(GeneralUtil.getExtraCmd(extraCmd,
+            ExtraCmd.OptimizerExtraCmd.JoinMergeJoinJudgeByRule));
+        if (StringUtils.isEmpty(choose)) {
+            // 默认返回true
+            return true;
+        } else {
+            return BooleanUtils.toBoolean(choose);
+        }
     }
 
     private static boolean chooseJoinMergeJoinForce(Map<String, Comparable> extraCmd) {
-        String choose = GeneralUtil.getExtraCmd(extraCmd, ExtraCmd.OptimizerExtraCmd.JoinMergeJoin);
+        String choose = ObjectUtils.toString(GeneralUtil.getExtraCmd(extraCmd, ExtraCmd.OptimizerExtraCmd.JoinMergeJoin));
         return BooleanUtils.toBoolean(choose);
     }
 

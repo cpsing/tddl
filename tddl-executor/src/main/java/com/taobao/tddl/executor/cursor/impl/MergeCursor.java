@@ -226,7 +226,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
             query.setLimitTo(iquery.getLimitTo());
             query.setOrderBys(iquery.getOrderBys());
             query.setGroupBys(iquery.getGroupBys());
-            query.valueQuery(iquery.getResultSetFilter());
+            query.valueQuery(iquery.getValueFilter());
             query.setKeyFilter(iquery.getKeyFilter());
             // ICursorMeta indexMeta = super.cursormeta;
             IColumn col = ASTNodeFactory.getInstance()

@@ -3,13 +3,17 @@ package com.taobao.tddl.optimizer.costbased.after;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.ObjectUtils;
+
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ExtraCmd;
+import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin;
-import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinType;
+import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinStrategy;
 import com.taobao.tddl.optimizer.core.plan.query.IMerge;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 
@@ -26,24 +30,11 @@ public class MergeJoinMergeOptimizer implements QueryPlanOptimizer {
     @Override
     public IDataNodeExecutor optimize(IDataNodeExecutor dne, Map<Integer, ParameterContext> parameterSettings,
                                       Map<String, Comparable> extraCmd) {
-
-        boolean isExpandLeft = false;
-        boolean isExpandRight = false;
-        if (extraCmd != null && !extraCmd.isEmpty()) {
-            if (extraCmd.get(ExtraCmd.OptimizerExtraCmd.ExpandLeft) != null) {
-                isExpandLeft = (Boolean) extraCmd.get(ExtraCmd.OptimizerExtraCmd.ExpandLeft);
-            }
-
-            if (extraCmd.get(ExtraCmd.OptimizerExtraCmd.ExpandRight) != null) {
-                isExpandRight = (Boolean) extraCmd.get(ExtraCmd.OptimizerExtraCmd.ExpandRight);
-            }
-        }
-
-        if (!isExpandLeft && !isExpandRight) {
+        if (isMergeExpand(extraCmd)) {
+            return this.findEveryJoin(dne, true, true);
+        } else {
             return dne;
         }
-
-        return this.findEveryJoin(dne, isExpandLeft, isExpandRight);
     }
 
     private IDataNodeExecutor findEveryJoin(IDataNodeExecutor dne, boolean isExpandLeft, boolean isExpandRight) {
@@ -100,9 +91,8 @@ public class MergeJoinMergeOptimizer implements QueryPlanOptimizer {
 
     private boolean canExpand(IQueryTree query) {
         // 如果一个节点包含limit，group by，order by等条件
-        if (query.getLimitFrom() != null || query.getLimitTo() != null
-            || (query.getGroupBys() != null && !query.getGroupBys().isEmpty())
-            || (query.getOrderBys() != null && !query.getGroupBys().isEmpty())) {
+        if (query.getLimitFrom() != null || query.getLimitTo() != null || query.getGroupBys() != null
+            || query.getOrderBys() != null) {
             return false;
         } else {
             return true;
@@ -114,7 +104,7 @@ public class MergeJoinMergeOptimizer implements QueryPlanOptimizer {
      */
     public IQueryTree expandLeft(IJoin j) {
         if (!(j.getLeftNode() instanceof IMerge)) {
-            j.setJoinType(JoinType.SORT_MERGE_JOIN);
+            j.setJoinStrategy(JoinStrategy.SORT_MERGE_JOIN);
             return j;
         }
 
@@ -123,7 +113,7 @@ public class MergeJoinMergeOptimizer implements QueryPlanOptimizer {
 
         for (IDataNodeExecutor leftChild : left.getSubNode()) {
             IJoin newJoin = (IJoin) j.copy();
-            newJoin.setJoinType(JoinType.SORT_MERGE_JOIN);
+            newJoin.setJoinStrategy(JoinStrategy.SORT_MERGE_JOIN);
             newJoin.setLeftNode((IQueryTree) leftChild);
             newJoin.setRightNode(j.getRightNode());
             newJoin.executeOn(j.getDataNode());
@@ -138,7 +128,7 @@ public class MergeJoinMergeOptimizer implements QueryPlanOptimizer {
         newMerge.setLimitTo(j.getLimitTo());
         newMerge.setOrderBys(j.getOrderBys());
         newMerge.setQueryConcurrency(j.getQueryConcurrency());
-        newMerge.setValueFilter(j.getResultSetFilter());
+        newMerge.setValueFilter(j.getValueFilter());
         newMerge.executeOn(j.getDataNode());
         return newMerge;
     }
@@ -174,7 +164,7 @@ public class MergeJoinMergeOptimizer implements QueryPlanOptimizer {
         newMerge.setLimitTo(j.getLimitTo());
         newMerge.setOrderBys(j.getOrderBys());
         newMerge.setQueryConcurrency(j.getQueryConcurrency());
-        newMerge.setValueFilter(j.getResultSetFilter());
+        newMerge.setValueFilter(j.getValueFilter());
         newMerge.executeOn(j.getDataNode());
         return newMerge;
     }
@@ -219,9 +209,13 @@ public class MergeJoinMergeOptimizer implements QueryPlanOptimizer {
         newMerge.setLimitTo(j.getLimitTo());
         newMerge.setOrderBys(j.getOrderBys());
         newMerge.setQueryConcurrency(j.getQueryConcurrency());
-        newMerge.setValueFilter(j.getResultSetFilter());
+        newMerge.setValueFilter(j.getValueFilter());
         newMerge.executeOn(j.getDataNode());
         return newMerge;
     }
 
+    private static boolean isMergeExpand(Map<String, Comparable> extraCmd) {
+        String value = ObjectUtils.toString(GeneralUtil.getExtraCmd(extraCmd, ExtraCmd.OptimizerExtraCmd.MergeExpand));
+        return BooleanUtils.toBoolean(value);
+    }
 }

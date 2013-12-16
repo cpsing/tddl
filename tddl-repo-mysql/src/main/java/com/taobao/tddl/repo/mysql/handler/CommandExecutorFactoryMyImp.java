@@ -5,13 +5,13 @@ import com.taobao.tddl.executor.handler.IndexNestedLoopJoinHandler;
 import com.taobao.tddl.executor.handler.MergeHandler;
 import com.taobao.tddl.executor.handler.NestedLoopJoinHandler;
 import com.taobao.tddl.executor.handler.SortMergeJoinHandler;
-import com.taobao.tddl.executor.spi.ICommandHandlerFactory;
 import com.taobao.tddl.executor.spi.ICommandHandler;
+import com.taobao.tddl.executor.spi.ICommandHandlerFactory;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IPut;
 import com.taobao.tddl.optimizer.core.plan.IPut.PUT_TYPE;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin;
-import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinType;
+import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinStrategy;
 import com.taobao.tddl.optimizer.core.plan.query.IMerge;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 
@@ -57,8 +57,8 @@ public class CommandExecutorFactoryMyImp implements ICommandHandlerFactory {
             if (isCondensable) return CONDENSABLE_JOIN_HANDLER;
 
             IJoin join = (IJoin) executor;
-            JoinType joinType = join.getJoinType();
-            switch (joinType) {
+            JoinStrategy joinStrategy = join.getJoinStrategy();
+            switch (joinStrategy) {
                 case INDEX_NEST_LOOP:
                     return INDEX_NEST_LOOP_JOIN_HANDLER;
                 case NEST_LOOP_JOIN:

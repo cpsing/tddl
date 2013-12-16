@@ -15,7 +15,7 @@ import com.taobao.tddl.optimizer.core.plan.query.IParallelizableQueryTree;
 
 public abstract class QueryTree extends DataNodeExecutor<IQueryTree> implements IParallelizableQueryTree<IQueryTree> {
 
-    protected IFilter           resultSetFilter;
+    protected IFilter           valueFilter;
     protected IFilter           havingFilter;
     protected List<IOrderBy>    orderBys             = Collections.emptyList();
     protected List<IOrderBy>    groupBys             = Collections.emptyList();
@@ -40,12 +40,12 @@ public abstract class QueryTree extends DataNodeExecutor<IQueryTree> implements 
     protected Boolean           isSubQuery           = false;
     protected boolean           isTopQuery           = false;
 
-    public IFilter getResultSetFilter() {
-        return resultSetFilter;
+    public IFilter getValueFilter() {
+        return valueFilter;
     }
 
-    public IQueryTree setValueFilter(IFilter value_filter) {
-        this.resultSetFilter = value_filter;
+    public IQueryTree setValueFilter(IFilter valueFilter) {
+        this.valueFilter = valueFilter;
         return this;
     }
 
@@ -170,7 +170,7 @@ public abstract class QueryTree extends DataNodeExecutor<IQueryTree> implements 
             }
         }
 
-        IFilter rsf = getResultSetFilter();
+        IFilter rsf = getValueFilter();
         if (rsf != null) {
             rsf.assignment(parameterSettings);
         }
@@ -207,7 +207,7 @@ public abstract class QueryTree extends DataNodeExecutor<IQueryTree> implements 
         o.setLimitTo(this.getLimitTo());
         o.setOrderBys(this.getOrderBys());
         o.setQueryConcurrency(this.getQueryConcurrency());
-        o.setValueFilter(this.getResultSetFilter());
+        o.setValueFilter(this.getValueFilter());
         o.setAlias(this.getAlias());
         o.setCanMerge(this.canMerge());
         o.setUseTempTableExplicit(this.isUseTempTableExplicit());

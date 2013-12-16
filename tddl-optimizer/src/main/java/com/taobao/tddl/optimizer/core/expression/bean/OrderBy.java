@@ -82,15 +82,11 @@ public class OrderBy implements IOrderBy {
         return this.column.getDataType();
     }
 
-    public IOrderBy deepCopy() {
+    public IOrderBy copy() {
         IOrderBy newOrder = ASTNodeFactory.getInstance().createOrderBy();
         newOrder.setColumn(this.getColumn().copy());
         newOrder.setDirection(this.getDirection());
         return newOrder;
-    }
-
-    public IOrderBy copy() {
-        return deepCopy();
     }
 
     public String toString() {

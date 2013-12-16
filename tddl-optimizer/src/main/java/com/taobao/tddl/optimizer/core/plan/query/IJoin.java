@@ -14,7 +14,7 @@ import com.taobao.tddl.optimizer.core.plan.IQueryTree;
  */
 public interface IJoin extends IParallelizableQueryTree<IQueryTree> {
 
-    public enum JoinType {
+    public enum JoinStrategy {
         HASH_JOIN, NEST_LOOP_JOIN, INDEX_NEST_LOOP, SORT_MERGE_JOIN;
     }
 
@@ -102,14 +102,14 @@ public interface IJoin extends IParallelizableQueryTree<IQueryTree> {
      * @param joinType
      * @return
      */
-    IJoin setJoinType(JoinType joinType);
+    IJoin setJoinStrategy(JoinStrategy joinStrategy);
 
     /**
      * 获取join类型
      * 
      * @return
      */
-    JoinType getJoinType();
+    JoinStrategy getJoinStrategy();
 
     /**
      * 是否左outer join

@@ -88,7 +88,7 @@ public class Merge extends QueryTree implements IMerge {
             appendln(sb, tabTittle + (this.isUnion() ? "Union" : "Merge"));
         }
 
-        appendField(sb, "valueFilter", printFilterString(this.getResultSetFilter()), tabContent);
+        appendField(sb, "valueFilter", printFilterString(this.getValueFilter()), tabContent);
         appendField(sb, "having", printFilterString(this.getHavingFilter()), tabContent);
         if (!(this.getLimitFrom() != null && this.getLimitFrom().equals(-1L) && this.getLimitTo() != null && this.getLimitTo()
             .equals(-1L))) {

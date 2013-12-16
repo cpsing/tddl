@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.ObjectUtils;
 
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
@@ -15,12 +16,11 @@ import com.taobao.tddl.optimizer.core.ast.query.JoinNode;
 import com.taobao.tddl.optimizer.core.ast.query.MergeNode;
 import com.taobao.tddl.optimizer.core.ast.query.QueryNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
-import com.taobao.tddl.optimizer.core.ast.query.strategy.BlockNestedLoopJoin;
-import com.taobao.tddl.optimizer.core.ast.query.strategy.IndexNestedLoopJoin;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
+import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinStrategy;
 import com.taobao.tddl.optimizer.costbased.FilterSpliter;
 import com.taobao.tddl.optimizer.costbased.esitimater.Cost;
 import com.taobao.tddl.optimizer.costbased.esitimater.CostEsitimaterFactory;
@@ -157,13 +157,6 @@ public class JoinChooser {
         }
 
         if (node instanceof TableNode) {
-            if (!isOptimizeIndexMerge(extraCmd)) {
-                // 判断是否要处理OR转化为index merge，比如mysql可以push
-                // 比如hbase/bdb这一类，OR条件目前只能是主键索引，由执行器层面去解决
-                // 如果涉及多字段时就需要拆分为index merge，同时做uniq
-                return node;
-            }
-
             // Query是对实体表进行查询
             List<QueryTreeNode> ss = FilterSpliter.splitByDNF((TableNode) node, extraCmd);
             // 如果子查询中得某一个没有keyFilter，也即需要做全表扫描
@@ -177,9 +170,9 @@ public class JoinChooser {
             }
 
             if (isExistAQueryNeedTableScan) {
-                ((TableNode) node).setIndexQueryValueFilter(node.getWhereFilter());
+                ((TableNode) node).setIndexQueryValueFilter(null);
                 ((TableNode) node).setKeyFilter(null);
-                node.setResultFilter(null);
+                ((TableNode) node).setResultFilter(null);
                 ss.clear();
                 ss = null;
                 ((TableNode) node).setFullTableScan(true);
@@ -196,6 +189,7 @@ public class JoinChooser {
                 merge.setUnion(true);
                 merge.build();
                 return merge;
+
             } else if (ss != null && ss.size() == 1) {
                 return ss.get(0);
             } else {
@@ -206,22 +200,20 @@ public class JoinChooser {
                     extraCmd);
 
                 if (indexWithAllColumnsSelected != null) {
+                    // 如果存在索引，则可以使用index value filter
                     ((TableNode) node).useIndex(indexWithAllColumnsSelected);
+                    ((TableNode) node).setIndexQueryValueFilter(node.getWhereFilter());
+                } else {
+                    // 没有索引，则可以使用result filter
+                    ((TableNode) node).setResultFilter(node.getWhereFilter());
                 }
+
                 return node;
             }
-
         } else if (node instanceof JoinNode) {
-            // 如果Join是OuterJoin，则不区分内外表，只能使用NestLoop或者SortMerge，暂时只使用SortMerge
-            // if (((JoinNode) node).isOuterJoin()) {
-            // ((JoinNode) node).setJoinStrategy(new BlockNestedLoopJoin(oc));
-            //
-            // return node;
-            // }
-
             // 如果右表是subquery，则也不能用indexNestedLoop
             if (((JoinNode) node).getRightNode().isSubQuery()) {
-                ((JoinNode) node).setJoinStrategy(new BlockNestedLoopJoin());
+                ((JoinNode) node).setJoinStrategy(JoinStrategy.NEST_LOOP_JOIN);
                 return node;
             }
 
@@ -261,21 +253,10 @@ public class JoinChooser {
                         tablename,
                         extraCmd);
                     ((TableNode) innerNode).useIndex(index);
-                    List<List<IFilter>> DNFNodes = FilterUtils.toDNFNodesArray(innerNode.getWhereFilter());
-                    if (DNFNodes.size() == 1) {
-                        // 即使索引没有选择主键，但是有的filter依旧会在s主键上进行，作为valueFilter，所以要把主键也传进去
-                        Map<FilterType, IFilter> filters = FilterSpliter.splitByIndex(DNFNodes.get(0),
-                            (TableNode) innerNode);
-                        ((TableNode) innerNode).setKeyFilter(filters.get(FilterType.IndexQueryKeyFilter));
-                        ((TableNode) innerNode).setResultFilter(filters.get(FilterType.ResultFilter));
-                        ((TableNode) innerNode).setIndexQueryValueFilter(filters.get(FilterType.IndexQueryValueFilter));
-                    } else {
-                        // 如果存在多个合取方式的的or组合时，无法区分出key/indexValue/result，直接下推
-                        ((TableNode) innerNode).setResultFilter(innerNode.getWhereFilter());
-                    }
+                    buildTableFilter(((TableNode) innerNode));
 
                     if (index == null) {// case 1.1
-                        ((JoinNode) node).setJoinStrategy(new IndexNestedLoopJoin());
+                        ((JoinNode) node).setJoinStrategy(JoinStrategy.NEST_LOOP_JOIN);
                     } else {// case 1.2
                         for (IBooleanFilter filter : ((JoinNode) node).getJoinFilter()) {
                             ISelectable rightColumn = (ISelectable) filter.getValue();
@@ -296,14 +277,14 @@ public class JoinChooser {
                             node.build();
                         }
 
-                        ((JoinNode) node).setJoinStrategy(new IndexNestedLoopJoin());
+                        ((JoinNode) node).setJoinStrategy(JoinStrategy.INDEX_NEST_LOOP);
                     }
                 } else {// case 2，因为2.1与2.2现在使用同一种策略，就是使用NestLoop...
-                    ((JoinNode) node).setJoinStrategy(new IndexNestedLoopJoin());
+                    ((JoinNode) node).setJoinStrategy(JoinStrategy.NEST_LOOP_JOIN);
                 }
 
             } else { // 这种情况也属于case 2，先使用NestLoop...
-                ((JoinNode) node).setJoinStrategy(new IndexNestedLoopJoin());
+                ((JoinNode) node).setJoinStrategy(JoinStrategy.NEST_LOOP_JOIN);
             }
             return node;
         } else {
@@ -311,11 +292,23 @@ public class JoinChooser {
         }
     }
 
-    private static boolean isOptimizeJoinOrder(Map<String, Comparable> extraCmd) {
-        return BooleanUtils.toBoolean(GeneralUtil.getExtraCmd(extraCmd, ExtraCmd.OptimizerExtraCmd.ChooseJoin));
+    private static void buildTableFilter(TableNode tableNode) {
+        List<List<IFilter>> DNFNodes = FilterUtils.toDNFNodesArray(tableNode.getWhereFilter());
+        if (DNFNodes.size() == 1) {
+            // 即使索引没有选择主键，但是有的filter依旧会在s主键上进行，作为valueFilter，所以要把主键也传进去
+            Map<FilterType, IFilter> filters = FilterSpliter.splitByIndex(DNFNodes.get(0), tableNode);
+            tableNode.setKeyFilter(filters.get(FilterType.IndexQueryKeyFilter));
+            tableNode.setResultFilter(filters.get(FilterType.ResultFilter));
+            tableNode.setIndexQueryValueFilter(filters.get(FilterType.IndexQueryValueFilter));
+        } else {
+            // 如果存在多个合取方式的的or组合时，无法区分出key/indexValue/result，直接下推
+            tableNode.setResultFilter(tableNode.getWhereFilter());
+        }
     }
 
-    private static boolean isOptimizeIndexMerge(Map<String, Comparable> extraCmd) {
-        return BooleanUtils.toBoolean(GeneralUtil.getExtraCmd(extraCmd, ExtraCmd.OptimizerExtraCmd.ChooseIndexMerge));
+    private static boolean isOptimizeJoinOrder(Map<String, Comparable> extraCmd) {
+        String value = ObjectUtils.toString(GeneralUtil.getExtraCmd(extraCmd, ExtraCmd.OptimizerExtraCmd.ChooseJoin));
+        return BooleanUtils.toBoolean(value);
     }
+
 }

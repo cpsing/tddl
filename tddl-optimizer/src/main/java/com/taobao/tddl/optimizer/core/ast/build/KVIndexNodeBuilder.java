@@ -108,8 +108,6 @@ public class KVIndexNodeBuilder extends QueryTreeNodeBuilder {
         if (c.getTableName() != null) {
             if ((!c.getTableName().equals(this.getNode().getIndexName()))
                 && (!c.getTableName().equals(this.getNode().getAlias()))) {
-                // && (!c.getTableName().equals(this.getNode().getTableName())))
-                // {
                 return null;
             }
         }

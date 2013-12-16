@@ -35,18 +35,14 @@ public class ExtraCmd {
         public final static String JoinMergeJoin            = "JoinMergeJoin";
 
         /**
+         * 为true时，Merge Join Merge将会展开
+         */
+        public final static String MergeExpand              = "MergeExpand";
+
+        /**
          * 为true时，Merge将并行执行
          */
         public final static String MergeConcurrent          = "MergeConcurrent";
-
-        /**
-         * 此选项为True时将关闭分库分表
-         */
-        public final static String OffSharding              = "OffSharding";
-
-        public final static String ExpandLeft               = "ExpandLeft";
-
-        public final static String ExpandRight              = "ExpandRight";
     }
 
     public static class ExecutionExtraCmd {

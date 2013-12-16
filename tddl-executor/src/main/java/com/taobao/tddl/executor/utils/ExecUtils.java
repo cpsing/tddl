@@ -668,8 +668,7 @@ public class ExecUtils {
 
         List<IOrderBy> news = new ArrayList(orders.size());
         for (IOrderBy c : orders) {
-
-            news.add(c.deepCopy());
+            news.add(c.copy());
         }
 
         return news;

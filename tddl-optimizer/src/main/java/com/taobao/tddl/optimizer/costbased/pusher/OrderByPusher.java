@@ -11,11 +11,11 @@ import com.taobao.tddl.optimizer.core.ast.query.JoinNode;
 import com.taobao.tddl.optimizer.core.ast.query.MergeNode;
 import com.taobao.tddl.optimizer.core.ast.query.QueryNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
-import com.taobao.tddl.optimizer.core.ast.query.strategy.IndexNestedLoopJoin;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
+import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinStrategy;
 
 /**
  * 将merge/join中的order by条件下推，包括隐式的order by条件，比如将groupBy转化为orderBy
@@ -153,7 +153,7 @@ public class OrderByPusher {
         } else if (qtn instanceof JoinNode) {
             // index nested loop中的order by，可以推到左节点
             JoinNode join = (JoinNode) qtn;
-            if (join.getJoinStrategy() instanceof IndexNestedLoopJoin) {
+            if (join.getJoinStrategy() == JoinStrategy.INDEX_NEST_LOOP) {
                 List<IOrderBy> orders = getPushOrderBys(join, join.getLeftNode());
                 if (orders != null && !orders.isEmpty()) {
                     for (IOrderBy order : orders) {

@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
@@ -129,8 +131,14 @@ public class IndexChooser {
     }
 
     private static boolean chooseIndex(Map<String, Comparable> extraCmd) {
-        String ifChooseIndex = GeneralUtil.getExtraCmd(extraCmd, ExtraCmd.OptimizerExtraCmd.ChooseIndex);
-        return BooleanUtils.toBoolean(ifChooseIndex);
+        String ifChooseIndex = ObjectUtils.toString(GeneralUtil.getExtraCmd(extraCmd,
+            ExtraCmd.OptimizerExtraCmd.ChooseIndex));
+        // 默认返回true
+        if (StringUtils.isEmpty(ifChooseIndex)) {
+            return true;
+        } else {
+            return BooleanUtils.toBoolean(ifChooseIndex);
+        }
     }
 
 }
