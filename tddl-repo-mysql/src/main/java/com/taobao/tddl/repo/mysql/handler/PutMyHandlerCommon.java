@@ -1,9 +1,8 @@
 package com.taobao.tddl.repo.mysql.handler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.executor.common.TransactionConfig;
@@ -12,8 +11,8 @@ import com.taobao.tddl.executor.handler.HandlerCommon;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.spi.IDataSourceGetter;
-import com.taobao.tddl.executor.spi.ITHLog;
 import com.taobao.tddl.executor.spi.IRepository;
+import com.taobao.tddl.executor.spi.ITHLog;
 import com.taobao.tddl.executor.spi.ITable;
 import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.monitor.Monitor;
@@ -33,7 +32,7 @@ public abstract class PutMyHandlerCommon extends HandlerCommon {
 
     protected IDataSourceGetter dsGetter;
 
-    public Log                 logger = LogFactory.getLog(PutMyHandlerCommon.class);
+    public Logger               logger = LoggerFactory.getLogger(PutMyHandlerCommon.class);
 
     @Override
     public ISchematicCursor handle(IDataNodeExecutor executor, ExecutionContext executionContext) throws TddlException {
