@@ -86,7 +86,7 @@ public class UpdateHandler extends PutHandlerCommon {
                     }
                 }
                 prepare(transaction, table, kv, key, value, PUT_TYPE.UPDATE);
-                table.put(executionContext, key, value, meta, executionContext.getDbName());
+                table.put(executionContext, key, value, meta, put.getTableName());
             }
 
         } catch (TddlException ex) {

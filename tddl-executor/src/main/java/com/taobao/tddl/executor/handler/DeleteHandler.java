@@ -41,7 +41,7 @@ public class DeleteHandler extends PutHandlerCommon {
                 affect_rows++;
                 CloneableRecord key = ExecUtils.convertToClonableRecord(rowSet);
                 prepare(transaction, table, rowSet, null, null, PUT_TYPE.DELETE);
-                table.delete(executionContext, key, meta, executionContext.getDbName());
+                table.delete(executionContext, key, meta, put.getTableName());
             }
         } catch (Exception e) {
             throw e;

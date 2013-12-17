@@ -40,7 +40,6 @@ public class QueryHandler extends QueryHandlerCommon {
         List<IOrderBy> _orderBy = ((IQueryTree) executor).getOrderBys();
         IRepository repo = executionContext.getCurrentRepository();
         IDataNodeExecutor _subQuery = null;
-        ITransaction transaction = executionContext.getTransaction();
         IQuery query = (IQuery) executor;
         _subQuery = query.getSubQuery();
 

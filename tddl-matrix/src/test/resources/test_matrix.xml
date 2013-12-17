@@ -49,6 +49,11 @@
 		<atom name="">
 		</atom>
 	</group>
+	
+	
+	<group name="andor_show_group1" type="MYSQL_JDBC">
+		
+	</group>
 
 	
 </matrix>

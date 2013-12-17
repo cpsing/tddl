@@ -135,39 +135,69 @@ public class MatrixExecutor extends AbstractLifecycle implements IExecutor {
     @Override
     public Future<ISchematicCursor> execByExecPlanNodeFuture(IDataNodeExecutor qc, ExecutionContext executionContext)
                                                                                                                      throws TddlException {
-        // TODO Auto-generated method stub
-        return null;
+        return ExecutorContext.getContext().getTopologyExecutor().execByExecPlanNodeFuture(qc, executionContext);
     }
 
     @Override
     public ResultCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext)
                                                                                                    throws TddlException {
-        // TODO Auto-generated method stub
-        return null;
+        if (logger.isDebugEnabled()) {
+            logger.warn("extraCmd:\n" + executionContext.getExtraCmds());
+            logger.warn("ParameterContext:\n" + executionContext.getParams());
+        }
+
+        // client端核心流程y
+        try {
+            long time = System.currentTimeMillis();
+
+            ISchematicCursor sc = ExecutorContext.getContext()
+                .getTopologyExecutor()
+                .execByExecPlanNode(qc, executionContext);
+
+            ResultCursor rc = this.wrapResultCursor(qc, sc, executionContext);
+
+            // 控制语句
+            time = Monitor.monitorAndRenewTime(Monitor.KEY1, Monitor.TDDL_EXECUTE, Monitor.Key3Success, time);
+
+            if (qc instanceof IQueryTree) {
+                // 做下表名替换
+                List columnsForResultSet = ((IQueryTree) qc).getColumns();
+                if (((IQueryTree) qc).getAlias() != null) {
+                    columnsForResultSet = ExecUtils.copySelectables(columnsForResultSet);
+                    for (Object s : columnsForResultSet) {
+                        ((ISelectable) s).setTableName(((IQueryTree) qc).getAlias());
+                    }
+                }
+                rc.setOriginalSelectColumns(columnsForResultSet);
+            }
+            return rc;
+        } catch (EmptyResultFilterException e) {
+            // e.printStackTrace();
+            return ResultCursor.EMPTY_RESULT_CURSOR;
+        } catch (Exception e) {
+            throw new TddlException(e);
+        }
     }
 
     @Override
-    public void commit(ExecutionContext executionContext) throws TddlException {
-        // TODO Auto-generated method stub
+    public ResultCursor commit(ExecutionContext executionContext) throws TddlException {
+        return ExecutorContext.getContext().getTopologyExecutor().commit(executionContext);
+    }
+
+    @Override
+    public ResultCursor rollback(ExecutionContext executionContext) throws TddlException {
+        return ExecutorContext.getContext().getTopologyExecutor().rollback(executionContext);
 
     }
 
     @Override
-    public void rollback(ExecutionContext executionContext) throws TddlException {
-        // TODO Auto-generated method stub
-
+    public Future<ResultCursor> commitFuture(ExecutionContext executionContext) throws TddlException {
+        return ExecutorContext.getContext().getTopologyExecutor().commitFuture(executionContext);
     }
 
     @Override
-    public Future<ISchematicCursor> commitFuture(ExecutionContext executionContext) throws TddlException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Future<ISchematicCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException {
-        // TODO Auto-generated method stub
-        return null;
+    public Future<ResultCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException {
+        return ExecutorContext.getContext().getTopologyExecutor().rollbackFuture(executionContext);
     }
 
     protected ResultCursor wrapResultCursor(IDataNodeExecutor command, ISchematicCursor iSchematicCursor,
@@ -203,4 +233,5 @@ public class MatrixExecutor extends AbstractLifecycle implements IExecutor {
      * id 生成器
      */
     private AtomicNumberCreator idGen = AtomicNumberCreator.getNewInstance();
+
 }

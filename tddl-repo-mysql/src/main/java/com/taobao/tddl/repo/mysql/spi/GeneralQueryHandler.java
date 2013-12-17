@@ -39,27 +39,6 @@ public interface GeneralQueryHandler {
     public abstract boolean isAutoCommit() throws SQLException;
 
     /**
-     * 开始事务
-     * 
-     * @throws SQLException
-     */
-    public abstract void beginTransaction() throws SQLException;
-
-    /**
-     * 提交
-     * 
-     * @throws SQLException
-     */
-    public abstract void commit() throws SQLException;
-
-    /**
-     * 反馈
-     * 
-     * @throws SQLException
-     */
-    public abstract void rollback() throws SQLException;
-
-    /**
      * 获取结果集
      * 
      * @return
@@ -144,7 +123,7 @@ public interface GeneralQueryHandler {
      * @throws SQLException
      */
     public void executeUpdate(ExecutionContext executionContext, IPut put, ITable table, IndexMeta meta)
-                                                                                                       throws SQLException;
+                                                                                                        throws SQLException;
 
     /**
      * 执行一个update语句

@@ -101,6 +101,16 @@ public class ExtraCmd {
         public static final String CONFIG_DATA_HANDLER_FACTORY            = "CONFIG_DATA_HANDLER_FACTORY";
         public static final String PARSER_CACHE                           = "PARSER_CACHE";
         public static final String OPTIMIZER_CACHE                        = "OPTIMIZER_CACHE";
+
+        /**
+         * 为每个连接都初始化一个线程池，用来做并行查询，默认为true
+         */
+        public static final String INIT_CONCURRENT_POOL_EVERY_CONNECTION  = "INIT_CONCURRENT_POOL_EVERY_CONNECTION";
+
+        /**
+         * 并行查询线程池大小
+         */
+        public static final String CONCURRENT_THREAD_SIZE                 = "CONCURRENT_THREAD_SIZE";
     }
 
 }

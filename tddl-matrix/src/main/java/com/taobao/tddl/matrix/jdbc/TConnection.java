@@ -24,15 +24,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
+import com.taobao.tddl.common.model.ExtraCmd;
+import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.executor.ExecutorContext;
 import com.taobao.tddl.executor.MatrixExecutor;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.cursor.impl.ResultSetCursor;
+import com.taobao.tddl.matrix.config.TDefaultConfig;
 import com.taobao.tddl.matrix.jdbc.utils.ExceptionUtils;
 import com.taobao.tddl.optimizer.OptimizerContext;
 
@@ -44,7 +50,7 @@ public class TConnection implements Connection {
 
     private MatrixExecutor   executor         = null;
     private TDataSource      ds;
-    private ExecutionContext executionContext = null;
+    private ExecutionContext executionContext = new ExecutionContext();
     private Set<TStatement>  openedStatements = new HashSet<TStatement>(2);
 
     public TConnection(TDataSource ds){
@@ -55,14 +61,34 @@ public class TConnection implements Connection {
     public PreparedStatement prepareStatement(String sql) throws SQLException {
 
         checkClosed();
-        TPreparedStatement stmt = new TPreparedStatement(ds, this, sql);
+
+        if (isAutoCommit) {
+            executionContext = new ExecutionContext();
+        } else {
+            if (executionContext == null) {
+                executionContext = new ExecutionContext();
+                executionContext.setAutoCommit(false);
+            }
+        }
+
+        TPreparedStatement stmt = new TPreparedStatement(ds, this, sql, executionContext);
         openedStatements.add(stmt);
         return stmt;
     }
 
     public Statement createStatement() throws SQLException {
         checkClosed();
-        TStatement stmt = new TStatement(ds, this);
+
+        if (isAutoCommit) {
+            executionContext = new ExecutionContext();
+        } else {
+            if (executionContext == null) {
+                executionContext = new ExecutionContext();
+                executionContext.setAutoCommit(false);
+            }
+        }
+
+        TStatement stmt = new TStatement(ds, this, executionContext);
         openedStatements.add(stmt);
         return stmt;
     }
@@ -81,9 +107,7 @@ public class TConnection implements Connection {
             return;
         }
         this.isAutoCommit = autoCommit;
-        if (!this.isAutoCommit) {
-            initTransactionResource();
-        }
+        this.executionContext.setAutoCommit(autoCommit);
     }
 
     public boolean getAutoCommit() throws SQLException {
@@ -232,19 +256,37 @@ public class TConnection implements Connection {
      * @throws SQLException
      */
     public ResultSet executeSQL(String sql, Map<Integer, ParameterContext> context, TStatement stmt,
-                                Map<String, Comparable> extraCmd) throws SQLException {
+                                Map<String, Comparable> extraCmd, ExecutionContext executionContext)
+                                                                                                    throws SQLException {
         ExecutorContext.setContext(this.ds.getConfigHolder().getExecutorContext());
         OptimizerContext.setContext(this.ds.getConfigHolder().getOptimizerContext());
         ResultCursor resultCursor;
         ResultSet rs = null;
         extraCmd.putAll(buildExtraCommand(sql));
 
-        if (isAutoCommit) {
-            executionContext = new ExecutionContext();
+        if (this.ds.getExecutorService() != null) {
+            executionContext.setExecutorService(ds.getExecutorService());
         } else {
-            if (executionContext == null) executionContext = new ExecutionContext();
-        }
+            Object poolSizeObj = GeneralUtil.getExtraCmd(this.ds.getConnectionProperties(),
+                ExtraCmd.ConnectionExtraCmd.CONCURRENT_THREAD_SIZE);
+            int poolSize = 0;
+            if (poolSizeObj != null) {
 
+                poolSize = Integer.valueOf(poolSizeObj.toString());
+            } else {
+                poolSize = TDefaultConfig.CONCURRENT_THREAD_SIZE;
+            }
+
+            ExecutorService executorService = Executors.newFixedThreadPool(poolSize, new ThreadFactory() {
+
+                @Override
+                public Thread newThread(Runnable arg0) {
+                    return new Thread(arg0, "concurrent_query_executor");
+                }
+            });
+
+            executionContext.setExecutorService(executorService);
+        }
         executionContext.setParams(context);
         executionContext.setExtraCmds(extraCmd);
 
@@ -474,6 +516,10 @@ public class TConnection implements Connection {
 
     public boolean removeStatement(Object arg0) {
         return openedStatements.remove(arg0);
+    }
+
+    public ExecutionContext getExecutionContext() {
+        return this.executionContext;
     }
 
 }

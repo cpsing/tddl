@@ -1,6 +1,8 @@
 package com.taobao.tddl.executor.common;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.executor.spi.IRepository;
@@ -16,18 +18,14 @@ import com.taobao.tddl.optimizer.config.table.IndexMeta;
 public class ExecutionContext {
 
     /**
-     * 当前的事务的事务全局ID
+     * 当前事务的执行group，只支持单group的事务
      */
-    private Long                   transactionSequence;
+    private String                 transactionGroup = null;
 
     /**
      * 当前运行时的存储对象
      */
     private IRepository            currentRepository;
-    /**
-     * 是否创建事务
-     */
-    private boolean                createTxn;
 
     /**
      * 是否自动关闭结果集。目前这个东西已经基本无效。除了在update等查询中有使用
@@ -46,24 +44,17 @@ public class ExecutionContext {
      */
     private ITable                 table;
 
-    String                         actualTable;
+    Map<String, Comparable>        extraCmds        = new HashMap();
 
-    TopologyHandler                topology  = null;
+    Map<Integer, ParameterContext> params           = null;
+    String                         isolation        = null;
 
-    Map<String, Comparable>        extraCmds = null;
-    Map<Integer, ParameterContext> params    = null;
-    String                         isolation = null;
+    private ExecutorService        concurrentService;
+
+    private boolean                autoCommit       = true;
 
     public ExecutionContext(){
 
-    }
-
-    public Long getTransactionSequence() {
-        return transactionSequence;
-    }
-
-    public void setTransactionSequence(Long transactionSequence) {
-        this.transactionSequence = transactionSequence;
     }
 
     public IRepository getCurrentRepository() {
@@ -72,14 +63,6 @@ public class ExecutionContext {
 
     public void setCurrentRepository(IRepository currentRepository) {
         this.currentRepository = currentRepository;
-    }
-
-    public boolean isCreateTxn() {
-        return createTxn;
-    }
-
-    public void setCreateTxn(boolean createTxn) {
-        this.createTxn = createTxn;
     }
 
     public boolean isCloseResultSet() {
@@ -114,22 +97,6 @@ public class ExecutionContext {
         this.table = table;
     }
 
-    public String getDbName() {
-        return actualTable;
-    }
-
-    public void setActualTable(String actualTable) {
-        this.actualTable = actualTable;
-    }
-
-    public TopologyHandler getTopology() {
-        return topology;
-    }
-
-    public void setTopology(TopologyHandler topology) {
-        this.topology = topology;
-    }
-
     public Map<String, Comparable> getExtraCmds() {
         return extraCmds;
     }
@@ -152,6 +119,32 @@ public class ExecutionContext {
 
     public void setIsolation(String isolation) {
         this.isolation = isolation;
+    }
+
+    public ExecutorService getExecutorService() {
+        return this.concurrentService;
+    }
+
+    public void setExecutorService(ExecutorService concurrentService) {
+        this.concurrentService = concurrentService;
+    }
+
+    public String getTransactionGroup() {
+        return transactionGroup;
+    }
+
+    public void setTransactionGroup(String transactionGroup) {
+        this.transactionGroup = transactionGroup;
+    }
+
+    public boolean isAutoCommit() {
+        return autoCommit;
+    }
+
+    public void setAutoCommit(boolean autoCommit) {
+        this.autoCommit = autoCommit;
+
+        if (this.getTransaction() != null) this.getTransaction().setAutoCommit(autoCommit);
     }
 
 }

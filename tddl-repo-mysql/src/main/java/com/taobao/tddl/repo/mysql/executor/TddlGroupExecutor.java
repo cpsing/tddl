@@ -4,10 +4,11 @@ import java.util.concurrent.Future;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.Group;
+import com.taobao.tddl.executor.ExecutorContext;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.TransactionConfig;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
-import com.taobao.tddl.executor.exception.DataAccessException;
+import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.spi.ICommandHandler;
 import com.taobao.tddl.executor.spi.ICommandHandlerFactory;
 import com.taobao.tddl.executor.spi.IGroupExecutor;
@@ -36,16 +37,6 @@ public class TddlGroupExecutor implements IGroupExecutor {
     private Group              group;
 
     @Override
-    public void commit(ExecutionContext executionContext) throws TddlException {
-
-    }
-
-    @Override
-    public Future<ISchematicCursor> commitFuture(ExecutionContext executionContext) throws TddlException {
-        return null;
-    }
-
-    @Override
     public ISchematicCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext)
                                                                                                        throws TddlException {
 
@@ -62,8 +53,8 @@ public class TddlGroupExecutor implements IGroupExecutor {
     @Override
     public Future<ISchematicCursor> execByExecPlanNodeFuture(IDataNodeExecutor qc,
 
-    ExecutionContext executionContext) throws DataAccessException {
-        return null;
+    ExecutionContext executionContext) throws TddlException {
+        return ExecutorContext.getContext().getTopologyExecutor().execByExecPlanNodeFuture(qc, executionContext);
     }
 
     public ISchematicCursor executeInner(IDataNodeExecutor executor, ExecutionContext executionContext)
@@ -98,34 +89,18 @@ public class TddlGroupExecutor implements IGroupExecutor {
             return;
         }
         IRepository repo = executionContext.getCurrentRepository();
-        boolean createTxn = executionContext.isCreateTxn();
-        if (createTxn) {
-            // 如果有外部的
-            TransactionConfig tc = TransactionConfig.DEFAULT;
 
-            ITransaction trans = repo.beginTransaction(tc);
-            executionContext.setTransaction(trans);
-            executionContext.setTransactionSequence(trans.getId());
-            // 将groupNode 放入执行的上下文
-            String groupNode = targetExecutor.getDataNode();
-            executionContext.getExtraCmds().put(TRANSACTION_GROUP_KEY, groupNode);
-        } else {
-            Long transactionSequence = executionContext.getTransactionSequence();
-            if (transactionSequence == null) {
-                transactionSequence = TransactionConfig.AUTO_COMMIT;
-            }
-            executionContext.setTransactionSequence(transactionSequence);
-        }
-    }
+        // 如果有外部的
+        TransactionConfig tc = TransactionConfig.DEFAULT;
 
-    @Override
-    public void rollback(ExecutionContext executionContext) throws TddlException {
+        ITransaction trans = repo.beginTransaction(tc);
+        trans.setAutoCommit(executionContext.isAutoCommit());
+        executionContext.setTransaction(trans);
+        // 将groupNode 放入执行的上下文
+        String groupNode = targetExecutor.getDataNode();
 
-    }
+        executionContext.setTransactionGroup(groupNode);
 
-    @Override
-    public Future<ISchematicCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException {
-        return null;
     }
 
     public void setGroup(Group group) {
@@ -144,5 +119,35 @@ public class TddlGroupExecutor implements IGroupExecutor {
     public String toString() {
         return "GroupExecutor [groupName=" + group.getName() + ", type=" + group.getType()
                + ", remotingExecutableObject=" + remotingExecutableObject + "]";
+    }
+
+    @Override
+    public ResultCursor commit(ExecutionContext executionContext) throws TddlException {
+        ResultCursor rc = new ResultCursor(null, executionContext);
+        if (executionContext.getTransactionGroup() == null) return rc;
+
+        executionContext.getTransaction().commit();
+
+        return rc;
+    }
+
+    @Override
+    public ResultCursor rollback(ExecutionContext executionContext) throws TddlException {
+        ResultCursor rc = new ResultCursor(null, executionContext);
+        if (executionContext.getTransactionGroup() == null) return rc;
+
+        executionContext.getTransaction().rollback();
+
+        return rc;
+    }
+
+    @Override
+    public Future<ResultCursor> commitFuture(ExecutionContext executionContext) throws TddlException {
+        return ExecutorContext.getContext().getTopologyExecutor().commitFuture(executionContext);
+    }
+
+    @Override
+    public Future<ResultCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException {
+        return ExecutorContext.getContext().getTopologyExecutor().rollbackFuture(executionContext);
     }
 }

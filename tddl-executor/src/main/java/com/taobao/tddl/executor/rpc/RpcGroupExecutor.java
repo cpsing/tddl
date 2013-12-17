@@ -6,6 +6,7 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
+import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.spi.IGroupExecutor;
 import com.taobao.tddl.executor.spi.IRepository;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
@@ -19,13 +20,20 @@ import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 public class RpcGroupExecutor implements IGroupExecutor {
 
     @Override
-    public Future<ISchematicCursor> commitFuture(ExecutionContext executionContext) throws TddlException {
+    public ISchematicCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext)
+                                                                                                       throws TddlException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Future<ISchematicCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException {
+    public ResultCursor commit(ExecutionContext executionContext) throws TddlException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ResultCursor rollback(ExecutionContext executionContext) throws TddlException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -38,20 +46,13 @@ public class RpcGroupExecutor implements IGroupExecutor {
     }
 
     @Override
-    public void commit(ExecutionContext executionContext) throws TddlException {
+    public Future<ResultCursor> commitFuture(ExecutionContext executionContext) throws TddlException {
         // TODO Auto-generated method stub
-
+        return null;
     }
 
     @Override
-    public void rollback(ExecutionContext executionContext) throws TddlException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public ISchematicCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext)
-                                                                                                       throws TddlException {
+    public Future<ResultCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException {
         // TODO Auto-generated method stub
         return null;
     }

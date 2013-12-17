@@ -69,13 +69,13 @@ public class InsertHandler extends PutHandlerCommon {
             }
         }
         if (put.getPutType() == IPut.PUT_TYPE.INSERT) {
-            CloneableRecord value1 = table.get(executionContext, key, meta, executionContext.getDbName());
+            CloneableRecord value1 = table.get(executionContext, key, meta, put.getTableName());
             if (value1 != null) {
                 throw new TddlException(ExceptionErrorCodeUtils.Duplicate_entry, "exception insert existed :" + key);
             }
         }
         prepare(transaction, table, null, key, value, PUT_TYPE.INSERT);
-        table.put(executionContext, key, value, meta, executionContext.getDbName());
+        table.put(executionContext, key, value, meta, put.getTableName());
         affect_rows++;
         return affect_rows;
 

@@ -16,7 +16,6 @@ import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.spi.IDataSourceGetter;
 import com.taobao.tddl.executor.spi.ITable;
-import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
@@ -64,7 +63,6 @@ public class My_Table implements ITable {
                                                                                                               throws TddlException {
 
         My_JdbcHandler jdbcHandler = null;
-        ITransaction txn = executionContext.getTransaction();
 
         jdbcHandler = MysqlRepoUtils.getJdbcHandler(this.dsGetter, executor, executionContext);
 

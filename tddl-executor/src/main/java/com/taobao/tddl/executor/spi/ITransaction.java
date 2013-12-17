@@ -1,9 +1,6 @@
 package com.taobao.tddl.executor.spi;
 
-import java.util.List;
-
 import com.taobao.tddl.common.exception.TddlException;
-import com.taobao.tddl.executor.cursor.Cursor;
 
 /**
  * 事务对象
@@ -22,10 +19,6 @@ public interface ITransaction {
     boolean isAutoCommit() throws TddlException;
 
     public ITHLog getHistoryLog();
-
-    public void addCursor(Cursor cursor);
-
-    public List<Cursor> getCursors();
 
     public void close() throws TddlException;
 

@@ -5,6 +5,7 @@ import java.util.concurrent.Future;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
+import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 
 /**
@@ -28,9 +29,9 @@ public interface IExecutor {
     public ISchematicCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext)
                                                                                                        throws TddlException;
 
-    void commit(ExecutionContext executionContext) throws TddlException;
+    ResultCursor commit(ExecutionContext executionContext) throws TddlException;
 
-    void rollback(ExecutionContext executionContext) throws TddlException;
+    ResultCursor rollback(ExecutionContext executionContext) throws TddlException;
 
     /**
      * 执行一个命令
@@ -43,7 +44,7 @@ public interface IExecutor {
     public Future<ISchematicCursor> execByExecPlanNodeFuture(IDataNodeExecutor qc, ExecutionContext executionContext)
                                                                                                                      throws TddlException;
 
-    Future<ISchematicCursor> commitFuture(ExecutionContext executionContext) throws TddlException;
+    public Future<ResultCursor> commitFuture(ExecutionContext executionContext) throws TddlException;
 
-    Future<ISchematicCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException;
+    public Future<ResultCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException;
 }

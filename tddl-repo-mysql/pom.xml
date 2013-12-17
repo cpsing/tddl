@@ -32,5 +32,14 @@
 			<artifactId>tddl-group</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<!-- Test libs -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+
 	</dependencies>
 </project>

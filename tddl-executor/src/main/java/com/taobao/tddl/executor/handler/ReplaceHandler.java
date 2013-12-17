@@ -64,18 +64,18 @@ public class ReplaceHandler extends PutHandlerCommon {
             }
         }
         if (put.getPutType() == IPut.PUT_TYPE.INSERT) {
-            CloneableRecord value1 = table.get(executionContext, key, meta, executionContext.getDbName());
+            CloneableRecord value1 = table.get(executionContext, key, meta, put.getTableName());
             if (value1 != null) {
                 throw new TddlException(ExceptionErrorCodeUtils.Duplicate_entry, "exception insert existed :" + key);
             }
         }
         ITHLog iThLog = transaction.getHistoryLog();
         if (iThLog != null) {
-            CloneableRecord old = table.get(executionContext, key, meta, executionContext.getDbName());
+            CloneableRecord old = table.get(executionContext, key, meta, put.getTableName());
             prepare(transaction, table, null, key, value, PUT_TYPE.REPLACE);
         }
 
-        table.put(executionContext, key, value, meta, executionContext.getDbName());
+        table.put(executionContext, key, value, meta, put.getTableName());
         affect_rows++;
         return affect_rows;
 

@@ -58,7 +58,6 @@ public abstract class HandlerCommon implements ICommandHandler {
             }
             executionContext.setMeta(ts.getIndexMeta(indexName));
             executionContext.setTable(executionContext.getCurrentRepository().getTable(ts, groupDataNode, 0));
-            executionContext.setActualTable(actualTable);
         }
     }
 

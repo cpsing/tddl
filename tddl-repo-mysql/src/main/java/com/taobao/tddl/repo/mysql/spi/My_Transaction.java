@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.ExceptionErrorCodeUtils;
 import com.taobao.tddl.executor.common.AtomicNumberCreator;
-import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.spi.ITHLog;
 import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.group.jdbc.TGroupConnection;
@@ -50,7 +48,6 @@ public class My_Transaction implements ITransaction {
     }
 
     public void beginTransaction() {
-        autoCommit = false;
         if (connMap != null && !connMap.isEmpty()) {
             try {
                 if (connMap != null && !connMap.isEmpty()) {
@@ -190,17 +187,6 @@ public class My_Transaction implements ITransaction {
     }
 
     @Override
-    public void addCursor(Cursor cursor) {
-
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<Cursor> getCursors() {
-        return Collections.EMPTY_LIST;
-    }
-
-    @Override
     public void close() throws TddlException {
         SQLException exception = null;
         if (!autoCommit) {
@@ -237,6 +223,10 @@ public class My_Transaction implements ITransaction {
             // 获取当前链接执行的ID
             Long thdid = myconn.getId();
 
+            if (thdid == -1) {
+                myconn.close();
+                continue;
+            }
             // 这里是新建一个链接来关闭，也可以用连接池里的，不过可能会造成额外等待。。所以还是抄驱动的方式吧。
             // 复制一个链接(等于新创建一个链接)
             Connection conNew = null;
@@ -287,4 +277,21 @@ public class My_Transaction implements ITransaction {
         this.autoCommit = autoCommit;
 
     }
+
+    public Map<String, List<Connection>> getConnMap() {
+        return connMap;
+    }
+
+    public void setConnMap(Map<String, List<Connection>> connMap) {
+        this.connMap = connMap;
+    }
+
+    public String getTransactionalNodeName() {
+        return transactionalNodeName;
+    }
+
+    public void setTransactionalNodeName(String transactionalNodeName) {
+        this.transactionalNodeName = transactionalNodeName;
+    }
+
 }

@@ -685,6 +685,10 @@ public class TGroupConnection implements Connection {
 
             if (atomConnection == null) atomConnection = this.wBaseConnection;
 
+            /**
+             * 这个连接上没做过查询，不会创建真正连接的
+             */
+            if (atomConnection == null) return -1;
             TConnectionWrapper conn = (TConnectionWrapper) atomConnection;
 
             DruidPooledConnection druidConnection = (DruidPooledConnection) conn.getTargetConnection();

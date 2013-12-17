@@ -224,21 +224,6 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         return myTrans;
     }
 
-    public void beginTransaction() throws SQLException {
-        Connection conn = getConnection();
-        conn.setAutoCommit(false);
-    }
-
-    public void commit() throws SQLException {
-        Connection conn = getConnection();
-        conn.commit();
-    }
-
-    public void rollback() throws SQLException {
-        Connection conn = getConnection();
-        conn.rollback();
-    }
-
     public Connection getConnection() throws SQLException {
         Connection con = myTransaction.getConnection(groupName, ds, strongConsistent);
         return con;

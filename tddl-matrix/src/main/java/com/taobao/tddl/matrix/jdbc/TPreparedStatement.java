@@ -28,6 +28,7 @@ import com.taobao.tddl.common.jdbc.ParameterMethod;
 import com.taobao.tddl.common.model.SqlType;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.matrix.jdbc.utils.PreParser;
 
 /**
@@ -41,14 +42,14 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
     // 参数列表到参数上下文的映射 如 1:name 2：'2011-11-11'
     protected Map<Integer, ParameterContext> parameterSettings = new HashMap<Integer, ParameterContext>();
 
-    public TPreparedStatement(TDataSource ds, TConnection tConnection, String sql){
-        super(ds, tConnection, sql);
+    public TPreparedStatement(TDataSource ds, TConnection conn, String sql, ExecutionContext ec){
+        super(ds, conn, sql, ec);
     }
 
     public ResultSet executeQuery() throws SQLException {
         checkClosed();
         ensureResultSetIsEmpty();
-        this.currentResultSet = this.conn.executeSQL(sql, parameterSettings, this, extraCmd);
+        this.currentResultSet = this.conn.executeSQL(sql, parameterSettings, this, extraCmd, this.executionContext);
         return currentResultSet;
         // return this.uConnection.executeSQL(sql);
     }
@@ -57,7 +58,7 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
 
         checkClosed();
         ensureResultSetIsEmpty();
-        this.currentResultSet = this.conn.executeSQL(sql, parameterSettings, this, extraCmd);
+        this.currentResultSet = this.conn.executeSQL(sql, parameterSettings, this, extraCmd, this.executionContext);
         int affectRows = ((TResultSet) this.currentResultSet).getAffectRows();
         this.currentResultSet.close();
         return affectRows;

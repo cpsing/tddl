@@ -10,11 +10,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.SqlType;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
+import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.matrix.jdbc.utils.PreParser;
 
 /**
@@ -23,11 +25,13 @@ import com.taobao.tddl.matrix.jdbc.utils.PreParser;
  */
 public class TStatement implements Statement {
 
-    private static final Logger       log      = LoggerFactory.getLogger(TStatement.class);
+    private static final Logger       log              = LoggerFactory.getLogger(TStatement.class);
 
     protected String                  sql;
     protected TDataSource             ds;
     protected TConnection             conn;
+
+    protected ExecutionContext        executionContext = null;
     /**
      * 更新计数，如果执行了多次，那么这个值只会返回最后一次执行的结果。 如果是一个query，那么返回的数据应该是-1
      */
@@ -38,17 +42,19 @@ public class TStatement implements Statement {
      */
     protected ResultSet               currentResultSet;
 
-    protected Map<String, Comparable> extraCmd = new HashMap<String, Comparable>(4);
+    protected Map<String, Comparable> extraCmd         = new HashMap<String, Comparable>(4);
 
-    public TStatement(TDataSource ds, TConnection tConnection){
+    public TStatement(TDataSource ds, TConnection tConnection, ExecutionContext executionContext){
         this.ds = ds;
         this.conn = tConnection;
+        this.executionContext = executionContext;
     }
 
-    public TStatement(TDataSource ds, TConnection tConnection, String sql){
+    public TStatement(TDataSource ds, TConnection tConnection, String sql, ExecutionContext executionContext){
         this.ds = ds;
         this.conn = tConnection;
         this.sql = sql;
+        this.executionContext = executionContext;
     }
 
     protected void checkClosed() throws SQLException {
@@ -119,7 +125,8 @@ public class TStatement implements Statement {
         currentResultSet = this.conn.executeSQL(sql,
             (Map<Integer, ParameterContext>) Collections.EMPTY_MAP,
             this,
-            extraCmd);
+            extraCmd,
+            this.executionContext);
         return currentResultSet;
         // return this.uConnection.executeSQL(sql);
     }
@@ -160,8 +167,13 @@ public class TStatement implements Statement {
             if (removeThis) {
                 conn.removeStatement(this);
             }
-        } catch (SQLException e) {
-            log.warn("Close currentResultSet failed.", e);
+
+            if (this.executionContext.getTransaction() != null && this.executionContext.getTransaction().isAutoCommit()) {
+                this.executionContext.getTransaction().close();
+            }
+        } catch (Exception e) {
+
+            throw new TddlRuntimeException(e);
         } finally {
             currentResultSet = null;
         }
@@ -204,7 +216,8 @@ public class TStatement implements Statement {
         currentResultSet = this.conn.executeSQL(sql,
             ((Map<Integer, ParameterContext>) Collections.EMPTY_MAP),
             this,
-            extraCmd);
+            extraCmd,
+            this.executionContext);
         return ((TResultSet) currentResultSet).getAffectRows();
     }
 

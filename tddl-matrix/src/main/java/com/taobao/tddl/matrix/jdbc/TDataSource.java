@@ -5,11 +5,17 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import javax.sql.DataSource;
 
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.exception.TddlRuntimeException;
+import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
+import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.MatrixExecutor;
@@ -31,6 +37,11 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
     private Map<String, Comparable> connectionProperties = new HashMap(2);
 
     private ConfigHolder            configHolder;
+
+    /**
+     * 用于并行查询的线程池
+     */
+    private ExecutorService         executorService      = null;
 
     @Override
     public PrintWriter getLogWriter() throws SQLException {
@@ -97,6 +108,28 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
 
         this.configHolder = configHolder;
 
+        /**
+         * 如果不为每个连接都初始化，则为整个ds初始化一个线程池
+         */
+        if ("False".equalsIgnoreCase(GeneralUtil.getExtraCmd(this.getConnectionProperties(),
+            ExtraCmd.ConnectionExtraCmd.INIT_CONCURRENT_POOL_EVERY_CONNECTION))) {
+            int poolSize;
+            Object poolSizeObj = GeneralUtil.getExtraCmd(this.getConnectionProperties(),
+                ExtraCmd.ConnectionExtraCmd.CONCURRENT_THREAD_SIZE);
+
+            if (poolSizeObj == null) throw new TddlRuntimeException("如果线程池为整个datasource共用，请使用CONCURRENT_THREAD_SIZE指定线程池大小");
+
+            poolSize = Integer.valueOf(poolSizeObj.toString());
+
+            executorService = Executors.newFixedThreadPool(poolSize, new ThreadFactory() {
+
+                @Override
+                public Thread newThread(Runnable arg0) {
+                    return new Thread(arg0, "concurrent_query_executor");
+                }
+            });
+        }
+
     }
 
     public ConfigHolder getConfigHolder() {
@@ -121,7 +154,7 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
         return machineTopologyFile;
     }
 
-    public void setMachineTopologyFile(String machineTopologyFile) {
+    public void setTopologyFile(String machineTopologyFile) {
         this.machineTopologyFile = machineTopologyFile;
     }
 
@@ -151,4 +184,13 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
         this.appName = appName;
 
     }
+
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
+
+    public void setExecutorService(ExecutorService executorService) {
+        this.executorService = executorService;
+    }
+
 }

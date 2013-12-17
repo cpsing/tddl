@@ -1,6 +1,5 @@
 package com.taobao.tddl.repo.mysql.spi;
 
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -105,7 +104,6 @@ public class My_Cursor implements Cursor {
             }
 
             ResultSetMetaData rsmd = this.myJdbcHandler.getResultSet().getMetaData();
-            DatabaseMetaData dbmd = myJdbcHandler.getConnection().getMetaData();
             returnColumns = new ArrayList();
             for (int i = 1; i <= rsmd.getColumnCount(); i++) {
                 DATA_TYPE type = TableMetaParser.jdbcTypeToAndorType(rsmd.getColumnType(i));
