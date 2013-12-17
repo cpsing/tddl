@@ -1079,6 +1079,14 @@ public class SqlParserTest extends BaseOptimizerTest {
         System.out.println(qn);
     }
 
+    // @Test
+    public void testQuery_不带表() throws SqlParserException, QueryException {
+        String sql = "SELECT 1";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+        System.out.println(qn);
+    }
+
     // ==================================================
 
     private QueryTreeNode query(String sql) throws SqlParserException {
