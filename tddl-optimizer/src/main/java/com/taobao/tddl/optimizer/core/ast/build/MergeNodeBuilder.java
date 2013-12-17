@@ -300,7 +300,7 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
             // 下推select
             for (int i = 0; i < this.getNode().getChildren().size(); i++) {
                 QueryTreeNode sub = (QueryTreeNode) this.getNode().getChildren().get(i);
-                sub.addColumnsSelected(c);
+                sub.addColumnsSelected(c.copy());
             }
             s = this.getColumnFromOtherNode(c, child);
         }

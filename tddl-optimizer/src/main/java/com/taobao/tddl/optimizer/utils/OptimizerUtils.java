@@ -127,19 +127,6 @@ public class OptimizerUtils {
         return (IFilter) (f == null ? null : f.copy());
     }
 
-    public static List<IOrderBy> copyOrderBys(List<IOrderBy> orders) {
-        if (orders == null) {
-            return null;
-        }
-
-        List<IOrderBy> news = new ArrayList(orders.size());
-        for (IOrderBy c : orders) {
-            news.add(c.copy());
-        }
-
-        return news;
-    }
-
     public static Set<ISelectable> copySelectables(Set<ISelectable> cs) {
         if (cs == null) {
             return null;
@@ -177,7 +164,7 @@ public class OptimizerUtils {
         return newFilters;
     }
 
-    public static List<IOrderBy> copyOrder(List<IOrderBy> orders) {
+    public static List<IOrderBy> copyOrderBys(List<IOrderBy> orders) {
         if (orders == null) {
             return null;
         }
@@ -193,6 +180,10 @@ public class OptimizerUtils {
     }
 
     public static List<ISelectable> copySelectables(List<ISelectable> selects, String tableName) {
+        if (tableName == null) {
+            return copySelectables(selects);
+        }
+
         if (selects == null) {
             return null;
         }
@@ -213,6 +204,10 @@ public class OptimizerUtils {
     }
 
     public static List<IOrderBy> copyOrderBys(List<IOrderBy> orderBys, String tableName) {
+        if (tableName == null) {
+            return copyOrderBys(orderBys);
+        }
+
         if (orderBys == null) {
             return null;
         }
@@ -238,7 +233,9 @@ public class OptimizerUtils {
         }
 
         IFilter newFilter = (IFilter) filter.copy();
-        setFilter(newFilter, tableName);
+        if (tableName != null) {
+            setFilter(newFilter, tableName);
+        }
         return newFilter;
     }
 

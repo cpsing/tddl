@@ -21,7 +21,7 @@ public class DataNodeChooserTest extends BaseOptimizerTest {
     public void test_单表查询_不生成merge() {
         KVIndexNode table7 = new KVIndexNode("TABLE7");
         table7.build();
-        QueryTreeNode qtn = shard(table7);
+        QueryTreeNode qtn = shard(table7, false, false);
 
         Assert.assertTrue(qtn instanceof KVIndexNode);
         Assert.assertEquals("andor_group_0", qtn.getDataNode());
@@ -32,7 +32,7 @@ public class DataNodeChooserTest extends BaseOptimizerTest {
     public void test_单表查询_生成merge() {
         KVIndexNode table7 = new KVIndexNode("TABLE1");
         table7.build();
-        QueryTreeNode qtn = shard(table7);
+        QueryTreeNode qtn = shard(table7, false, false);
 
         Assert.assertTrue(qtn instanceof MergeNode);
         Assert.assertEquals(8, qtn.getChildren().size());
@@ -44,7 +44,7 @@ public class DataNodeChooserTest extends BaseOptimizerTest {
         table7.build();
 
         QueryNode query = new QueryNode(table7);
-        QueryTreeNode qtn = shard(query);
+        QueryTreeNode qtn = shard(query, false, false);
 
         Assert.assertTrue(qtn instanceof QueryNode);
         Assert.assertEquals("andor_group_0", qtn.getDataNode());
@@ -58,7 +58,7 @@ public class DataNodeChooserTest extends BaseOptimizerTest {
         table7.build();
 
         QueryNode query = new QueryNode(table7);
-        QueryTreeNode qtn = shard(query);
+        QueryTreeNode qtn = shard(query, false, false);
 
         // Merge的query
         Assert.assertTrue(qtn instanceof MergeNode);
@@ -75,7 +75,7 @@ public class DataNodeChooserTest extends BaseOptimizerTest {
 
         JoinNode join = table1.join(table2, "ID", "ID");
         join.build();
-        QueryTreeNode qtn = shard(join);
+        QueryTreeNode qtn = shard(join, false, false);
 
         Assert.assertTrue(qtn instanceof JoinNode);
         Assert.assertEquals("andor_group_0", ((JoinNode) qtn).getLeftNode().getDataNode());
@@ -91,7 +91,7 @@ public class DataNodeChooserTest extends BaseOptimizerTest {
 
         JoinNode join = table1.join(table2, "ID", "ID");
         join.build();
-        QueryTreeNode qtn = shard(join);
+        QueryTreeNode qtn = shard(join, false, false);
 
         Assert.assertTrue(qtn instanceof JoinNode);
         Assert.assertTrue(((JoinNode) qtn).getLeftNode() instanceof MergeNode);
@@ -185,7 +185,7 @@ public class DataNodeChooserTest extends BaseOptimizerTest {
         JoinNode join = table2.join(table3, "ID", "ID");
 
         // 两层join，左边是query，右边是join
-        JoinNode nextJoin = query1.join(join, "AID", "ID");// 用的是子表的别名
+        JoinNode nextJoin = query1.join(join, "AID", "TABLE2.ID");// 用的是子表的别名
         nextJoin.build();
         QueryTreeNode qtn = shard(nextJoin, false, true);
 
@@ -339,10 +339,6 @@ public class DataNodeChooserTest extends BaseOptimizerTest {
         Assert.assertTrue(qtn.getChild() instanceof JoinNode);// join merge join
         Assert.assertTrue(((JoinNode) qtn.getChild()).getLeftNode() instanceof QueryNode);
         Assert.assertTrue(((JoinNode) qtn.getChild()).getRightNode() instanceof KVIndexNode);
-    }
-
-    private QueryTreeNode shard(QueryTreeNode qtn) {
-        return (QueryTreeNode) DataNodeChooser.shard(qtn, null, null);
     }
 
     private QueryTreeNode shard(QueryTreeNode qtn, boolean joinMergeJoin, boolean joinMergeJoinByRule) {

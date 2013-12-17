@@ -66,12 +66,12 @@ public class MergeConcurrentOptimizer implements QueryPlanOptimizer {
             ExtraCmd.OptimizerExtraCmd.MergeConcurrent));
         if (StringUtils.isEmpty(value)) {
             if ((query.getLimitFrom() != null || query.getLimitTo() != null)) {
-                if (query.getOrderBys() == null && query.getOrderBys().isEmpty()) {
+                if (query.getOrderBys() == null || query.getOrderBys().isEmpty()) {
                     // 存在limit，但不存在order by时不允许走并行
                     return false;
                 }
-            } else if ((query.getOrderBys() == null && query.getOrderBys().isEmpty())
-                       && (query.getGroupBys() == null && query.getGroupBys().isEmpty())
+            } else if ((query.getOrderBys() == null || query.getOrderBys().isEmpty())
+                       && (query.getGroupBys() == null || query.getGroupBys().isEmpty())
                        && query.getHavingFilter() == null) {
                 if (isNoFilter(query)) {
                     // 没有其他的order by / group by / having /
@@ -87,10 +87,14 @@ public class MergeConcurrentOptimizer implements QueryPlanOptimizer {
         }
     }
 
-    private static boolean isNoFilter(IQueryTree dne) {
+    private static boolean isNoFilter(IDataNodeExecutor dne) {
+        if (!(dne instanceof IQueryTree)) {
+            return true;
+        }
+
         if (dne instanceof IMerge) {
             for (IDataNodeExecutor child : ((IMerge) dne).getSubNode()) {
-                return isNoFilter((IQueryTree) child);
+                return isNoFilter(child);
             }
         }
 

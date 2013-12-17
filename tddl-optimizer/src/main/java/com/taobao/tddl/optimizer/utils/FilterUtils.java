@@ -91,6 +91,10 @@ public class FilterUtils {
             throw new IllegalArgumentException("此处不支持And包含超过两个子节点\n" + node);
         }
 
+        if (node.getSubFilter().size() == 1) {
+            return node;
+        }
+
         if ((!isLogicalNode(node.getSubFilter().get(0))) && (!isLogicalNode(node.getSubFilter().get(1)))) {
             return node;
         }
