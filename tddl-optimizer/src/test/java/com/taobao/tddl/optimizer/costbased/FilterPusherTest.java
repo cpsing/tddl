@@ -245,16 +245,16 @@ public class FilterPusherTest extends BaseOptimizerTest {
         TableNode table3 = new TableNode("TABLE3");
 
         JoinNode join = table1.join(table2).addJoinKeys("TABLE1.NAME", "TABLE2.NAME");
-        join.select("TABLE1.ID AS ID , TABLE1.NAME AS NAME");
+        join.alias("A").select("TABLE1.ID AS ID , TABLE1.NAME AS NAME");
         addOtherJoinFilter(join, "TABLE1.ID>5 AND TABLE2.ID<10");
         join.build();
 
-        JoinNode nextJoin = join.join(table3).addJoinKeys("ID", "TABLE3.ID");
-        addOtherJoinFilter(nextJoin, "NAME = 6");
+        JoinNode nextJoin = join.join(table3).addJoinKeys("A.ID", "TABLE3.ID");
+        addOtherJoinFilter(nextJoin, "A.NAME = 6");
         nextJoin.build();
         FilterPusher.optimize(nextJoin);
 
-        Assert.assertEquals("TABLE1.ID = TABLE3.ID", nextJoin.getJoinFilter().get(0).toString());
+        Assert.assertEquals("A.ID = TABLE3.ID", nextJoin.getJoinFilter().get(0).toString());
         Assert.assertEquals("TABLE1.NAME = TABLE2.NAME", ((JoinNode) nextJoin.getLeftNode()).getJoinFilter()
             .get(0)
             .toString());

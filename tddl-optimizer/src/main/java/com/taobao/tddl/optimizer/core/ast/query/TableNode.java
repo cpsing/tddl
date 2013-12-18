@@ -223,6 +223,7 @@ public class TableNode extends QueryTreeNode {
                 if (this.getAlias() != null) {
                     tableName = this.getAlias();
                 }
+
                 join.select(OptimizerUtils.copySelectables(this.getColumnsSelected(), tableName));
                 join.setOrderBys(OptimizerUtils.copyOrderBys(this.getOrderBys(), tableName));
                 join.setGroupBys(OptimizerUtils.copyOrderBys(this.getGroupBys(), tableName));

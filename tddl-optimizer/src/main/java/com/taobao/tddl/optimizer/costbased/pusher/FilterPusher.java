@@ -293,7 +293,11 @@ public class FilterPusher {
             if (index >= 0) {// 只考虑在源查找，在目标查找在上一层进行控制
                 IBooleanFilter o = ASTNodeFactory.getInstance().createBooleanFilter().setOperation(bool.getOperation());
                 o.setColumn(otherColumns.get(index));
-                o.setValue(((IBooleanFilter) bool).getValue());
+                if (bool.getOperation() == OPERATION.IN) {
+                    o.setValues(((IBooleanFilter) bool).getValues());
+                } else {
+                    o.setValue(((IBooleanFilter) bool).getValue());
+                }
                 newIFilterToPush.add(o);
             }
         }

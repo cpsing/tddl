@@ -289,8 +289,11 @@ public abstract class QueryTreeNodeBuilder {
             isThis = c.isSameName(selected);
 
             if (isThis) {
+                if (res != null) {
+                    // 说明出现两个ID，需要明确指定TABLE
+                    throw new IllegalArgumentException("column: '" + c.getFullName() + "' is ambiguous");
+                }
                 res = selected;
-                break;
             }
         }
 

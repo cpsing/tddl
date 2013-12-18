@@ -213,24 +213,26 @@ public class JoinNodeBuilder extends QueryTreeNodeBuilder {
         QueryTreeNode right = this.getNode().getRightNode();
         ISelectable resFromLeft = null;
         ISelectable resFromRight = null;
-        if (left.hasColumn(c)) {// 可能在select/from中
+        boolean isLeft = left.hasColumn(c);
+        boolean isRight = right.hasColumn(c);
+        if (isLeft && isRight) {
+            throw new IllegalArgumentException("Column '" + c.getColumnName() + "' is ambiguous");
+        }
+
+        if (isLeft) {// 可能在select/from中
             resFromLeft = this.getColumnFromOtherNode(c, left);
             if (resFromLeft == null) {// 如果不在select中，添加到select进行join传递
-                left.addColumnsSelected(c);
+                left.addColumnsSelected(c.copy());
                 resFromLeft = this.getColumnFromOtherNode(c, left);
             }
         }
 
-        if (right.hasColumn(c)) {// 可能在select/from中
+        if (isRight) {// 可能在select/from中
             resFromRight = this.getColumnFromOtherNode(c, right);
             if (resFromRight == null) {// 如果不在select中，添加到select进行join传递
-                right.addColumnsSelected(c);
+                right.addColumnsSelected(c.copy());
                 resFromRight = this.getColumnFromOtherNode(c, right);
             }
-        }
-
-        if (resFromLeft != null && resFromRight != null) {
-            throw new IllegalArgumentException("Column '" + c.getColumnName() + "' is ambiguous");
         }
 
         return resFromLeft == null ? resFromRight : resFromLeft;

@@ -231,9 +231,10 @@ public class JoinChooser {
              *   2.1内表进行Join的列不存在索引
              *      策略：NestLoop，内表使用原来的索引
              *   2.2内表进行Join的列存在索引
-             *      这种情况最为复杂，有两种方法
-             *          a. 放弃原来根据约束条件选择的索引，而使用Join列中得索引(如果有的话)，将约束条件全部作为ValueFilter，这样可以使用IndexNestLoop
-             *          b. 采用根据约束条件选择的索引，而不管Join列，这样只能使用NestLoop
+             *      这种情况最为复杂，有三种方法
+             *          a. 如果join列和索引选择相同，这样可以使用IndexNestLoop
+             *          b. 放弃原来根据约束条件选择的索引，而使用Join列中得索引(如果有的话)，将约束条件全部作为ValueFilter，这样可以使用IndexNestLoop
+             *          c. 采用根据约束条件选择的索引，而不管Join列，这样只能使用NestLoop
              *      如果内表经约束后的大小比较小，则可以使用方案二，反之，则应使用方案一,不过此开销目前很难估算。
              *      或者枚举所有可能的情况，貌似也比较麻烦，暂时只采用方案二，实现简单一些。
              * </pre>
@@ -279,8 +280,23 @@ public class JoinChooser {
 
                         ((JoinNode) node).setJoinStrategy(JoinStrategy.INDEX_NEST_LOOP);
                     }
-                } else {// case 2，因为2.1与2.2现在使用同一种策略，就是使用NestLoop...
-                    ((JoinNode) node).setJoinStrategy(JoinStrategy.NEST_LOOP_JOIN);
+                } else {
+                    IndexMeta index = ((TableNode) innerNode).getIndexUsed();// 一定存在
+                    boolean isCover = true;
+                    for (IBooleanFilter filter : ((JoinNode) node).getJoinFilter()) {
+                        ISelectable rightColumn = (ISelectable) filter.getValue();
+                        if (index.getKeyColumn(rightColumn.getColumnName()) == null) {
+                            isCover = false; // join中出现index没有的列
+                        }
+                    }
+
+                    if (isCover) {
+                        // case 2.2中的a
+                        ((JoinNode) node).setJoinStrategy(JoinStrategy.INDEX_NEST_LOOP);
+                    } else {
+                        // case 2，因为2.1与2.2现在使用同一种策略，就是使用NestLoop...
+                        ((JoinNode) node).setJoinStrategy(JoinStrategy.NEST_LOOP_JOIN);
+                    }
                 }
 
             } else { // 这种情况也属于case 2，先使用NestLoop...

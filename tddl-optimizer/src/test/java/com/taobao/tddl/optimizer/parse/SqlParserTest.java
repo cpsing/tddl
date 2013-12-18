@@ -44,7 +44,7 @@ public class SqlParserTest extends BaseOptimizerTest {
 
     @Test
     public void testQuery_简单主键查询() throws SqlParserException, QueryException {
-        String sql = "SELECT * FROM TABLE1 WHERE ID=1";
+        String sql = "SELECT * FROM TABLE1 WHERE ID=1 OR ID = 2";
         QueryTreeNode qn = query(sql);
         qn.build();
 
