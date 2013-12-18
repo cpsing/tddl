@@ -4,18 +4,17 @@ import java.util.List;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.common.ExecutionContext;
-import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.Cursor;
-import com.taobao.tddl.executor.cursor.IANDCursor;
 import com.taobao.tddl.executor.cursor.IAffectRowCursor;
 import com.taobao.tddl.executor.cursor.IAggregateCursor;
+import com.taobao.tddl.executor.cursor.IBlockNestedLoopCursor;
 import com.taobao.tddl.executor.cursor.IColumnAliasCursor;
+import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.IInCursor;
 import com.taobao.tddl.executor.cursor.IIndexNestLoopCursor;
 import com.taobao.tddl.executor.cursor.ILimitFromToCursor;
 import com.taobao.tddl.executor.cursor.IMergeCursor;
-import com.taobao.tddl.executor.cursor.IMergeSortCursor;
-import com.taobao.tddl.executor.cursor.IORCursor;
+import com.taobao.tddl.executor.cursor.IMergeSortJoinCursor;
 import com.taobao.tddl.executor.cursor.IRangeCursor;
 import com.taobao.tddl.executor.cursor.IReverseOrderCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -23,6 +22,7 @@ import com.taobao.tddl.executor.cursor.ISetOrderCursor;
 import com.taobao.tddl.executor.cursor.ITempTableSortCursor;
 import com.taobao.tddl.executor.cursor.IValueFilterCursor;
 import com.taobao.tddl.executor.cursor.ResultCursor;
+import com.taobao.tddl.executor.cursor.impl.SortCursor;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
@@ -145,9 +145,8 @@ public interface ICursorFactory {
      * @return
      * @throws TddlException
      */
-    IMergeSortCursor join_sortMergeCursor(ExecutionContext context, ISchematicCursor left_cursor,
-                                          ISchematicCursor right_cursor, List left_columns, List right_columns,
-                                          List columns, boolean left_prefix, boolean right_prefix, IJoin joinNOde)
+    IMergeSortJoinCursor sortMergeJoinCursor(ExecutionContext context, ISchematicCursor left_cursor,
+                                             ISchematicCursor right_cursor, List left_columns, List right_columns)
                                                                                                                   throws TddlException;
 
     /**
@@ -163,9 +162,10 @@ public interface ICursorFactory {
      * @return
      * @throws TddlException
      */
-    public IANDCursor join_blockNestedLoopCursor(ExecutionContext context, ISchematicCursor left_cursor,
-                                                 ISchematicCursor right_cursor, List left_columns, List right_columns,
-                                                 List columns, IJoin join) throws TddlException;
+    public IBlockNestedLoopCursor blockNestedLoopJoinCursor(ExecutionContext context, ISchematicCursor left_cursor,
+                                                            ISchematicCursor right_cursor, List left_columns,
+                                                            List right_columns, List columns, IJoin join)
+                                                                                                         throws TddlException;
 
     /**
      * 如果order by col中的列，不是数据库的正常排序列，那么这个cursor会将数据查询进行颠倒操作。
@@ -238,6 +238,6 @@ public interface ICursorFactory {
     ISetOrderCursor setOrderCursor(ExecutionContext context, ISchematicCursor cursor, List<IOrderBy> ordersInRequest)
                                                                                                                      throws TddlException;
 
-    IORCursor mergeSortedCursor(ExecutionContext context, List<ISchematicCursor> cursors, boolean duplicated,
-                                String tableAlias) throws TddlException;
+    SortCursor mergeSortedCursor(ExecutionContext context, List<ISchematicCursor> cursors, boolean duplicated,
+                                 String tableAlias) throws TddlException;
 }

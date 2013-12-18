@@ -65,15 +65,11 @@ public class SortMergeJoinHandler extends QueryHandlerCommon {
             right_match = MATCH;
         }
         // 构造sortMerge Join的cursor
-        cursor = repo.getCursorFactory().join_sortMergeCursor(executionContext,
+        cursor = repo.getCursorFactory().sortMergeJoinCursor(executionContext,
             cursor_left,
             cursor_right,
             join.getLeftJoinOnColumns(),
-            join.getRightJoinOnColumns(),
-            join.getColumns(),
-            left_match == PREFIX_MATCH,
-            right_match == PREFIX_MATCH,
-            (IJoin) executor);
+            join.getRightJoinOnColumns());
         return cursor;
 
     }

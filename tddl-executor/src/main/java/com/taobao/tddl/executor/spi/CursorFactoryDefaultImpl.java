@@ -9,17 +9,16 @@ import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.ExecutorContext;
 import com.taobao.tddl.executor.common.ExecutionContext;
-import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.Cursor;
-import com.taobao.tddl.executor.cursor.IANDCursor;
 import com.taobao.tddl.executor.cursor.IAggregateCursor;
+import com.taobao.tddl.executor.cursor.IBlockNestedLoopCursor;
 import com.taobao.tddl.executor.cursor.IColumnAliasCursor;
+import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.IInCursor;
 import com.taobao.tddl.executor.cursor.IIndexNestLoopCursor;
 import com.taobao.tddl.executor.cursor.ILimitFromToCursor;
 import com.taobao.tddl.executor.cursor.IMergeCursor;
-import com.taobao.tddl.executor.cursor.IMergeSortCursor;
-import com.taobao.tddl.executor.cursor.IORCursor;
+import com.taobao.tddl.executor.cursor.IMergeSortJoinCursor;
 import com.taobao.tddl.executor.cursor.IRangeCursor;
 import com.taobao.tddl.executor.cursor.IReverseOrderCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -39,6 +38,7 @@ import com.taobao.tddl.executor.cursor.impl.MergeSortedCursors;
 import com.taobao.tddl.executor.cursor.impl.RangeCursor1;
 import com.taobao.tddl.executor.cursor.impl.ReverseOrderCursor;
 import com.taobao.tddl.executor.cursor.impl.SetOrderByCursor;
+import com.taobao.tddl.executor.cursor.impl.SortCursor;
 import com.taobao.tddl.executor.cursor.impl.SortMergeJoinCursor;
 import com.taobao.tddl.executor.cursor.impl.TempTableSortCursor;
 import com.taobao.tddl.executor.cursor.impl.ValueFilterCursor;
@@ -108,8 +108,8 @@ public class CursorFactoryDefaultImpl implements ICursorFactory {
     }
 
     @Override
-    public IORCursor mergeSortedCursor(ExecutionContext executionContext, List<ISchematicCursor> cursors,
-                                       boolean duplicated, String tableAlias) throws TddlException {
+    public SortCursor mergeSortedCursor(ExecutionContext executionContext, List<ISchematicCursor> cursors,
+                                        boolean duplicated, String tableAlias) throws TddlException {
         try {
             return new MergeSortedCursors(cursors, tableAlias, duplicated);
         } catch (Exception e) {
@@ -209,14 +209,11 @@ public class CursorFactoryDefaultImpl implements ICursorFactory {
     }
 
     @Override
-    public IMergeSortCursor join_sortMergeCursor(ExecutionContext executionContext, ISchematicCursor left_cursor,
-                                                 ISchematicCursor right_cursor, List left_columns, List right_columns,
-                                                 List columns, boolean left_prefix, boolean right_prefix, IJoin join)
-                                                                                                                     throws TddlException {
+    public IMergeSortJoinCursor sortMergeJoinCursor(ExecutionContext executionContext, ISchematicCursor left_cursor,
+                                                    ISchematicCursor right_cursor, List left_columns, List right_columns)
+                                                                                                                         throws TddlException {
         try {
-            List<IOrderBy> orderBys = left_cursor.getOrderBy();
-            // Comparator<IRowSet> rows=
-            // ExecUtil.getComp(left_columns,right_columns,left_cursor.getMeta(),right_cursor.getMeta());
+
             return new SortMergeJoinCursor(left_cursor, right_cursor, left_columns, right_columns);
         } catch (Exception e) {
             closeParentCursor(left_cursor);
@@ -264,9 +261,11 @@ public class CursorFactoryDefaultImpl implements ICursorFactory {
     }
 
     @Override
-    public IANDCursor join_blockNestedLoopCursor(ExecutionContext executionContext, ISchematicCursor left_cursor,
-                                                 ISchematicCursor right_cursor, List left_columns, List right_columns,
-                                                 List columns, IJoin join) throws TddlException {
+    public IBlockNestedLoopCursor blockNestedLoopJoinCursor(ExecutionContext executionContext,
+                                                            ISchematicCursor left_cursor,
+                                                            ISchematicCursor right_cursor, List left_columns,
+                                                            List right_columns, List columns, IJoin join)
+                                                                                                         throws TddlException {
 
         try {
             return new BlockNestedtLoopCursor(left_cursor,

@@ -1,7 +1,6 @@
-package com.taobao.tddl.executor.common;
+package com.taobao.tddl.executor.cursor.impl;
 
-import com.taobao.tddl.executor.common.CursorMetaImp.ColumnHolder;
-
+import com.taobao.tddl.executor.cursor.impl.CursorMetaImp.ColumnHolder;
 
 public class ColMetaAndIndex {
 

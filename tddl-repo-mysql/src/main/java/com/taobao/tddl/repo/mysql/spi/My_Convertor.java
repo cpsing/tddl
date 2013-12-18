@@ -2,7 +2,7 @@ package com.taobao.tddl.repo.mysql.spi;
 
 import java.sql.ResultSet;
 
-import com.taobao.tddl.executor.common.ICursorMeta;
+import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.rowset.ResultSetRowSet;
 

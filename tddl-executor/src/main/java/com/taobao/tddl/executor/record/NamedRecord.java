@@ -3,7 +3,7 @@ package com.taobao.tddl.executor.record;
 import java.util.List;
 import java.util.Map;
 
-import com.taobao.tddl.executor.cursor.IRecord;
+import com.taobao.tddl.executor.common.IRecord;
 
 /**
  * @author jianxing <jianxing.qx@taobao.com>

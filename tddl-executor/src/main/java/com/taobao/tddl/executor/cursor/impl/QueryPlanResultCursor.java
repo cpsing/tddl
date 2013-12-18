@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.taobao.tddl.common.exception.TddlException;
-import com.taobao.tddl.executor.common.CursorMetaImp;
 import com.taobao.tddl.executor.common.ExecutionContext;
-import com.taobao.tddl.executor.common.ICursorMeta;
+import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;

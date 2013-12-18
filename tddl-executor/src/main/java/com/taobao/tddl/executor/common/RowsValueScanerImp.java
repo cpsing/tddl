@@ -1,10 +1,10 @@
-package com.taobao.tddl.executor.cursor;
+package com.taobao.tddl.executor.common;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.taobao.tddl.executor.common.ICursorMeta;
+import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 

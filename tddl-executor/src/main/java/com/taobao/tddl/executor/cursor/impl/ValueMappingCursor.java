@@ -5,8 +5,8 @@ import java.util.Map;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
-import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.Cursor;
+import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;

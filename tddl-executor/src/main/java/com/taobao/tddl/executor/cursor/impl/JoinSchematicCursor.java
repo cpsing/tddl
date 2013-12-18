@@ -5,11 +5,11 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.taobao.tddl.common.exception.TddlException;
-import com.taobao.tddl.executor.common.CursorMetaImp;
-import com.taobao.tddl.executor.common.ICursorMeta;
+import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.executor.rowset.JoinRowSet;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
@@ -62,7 +62,7 @@ public class JoinSchematicCursor extends SchematicCursor {
         this.leftOutJoin = left;
     }
 
-    public void setRightLeftJoin(boolean right) {
+    public void setRightJoin(boolean right) {
         this.rightOutJoin = right;
     }
 
@@ -142,6 +142,21 @@ public class JoinSchematicCursor extends SchematicCursor {
             if (index == null) index = cursorMeta.getIndex(cm.getTableName(), cm.getAlias());
             indexes.add(offset + index);
         }
+    }
+
+    public IRowSet joinRecord(IRowSet kv1, IRowSet kv2) {
+        ICursorMeta leftCursorMeta = null;
+        ICursorMeta rightCursorMeta = null;
+        if (kv1 != null) {
+            leftCursorMeta = kv1.getParentCursorMeta();
+        }
+        if (kv2 != null) {
+            rightCursorMeta = kv2.getParentCursorMeta();
+        }
+        buildSchemaInJoin(leftCursorMeta, rightCursorMeta);
+
+        IRowSet joinedRowSet = new JoinRowSet(rightCursorOffset, kv1, kv2, joinCursorMeta);
+        return joinedRowSet;
     }
 
     private void setOrderBy(ISchematicCursor left_cursor) {

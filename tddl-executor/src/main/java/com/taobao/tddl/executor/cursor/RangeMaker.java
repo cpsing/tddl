@@ -5,9 +5,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import com.taobao.tddl.executor.common.ColMetaAndIndex;
-import com.taobao.tddl.executor.common.CursorMetaImp;
-import com.taobao.tddl.executor.common.ICursorMeta;
+import com.taobao.tddl.executor.cursor.impl.ColMetaAndIndex;
+import com.taobao.tddl.executor.cursor.impl.CursorMetaImp;
 import com.taobao.tddl.executor.function.ExtraFunction;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;

@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.taobao.tddl.executor.common.ColMetaAndIndex;
-import com.taobao.tddl.executor.common.ICursorMeta;
+import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.rowset.IRowSet;
 
 public class ValueMappingIRowSetConvertor {

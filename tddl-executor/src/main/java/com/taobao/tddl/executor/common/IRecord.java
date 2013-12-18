@@ -1,4 +1,4 @@
-package com.taobao.tddl.executor.cursor;
+package com.taobao.tddl.executor.common;
 
 import java.util.List;
 import java.util.Map;

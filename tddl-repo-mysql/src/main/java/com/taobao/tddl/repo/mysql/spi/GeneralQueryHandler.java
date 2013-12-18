@@ -3,7 +3,7 @@ package com.taobao.tddl.repo.mysql.spi;
 import java.sql.SQLException;
 
 import com.taobao.tddl.executor.common.ExecutionContext;
-import com.taobao.tddl.executor.common.ICursorMeta;
+import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;

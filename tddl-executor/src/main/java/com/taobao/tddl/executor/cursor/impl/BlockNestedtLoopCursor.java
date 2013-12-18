@@ -7,10 +7,11 @@ import java.util.Map;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.codec.CodecFactory;
-import com.taobao.tddl.executor.common.CursorMetaImp;
+import com.taobao.tddl.executor.codec.RecordCodec;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.common.ExecutionContext;
-import com.taobao.tddl.executor.common.ICursorMeta;
+import com.taobao.tddl.executor.cursor.IBlockNestedLoopCursor;
+import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.IValueFilterCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
@@ -28,12 +29,13 @@ import com.taobao.tddl.optimizer.core.plan.query.IJoin;
  * @author mengshi <mengshi.sunmengshi@taobao.com> Block Nested Loop Join
  * @author mengshi
  */
-public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor {
+public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor implements IBlockNestedLoopCursor {
 
-    ICursorFactory   cursorFactory    = null;
-    ExecutionContext executionContext = null;
-    ICursorMeta      rightCursorMeta  = null;
-    private IJoin    join;
+    ICursorFactory      cursorFactory    = null;
+    ExecutionContext    executionContext = null;
+    ICursorMeta         rightCursorMeta  = null;
+    private IJoin       join;
+    private RecordCodec leftCodec;
 
     public BlockNestedtLoopCursor(ISchematicCursor leftCursor, ISchematicCursor rightCursor, List leftColumns,
                                   List rightColumns, List columns, ICursorFactory cursorFactory, IJoin join,

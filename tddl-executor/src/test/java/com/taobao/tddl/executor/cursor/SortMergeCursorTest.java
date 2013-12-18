@@ -250,7 +250,7 @@ public class SortMergeCursorTest {
             leftJoinOnColumns,
             rightJoinOnColumns);
 
-        c.setRightLeftJoin(true);
+        c.setRightJoin(true);
 
         Object[] leftExpected = new Object[] { 2, 4, 5 };
         Object[] rightExpected = new Object[] { 2, 4, 5 };
@@ -286,7 +286,7 @@ public class SortMergeCursorTest {
             leftJoinOnColumns,
             rightJoinOnColumns);
 
-        c.setRightLeftJoin(true);
+        c.setRightJoin(true);
 
         Object[] leftExpected = new Object[] { 2, null, 4, 5 };
         Object[] rightExpected = new Object[] { 2, 3, 4, 5 };
@@ -322,7 +322,7 @@ public class SortMergeCursorTest {
             leftJoinOnColumns,
             rightJoinOnColumns);
 
-        c.setRightLeftJoin(true);
+        c.setRightJoin(true);
         c.setLeftJoin(true);
 
         Object[] leftExpected = new Object[] { 2, 3, 4, 5 };
@@ -359,7 +359,7 @@ public class SortMergeCursorTest {
             leftJoinOnColumns,
             rightJoinOnColumns);
 
-        c.setRightLeftJoin(true);
+        c.setRightJoin(true);
         c.setLeftJoin(true);
         Object[] leftExpected = new Object[] { 2, null, 4, 5 };
         Object[] rightExpected = new Object[] { 2, 3, 4, 5 };
@@ -395,7 +395,7 @@ public class SortMergeCursorTest {
             leftJoinOnColumns,
             rightJoinOnColumns);
 
-        c.setRightLeftJoin(true);
+        c.setRightJoin(true);
         c.setLeftJoin(true);
         Object[] leftExpected = new Object[] { 2, null, 4, 5, 6 };
         Object[] rightExpected = new Object[] { 2, 3, 4, 5, null };
@@ -431,10 +431,47 @@ public class SortMergeCursorTest {
             leftJoinOnColumns,
             rightJoinOnColumns);
 
-        c.setRightLeftJoin(true);
+        c.setRightJoin(true);
         c.setLeftJoin(true);
         Object[] leftExpected = new Object[] { 2, null, 4, 5, 6, null };
         Object[] rightExpected = new Object[] { 2, 3, 4, 5, null, 9 };
+        List leftActual = new ArrayList();
+        List rightActual = new ArrayList();
+        IRowSet row = null;
+        while ((row = c.next()) != null) {
+            leftActual.add(row.getObject(0));
+            rightActual.add(row.getObject(3));
+            System.out.println(row);
+        }
+
+        Assert.assertArrayEquals(leftExpected, leftActual.toArray());
+        Assert.assertArrayEquals(rightExpected, rightActual.toArray());
+    }
+
+    @Test
+    public void testFullOutterJoin5() throws TddlException {
+
+        ISchematicCursor left_cursor = new SchematicCursor(this.getCursor("T1", new Integer[] { 1, 1, 1, 2, 4, 5, 6, 6,
+                6 }));
+        ISchematicCursor right_cursor = new SchematicCursor(this.getCursor("T2", new Integer[] {}));
+
+        List leftJoinOnColumns = new ArrayList();
+
+        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DATA_TYPE.INT_VAL).setTableName("T1"));
+
+        List rightJoinOnColumns = new ArrayList();
+
+        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DATA_TYPE.INT_VAL).setTableName("T2"));
+
+        SortMergeJoinCursor c = new SortMergeJoinCursor(left_cursor,
+            right_cursor,
+            leftJoinOnColumns,
+            rightJoinOnColumns);
+
+        c.setRightJoin(true);
+        c.setLeftJoin(true);
+        Object[] leftExpected = new Object[] { 1, 1, 1, 2, 4, 5, 6, 6, 6 };
+        Object[] rightExpected = new Object[] { null, null, null, null, null, null, null, null, null };
         List leftActual = new ArrayList();
         List rightActual = new ArrayList();
         IRowSet row = null;

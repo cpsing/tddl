@@ -8,7 +8,6 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.cursor.Cursor;
-import com.taobao.tddl.executor.cursor.IORCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
@@ -21,7 +20,7 @@ import com.taobao.tddl.optimizer.core.expression.IOrderBy;
  * @author mengshi.sunmengshi 2013-12-3 上午10:57:02
  * @since 5.1.0
  */
-public class MergeSortedCursors extends SortCursor implements IORCursor {
+public class MergeSortedCursors extends SortCursor {
 
     private ValueMappingIRowSetConvertor valueMappingIRowSetConvertor;
     private List<ISchematicCursor>       cursors;
@@ -31,14 +30,6 @@ public class MergeSortedCursors extends SortCursor implements IORCursor {
      * 保存每个cursor当前的值得wrapper
      */
     private List<IRowSet>                values;
-    //
-    // public MergeSortedCursors(List<ISchematicCursor> cursors,String
-    // tableAlias)
-    // throws FetchException {
-    // super(cursors.get(0), cursors.get(0) == null ? null : cursors.get(0)
-    // .getOrderBy());
-    // this.cursors = cursors;
-    // }
 
     private boolean                      templateIsLeft = true;
 

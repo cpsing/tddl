@@ -12,12 +12,12 @@ import java.util.regex.Pattern;
 
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.common.utils.TStringUtil;
-import com.taobao.tddl.executor.common.ColMetaAndIndex;
-import com.taobao.tddl.executor.common.CursorMetaImp;
-import com.taobao.tddl.executor.common.ICursorMeta;
+import com.taobao.tddl.executor.common.IRowsValueScaner;
 import com.taobao.tddl.executor.common.KVPair;
-import com.taobao.tddl.executor.cursor.IRowsValueScaner;
-import com.taobao.tddl.executor.cursor.RowsValueScanerImp;
+import com.taobao.tddl.executor.common.RowsValueScanerImp;
+import com.taobao.tddl.executor.cursor.ICursorMeta;
+import com.taobao.tddl.executor.cursor.impl.ColMetaAndIndex;
+import com.taobao.tddl.executor.cursor.impl.CursorMetaImp;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.record.MapRecord;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;

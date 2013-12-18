@@ -31,7 +31,7 @@ public class NestedLoopJoinHandler extends QueryHandlerCommon {
             .getTopologyExecutor()
             .execByExecPlanNode(join.getRightNode(), executionContext);
 
-        cursor = repo.getCursorFactory().join_blockNestedLoopCursor(executionContext,
+        cursor = repo.getCursorFactory().blockNestedLoopJoinCursor(executionContext,
             cursor_left,
             cursor_right,
             join.getLeftJoinOnColumns(),

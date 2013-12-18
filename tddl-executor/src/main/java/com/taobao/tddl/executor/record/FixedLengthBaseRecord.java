@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.taobao.tddl.executor.cursor.IRecord;
+import com.taobao.tddl.executor.common.IRecord;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 
 /**

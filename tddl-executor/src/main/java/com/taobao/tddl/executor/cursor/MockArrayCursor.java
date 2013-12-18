@@ -7,10 +7,9 @@ import java.util.Map;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
-import com.taobao.tddl.executor.common.CursorMetaImp;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
-import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.common.KVPair;
+import com.taobao.tddl.executor.cursor.impl.CursorMetaImp;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;

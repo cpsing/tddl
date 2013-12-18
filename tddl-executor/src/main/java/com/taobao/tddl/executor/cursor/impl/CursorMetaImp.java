@@ -1,4 +1,4 @@
-package com.taobao.tddl.executor.common;
+package com.taobao.tddl.executor.cursor.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,8 +10,9 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.executor.cursor.IRowsValueScaner;
-import com.taobao.tddl.executor.cursor.RowsValueScanerImp;
+import com.taobao.tddl.executor.common.IRowsValueScaner;
+import com.taobao.tddl.executor.common.RowsValueScanerImp;
+import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.optimizer.config.table.ColumnMessage;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;

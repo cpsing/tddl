@@ -2,8 +2,8 @@ package com.taobao.tddl.repo.mysql.cursor;
 
 import java.util.List;
 
-import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.Cursor;
+import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 

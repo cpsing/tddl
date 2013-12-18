@@ -3,7 +3,7 @@ package com.taobao.tddl.executor.record;
 import java.util.Collections;
 
 import com.taobao.tddl.executor.codec.CodecFactory;
-import com.taobao.tddl.executor.cursor.IRecord;
+import com.taobao.tddl.executor.common.IRecord;
 
 /**
  * @author mengshi.sunmengshi 2013-11-29 下午2:41:09

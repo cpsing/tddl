@@ -8,13 +8,10 @@ import java.util.List;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.executor.common.CursorMetaImp;
-import com.taobao.tddl.executor.common.ICursorMeta;
-import com.taobao.tddl.executor.cursor.IANDCursor;
+import com.taobao.tddl.executor.cursor.IMergeSortJoinCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.executor.rowset.JoinRowSet;
 import com.taobao.tddl.executor.utils.ExecUtils;
 
 /**
@@ -57,7 +54,7 @@ import com.taobao.tddl.executor.utils.ExecUtils;
  * @since 5.1.0
  */
 @SuppressWarnings("rawtypes")
-public class SortMergeJoinCursor extends JoinSchematicCursor implements IANDCursor {
+public class SortMergeJoinCursor extends JoinSchematicCursor implements IMergeSortJoinCursor {
 
     protected IRowSet current;
 
@@ -233,21 +230,6 @@ public class SortMergeJoinCursor extends JoinSchematicCursor implements IANDCurs
         }
 
         return key;
-    }
-
-    public IRowSet joinRecord(IRowSet kv1, IRowSet kv2) {
-        ICursorMeta leftCursorMeta = null;
-        ICursorMeta rightCursorMeta = null;
-        if (kv1 != null) {
-            leftCursorMeta = kv1.getParentCursorMeta();
-        }
-        if (kv2 != null) {
-            rightCursorMeta = kv2.getParentCursorMeta();
-        }
-        buildSchemaInJoin(leftCursorMeta, rightCursorMeta);
-
-        IRowSet joinedRowSet = new JoinRowSet(rightCursorOffset, kv1, kv2, joinCursorMeta);
-        return joinedRowSet;
     }
 
     @Override
