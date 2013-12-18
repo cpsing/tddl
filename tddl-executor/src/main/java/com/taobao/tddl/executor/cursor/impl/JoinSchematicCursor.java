@@ -61,15 +61,6 @@ public class JoinSchematicCursor extends SchematicCursor {
         schemaInited = false;
     }
 
-    // protected void buildSchemaInJoin(ISchematicCursor left_cursor,
-    // ISchematicCursor right_cursor) {
-    // ICursorMeta leftCursorMeta = left_cursor.getMeta();
-    // ICursorMeta rightCursorMeta = right_cursor.getMeta();
-    //
-    // buildSchemaInJoin(leftCursorMeta, rightCursorMeta);
-    //
-    // }
-
     protected void setLeftRightJoin(IJoin join) {
         if (join != null) {
             this.leftOutJoin = join.getLeftOuter();
@@ -127,22 +118,13 @@ public class JoinSchematicCursor extends SchematicCursor {
         // 以左面数据顺序，作为排序
         setOrderBy(left_cursor);
 
-        // List<ColumnMeta> leftColumns = leftCursorMeta.getColumns();
-        // List<ColumnMeta> rightColumns = rightCursorMeta.getColumns();
-        // this.kvPairComparator = ExecUtil.getComp(this.leftJoinOnColumns,
-        // this.rightJoinOnColumns, leftCursorMeta,
-        // rightCursorMeta);
         List<ColumnMeta> newJoinColumnMsg = new ArrayList<ColumnMeta>(leftColumns.size() + rightColumns.size());
-        // rightCursorOffset = leftCursorMeta.getIndexRange();
+
         newJoinColumnMsg.addAll(leftColumns);
         newJoinColumnMsg.addAll(rightColumns);
-        // List<Integer> indexes = new
-        // ArrayList<Integer>(newJoinColumnMsg.size());
-        // addIndexToNewIndexes(leftCursorMeta, leftColumns, indexes, 0);
-        // addIndexToNewIndexes(rightCursorMeta, rightColumns, indexes,
-        // rightCursorOffset);
+
         ICursorMeta cursorMetaImpJoin = CursorMetaImp.buildNew(newJoinColumnMsg);
-        // setMeta(cursorMetaImpJoin);
+
         rightCursorOffset = leftColumns.size();
         this.joinCursorMeta = cursorMetaImpJoin;
 

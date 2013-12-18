@@ -11,6 +11,8 @@
 		</properties>
 
 		<atom name="andor_show_group0_atom0">
+		<ip></ip>
+		<username></username>
 			<properties>
 				<property name="com.taobao.tddl.atom.global.andor_show_group0_atom0">
 					<value>
