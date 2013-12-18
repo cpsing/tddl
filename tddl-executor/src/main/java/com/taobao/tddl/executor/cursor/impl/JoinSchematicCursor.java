@@ -35,8 +35,6 @@ public class JoinSchematicCursor extends SchematicCursor {
     protected Comparator<IRowSet> kvPairComparator;
     protected List<ISelectable>   leftJoinOnColumns;
     protected List<ISelectable>   rightJoinOnColumns;
-    protected List<ISelectable>   leftColumns;
-    protected List<ISelectable>   rightColumns;
 
     /**
      * 见 com.taobao.ustore.optimizer.node.lazy.query.JoinNode
@@ -45,23 +43,30 @@ public class JoinSchematicCursor extends SchematicCursor {
      * innerJoin:leftOuter=true && rightOuter=true outerJoin:leftOuter=false &&
      * rightOuter=false
      */
-    protected boolean             leftOutJoin    = true;
-    protected boolean             rightOutJoin   = true;
+    protected boolean             leftOutJoin    = false;
+    protected boolean             rightOutJoin   = false;
 
     public JoinSchematicCursor(ISchematicCursor left_cursor, ISchematicCursor right_cursor, List leftJoinOnColumns,
-                               List rightJoinOnColumns, List leftColumns, List rightColumns){
+                               List rightJoinOnColumns){
         super(null, null, null);
         this.left_cursor = left_cursor;
         this.right_cursor = right_cursor;
 
         this.leftJoinOnColumns = leftJoinOnColumns;
         this.rightJoinOnColumns = rightJoinOnColumns;
-        this.leftColumns = leftColumns;
-        this.rightColumns = rightColumns;
+
         schemaInited = false;
     }
 
-    protected void setLeftRightJoin(IJoin join) {
+    public void setLeftJoin(boolean left) {
+        this.leftOutJoin = left;
+    }
+
+    public void setRightLeftJoin(boolean right) {
+        this.rightOutJoin = right;
+    }
+
+    public void setLeftRightJoin(IJoin join) {
         if (join != null) {
             this.leftOutJoin = join.getLeftOuter();
             this.rightOutJoin = join.getRightOuter();

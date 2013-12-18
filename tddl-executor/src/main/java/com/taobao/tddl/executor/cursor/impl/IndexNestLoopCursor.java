@@ -44,9 +44,7 @@ public class IndexNestLoopCursor extends SortMergeJoinCursor1 implements IIndexN
             rightJoinOnColumns,
             false,
             prefix,
-            (leftCursor != null ? leftCursor.getOrderBy() : null),
-            leftColumns,
-            rightColumns);
+            (leftCursor != null ? leftCursor.getOrderBy() : null));
         this.orderBys = leftCursor.getOrderBy();
     }
 

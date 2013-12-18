@@ -30,7 +30,7 @@ import com.taobao.tddl.optimizer.core.plan.query.IJoin;
  */
 public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor {
 
-    ICursorFactory    cursorFactory    = null;
+    ICursorFactory   cursorFactory    = null;
     ExecutionContext executionContext = null;
     ICursorMeta      rightCursorMeta  = null;
     private IJoin    join;
@@ -45,7 +45,7 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor {
             .getCodec(ExecUtils.getColumnMetas(rightColumns));
         this.left_key = leftCodec.newEmptyRecord();
         this.executionContext = executionContext;
-        rightCursorMeta = CursorMetaImp.buildNew(ExecUtils.convertISelectablesToColumnMeta(this.rightColumns,
+        rightCursorMeta = CursorMetaImp.buildNew(ExecUtils.convertISelectablesToColumnMeta(rightRetColumns,
             join.getRightNode().getAlias(),
             join.isSubQuery()));
         this.join = join;

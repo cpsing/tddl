@@ -39,7 +39,7 @@ import com.taobao.tddl.executor.cursor.impl.MergeSortedCursors;
 import com.taobao.tddl.executor.cursor.impl.RangeCursor1;
 import com.taobao.tddl.executor.cursor.impl.ReverseOrderCursor;
 import com.taobao.tddl.executor.cursor.impl.SetOrderByCursor;
-import com.taobao.tddl.executor.cursor.impl.SortMergeJoinCursor1;
+import com.taobao.tddl.executor.cursor.impl.SortMergeJoinCursor;
 import com.taobao.tddl.executor.cursor.impl.TempTableSortCursor;
 import com.taobao.tddl.executor.cursor.impl.ValueFilterCursor;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
@@ -217,15 +217,7 @@ public class CursorFactoryDefaultImpl implements ICursorFactory {
             List<IOrderBy> orderBys = left_cursor.getOrderBy();
             // Comparator<IRowSet> rows=
             // ExecUtil.getComp(left_columns,right_columns,left_cursor.getMeta(),right_cursor.getMeta());
-            return new SortMergeJoinCursor1(left_cursor,
-                right_cursor,
-                left_columns,
-                right_columns,
-                left_prefix,
-                right_prefix,
-                orderBys,
-                join.getLeftNode().getColumns(),
-                join.getRightNode().getColumns());
+            return new SortMergeJoinCursor(left_cursor, right_cursor, left_columns, right_columns);
         } catch (Exception e) {
             closeParentCursor(left_cursor);
             closeParentCursor(right_cursor);

@@ -1,20 +1,21 @@
 package com.taobao.tddl.executor.cursor.impl;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.executor.common.CursorMetaImp;
 import com.taobao.tddl.executor.common.ICursorMeta;
 import com.taobao.tddl.executor.cursor.IANDCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
+import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.rowset.JoinRowSet;
 import com.taobao.tddl.executor.utils.ExecUtils;
-import com.taobao.tddl.optimizer.core.expression.IOrderBy;
-import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
 /**
  * <pre>
@@ -60,13 +61,24 @@ public class SortMergeJoinCursor extends JoinSchematicCursor implements IANDCurs
 
     protected IRowSet current;
 
-    Iterator<IRowSet> resultsIter = null;
+    Iterator<IRowSet> resultsIter      = null;
+
+    private IRowSet   left_key;
+
+    private IRowSet   right_key;
+
+    private boolean   needAdvanceLeft  = true;
+
+    private boolean   needAdvanceRight = true;
+
+    private List      leftSubSet;
+
+    private List      rightSubSet;
 
     @SuppressWarnings("unchecked")
-    public SortMergeJoinCursor(ISchematicCursor left_cursor, ISchematicCursor right_cursor, List left_columns,
-                               List right_columns, List<IOrderBy> orderBys, List leftColumns, List rightColumns)
-                                                                                                                throws TddlException{
-        super(left_cursor, right_cursor, left_columns, right_columns, leftColumns, rightColumns);
+    public SortMergeJoinCursor(ISchematicCursor left_cursor, ISchematicCursor right_cursor, List leftJoinOnColumns,
+                               List rightJoinOnColumns) throws TddlException{
+        super(left_cursor, right_cursor, leftJoinOnColumns, rightJoinOnColumns);
         this.left_cursor = left_cursor;
         this.right_cursor = right_cursor;
 
@@ -79,33 +91,100 @@ public class SortMergeJoinCursor extends JoinSchematicCursor implements IANDCurs
             return this.current;
         }
 
-        List<IRowSet> leftSubSet = new LinkedList();
-        List<IRowSet> rightSubSet = new LinkedList();
+        // right join情况下，若上轮迭代没有匹配，则没有消耗leftSubSet，不需要前移
+        if (needAdvanceLeft) {
+            this.leftSubSet = new LinkedList();
+            left_key = advance(leftSubSet, left_cursor, leftJoinOnColumns);
+        }
 
-        IRowSet left_key = advance(leftSubSet, left_cursor, leftJoinOnColumns);
-        IRowSet right_key = advance(rightSubSet, right_cursor, rightJoinOnColumns);
+        // left join情况下，若上轮迭代没有匹配，则没有消耗rightSubSet，不需要前移
+        if (needAdvanceRight) {
+            this.rightSubSet = new LinkedList();
+            right_key = advance(rightSubSet, right_cursor, rightJoinOnColumns);
+        }
 
         while (!leftSubSet.isEmpty() && !rightSubSet.isEmpty()) {
+            int compare = compare(left_key, right_key, leftJoinOnColumns, rightJoinOnColumns);
+            if (compare == 0) {
 
-            if (compare(left_key, right_key) == 0) {
-
+                this.needAdvanceLeft = true;
+                this.needAdvanceRight = true;
                 List<IRowSet> results = acrossProduct(leftSubSet, rightSubSet);
                 resultsIter = results.iterator();
-
-                left_key = advance(leftSubSet, left_cursor, leftJoinOnColumns);
-                right_key = advance(rightSubSet, right_cursor, rightJoinOnColumns);
 
                 this.current = resultsIter.next();
                 return this.current;
 
-            } else if (compare(left_key, right_key) < 0) {
-                left_key = advance(leftSubSet, left_cursor, leftJoinOnColumns);
             } else {
-                right_key = advance(rightSubSet, right_cursor, rightJoinOnColumns);
+
+                // outter join情况下，没有消耗就不需要前移
+                if (this.isLeftOutJoin() || this.isRightOutJoin()) {
+                    needAdvanceLeft = false;
+                    needAdvanceRight = false;
+                }
+
+                if (compare < 0) {
+
+                    if (this.isLeftOutJoin()) {
+                        this.needAdvanceLeft = true;
+                        List<IRowSet> results = acrossProduct(leftSubSet,
+                            getNullSubSet(right_cursor.getReturnColumns()));
+                        resultsIter = results.iterator();
+                        this.current = resultsIter.next();
+                        return this.current;
+                    }
+
+                    left_key = advance(leftSubSet, left_cursor, leftJoinOnColumns);
+                } else {
+
+                    if (this.isRightOutJoin()) {
+                        this.needAdvanceRight = true;
+                        List<IRowSet> results = acrossProduct(getNullSubSet(left_cursor.getReturnColumns()),
+                            rightSubSet);
+                        resultsIter = results.iterator();
+                        this.current = resultsIter.next();
+                        return this.current;
+                    }
+                    right_key = advance(rightSubSet, right_cursor, rightJoinOnColumns);
+                }
             }
         }
 
-        return null;
+        if (!(leftSubSet.isEmpty() && rightSubSet.isEmpty())) {
+
+            // outter join情况下，要将两个cursor都取完
+            if (leftSubSet.isEmpty() && this.isRightOutJoin()) {
+                this.needAdvanceRight = true;
+                List<IRowSet> results = acrossProduct(getNullSubSet(left_cursor.getReturnColumns()), rightSubSet);
+                resultsIter = results.iterator();
+                this.current = resultsIter.next();
+                return this.current;
+            }
+
+            if (rightSubSet.isEmpty() && this.isLeftOutJoin()) {
+                this.needAdvanceLeft = true;
+                List<IRowSet> results = acrossProduct(leftSubSet, getNullSubSet(right_cursor.getReturnColumns()));
+                resultsIter = results.iterator();
+                this.current = resultsIter.next();
+                return this.current;
+            }
+        }
+
+        current = null;
+        return current;
+    }
+
+    private List<IRowSet> getNullSubSet(List columns) {
+        List subSet = new ArrayList(1);
+        List value = new ArrayList(columns.size());
+
+        for (int i = 0; i < columns.size(); i++) {
+            value.add(null);
+        }
+        ArrayRowSet row = new ArrayRowSet(CursorMetaImp.buildNew(columns), value.toArray());
+        subSet.add(row);
+
+        return subSet;
     }
 
     /**
@@ -128,23 +207,29 @@ public class SortMergeJoinCursor extends JoinSchematicCursor implements IANDCurs
 
     }
 
-    private int compare(IRowSet row1, IRowSet row2) {
+    private int compare(IRowSet row1, IRowSet row2, List columns1, List columns2) {
+
+        Comparator kvPairComparator = ExecUtils.getComp(columns1,
+            columns2,
+            row1.getParentCursorMeta(),
+            row2.getParentCursorMeta());
         return kvPairComparator.compare(row1, row2);
     }
 
-    private IRowSet advance(List<IRowSet> subSet, ISchematicCursor cursor, List<ISelectable> columns)
-                                                                                                     throws TddlException {
-
+    private IRowSet advance(List<IRowSet> subSet, ISchematicCursor cursor, List columns) throws TddlException {
+        subSet.clear();
         if (cursor.current() == null) {
             if (cursor.next() == null) {
                 return null;
             }
         }
 
-        IRowSet key = cursor.current();
+        // 这里的数据要固化下来，否则next之后数据就丢了
+        IRowSet key = ExecUtils.fromIRowSetToArrayRowSet(cursor.current());
+        subSet.add(key);
 
-        while (cursor.next() != null && compare(key, cursor.current()) == 0) {
-            subSet.add(cursor.current());
+        while (cursor.next() != null && compare(key, cursor.current(), columns, columns) == 0) {
+            subSet.add(ExecUtils.fromIRowSetToArrayRowSet(cursor.current()));
         }
 
         return key;
@@ -160,7 +245,7 @@ public class SortMergeJoinCursor extends JoinSchematicCursor implements IANDCurs
             rightCursorMeta = kv2.getParentCursorMeta();
         }
         buildSchemaInJoin(leftCursorMeta, rightCursorMeta);
-        ;
+
         IRowSet joinedRowSet = new JoinRowSet(rightCursorOffset, kv1, kv2, joinCursorMeta);
         return joinedRowSet;
     }

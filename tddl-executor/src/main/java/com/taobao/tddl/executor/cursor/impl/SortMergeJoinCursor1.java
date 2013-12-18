@@ -66,9 +66,9 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
 
     @SuppressWarnings("unchecked")
     public SortMergeJoinCursor1(ISchematicCursor left_cursor, ISchematicCursor right_cursor, List left_columns,
-                                List right_columns, boolean left_prefix, boolean right_prefix, List<IOrderBy> orderBys,
-                                List leftColumns, List rightColumns) throws TddlException{
-        super(left_cursor, right_cursor, left_columns, right_columns, leftColumns, rightColumns);
+                                List right_columns, boolean left_prefix, boolean right_prefix, List<IOrderBy> orderBys)
+                                                                                                                       throws TddlException{
+        super(left_cursor, right_cursor, left_columns, right_columns);
         this.left_cursor = left_cursor;
         this.right_cursor = right_cursor;
         this.left_prefix = left_prefix;
@@ -151,6 +151,7 @@ public class SortMergeJoinCursor1 extends JoinSchematicCursor implements IANDCur
             // 有一边儿为空，则认为数据已经没有join的可能了
             return null;
         }
+
         int n = kvPairComparator.compare(left, right);
         do {
             GeneralUtil.checkInterrupted();
