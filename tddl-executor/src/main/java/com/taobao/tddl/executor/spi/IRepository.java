@@ -23,7 +23,7 @@ public interface IRepository {
      * @return
      * @throws Exception
      */
-    ITable getTable(TableMeta meta, String groupNode, long requestID) throws TddlException;
+    ITable getTable(TableMeta meta, String groupNode) throws TddlException;
 
     /**
      * 关闭存储引擎所使用的对象。
@@ -90,5 +90,5 @@ public interface IRepository {
 
     IGroupExecutor buildGroupExecutor(Group group);
 
-    ITempTable createTempTable();
+    ITable getTempTable(TableMeta meta) throws TddlException;
 }

@@ -45,6 +45,7 @@ public class JoinSchematicCursor extends SchematicCursor {
      */
     protected boolean             leftOutJoin    = false;
     protected boolean             rightOutJoin   = false;
+    private List<ColumnMeta>      returnColumns;
 
     public JoinSchematicCursor(ISchematicCursor left_cursor, ISchematicCursor right_cursor, List leftJoinOnColumns,
                                List rightJoinOnColumns){
@@ -174,5 +175,22 @@ public class JoinSchematicCursor extends SchematicCursor {
         }
 
         return exs;
+    }
+
+    @Override
+    public List<ColumnMeta> getReturnColumns() throws TddlException {
+        if (this.returnColumns != null) {
+            return this.returnColumns;
+        }
+
+        List<ColumnMeta> leftColumns = this.left_cursor.getReturnColumns();
+        List<ColumnMeta> rightColumns = this.right_cursor.getReturnColumns();
+
+        returnColumns = new ArrayList(leftColumns.size() + rightColumns.size());
+        returnColumns.addAll(leftColumns);
+        returnColumns.addAll(rightColumns);
+
+        return returnColumns;
+
     }
 }

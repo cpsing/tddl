@@ -32,7 +32,7 @@ public class RepositoryHolder {
         return repository.get(arg0);
     }
 
-    public IRepository getOrCreateRepository(String repoName) {
+    public IRepository getOrCreateRepository(String repoName, Map<String, String> properties) {
 
         if (get(repoName) != null) {
             return get(repoName);
@@ -42,7 +42,7 @@ public class RepositoryHolder {
             if (get(repoName) == null) {
                 IRepositoryFactory factory = getRepoFactory(repoName);
 
-                IRepository repo = factory.buildRepository();
+                IRepository repo = factory.buildRepository(properties);
 
                 if (repo == null) {
                     throw new TddlRuntimeException(repoNotFoundError.format(repoName));

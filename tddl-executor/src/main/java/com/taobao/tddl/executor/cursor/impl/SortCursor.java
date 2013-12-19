@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.taobao.tddl.common.exception.TddlException;
-import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
@@ -24,11 +23,6 @@ public abstract class SortCursor extends SchematicCursor {
      * 比较器
      */
     protected Comparator<IRowSet> kvPairComparator;
-    protected KVPair              tmp;
-    /**
-     * 
-     */
-    protected KVPair              prev;
 
     private boolean               schemaInited = false;
 

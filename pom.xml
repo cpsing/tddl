@@ -84,6 +84,7 @@
 		<module>tddl-sequence</module>
 		<module>tddl-sample</module>
 		<module>tddl-qatest</module>
+		<module>tddl-repo-bdb</module>
 	</modules>
 
 	<dependencyManagement>

@@ -72,7 +72,7 @@ public class TopologyHandler extends AbstractLifecycle {
             group.setAppName(this.appName);
             IRepository repo = ExecutorContext.getContext()
                 .getRepositoryHolder()
-                .getOrCreateRepository(group.getType().toString());
+                .getOrCreateRepository(group.getType().toString(), matrix.getProperties());
 
             IGroupExecutor groupExecutor = repo.buildGroupExecutor(group);
 

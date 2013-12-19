@@ -27,7 +27,6 @@ import com.taobao.tddl.optimizer.core.plan.query.IJoin;
 
 /**
  * @author mengshi <mengshi.sunmengshi@taobao.com> Block Nested Loop Join
- * @author mengshi
  */
 public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor implements IBlockNestedLoopCursor {
 

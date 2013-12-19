@@ -162,11 +162,6 @@ public class IndexNestedLoopMgetImpCursor extends IndexNestLoopCursor implements
                         throw new RuntimeException(e);
                     }
 
-                    // current = new
-                    // JoinRowSet(left.getParentCursorMeta().getIndexRange(),
-                    // left,
-                    // right,
-                    // left.getParentCursorMeta());
                     return current;
                 }
             }

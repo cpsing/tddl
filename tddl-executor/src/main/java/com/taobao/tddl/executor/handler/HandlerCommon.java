@@ -57,7 +57,7 @@ public abstract class HandlerCommon implements ICommandHandler {
                 throw new IllegalArgumentException("table :" + tableName + " is not found");
             }
             executionContext.setMeta(ts.getIndexMeta(indexName));
-            executionContext.setTable(executionContext.getCurrentRepository().getTable(ts, groupDataNode, 0));
+            executionContext.setTable(executionContext.getCurrentRepository().getTable(ts, groupDataNode));
         }
     }
 

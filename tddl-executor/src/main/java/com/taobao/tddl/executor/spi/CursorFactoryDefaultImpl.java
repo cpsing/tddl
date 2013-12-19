@@ -35,7 +35,7 @@ import com.taobao.tddl.executor.cursor.impl.IndexNestedLoopMgetImpCursor;
 import com.taobao.tddl.executor.cursor.impl.LimitFromToCursor;
 import com.taobao.tddl.executor.cursor.impl.MergeCursor;
 import com.taobao.tddl.executor.cursor.impl.MergeSortedCursors;
-import com.taobao.tddl.executor.cursor.impl.RangeCursor1;
+import com.taobao.tddl.executor.cursor.impl.RangeCursor;
 import com.taobao.tddl.executor.cursor.impl.ReverseOrderCursor;
 import com.taobao.tddl.executor.cursor.impl.SetOrderByCursor;
 import com.taobao.tddl.executor.cursor.impl.SortCursor;
@@ -129,12 +129,9 @@ public class CursorFactoryDefaultImpl implements ICursorFactory {
             if ("True".equalsIgnoreCase(GeneralUtil.getExtraCmd(executionContext.getExtraCmds(),
                 ExtraCmd.ExecutionExtraCmd.ALLOW_TEMPORARY_TABLE))) {
 
-                ITempTable tt = ExecutorContext.getContext()
-                    .getRepositoryHolder()
-                    .get(Group.GroupType.BDB_JE)
-                    .createTempTable();
+                IRepository bdbRepo = ExecutorContext.getContext().getRepositoryHolder().get(Group.GroupType.BDB_JE);
                 return new TempTableSortCursor(this,
-                    tt,
+                    bdbRepo,
                     cursor,
                     orderBys,
                     sortedDuplicates,
@@ -289,7 +286,7 @@ public class CursorFactoryDefaultImpl implements ICursorFactory {
     public IRangeCursor rangeCursor(ExecutionContext executionContext, ISchematicCursor cursor, IFilter lf)
                                                                                                            throws TddlException {
         try {
-            return new RangeCursor1(cursor, lf);
+            return new RangeCursor(cursor, lf);
         } catch (Exception e) {
             closeParentCursor(cursor);
             throw new TddlException(e);

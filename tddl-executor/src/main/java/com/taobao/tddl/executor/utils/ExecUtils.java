@@ -22,7 +22,7 @@ import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.record.MapRecord;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.executor.rowset.IRowSetWrapper;
+import com.taobao.tddl.executor.rowset.RowSetWrapper;
 import com.taobao.tddl.executor.rowset.ResultSetRowSet;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
@@ -127,8 +127,8 @@ public class ExecUtils {
             List<Object> values = rsrs.getValues();
             IRowSet rs = new ArrayRowSet(rsrs.getParentCursorMeta(), values.toArray());
             return rs;
-        } else if (rsrs instanceof IRowSetWrapper) {
-            return IRowSetWrapperToArrayRowSet((IRowSetWrapper) rsrs);
+        } else if (rsrs instanceof RowSetWrapper) {
+            return IRowSetWrapperToArrayRowSet((RowSetWrapper) rsrs);
         } else {
             return rsrs;
         }
@@ -343,7 +343,7 @@ public class ExecUtils {
      * @param rsrs
      * @return
      */
-    private static IRowSet IRowSetWrapperToArrayRowSet(IRowSetWrapper rsrs) {
+    private static IRowSet IRowSetWrapperToArrayRowSet(RowSetWrapper rsrs) {
         if (rsrs == null) {
             return null;
         }
@@ -354,8 +354,8 @@ public class ExecUtils {
             IRowSet rs = new ArrayRowSet(irs.getParentCursorMeta(), values.toArray());
             rsrs.setParentRowSet(rs);
 
-        } else if (irs instanceof IRowSetWrapper) {
-            IRowSetWrapperToArrayRowSet((IRowSetWrapper) irs);
+        } else if (irs instanceof RowSetWrapper) {
+            IRowSetWrapperToArrayRowSet((RowSetWrapper) irs);
         }
 
         return rsrs;

@@ -252,14 +252,6 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
         return false;
     }
 
-    // public Object getColumnValue(IColumn c, IRowSet iRowSet) {
-    // Object ret = key.get(c.getTableName(), c.getColumnName());
-    // if (ret == null) {
-    // ret = value.get(c.getTableName(), c.getColumnName());
-    // }
-    // return ret;
-    // }
-
     @Override
     public boolean skipTo(CloneableRecord key) throws TddlException {
         if (super.skipTo(key)) {

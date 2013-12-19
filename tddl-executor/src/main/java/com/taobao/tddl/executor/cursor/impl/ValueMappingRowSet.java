@@ -4,9 +4,15 @@ import java.util.Map;
 
 import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.executor.rowset.IRowSetWrapper;
+import com.taobao.tddl.executor.rowset.RowSetWrapper;
 
-public class ValueMappingRowSet extends IRowSetWrapper {
+/**
+ * 两个rowset内容相同，但是列顺序不同，可以用此转换
+ * 
+ * @author mengshi.sunmengshi 2013-12-19 上午11:09:09
+ * @since 5.1.0
+ */
+public class ValueMappingRowSet extends RowSetWrapper {
 
     public ValueMappingRowSet(ICursorMeta iCursorMeta, IRowSet rowSet,
                               Map<Integer/* 返回列中的index位置 */, Integer/* 实际数据中的index位置 */> mapping){

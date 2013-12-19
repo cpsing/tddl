@@ -20,10 +20,10 @@ import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.ITempTableSortCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.executor.rowset.IRowSetWrapper;
+import com.taobao.tddl.executor.rowset.RowSetWrapper;
 import com.taobao.tddl.executor.spi.ICursorFactory;
+import com.taobao.tddl.executor.spi.IRepository;
 import com.taobao.tddl.executor.spi.ITable;
-import com.taobao.tddl.executor.spi.ITempTable;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
@@ -53,7 +53,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
 
     private boolean             inited           = false;
 
-    private final ITempTable    repo;
+    private final IRepository   repo;
     protected ISchematicCursor  tempTargetCursor = null;
     ITable                      targetTable      = null;
 
@@ -70,7 +70,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
      * @throws FetchException
      * @throws TddlException
      */
-    public TempTableSortCursor(ICursorFactory cursorFactory, ITempTable repo, ISchematicCursor cursor,
+    public TempTableSortCursor(ICursorFactory cursorFactory, IRepository repo, ISchematicCursor cursor,
                                List<IOrderBy> orderBys, boolean sortedDuplicates, long requestID,
                                ExecutionContext executionContext) throws TddlException, TddlException{
         super(cursor, orderBys);
@@ -90,8 +90,8 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
 
     }
 
-    protected ISchematicCursor prepare(ITempTable repo, ISchematicCursor cursor, List<IOrderBy> orderBys)
-                                                                                                         throws TddlException {
+    protected ISchematicCursor prepare(IRepository repo, ISchematicCursor cursor, List<IOrderBy> orderBys)
+                                                                                                          throws TddlException {
 
         List<ColumnMeta> columns = new ArrayList<ColumnMeta>();
         List<ColumnMeta> values = new ArrayList<ColumnMeta>();
@@ -136,7 +136,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
         tmpSchema.setTmp(true);
         tmpSchema.setSortedDuplicates(sortedDuplicates);
         // 增加临时表的判定
-        targetTable = repo.getTable(tmpSchema, "", true, requestID);
+        targetTable = repo.getTempTable(tmpSchema);
         CloneableRecord key = CodecFactory.getInstance(CodecFactory.FIXED_LENGTH).getCodec(columns).newEmptyRecord();
         CloneableRecord value = null;
         if (values != null && values.size() != 0) {
@@ -194,7 +194,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
                     value.put(identity, i++);
                 }
                 // System.out.println("TempTableSortCursor: "+key+"  "+value);
-                targetTable.put(null, key, value, primary_meta, tableName);
+                targetTable.put(this.executionContext, key, value, primary_meta, tableName);
 
             } while ((rowSet = cursor.next()) != null);
         }
@@ -324,7 +324,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
 
     private IRowSet wrap(IRowSet next) {
         if (next != null) {
-            next = new IRowSetWrapper(returnMeta, next);
+            next = new RowSetWrapper(returnMeta, next);
         }
         return next;
     }
@@ -400,5 +400,11 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
             sb.append(this.tempTargetCursor.toStringWithInden(inden + 1));
         }
         return sb.toString();
+    }
+
+    @Override
+    public List<ColumnMeta> getReturnColumns() throws TddlException {
+        initTTSC();
+        return this.returnMeta.getColumns();
     }
 }

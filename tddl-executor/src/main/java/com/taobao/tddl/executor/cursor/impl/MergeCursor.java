@@ -6,17 +6,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.ExecutorContext;
 import com.taobao.tddl.executor.codec.CodecFactory;
 import com.taobao.tddl.executor.codec.RecordCodec;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.common.ExecutionContext;
-import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.IMergeCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -39,11 +37,12 @@ import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
 
 /**
- * @author jianxing <jianxing.qx@taobao.com>
+ * @author mengshi.sunmengshi 2013-12-19 下午12:18:29
+ * @since 5.1.0
  */
 public class MergeCursor extends SchematicCursor implements IMergeCursor {
 
-    private Log                            logger                       = LogFactory.getLog(MergeCursor.class);
+    private Logger                         logger                       = LoggerFactory.getLogger(MergeCursor.class);
     protected List<ISchematicCursor>       cursors;
     int                                    sizeLimination               = 10000;
     protected final IDataNodeExecutor      currentExecotor;
@@ -51,11 +50,6 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
     protected final ExecutionContext       executionContext;
     protected ValueMappingIRowSetConvertor valueMappingIRowSetConvertor = new ValueMappingIRowSetConvertor();
     protected int                          currentIndex                 = 0;
-
-    // /**
-    // * mget中用来做查找条件的codec 技术债
-    // */
-    // protected RecordCodec finderCodec = null;
 
     public MergeCursor(List<ISchematicCursor> cursors, IDataNodeExecutor currentExecotor,
                        ExecutionContext executionContext){
@@ -66,7 +60,6 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
         this.cursors = cursors;
         List<IOrderBy> orderBys = this.cursors.get(0).getOrderBy();
         setOrderBy(orderBys);
-        // buildFinderCodec(orderBys);
 
     }
 
@@ -78,36 +71,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
         this.currentExecotor = currentExecotor;
         this.executionContext = executionContext;
         setOrderBy(orderBys);
-        // buildFinderCodec(orderBys);
     }
-
-    // private void buildFinderCodec(List<IOrderBy> orderBys) {
-    // List<IOrderBy> ordersForMeta = new ArrayList<IOrderBy>();
-    // if (orderBys != null && !orderBys.isEmpty())
-    // ordersForMeta.add(orderBys.get(0));
-    // List<ColumnMeta> colMetas =
-    // generateMergeOrderByAndReturnColumnList(ordersForMeta);
-    // finderCodec = CodecFactory.getInstance(CodecFactory.FIXED_LENGTH)
-    // .getCodec(colMetas);
-    // }
-
-    // private List<ColumnMeta> generateMergeOrderByAndReturnColumnList(
-    // List<IOrderBy> orderBys) {
-    // List<IOrderBy> newOrderBys = new ArrayList<IOrderBy>();
-    // List<ColumnMeta> colMetas = new ArrayList<ColumnMeta>();
-    //
-    // for (IOrderBy orderBy : orderBys) {
-    // OrderBy ob = new OrderBy();
-    // ob.setColumn(orderBy.getColumn());
-    // // 排序不固定，所以desc asc 判断为null
-    // newOrderBys.add(ob);
-    // colMetas.add(GeneralUtil.getColumnMeta(ob.getColumn()));
-    // }
-    // if (!newOrderBys.isEmpty()) {
-    // setOrderBy(newOrderBys);
-    // }
-    // return colMetas;
-    // }
 
     @Override
     protected void init() throws TddlException {
@@ -115,7 +79,6 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
 
         super.init();
 
-        // getReturnColumns();
     }
 
     @Override
@@ -228,7 +191,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
             query.setGroupBys(iquery.getGroupBys());
             query.valueQuery(iquery.getValueFilter());
             query.setKeyFilter(iquery.getKeyFilter());
-            // ICursorMeta indexMeta = super.cursormeta;
+
             IColumn col = ASTNodeFactory.getInstance()
                 .createColumn()
                 .setColumnName(colName)
@@ -257,7 +220,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
                 executionContext.getExtraCmds());
 
             ISchematicCursor cursor = null;
-            List<KVPair> returnList;
+
             Map<CloneableRecord, DuplicateKVPair> duplicateKeyMap = null;
             try {
 
@@ -294,14 +257,10 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
         Map<CloneableRecord, DuplicateKVPair> duplicateKeyMap = new HashMap<CloneableRecord, DuplicateKVPair>();
         IRowSet kvPair;
         int count = 0;
-        // if (orderBys.size() != 1) {
-        // throw new IllegalArgumentException("目前只支持单值查询吧。。简化一点");
-        // }
+
         ISelectable icol = c.copy();
-        // for (IOrderBy obys : orderBys) {
-        // icol = obys.getColumn().copy();
+
         icol.setTableName(null);
-        // \\ }
 
         List<ColumnMeta> colMetas = new ArrayList();
         colMetas.add(ExecUtils.getColumnMeta(icol));

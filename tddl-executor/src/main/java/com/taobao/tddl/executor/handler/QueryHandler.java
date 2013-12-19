@@ -6,7 +6,7 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.ExecutorContext;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
-import com.taobao.tddl.executor.cursor.impl.RangeCursor1;
+import com.taobao.tddl.executor.cursor.impl.RangeCursor;
 import com.taobao.tddl.executor.spi.IRepository;
 import com.taobao.tddl.executor.spi.ITable;
 import com.taobao.tddl.executor.spi.ITransaction;
@@ -85,7 +85,7 @@ public class QueryHandler extends QueryHandlerCommon {
                 cursor = repo.getCursorFactory().rangeCursor(executionContext, cursor, lf);
             }
 
-            if (cursor instanceof RangeCursor1) {//
+            if (cursor instanceof RangeCursor) {//
 
                 if (_orderBy != null) {
                     if (_orderBy.size() == 1) {

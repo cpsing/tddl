@@ -16,12 +16,11 @@ import com.taobao.tddl.executor.spi.IDataSourceGetter;
 import com.taobao.tddl.executor.spi.IGroupExecutor;
 import com.taobao.tddl.executor.spi.IRepository;
 import com.taobao.tddl.executor.spi.ITable;
-import com.taobao.tddl.executor.spi.ITempTable;
 import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.group.jdbc.TGroupDataSource;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.repo.mysql.executor.TddlGroupExecutor;
-import com.taobao.tddl.repo.mysql.handler.CommandExecutorFactoryMyImp;
+import com.taobao.tddl.repo.mysql.handler.CommandHandlerFactoryMyImp;
 
 public class My_Repository implements IRepository {
 
@@ -32,7 +31,7 @@ public class My_Repository implements IRepository {
     protected IDataSourceGetter      dsGetter = new DatasourceMySQLImplement();
 
     @Override
-    public ITable getTable(TableMeta meta, String groupNode, long requestID) throws TddlException {
+    public ITable getTable(TableMeta meta, String groupNode) throws TddlException {
 
         ITable table = tables.get(groupNode);
         if (table == null) {
@@ -108,7 +107,7 @@ public class My_Repository implements IRepository {
         this.config.setProperty(RepositoryConfig.IS_TRANSACTIONAL, "true");
         cfm = new CursorFactoryMyImpl();
 
-        cef = new CommandExecutorFactoryMyImp();
+        cef = new CommandHandlerFactoryMyImp();
 
     }
 
@@ -135,7 +134,7 @@ public class My_Repository implements IRepository {
     }
 
     @Override
-    public ITempTable createTempTable() {
+    public ITable getTempTable(TableMeta meta) throws TddlException {
         throw new UnsupportedOperationException("temp table is not supported by mysql repo");
     }
 }

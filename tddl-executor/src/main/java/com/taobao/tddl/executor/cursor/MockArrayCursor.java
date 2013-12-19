@@ -24,6 +24,7 @@ public class MockArrayCursor extends AbstractLifecycle implements Cursor {
     private String      tableName;
     List<ColumnMeta>    columns = new ArrayList();
     private IRowSet     current;
+    private boolean     closed  = false;
 
     public MockArrayCursor(String tableName){
         this.tableName = tableName;
@@ -101,6 +102,7 @@ public class MockArrayCursor extends AbstractLifecycle implements Cursor {
 
     @Override
     public List<TddlException> close(List<TddlException> exceptions) {
+        this.closed = true;
         if (exceptions == null) exceptions = new ArrayList();
         return exceptions;
     }
@@ -157,6 +159,10 @@ public class MockArrayCursor extends AbstractLifecycle implements Cursor {
     public void initMeta() {
         this.meta = CursorMetaImp.buildNew(columns);
 
+    }
+
+    public boolean isClosed() {
+        return this.closed;
     }
 
 }

@@ -8,9 +8,9 @@ import com.taobao.tddl.optimizer.config.table.TableMeta;
  */
 public abstract class AbstractTable implements ITable {
 
-    TableMeta  schema;
+    protected TableMeta   schema;
 
-    IRepository repo;
+    protected IRepository repo;
 
     public AbstractTable(TableMeta schema, IRepository repo){
         this.schema = schema;

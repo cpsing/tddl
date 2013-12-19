@@ -14,7 +14,7 @@ import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.executor.rowset.IRowSetWrapper;
+import com.taobao.tddl.executor.rowset.RowSetWrapper;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
@@ -77,10 +77,7 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
             }
             Integer index = cursormeta.getIndex(col.getTableName(), col.getColumnName());
             if (index == null) index = cursormeta.getIndex(col.getTableName(), col.getAlias());
-            // if (index == null) {
-            // throw new IllegalArgumentException("can't find index : "
-            // + col.getTableName() + "." + col.getColumnName());
-            // }
+
             if (index != null) {
                 indexes.add(index);
                 colMessages.add(cm);
@@ -145,7 +142,7 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
             return null;
         }
         initAliasSchema(retColumns, tableAlias, ir.getParentCursorMeta());
-        IRowSet ret = new IRowSetWrapper(newMeta, ir);
+        IRowSet ret = new RowSetWrapper(newMeta, ir);
         return ret;
     }
 
@@ -184,6 +181,7 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
 
     }
 
+    @Override
     public List<ColumnMeta> getReturnColumns() throws TddlException {
         if (this.returnColumnMetas != null) return this.returnColumnMetas;
 

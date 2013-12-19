@@ -13,3 +13,7 @@ temp
 bin/
 sqldump.txt
 sqldumpFile.txt
+bdbtmp/
+je.info.*
+*.lck
+*.jdb
