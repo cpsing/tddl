@@ -144,7 +144,6 @@ public class MySqlSelectVisitor extends EmptySQLASTVisitor {
                 whereFilter = mev.buildConstanctFilter(mev.getColumnOrValue());
             }
 
-            whereFilter = handleSubQuery(whereFilter, false);// 处理下子查询
             tableNode.query(whereFilter);
             this.tableNode.setAllWhereFilter(tableNode.getWhereFilter());
         } else {

@@ -1,8 +1,10 @@
 package com.taobao.tddl.optimizer.costbased.pusher;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.ASTNode;
@@ -11,11 +13,13 @@ import com.taobao.tddl.optimizer.core.ast.query.JoinNode;
 import com.taobao.tddl.optimizer.core.ast.query.MergeNode;
 import com.taobao.tddl.optimizer.core.ast.query.QueryNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
+import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinStrategy;
+import com.taobao.tddl.optimizer.exceptions.OptimizerException;
 
 /**
  * 将merge/join中的order by条件下推，包括隐式的order by条件，比如将groupBy转化为orderBy
@@ -23,6 +27,7 @@ import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinStrategy;
  * <pre>
  * a. 如果orderBy中包含function，也不做下推
  * b. 如果orderBy中的的column字段来自于子节点的函数查询，也不做下推
+ * c. 如果join是SortMergeJoin，会下推join列
  * 
  * 比如: tabl1.join(table2).on("table1.id=table2.id").orderBy("id")
  * 转化为：table.orderBy(id).join(table2).on("table1.id=table2.id")
@@ -86,9 +91,15 @@ public class OrderByPusher {
             if (containsDistinctColumns(merge)) {
                 for (ASTNode con : merge.getChildren()) {
                     QueryTreeNode child = (QueryTreeNode) con;
-                    // distinct group by同时存在时，要先安group by的列排序
-                    if (child.getGroupBys() != null && !child.getGroupBys().isEmpty()) {
-                        child.setOrderBys(child.getGroupBys());
+                    // 重新构建order by / group by字段
+                    if (!child.getGroupBys().isEmpty()) {
+                        List<IOrderBy> implicitOrderBys = child.getImplicitOrderBys();
+                        // 如果order by包含了所有的group by顺序
+                        if (containAllGroupBys(implicitOrderBys, child.getGroupBys())) {
+                            child.setOrderBys(implicitOrderBys);
+                        } else {
+                            child.setOrderBys(child.getGroupBys());
+                        }
                     }
 
                     // 将查询所有字段进行order by，保证每个child返回的数据顺序都是一致的
@@ -108,6 +119,7 @@ public class OrderByPusher {
                         }
                     }
 
+                    // 清空child的group by，由merge节点进行处理
                     child.setGroupBys(new ArrayList(0));
                 }
 
@@ -153,27 +165,97 @@ public class OrderByPusher {
         } else if (qtn instanceof JoinNode) {
             // index nested loop中的order by，可以推到左节点
             JoinNode join = (JoinNode) qtn;
-            if (join.getJoinStrategy() == JoinStrategy.INDEX_NEST_LOOP) {
-                List<IOrderBy> orders = getPushOrderBys(join, join.getLeftNode());
-                if (orders != null && !orders.isEmpty()) {
-                    for (IOrderBy order : orders) {
-                        if (join.getLeftNode().hasColumn(order.getColumn())) {
-                            join.getLeftNode().orderBy(order.getColumn(), order.getDirection());
-                        } else if (join.isUedForIndexJoinPK()) {
-                            // 尝试忽略下表名查找一下
-                            ISelectable newC = order.getColumn().copy().setTableName(null);
-                            if (join.getLeftNode().hasColumn(newC)) {
-                                join.getLeftNode().orderBy(order.getColumn(), order.getDirection());
+            if (join.getJoinStrategy() == JoinStrategy.INDEX_NEST_LOOP
+                || join.getJoinStrategy() == JoinStrategy.NEST_LOOP_JOIN) {
+                List<IOrderBy> orders = getPushOrderBys(join, join.getImplicitOrderBys(), join.getLeftNode());
+                pushJoinOrder(orders, join.getLeftNode(), join.isUedForIndexJoinPK());
+            } else if (join.getJoinStrategy() == JoinStrategy.SORT_MERGE_JOIN) {
+                // 如果是sort merge join中的order by，需要推到左/右节点
+                List<IOrderBy> implicitOrders = join.getImplicitOrderBys();
+                Map<ISelectable, IOrderBy> orderColumnsMap = new HashMap<ISelectable, IOrderBy>();
+                for (IOrderBy order : implicitOrders) {
+                    orderColumnsMap.put(order.getColumn(), order);
+                }
+
+                List<IOrderBy> leftJoinColumnOrderbys = new ArrayList<IOrderBy>();
+                List<IOrderBy> rightJoinColumnOrderbys = new ArrayList<IOrderBy>();
+                for (IBooleanFilter joinFilter : join.getJoinFilter()) {
+                    ISelectable column = (ISelectable) joinFilter.getColumn();
+                    ISelectable value = (ISelectable) joinFilter.getValue();
+                    if (!(column instanceof IColumn && value instanceof IColumn)) {
+                        throw new OptimizerException("join列出现函数列,下推函数orderby过于复杂,此时sort merge join无法支持");
+                    }
+
+                    // 复制下隐藏orderby的asc/desc
+                    boolean asc = true;
+                    IOrderBy o = orderColumnsMap.get(column);
+                    if (o != null) {
+                        asc = o.getDirection();
+                    }
+
+                    o = orderColumnsMap.get(value);
+                    if (o != null) {
+                        asc = o.getDirection();
+                    }
+
+                    leftJoinColumnOrderbys.add(ASTNodeFactory.getInstance()
+                        .createOrderBy()
+                        .setColumn(column)
+                        .setDirection(asc));
+                    rightJoinColumnOrderbys.add(ASTNodeFactory.getInstance()
+                        .createOrderBy()
+                        .setColumn(value)
+                        .setDirection(asc));
+                }
+                // 调整下join orderBys的顺序，尽可能和原始的order by顺序一致，这样可以有利于下推
+                adjustJoinColumnByImplicitOrders(leftJoinColumnOrderbys, rightJoinColumnOrderbys, implicitOrders);
+                // 先推join列，
+                // 如果join列推失败了，比如join列是函数列，这问题就蛋疼了，需要提前做判断
+                List<IOrderBy> leftOrders = getPushOrderBys(join, leftJoinColumnOrderbys, join.getLeftNode());
+                pushJoinOrder(leftOrders, join.getLeftNode(), join.isUedForIndexJoinPK());
+
+                List<IOrderBy> rightOrders = getPushOrderBys(join, rightJoinColumnOrderbys, join.getRightNode());
+                pushJoinOrder(rightOrders, join.getRightNode(), join.isUedForIndexJoinPK());
+                if (!implicitOrders.isEmpty()) {
+                    // group by + order by的隐藏列，如果和join列前缀相同，则下推，否则忽略
+                    leftOrders = getPushOrderBys(join, implicitOrders, join.getLeftNode());
+                    rightOrders = getPushOrderBys(join, implicitOrders, join.getRightNode());
+                    if (!leftOrders.isEmpty() || !rightOrders.isEmpty()) {
+                        pushJoinOrder(leftOrders, join.getLeftNode(), join.isUedForIndexJoinPK());
+                        pushJoinOrder(rightOrders, join.getRightNode(), join.isUedForIndexJoinPK());
+                    } else {
+                        // 尝试一下只推group by的排序，减少一层排序
+                        if (join.getGroupBys() != null && !join.getGroupBys().isEmpty()) {
+                            List<IOrderBy> leftImplicitOrders = getPushOrderBysCombileGroupAndJoinColumns(join.getGroupBys(),
+                                leftJoinColumnOrderbys);
+                            leftOrders = getPushOrderBys(join, leftImplicitOrders, join.getLeftNode());
+
+                            List<IOrderBy> rightImplicitOrders = getPushOrderBysCombileGroupAndJoinColumns(join.getGroupBys(),
+                                rightJoinColumnOrderbys);
+
+                            // 重置下group by的顺序
+                            if (!leftImplicitOrders.isEmpty()) {
+                                join.setGroupBys(leftImplicitOrders);
+                            } else if (!rightImplicitOrders.isEmpty()) {
+                                join.setGroupBys(rightImplicitOrders);
+                            }
+
+                            rightOrders = getPushOrderBys(join, rightImplicitOrders, join.getRightNode());
+                            if (!leftOrders.isEmpty() || !rightOrders.isEmpty()) {
+                                pushJoinOrder(leftOrders, join.getLeftNode(), join.isUedForIndexJoinPK());
+                                pushJoinOrder(rightOrders, join.getRightNode(), join.isUedForIndexJoinPK());
+
                             }
                         }
                     }
-                    join.getLeftNode().build();
                 }
             }
+
+            join.build();
         } else if (qtn instanceof QueryNode) {
             // 可以将order推到子查询
             QueryNode query = (QueryNode) qtn;
-            List<IOrderBy> orders = getPushOrderBys(query, query.getChild());
+            List<IOrderBy> orders = getPushOrderBys(query, query.getImplicitOrderBys(), query.getChild());
             if (orders != null && !orders.isEmpty()) {
                 for (IOrderBy order : orders) {
                     query.getChild().orderBy(order.getColumn(), order.getDirection());
@@ -222,6 +304,60 @@ public class OrderByPusher {
         return false;
     }
 
+    private static boolean containAllGroupBys(List<IOrderBy> orderBys, List<IOrderBy> groupBys) {
+        for (IOrderBy group : groupBys) {
+            boolean found = false;
+            for (IOrderBy order : orderBys) {
+                if (order.getColumn().equals(group.getColumn())) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * 调整join列，按照order by的顺序，有利于下推
+     */
+    private static void adjustJoinColumnByImplicitOrders(List<IOrderBy> leftJoinOrders, List<IOrderBy> rightJoinOrders,
+                                                         List<IOrderBy> implicitOrders) {
+        // 调整下join orderBys的顺序，尽可能和原始的order by顺序一致，这样可以有利于下推
+        for (int i = 0; i < implicitOrders.size(); i++) {
+            if (i >= leftJoinOrders.size()) {
+                return;
+            }
+            IOrderBy order = implicitOrders.get(i);
+            int leftIndex = findOrderByByColumn(leftJoinOrders, order.getColumn());
+            int rightIndex = findOrderByByColumn(rightJoinOrders, order.getColumn());
+
+            int index = -1;
+            if (leftIndex >= 0 && leftIndex != i) { // 判断位置是否相同
+                index = leftIndex;
+            } else if (rightIndex >= 0 && rightIndex != i) {
+                index = rightIndex;
+            }
+
+            if (index >= 0) {
+                // 交换位置一下
+                IOrderBy tmp = leftJoinOrders.get(i);
+                leftJoinOrders.set(i, leftJoinOrders.get(index));
+                leftJoinOrders.set(index, tmp);
+
+                tmp = rightJoinOrders.get(i);
+                rightJoinOrders.set(i, rightJoinOrders.get(index));
+                rightJoinOrders.set(index, tmp);
+            } else {
+                return;// join列中没有order by的字段，直接退出
+            }
+        }
+    }
+
     /**
      * 尝试对比父节点中的orderby和子节点的orderby顺序，如果前缀一致，则找出末尾的order by字段进行返回
      * 
@@ -252,9 +388,9 @@ public class OrderByPusher {
      * 返回空
      * </pre>
      */
-    private static List<IOrderBy> getPushOrderBys(QueryTreeNode qtn, QueryTreeNode child) {
+    private static List<IOrderBy> getPushOrderBys(QueryTreeNode qtn, List<IOrderBy> implicitOrderBys,
+                                                  QueryTreeNode child) {
         List<IOrderBy> newOrderBys = new LinkedList<IOrderBy>();
-        List<IOrderBy> implicitOrderBys = qtn.getImplicitOrderBys();
         List<IOrderBy> targetOrderBys = child.getOrderBys();
         if (implicitOrderBys == null || implicitOrderBys.size() == 0) {
             return new LinkedList<IOrderBy>();
@@ -287,5 +423,61 @@ public class OrderByPusher {
         }
 
         return newOrderBys;
+    }
+
+    /**
+     * 尝试组合group by和join列的排序字段，以join列顺序为准，重排groupBys顺序
+     */
+    private static List<IOrderBy> getPushOrderBysCombileGroupAndJoinColumns(List<IOrderBy> groups,
+                                                                            List<IOrderBy> joinOrders) {
+        List<IOrderBy> newOrderbys = new ArrayList<IOrderBy>();
+        for (IOrderBy joinOrder : joinOrders) {
+            if (findOrderByByColumn(groups, joinOrder.getColumn()) >= 0) {
+                newOrderbys.add(joinOrder);
+            } else {
+                return new ArrayList<IOrderBy>(); // 返回一般的顺序没用
+            }
+        }
+
+        for (IOrderBy group : groups) {
+            // 找到join column中没有的进行添加
+            if (findOrderByByColumn(newOrderbys, group.getColumn()) < 0) {
+                newOrderbys.add(group);
+            }
+        }
+
+        return newOrderbys;
+    }
+
+    /**
+     * 尝试查找一个同名的排序字段，返回下标，-1代表没找到
+     */
+    protected static int findOrderByByColumn(List<IOrderBy> orderbys, ISelectable column) {
+        for (int i = 0; i < orderbys.size(); i++) {
+            IOrderBy order = orderbys.get(i);
+            if (order.getColumn().equals(column)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private static void pushJoinOrder(List<IOrderBy> orders, QueryTreeNode qn, boolean isUedForIndexJoinPK) {
+        if (orders != null && !orders.isEmpty()) {
+            for (IOrderBy order : orders) {
+                if (qn.hasColumn(order.getColumn())) {
+                    qn.orderBy(order.getColumn(), order.getDirection());
+                } else if (isUedForIndexJoinPK) {
+                    // 尝试忽略下表名查找一下
+                    ISelectable newC = order.getColumn().copy().setTableName(null);
+                    if (qn.hasColumn(newC)) {
+                        qn.orderBy(order.getColumn(), order.getDirection());
+                    }
+                }
+            }
+
+            qn.build();
+        }
     }
 }

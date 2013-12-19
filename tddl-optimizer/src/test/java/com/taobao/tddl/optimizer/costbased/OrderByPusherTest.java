@@ -200,6 +200,156 @@ public class OrderByPusherTest extends BaseOptimizerTest {
     }
 
     @Test
+    public void test_orderby_SortMerge下推() {
+        TableNode table1 = new TableNode("TABLE1");
+        TableNode table2 = new TableNode("TABLE2");
+
+        JoinNode join = table1.join(table2).addJoinKeys("ID", "ID").addJoinKeys("NAME", "NAME");
+        join.setOuterJoin().setJoinStrategy(JoinStrategy.SORT_MERGE_JOIN);
+        join.select("TABLE1.ID AS ID , TABLE1.NAME AS NAME , TABLE1.SCHOOL AS SCHOOL");
+        join.groupBy("NAME").groupBy("SCHOOL").groupBy("ID"); // group by顺序可调整
+        join.orderBy("ID", false);
+        join.build();
+
+        OrderByPusher.optimize(join);
+        // 推出来的结果：
+        // 1. 按照join列先推，ID , NAME的排序
+        // 2. 按照order by + group by的推成功，最后排序结果为ID,NAME,SCHOOL
+        Assert.assertEquals("TABLE1.ID", join.getLeftNode().getOrderBys().get(0).getColumn().toString());
+        Assert.assertEquals(false, join.getLeftNode().getOrderBys().get(0).getDirection()); // 逆序
+        Assert.assertEquals("TABLE1.NAME", join.getLeftNode().getOrderBys().get(1).getColumn().toString());
+        Assert.assertEquals("TABLE1.SCHOOL", join.getLeftNode().getOrderBys().get(2).getColumn().toString());
+
+        Assert.assertEquals("TABLE2.ID", join.getRightNode().getOrderBys().get(0).getColumn().toString());
+        Assert.assertEquals(false, join.getRightNode().getOrderBys().get(0).getDirection()); // 逆序
+        Assert.assertEquals("TABLE2.NAME", join.getRightNode().getOrderBys().get(1).getColumn().toString());
+
+        Assert.assertEquals("TABLE1.ID as ID", join.getGroupBys().get(0).getColumn().toString());
+        Assert.assertEquals("TABLE1.NAME as NAME", join.getGroupBys().get(1).getColumn().toString());
+        Assert.assertEquals("TABLE1.SCHOOL as SCHOOL", join.getGroupBys().get(2).getColumn().toString());
+
+        Assert.assertEquals("TABLE1.ID as ID", join.getOrderBys().get(0).getColumn().toString());
+        Assert.assertEquals(false, join.getOrderBys().get(0).getDirection()); // 逆序
+    }
+
+    @Test
+    public void test_orderby_SortMerge下推_只推group() {
+        TableNode table1 = new TableNode("TABLE1");
+        TableNode table2 = new TableNode("TABLE2");
+
+        JoinNode join = table1.join(table2).addJoinKeys("ID", "ID").addJoinKeys("NAME", "NAME");
+        join.setOuterJoin().setJoinStrategy(JoinStrategy.SORT_MERGE_JOIN);
+        join.select("TABLE1.ID AS ID , TABLE1.NAME AS NAME , TABLE1.SCHOOL AS SCHOOL");
+        join.groupBy("NAME").groupBy("SCHOOL").groupBy("ID"); // group by顺序可调整
+        join.orderBy("SCHOOL", false);
+        join.build();
+
+        OrderByPusher.optimize(join);
+        // 推出来的结果：
+        // 1. 按照join列先推，ID , NAME的排序
+        // 2. 按照order by + group by的会推不成功，因为是按照school字段顺序
+        // 3. 按照group by单独推会成功
+        Assert.assertEquals("TABLE1.ID", join.getLeftNode().getOrderBys().get(0).getColumn().toString());
+        Assert.assertEquals("TABLE1.NAME", join.getLeftNode().getOrderBys().get(1).getColumn().toString());
+        Assert.assertEquals("TABLE1.SCHOOL", join.getLeftNode().getOrderBys().get(2).getColumn().toString());
+        Assert.assertEquals(false, join.getLeftNode().getOrderBys().get(2).getDirection()); // 逆序
+
+        Assert.assertEquals("TABLE2.ID", join.getRightNode().getOrderBys().get(0).getColumn().toString());
+        Assert.assertEquals("TABLE2.NAME", join.getRightNode().getOrderBys().get(1).getColumn().toString());
+
+        Assert.assertEquals("TABLE1.ID as ID", join.getGroupBys().get(0).getColumn().toString());
+        Assert.assertEquals("TABLE1.NAME as NAME", join.getGroupBys().get(1).getColumn().toString());
+        Assert.assertEquals("TABLE1.SCHOOL as SCHOOL", join.getGroupBys().get(2).getColumn().toString());
+
+        Assert.assertEquals("TABLE1.SCHOOL as SCHOOL", join.getOrderBys().get(0).getColumn().toString());
+        Assert.assertEquals(false, join.getOrderBys().get(0).getDirection()); // 逆序
+    }
+
+    @Test
+    public void test_orderby_SortMerge下推_调整join顺序() {
+        TableNode table1 = new TableNode("TABLE1");
+        TableNode table2 = new TableNode("TABLE2");
+
+        JoinNode join = table1.join(table2).addJoinKeys("ID", "ID").addJoinKeys("NAME", "NAME");
+        join.setOuterJoin().setJoinStrategy(JoinStrategy.SORT_MERGE_JOIN);
+        join.select("TABLE1.ID AS ID , TABLE1.NAME AS NAME , TABLE1.SCHOOL AS SCHOOL");
+        join.groupBy("NAME").groupBy("SCHOOL"); // group by顺序可调整
+        join.orderBy("NAME", false);
+        join.build();
+
+        OrderByPusher.optimize(join);
+        // 推出来的结果：
+        // 1. 按照join列先推，ID , NAME的排序
+        // 2. 按照order by + group by的会推不成功，因为是按照NAME+SCHOOL字段顺序
+        Assert.assertEquals("TABLE1.NAME", join.getLeftNode().getOrderBys().get(0).getColumn().toString());
+        Assert.assertEquals("TABLE1.ID", join.getLeftNode().getOrderBys().get(1).getColumn().toString());
+        Assert.assertEquals(false, join.getLeftNode().getOrderBys().get(0).getDirection()); // 逆序
+
+        Assert.assertEquals("TABLE2.NAME", join.getRightNode().getOrderBys().get(0).getColumn().toString());
+        Assert.assertEquals("TABLE2.ID", join.getRightNode().getOrderBys().get(1).getColumn().toString());
+        Assert.assertEquals(false, join.getRightNode().getOrderBys().get(0).getDirection()); // 逆序
+
+        Assert.assertEquals("TABLE1.NAME as NAME", join.getGroupBys().get(0).getColumn().toString());
+        Assert.assertEquals(false, join.getGroupBys().get(0).getDirection()); // 逆序
+        Assert.assertEquals("TABLE1.SCHOOL as SCHOOL", join.getGroupBys().get(1).getColumn().toString());
+
+        Assert.assertEquals("TABLE1.NAME as NAME", join.getOrderBys().get(0).getColumn().toString());
+        Assert.assertEquals(false, join.getOrderBys().get(0).getDirection()); // 逆序
+    }
+
+    @Test
+    public void test_orderby_SortMerge下推_多级结构下推() {
+        TableNode table1 = new TableNode("TABLE1");
+        TableNode table2 = new TableNode("TABLE2");
+
+        // 如果底层join的顺序不是ID,NAME的顺序，暂时没法推，要递归做最优，算法太复杂，先简单只考虑一层
+        JoinNode join = table1.join(table2).addJoinKeys("ID", "ID");
+        join.setJoinStrategy(JoinStrategy.SORT_MERGE_JOIN);
+        join.alias("S").select("TABLE1.ID AS AID , TABLE1.NAME AS ANAME , TABLE1.SCHOOL AS ASCHOOL");
+        join.build();
+
+        QueryNode queryA = new QueryNode(join);
+        queryA.alias("B");
+        queryA.select("S.AID AS BID,S.ANAME AS BNAME,S.ASCHOOL AS BSCHOOL");
+        queryA.build();
+
+        QueryNode queryB = queryA.deepCopy();
+        queryB.alias("C");
+        queryB.select("S.AID AS CID,S.ANAME AS CNAME,S.ASCHOOL AS CSCHOOL");
+        queryB.build();
+
+        JoinNode nextJoin = queryA.join(queryB).addJoinKeys("BID", "CID").addJoinKeys("BNAME", "CNAME");
+        nextJoin.setJoinStrategy(JoinStrategy.SORT_MERGE_JOIN);
+        nextJoin.select("C.CID AS ID , C.CNAME AS NAME , C.CSCHOOL AS SCHOOL");
+        // group by顺序可调整
+        nextJoin.groupBy("NAME").groupBy("SCHOOL").groupBy("ID");
+        nextJoin.orderBy("SCHOOL", false);
+        nextJoin.build();
+
+        OrderByPusher.optimize(nextJoin);
+        // 推导结果有点深，就不枚举了
+
+        // 左子树，ID , NAME
+        Assert.assertEquals(2, ((TableNode) queryA.getChild().getChildren().get(0)).getOrderBys().size());
+        // 只是id join列
+        Assert.assertEquals(1, ((TableNode) queryA.getChild().getChildren().get(1)).getOrderBys().size());
+        // ID , NAME
+        Assert.assertEquals(2, queryA.getOrderBys().size());
+
+        // 右子树，ID , NAME , SCHOOL
+        Assert.assertEquals(3, ((TableNode) queryB.getChild().getChildren().get(0)).getOrderBys().size());
+        // 只是id join列
+        Assert.assertEquals(1, ((TableNode) queryB.getChild().getChildren().get(1)).getOrderBys().size());
+        // ID , NAME , SCHOOL
+        Assert.assertEquals(3, queryB.getOrderBys().size());
+
+        // ID
+        Assert.assertEquals(1, nextJoin.getOrderBys().size());
+        // ID , NAME , SCHOOL
+        Assert.assertEquals(3, nextJoin.getGroupBys().size());
+    }
+
+    @Test
     public void test_merge的distinct下推() {
         TableNode table1 = new TableNode("TABLE1");
         TableNode table2 = new TableNode("TABLE2");

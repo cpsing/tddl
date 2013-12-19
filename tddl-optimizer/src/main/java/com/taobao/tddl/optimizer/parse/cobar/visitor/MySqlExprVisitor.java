@@ -2,6 +2,7 @@ package com.taobao.tddl.optimizer.parse.cobar.visitor;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
@@ -655,7 +656,9 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
             }
             filter.setValues(values);
         } else if (ex instanceof QueryExpression) {
-            throw new NotSupportException("not support inExpression with subquery");
+            MySqlExprVisitor v = new MySqlExprVisitor();
+            ex.accept(v);
+            filter.setValues(Arrays.asList((Comparable) v.getTableNode()));
         }
 
         this.filter = filter;
@@ -720,8 +723,6 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
                     throw new IllegalStateException("and has no other columns , " + ifilter);
                 }
             }
-        } else {
-            throw new NotSupportException("unknow ifilter in there " + ifilter);
         }
     }
 

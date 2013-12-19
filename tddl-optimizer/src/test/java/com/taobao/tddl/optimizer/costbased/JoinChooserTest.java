@@ -218,6 +218,54 @@ public class JoinChooserTest extends BaseOptimizerTest {
         // Assert.assertTrue(((TableNode) qn).isFullTableScan());
     }
 
+    @Test
+    public void test_JoinStrategy选择sortmerge_outterJoin() {
+        TableNode table1 = new TableNode("TABLE10");
+        TableNode table2 = new TableNode("TABLE11");
+        JoinNode join = table1.join(table2).setOuterJoin();
+        join.build();
+
+        QueryTreeNode qn = optimize(join, true, true, true);
+        Assert.assertEquals(JoinStrategy.SORT_MERGE_JOIN, ((JoinNode) qn).getJoinStrategy());
+    }
+
+    @Test
+    public void test_JoinStrategy选择sortmerge_右表存在group条件() {
+        TableNode table1 = new TableNode("TABLE1");
+        TableNode table2 = new TableNode("TABLE2");
+        JoinNode join = table1.join(table2).setLeftOuterJoin().addJoinKeys("ID", "ID").addJoinKeys("NAME", "NAME");
+        join.orderBy("TABLE2.ID");
+        join.groupBy("TABLE2.NAME").groupBy("TABLE2.ID").groupBy("TABLE2.SCHOOL");
+        join.build();
+
+        QueryTreeNode qn = optimize(join, true, true, true);
+        Assert.assertEquals(JoinStrategy.SORT_MERGE_JOIN, ((JoinNode) qn).getJoinStrategy());
+    }
+
+    @Test
+    public void test_JoinStrategy选择sortmerge_右表存在order条件() {
+        TableNode table1 = new TableNode("TABLE1");
+        TableNode table2 = new TableNode("TABLE2");
+        JoinNode join = table1.join(table2).setLeftOuterJoin().addJoinKeys("ID", "ID").addJoinKeys("NAME", "NAME");
+        join.orderBy("TABLE2.ID");
+        join.build();
+
+        QueryTreeNode qn = optimize(join, true, true, true);
+        Assert.assertEquals(JoinStrategy.SORT_MERGE_JOIN, ((JoinNode) qn).getJoinStrategy());
+    }
+
+    @Test
+    public void test_JoinStrategy不选择sortmerge_右表存在order条件() {
+        TableNode table1 = new TableNode("TABLE1");
+        TableNode table2 = new TableNode("TABLE2");
+        JoinNode join = table1.join(table2).setLeftOuterJoin().addJoinKeys("ID", "ID").addJoinKeys("NAME", "NAME");
+        join.orderBy("TABLE2.SCHOOL"); // join列的顺序没法推导
+        join.build();
+
+        QueryTreeNode qn = optimize(join, true, true, true);
+        Assert.assertEquals(JoinStrategy.INDEX_NEST_LOOP, ((JoinNode) qn).getJoinStrategy());
+    }
+
     private QueryTreeNode optimize(QueryTreeNode qtn, boolean chooseIndex, boolean chooseJoin, boolean chooseIndexMerge) {
         Map<String, Comparable> extraCmd = new HashMap<String, Comparable>();
         extraCmd.put(ExtraCmd.OptimizerExtraCmd.ChooseIndex, chooseIndex);
