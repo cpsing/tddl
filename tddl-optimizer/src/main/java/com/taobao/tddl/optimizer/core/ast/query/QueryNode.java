@@ -13,6 +13,7 @@ import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.build.QueryNodeBuilder;
 import com.taobao.tddl.optimizer.core.ast.build.QueryTreeNodeBuilder;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
+import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 import com.taobao.tddl.optimizer.exceptions.QueryException;
@@ -78,15 +79,12 @@ public class QueryNode extends QueryTreeNode {
     }
 
     public List getImplicitOrderBys() {
-        if (this.getOrderBys() != null && !this.getOrderBys().isEmpty()) {
-            return this.getOrderBys();
+        List<IOrderBy> orderByCombineWithGroupBy = getOrderByCombineWithGroupBy();
+        if (orderByCombineWithGroupBy != null) {
+            return orderByCombineWithGroupBy;
+        } else {
+            return this.getChild().getImplicitOrderBys();
         }
-
-        if (this.getGroupBys() != null && !this.getGroupBys().isEmpty()) {
-            return this.getGroupBys();
-        }
-
-        return this.getChild().getImplicitOrderBys();
     }
 
     public QueryTreeNodeBuilder getBuilder() {

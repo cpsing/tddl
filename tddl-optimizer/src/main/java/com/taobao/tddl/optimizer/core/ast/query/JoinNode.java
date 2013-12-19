@@ -38,13 +38,13 @@ public class JoinNode extends QueryTreeNode {
      * rightOuterJoin:
      *      leftOuter=false && rightOuter=true
      * innerJoin:
-     *      leftOuter=true && rightOuter=true 
+     *      leftOuter=false && rightOuter=false 
      * outerJoin:
-     *      leftOuter=false && rightOuter=false
+     *      leftOuter=true && rightOuter=true
      * </pre>
      */
-    private boolean              leftOuter             = true;
-    private boolean              rightOuter            = true;
+    private boolean              leftOuter             = false;
+    private boolean              rightOuter            = false;
 
     private boolean              isCrossJoin           = false;
     private boolean              usedForIndexJoinPK    = false;
@@ -142,12 +142,9 @@ public class JoinNode extends QueryTreeNode {
         if (this.getJoinStrategy() == JoinStrategy.INDEX_NEST_LOOP
             || this.getJoinStrategy() == JoinStrategy.NEST_LOOP_JOIN) {
             orders = this.getLeftNode().getImplicitOrderBys();
-        } else {
-            // sort merge的话，以join列为准
-            // 暂时以右边为准
-            for (ISelectable c : this.getRightKeys()) {
-                orders.add(ASTNodeFactory.getInstance().createOrderBy().setColumn(c));
-            }
+        } else if (this.getJoinStrategy() == JoinStrategy.SORT_MERGE_JOIN) {
+            // sort merge的话，返回空值，由上层来判断
+            return orders;
         }
 
         List<IOrderBy> implicitOrdersCandidate = orders;
@@ -342,20 +339,18 @@ public class JoinNode extends QueryTreeNode {
     public JoinNode setLeftOuterJoin() {
         this.leftOuter = true;
         this.rightOuter = false;
-
         return this;
     }
 
     public JoinNode setRightOuterJoin() {
         this.rightOuter = true;
         this.leftOuter = false;
-
         return this;
     }
 
     public JoinNode setInnerJoin() {
-        this.leftOuter = true;
-        this.rightOuter = true;
+        this.leftOuter = false;
+        this.rightOuter = false;
         return this;
     }
 
@@ -363,9 +358,8 @@ public class JoinNode extends QueryTreeNode {
      * 或者称为full join
      */
     public JoinNode setOuterJoin() {
-        this.leftOuter = false;
-        this.rightOuter = false;
-
+        this.leftOuter = true;
+        this.rightOuter = true;
         return this;
     }
 
@@ -386,11 +380,11 @@ public class JoinNode extends QueryTreeNode {
     }
 
     public boolean isInnerJoin() {
-        return (this.getLeftOuter()) && (this.getRightOuter());
+        return (!this.getLeftOuter()) && (!this.getRightOuter());
     }
 
     public boolean isOuterJoin() {
-        return (!this.getLeftOuter()) && (!this.getRightOuter());
+        return (this.getLeftOuter()) && (this.getRightOuter());
     }
 
     public boolean isNeedOptimizeJoinOrder() {
@@ -458,16 +452,16 @@ public class JoinNode extends QueryTreeNode {
         appendField(sb, "joinFilter:", this.getJoinFilter(), tabContent);
         appendField(sb, "otherJoinOnFilter:", this.getOtherJoinOnFilter(), tabContent);
 
-        if (this.leftOuter && this.rightOuter) {
+        if (this.isInnerJoin()) {
             appendField(sb, "type", "inner join", tabContent);
         }
-        if (!this.leftOuter && this.rightOuter) {
+        if (this.isRightOuterJoin()) {
             appendField(sb, "type", "right outter join", tabContent);
         }
-        if (this.leftOuter && !this.rightOuter) {
+        if (this.isLeftOuterJoin()) {
             appendField(sb, "type", "left outter join", tabContent);
         }
-        if (!this.leftOuter && !this.rightOuter) {
+        if (this.isOuterJoin()) {
             appendField(sb, "type", "outer join", tabContent);
         }
 

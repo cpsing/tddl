@@ -669,39 +669,48 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
     // ==================== helper method =================
 
     /**
-     * 如果order by中的列与group by中的都一样，且order by的列少于group by的列 则应将最后的group
-     * by的列补到order by中 <br/>
-     * 如：group by c1 c2 order by c1 等价于group by c1 c2 order by c1 c2<br/>
-     * 其他情况返回orderby列，不做任何修改
+     * <pre>
+     * distinct和group by的字段顺序打乱的计算结果是等价的，所以可以对此做一些优化
+     * 
+     * 1. order by和group by同时存在时，并且group by包含了order by所有的字段，调整groupBy的字段顺序符合order by的顺序，多余的字段并下推到order by
+     * 如: group by c1 c2 c3 order by c2 c1，可优化为：group by c2 c1 c3 order by c2 c1 c3，同时可将order by下推
+     * 2. 只存在group by，复制group by字段到order by
+     * </pre>
      */
-    protected List<IOrderBy> getOrderByCombineWithGroupBy() {
+    public List<IOrderBy> getOrderByCombineWithGroupBy() {
         // 如果用户没指定order by，则显示index的order by
         if (this.getOrderBys() != null && !this.getOrderBys().isEmpty()) {
             if (this.getGroupBys() != null && !this.getGroupBys().isEmpty()) {
-                if (this.getGroupBys().size() <= this.getOrderBys().size()) {
-                    return this.getOrderBys();
-                }
-
-                List<IOrderBy> orderByCombineWithGroupBy = new ArrayList();
-
-                for (int i = 0; i < this.getOrderBys().size(); i++) {
-                    if (this.getGroupBys().get(i).getColumn().equals(this.getOrderBys().get(i).getColumn())) {
-                        orderByCombineWithGroupBy.add(this.getOrderBys().get(i));
+                List<IOrderBy> newOrderBys = new ArrayList<IOrderBy>();
+                // 首先以order by的顺序，查找group by中对应的字段
+                for (IOrderBy orderBy : this.getOrderBys()) {
+                    if (findOrderByByColumn(this.getGroupBys(), orderBy.getColumn()) != null) {
+                        newOrderBys.add(orderBy.copy());
                     } else {
+                        if (newOrderBys.size() == this.getGroupBys().size()) {
+                            // 说明出现order by包含了整个group by
+                            this.setGroupBys(newOrderBys);// 将group by重置一下顺序
+                        }
+
+                        // group by中不包含order by字段
                         return this.getOrderBys();
                     }
                 }
 
-                for (int i = this.getOrderBys().size(); i < this.getGroupBys().size(); i++) {
-                    orderByCombineWithGroupBy.add(this.getGroupBys().get(i).copy());
+                for (IOrderBy groupBy : this.getGroupBys()) {
+                    if (findOrderByByColumn(newOrderBys, groupBy.getColumn()) == null) {
+                        // 添加下order by中没有的字段
+                        newOrderBys.add(groupBy.copy());
+                    }
                 }
 
-                return orderByCombineWithGroupBy;
+                this.setGroupBys(newOrderBys);// 将group by重置一下顺序
+                return newOrderBys;
             } else {
                 return this.getOrderBys();
             }
         } else {
-            // 没有orderby
+            // 没有orderby,复制group by
             if (this.getGroupBys() != null && !this.getGroupBys().isEmpty()) {
                 return OptimizerUtils.copyOrderBys(this.getGroupBys());
             }
@@ -709,6 +718,19 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
             return null;
         }
 
+    }
+
+    /**
+     * 尝试查找一个同名的排序字段
+     */
+    protected IOrderBy findOrderByByColumn(List<IOrderBy> orderbys, ISelectable column) {
+        for (IOrderBy order : orderbys) {
+            if (order.getColumn().equals(column)) {
+                return order;
+            }
+        }
+
+        return null;
     }
 
     /**

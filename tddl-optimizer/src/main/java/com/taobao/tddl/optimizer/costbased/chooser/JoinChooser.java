@@ -19,6 +19,7 @@ import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
+import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin.JoinStrategy;
 import com.taobao.tddl.optimizer.costbased.FilterSpliter;
@@ -220,7 +221,20 @@ public class JoinChooser {
             /**
              * <pre>
              * 如果内表是一个TableNode，或者是一个紧接着TableNode的QueryNode
-             * 先只考虑约束条件，而不考虑Join条件分以下两种大类情况：
+             * 考虑orderby条件和join类型
+             * 1. 如果是outter join
+             *      a. 存在order by
+             *          i. join列是一个orderBy列的子集，并且是一个前序匹配，选择SortMergeJoin
+             *          ii. 不满足条件i,需要做本地排序，按照join列, 选择SortMergeJoin
+             *      b. 不存在order by,存在group by
+             *          i. join列是一个orderBy列的子集，调整group by的顺序，选择SortMergeJoin
+             *          ii. 不满足条件i,需要做本地排序，按照join列, 选择SortMergeJoin
+             *      c.  不满足a和b时，选择SortMergeJoin，下推join列做为排序条件
+             * 2. left outter/right outter join
+             *      a. 对应的outter表上存在order by字段时，join列是一个orderBy列的子集，并且是一个前序匹配，选择SortMergeJoin
+             *      b. 对应的outter表上存在group by字段时，join列是一个orderBy列的子集，调整groupBy顺序，选择SortMergeJoin
+             * 
+             * 其余case考虑约束条件，而不考虑Join条件分以下两种大类情况：
              * 1.内表没有选定索引(约束条件里没有用到索引的列)
              *   1.1内表进行Join的列不存在索引
              *      策略：NestLoop，内表使用全表扫描
@@ -239,6 +253,18 @@ public class JoinChooser {
              *      或者枚举所有可能的情况，貌似也比较麻烦，暂时只采用方案二，实现简单一些。
              * </pre>
              */
+
+            if (((JoinNode) node).isOuterJoin()) {
+                // 几种分支都是选择sort merge join
+                // join列的处理会在JoinNode.getImplicitOrderBys()中进行
+                ((JoinNode) node).setJoinStrategy(JoinStrategy.SORT_MERGE_JOIN);
+                return node;
+            } else if (((JoinNode) node).isLeftOuterJoin() || ((JoinNode) node).isRightOuterJoin()) {
+                if (canChooseSortMerge((JoinNode) node)) {
+                    ((JoinNode) node).setJoinStrategy(JoinStrategy.SORT_MERGE_JOIN);
+                    return node;
+                }
+            }
 
             QueryTreeNode innerNode = ((JoinNode) node).getRightNode();
             if (innerNode instanceof TableNode) {
@@ -306,6 +332,43 @@ public class JoinChooser {
         } else {
             return node;
         }
+    }
+
+    /**
+     * <pre>
+     * 选择sort merge join的条件：
+     * 1. 存在orderby，orderby顺序包含所有join列或者join列包含所有orderby字段，一个前缀顺序匹配. (orderby必须按顺序匹配，join列可以无序)
+     * 2. 存在groupby, groupby中包含所有join列，或者join列包含所有groupby，(group by和join列都可以无序)
+     * </pre>
+     */
+    private static boolean canChooseSortMerge(JoinNode node) {
+        List<IOrderBy> orderBys = node.getImplicitOrderBys();
+        List<ISelectable> columns = node.isLeftOuterJoin() ? node.getRightKeys() : node.getLeftKeys();
+        // 先判断group，判断排序条件是否满足
+        if (!orderBys.isEmpty()) {
+            for (int i = 0; i < orderBys.size(); i++) {
+                IOrderBy order = orderBys.get(i);
+                if (i >= columns.size()) {
+                    return true; // 代表前缀匹配成功
+                }
+
+                boolean match = false;
+                for (ISelectable column : columns) {
+                    if (order.getColumn().equals(column)) {
+                        match = true;
+                        break;
+                    }
+                }
+
+                if (!match) {
+                    return false;
+                }
+            }
+
+            return true;// 走到这一步，代表匹配成功
+        }
+
+        return false; // 这种情况就用传统的模式
     }
 
     private static void buildTableFilter(TableNode tableNode) {

@@ -79,7 +79,6 @@
 		<module>tddl-executor</module>
 		<module>tddl-matrix</module>
 		<module>tddl-rule</module>
-		<module>tddl-security</module>
 		<module>tddl-monitor</module>
 		<module>tddl-sequence</module>
 		<module>tddl-sample</module>
