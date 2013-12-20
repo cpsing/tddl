@@ -48,8 +48,7 @@ public class TGroupDataSource implements DataSource {
     private String             dsKeyAndWeightCommaArray;
     private DataSourceFetcher  dataSourceFetcher;
     private DBType             dbType = DBType.MYSQL;
-
-    private Group              group  = null;
+    private Group              group  = new Group();
 
     public TGroupDataSource(){
     }
@@ -390,9 +389,7 @@ public class TGroupDataSource implements DataSource {
 
     }
 
-    public void setGroup(Group group)
-
-    {
+    public void setGroup(Group group) {
         this.group = group;
     }
 

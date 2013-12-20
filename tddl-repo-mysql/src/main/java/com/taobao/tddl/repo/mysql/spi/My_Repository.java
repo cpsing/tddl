@@ -123,7 +123,6 @@ public class My_Repository implements IRepository {
     public IGroupExecutor buildGroupExecutor(Group group) {
         TGroupDataSource groupDS = new TGroupDataSource(group.getName(), group.getAppName());
         groupDS.setGroup(group);
-
         groupDS.init();
 
         TddlGroupExecutor executor = new TddlGroupExecutor();

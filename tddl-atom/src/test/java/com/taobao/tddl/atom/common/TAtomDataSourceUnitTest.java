@@ -9,8 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.taobao.diamond.client.DiamondConfigure;
-import com.taobao.diamond.client.impl.DiamondClientFactory;
 import com.taobao.diamond.mockserver.MockServer;
 import com.taobao.tddl.atom.TAtomDataSource;
 import com.taobao.tddl.atom.config.TAtomConfParser;
@@ -19,14 +17,11 @@ import com.taobao.tddl.atom.exception.AtomAlreadyInitException;
 
 public class TAtomDataSourceUnitTest {
 
-    private volatile static DiamondConfigure configure = DiamondClientFactory.getSingletonDiamondSubscriber()
-                                                           .getDiamondConfigure();
-    static String                            TEST_SQL  = "select 1 from druid_0000";
+    static String TEST_SQL = "select 1 from druid_0000";
 
     @Before
     public void beforeClass() {
         MockServer.setUpMockServer();
-        configure.setPollingIntervalTime(1);
     }
 
     @After
@@ -282,7 +277,7 @@ public class TAtomDataSourceUnitTest {
         MockServer.setConfigInfo(TAtomConstants.getAppDataId(appName, dbKey), appStr);
         // 解析配置
         TAtomDsConfDO tAtomDsConfDO = TAtomConfParser.parserTAtomDsConfDO(globaStr, appStr);
-        Properties passwdProp = PropLoadTestUtil.loadPropFromFile("conf/" + configName + "/psswd.properties");
+        Properties passwdProp = PropLoadTestUtil.loadPropFromFile("conf/" + configName + "/passwd.properties");
         String passwdDataId = TAtomConstants.getPasswdDataId(tAtomDsConfDO.getDbName(),
             tAtomDsConfDO.getDbType(),
             tAtomDsConfDO.getUserName());
@@ -298,7 +293,7 @@ public class TAtomDataSourceUnitTest {
         Assert.assertTrue(result);
         MockServer.setConfigInfo(passwdDataId,
             PropLoadTestUtil.convertProp2Str(restore.doChange(PropLoadTestUtil.loadPropFromFile("conf/" + configName
-                                                                                                + "/psswd.properties"))));
+                                                                                                + "/passwd.properties"))));
         Thread.sleep(1200);
         // 期待结果正常
         actual = jtp.queryForInt(testSql);
@@ -313,7 +308,6 @@ public class TAtomDataSourceUnitTest {
         String dbKey = "unitTestDb-" + methodName;
         String configName = dbType;
         String testSql = TAtomDataSourceUnitTest.TEST_SQL;
-        ;
         TAtomDataSource tAtomDataSource = createTAtomDataSource(appName, dbKey, configName);
         JdbcTemplate jtp = new JdbcTemplate(tAtomDataSource);
         int actual = jtp.queryForInt(testSql);
@@ -362,7 +356,7 @@ public class TAtomDataSourceUnitTest {
         // 解析配置
         TAtomDsConfDO tAtomDsConfDO = TAtomConfParser.parserTAtomDsConfDO(globaStr, appStr);
         // 密码配置
-        String passwdStr = PropLoadTestUtil.loadPropFile2String("conf/" + configName + "/psswd.properties");
+        String passwdStr = PropLoadTestUtil.loadPropFile2String("conf/" + configName + "/passwd.properties");
         MockServer.setConfigInfo(TAtomConstants.getPasswdDataId(tAtomDsConfDO.getDbName(),
             tAtomDsConfDO.getDbType(),
             tAtomDsConfDO.getUserName()), passwdStr);

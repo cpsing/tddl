@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
@@ -16,6 +17,9 @@ import com.taobao.tddl.atom.TAtomDbStatusEnum;
 import com.taobao.tddl.atom.TAtomDbTypeEnum;
 import com.taobao.tddl.atom.config.TAtomDsConfDO;
 import com.taobao.tddl.atom.exception.AtomNotAvailableException;
+import com.taobao.tddl.atom.utils.ConnRestrictEntry;
+import com.taobao.tddl.atom.utils.ConnRestrictSlot;
+import com.taobao.tddl.atom.utils.ConnRestrictor;
 import com.taobao.tddl.atom.utils.CountPunisher;
 import com.taobao.tddl.atom.utils.SmoothValve;
 import com.taobao.tddl.atom.utils.TimesliceFlowControl;
@@ -25,6 +29,7 @@ import com.taobao.tddl.common.jdbc.sort.OracleExceptionSorter;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.monitor.Monitor;
 import com.taobao.tddl.monitor.SnapshotValuesOutputCallBack;
+import com.taobao.tddl.monitor.stat.AbstractStatLogWriter.LogCounter;
 import com.taobao.tddl.monitor.stat.StatLogWriter;
 import com.taobao.tddl.monitor.utils.NagiosUtils;
 
@@ -56,6 +61,15 @@ public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallB
     // final AtomicInteger readTimes = new AtomicInteger();//包权限
     final AtomicInteger                               readTimesReject            = new AtomicInteger();                        // 包权限
     volatile ConnectionProperties                     connectionProperties       = new ConnectionProperties();                 // 包权限
+
+    /**
+     * 应用连接限制
+     */
+    private ConnRestrictor                            connRestrictor;
+
+    // changyuan.lh: 并发连接数和阻塞等待的统计对象
+    private LogCounter                                statConnNumber;
+    private LogCounter                                statConnBlocking;
 
     // final private Timer timer = new Timer();
     // private volatile TimerTask timerTask = new TimerTaskC();
@@ -102,14 +116,14 @@ public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallB
         /**
          * 当前数据库的名字
          */
-        public volatile String           datasourceName;
+        public volatile String            datasourceName;
 
         // add by junyu,2012-4-17,日志统计使用
-        public volatile String           ip;
+        public volatile String            ip;
 
-        public volatile String           port;
+        public volatile String            port;
 
-        public volatile String           realDbName;
+        public volatile String            realDbName;
         /**
          * 写次数限制，0为不限制
          */
@@ -122,17 +136,17 @@ public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallB
         /**
          * 线程count限制，0为不限制
          */
-        public volatile int              threadCountRestriction;
+        public volatile int               threadCountRestriction;
 
         /**
          * 允许并发读的最大个数，0为不限制
          */
-        public volatile int              maxConcurrentReadRestrict;
+        public volatile int               maxConcurrentReadRestrict;
 
         /**
          * 允许并发写的最大个数，0为不限制
          */
-        public volatile int              maxConcurrentWriteRestrict;
+        public volatile int               maxConcurrentWriteRestrict;
     }
 
     public TDataSourceWrapper(DataSource targetDataSource, TAtomDsConfDO runTimeConf){
@@ -170,6 +184,23 @@ public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallB
 
         logger.warn("set maxConcurrentWriteRestrict " + runTimeConf.getMaxConcurrentWriteRestrict());
         this.connectionProperties.maxConcurrentWriteRestrict = runTimeConf.getMaxConcurrentWriteRestrict();
+    }
+
+    public void init() {
+        // changyuan.lh: 初始化连接分桶
+        final String datasourceKey = connectionProperties.datasourceName;
+        List<ConnRestrictEntry> connRestrictEntries = runTimeConf.getConnRestrictEntries();
+        if (connRestrictEntries != null) {
+            this.connRestrictor = new ConnRestrictor(datasourceKey, connRestrictEntries);
+        }
+        this.statConnNumber = Monitor.connStat(datasourceKey, "-", Monitor.KEY3_CONN_NUMBER);
+        this.statConnBlocking = Monitor.connStat(datasourceKey, "-", Monitor.KEY3_CONN_BLOCKING);
+
+        // timerTask = new TimerTaskC();
+        Monitor.addSnapshotValuesCallbask(this);
+        // Monitor.addGlobalConfigListener(globalConfigListener);
+        // timer.schedule(timerTask, 0,
+        // this.connectionProperties.timeSliceInMillis);
     }
 
     // 包权限，给下游对象调用
@@ -226,23 +257,55 @@ public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallB
                 // isNotAvailable = true;
                 valve.setNotAvailable();
             }
-            throw e;
+
+            throw new SQLException("get connection failed,dbKey is "
+                                   + (connectionProperties.datasourceName != null ? connectionProperties.datasourceName : this.runTimeConf.getDbName()),
+                e);
         }
     }
 
     private Connection getConnection0(String username, String password) throws SQLException {
+        final long callMillis = System.currentTimeMillis();
+        ConnRestrictSlot connRestrictSlot = null;
         TConnectionWrapper tconnectionWrapper;
         try {
             recordThreadCount();
-            tconnectionWrapper = new TConnectionWrapper(getConnectionByTargetDataSource(username, password), this);
+            if (connRestrictor != null) {
+                connRestrictSlot = connRestrictor.doRestrict(runTimeConf.getBlockingTimeout());
+            }
+
+            tconnectionWrapper = new TConnectionWrapper(getConnectionByTargetDataSource(username, password),
+                connRestrictSlot,
+                this);
         } catch (SQLException e) {
+            if (connRestrictSlot != null) {
+                connRestrictSlot.freeConnection();
+            }
             threadCount.decrementAndGet();
             throw e;
         } catch (RuntimeException e) {
+            if (connRestrictSlot != null) {
+                connRestrictSlot.freeConnection();
+            }
             threadCount.decrementAndGet();
             throw e;
+        } finally {
+            // changyuan.lh: 记录统计信息
+            final long connMillis = System.currentTimeMillis() - callMillis;
+            if (connRestrictSlot != null) {
+                connRestrictSlot.statConnection(connMillis);
+            }
+            addConnStat(connMillis);
         }
         return tconnectionWrapper;
+    }
+
+    /**
+     * changyuan.lh: 记录统计信息
+     */
+    private final void addConnStat(final long connMillis) {
+        statConnNumber.stat(1, threadCount.get());
+        statConnBlocking.stat(1, connMillis);
     }
 
     private Connection getConnectionByTargetDataSource(String username, String password) throws SQLException {

@@ -82,17 +82,12 @@ public class Weight {
             indexes = null;
         } else {
             weightStr = weightStr.trim().toUpperCase();
-
             // 如果字母'R'在weightStr中找不到，则读权重是0，
             // 如果字母'R'在weightStr中已找到了，但是在字母'R'后面没有数字，是读权重是10
             r = getUnitWeight(weightStr, 'R', weightPattern_r, 0, 10);
-
             w = getUnitWeight(weightStr, 'W', weightPattern_w, 0, 10);
-
             p = getUnitWeight(weightStr, 'P', weightPattern_p, 0, 0);
-
             q = getUnitWeight(weightStr, 'Q', weightPattern_q, 0, 0);
-
             indexes = getUnitWeights(weightStr, 'I', weightPattern_i);
 
         }
@@ -134,12 +129,5 @@ public class Weight {
             start = m.end();
         }
         return is;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(new Weight("wr0i1"));
-        System.out.println(new Weight("wr0i0I1"));
-        System.out.println(new Weight("i0w10I1r20"));
-        System.out.println(new Weight("i0w10I1r20i3"));
     }
 }

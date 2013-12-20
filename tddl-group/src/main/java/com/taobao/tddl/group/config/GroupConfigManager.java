@@ -28,8 +28,6 @@ import com.taobao.tddl.common.model.DBType;
 import com.taobao.tddl.common.model.DataSourceType;
 import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.common.utils.TStringUtil;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.common.utils.thread.NamedThreadFactory;
 import com.taobao.tddl.config.ConfigDataHandler;
 import com.taobao.tddl.config.ConfigDataHandlerFactory;
@@ -47,6 +45,9 @@ import com.taobao.tddl.group.jdbc.DataSourceFetcher;
 import com.taobao.tddl.group.jdbc.DataSourceWrapper;
 import com.taobao.tddl.group.jdbc.TGroupDataSource;
 import com.taobao.tddl.group.listener.DataSourceChangeListener;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * 一个ConfigManager对应一个TGroupDataSource，
@@ -157,11 +158,8 @@ public class GroupConfigManager {
 
     private TAtomDsStandard initAtomDataSource(String appName, String dsKey, String unitName) {
         try {
-
             if (tGroupDataSource.getDataSourceType().equals(DataSourceType.DruidDataSource)) {
-
                 Atom atom = null;
-
                 if (this.tGroupDataSource.getGroup() != null) {
                     atom = this.tGroupDataSource.getGroup().getAtom(dsKey);
                 }
@@ -178,7 +176,6 @@ public class GroupConfigManager {
                 atomDataSource.init(appName, dsKey, unitName);
                 atomDataSource.setLogWriter(tGroupDataSource.getLogWriter());
                 atomDataSource.setLoginTimeout(tGroupDataSource.getLoginTimeout());
-
                 return atomDataSource;
             } else {
                 throw new IllegalArgumentException("do not have this datasource type : "

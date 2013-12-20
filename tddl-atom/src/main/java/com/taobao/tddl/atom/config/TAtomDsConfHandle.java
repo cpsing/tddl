@@ -18,12 +18,14 @@ import com.taobao.tddl.atom.exception.AtomAlreadyInitException;
 import com.taobao.tddl.atom.exception.AtomIllegalException;
 import com.taobao.tddl.atom.exception.AtomInitialException;
 import com.taobao.tddl.atom.jdbc.TDataSourceWrapper;
+import com.taobao.tddl.atom.utils.ConnRestrictEntry;
 import com.taobao.tddl.common.model.Atom;
 import com.taobao.tddl.common.utils.TStringUtil;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.config.ConfigDataListener;
 import com.taobao.tddl.monitor.Monitor;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * 数据库动态切换的Handle类，所有数据库的动态切换 都是由这个类完成
@@ -187,7 +189,6 @@ public class TAtomDsConfHandle {
     }
 
     public Atom getAtom() {
-        // TODO Auto-generated method stub
         return this.atom;
     }
 
@@ -458,6 +459,10 @@ public class TAtomDsConfHandle {
                         }
                     } else {
                         boolean isNeedFlush = isAppChangeNeedFlush(TAtomDsConfHandle.this.runTimeConf, newConf);
+                        /**
+                         * 阀值变化无需刷新持有的数据源，只要更新runTimeConf，并且清空wrapDataSource
+                         */
+                        boolean isRestrictChange = isRestrictChange(TAtomDsConfHandle.this.runTimeConf, newConf);
 
                         if (isNeedFlush) {
                             try {
@@ -485,7 +490,7 @@ public class TAtomDsConfHandle {
                                 logger.error("[TDDL DRUID] flush DataSource Error ! dataId:" + dataId + ",data:"
                                              + appConfStr, e);
                             }
-                        } else {
+                        } else if (isRestrictChange) {
                             TAtomDsConfHandle.this.runTimeConf = newConf;
                             clearDataSourceWrapper();
                         }
@@ -557,6 +562,33 @@ public class TAtomDsConfHandle {
                     return true;
                 }
 
+                return false;
+            }
+
+            private boolean isRestrictChange(TAtomDsConfDO runConf, TAtomDsConfDO newConf) {
+                if (runConf.getReadRestrictTimes() != newConf.getReadRestrictTimes()) {
+                    return true;
+                }
+
+                if (runConf.getWriteRestrictTimes() != newConf.getWriteRestrictTimes()) {
+                    return true;
+                }
+
+                if (runConf.getThreadCountRestrict() != newConf.getThreadCountRestrict()) {
+                    return true;
+                }
+
+                if (runConf.getTimeSliceInMillis() != newConf.getTimeSliceInMillis()) {
+                    return true;
+                }
+
+                List<ConnRestrictEntry> runEntries = runConf.getConnRestrictEntries();
+                List<ConnRestrictEntry> newEntries = newConf.getConnRestrictEntries();
+                if (runEntries != newEntries) {
+                    if (runEntries == null || newEntries == null || !newEntries.equals(runEntries)) {
+                        return true;
+                    }
+                }
                 return false;
             }
         });
@@ -789,6 +821,7 @@ public class TAtomDsConfHandle {
                 tDataSourceWrapper.setDatasourceRealDbName(runTimeConf.getDbName());
                 tDataSourceWrapper.setDbStatus(getStatus());
                 logger.warn("set datasource key: " + dbKey);
+                tDataSourceWrapper.init();
                 wrapDataSource = tDataSourceWrapper;
 
                 return wrapDataSource;

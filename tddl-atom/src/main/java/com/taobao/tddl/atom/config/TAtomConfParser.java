@@ -2,12 +2,16 @@ package com.taobao.tddl.atom.config;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import com.taobao.tddl.atom.securety.impl.PasswordCoder;
+import com.taobao.tddl.atom.utils.ConnRestrictEntry;
 import com.taobao.tddl.common.utils.TStringUtil;
+
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
@@ -51,6 +55,11 @@ public class TAtomConfParser {
     public static final String APP_THREAD_COUNT_RESTRICT             = "threadCountRestrict";
 
     public static final String APP_TIME_SLICE_IN_MILLS               = "timeSliceInMillis";
+
+    /**
+     * 应用连接限制: 限制某个应用键值的并发连接数。
+     */
+    public static final String APP_CONN_RESTRICT                     = "connRestrict";
 
     public static TAtomDsConfDO parserTAtomDsConfDO(String globaConfStr, String appConfStr) {
         TAtomDsConfDO pasObj = new TAtomDsConfDO();
@@ -139,6 +148,14 @@ public class TAtomConfParser {
                         pasObj.setDriverClass(driverClass);
                     }
                 }
+
+                // 解析应用连接限制, 参看下面的文档
+                String connRestrictStr = TStringUtil.trim(appProp.getProperty(TAtomConfParser.APP_CONN_RESTRICT));
+                List<ConnRestrictEntry> connRestrictEntries = parseConnRestrictEntries(connRestrictStr,
+                    pasObj.getMaxPoolSize());
+                if (null != connRestrictEntries && !connRestrictEntries.isEmpty()) {
+                    pasObj.setConnRestrictEntries(connRestrictEntries);
+                }
             }
         }
         return pasObj;
@@ -195,5 +212,70 @@ public class TAtomConfParser {
             }
         }
         return prop;
+    }
+
+    /**
+     * HASH 策略的最大槽数量限制。
+     */
+    public static final int MAX_HASH_RESTRICT_SLOT = 32;
+
+    /**
+     * 解析应用连接限制, 完整格式是:
+     * "K1,K2,K3,K4:80%; K5,K6,K7,K8:80%; K9,K10,K11,K12:80%; *:16,80%; ~:80%;"
+     * 这样可以兼容 HASH: "*:16,80%", 也可以兼容 LIST:
+     * "K1:80%; K2:80%; K3:80%; K4:80%; ~:80%;" 配置可以是连接数, 也可以是百分比。
+     */
+    public static List<ConnRestrictEntry> parseConnRestrictEntries(String connRestrictStr, int maxPoolSize) {
+        List<ConnRestrictEntry> connRestrictEntries = null;
+        if (TStringUtil.isNotBlank(connRestrictStr)) {
+            // Split "K1:number1; K2:number2; ...; *:count,number3; ~:number4"
+            String[] entries = TStringUtil.split(connRestrictStr, ";");
+            if (null != entries && entries.length > 0) {
+                HashMap<String, String> existKeys = new HashMap<String, String>();
+                connRestrictEntries = new ArrayList<ConnRestrictEntry>(entries.length);
+                for (String entry : entries) {
+                    // Parse "K1,K2,K3:number | *:count,number | ~:number"
+                    int find = entry.indexOf(':');
+                    if (find >= 1 && find < (entry.length() - 1)) {
+                        String key = entry.substring(0, find).trim();
+                        String value = entry.substring(find + 1).trim();
+                        // "K1,K2,K3:number | *:count,number | ~:number"
+                        ConnRestrictEntry connRestrictEntry = ConnRestrictEntry.parseEntry(key, value, maxPoolSize);
+                        if (connRestrictEntry == null) {
+                            logger.error("[connRestrict Error] parse entry error: " + entry);
+                        } else {
+                            // Remark entry config problem
+                            if (0 >= connRestrictEntry.getLimits()) {
+                                logger.error("[connRestrict Error] connection limit is 0: " + entry);
+                                connRestrictEntry.setLimits(/* 至少允许一个连接 */1);
+                            }
+                            if (ConnRestrictEntry.MAX_HASH_RESTRICT_SLOT < connRestrictEntry.getHashSize()) {
+                                logger.error("[connRestrict Error] hash size exceed maximum: " + entry);
+                                connRestrictEntry.setHashSize(ConnRestrictEntry.MAX_HASH_RESTRICT_SLOT);
+                            }
+                            // Remark Key config confliction
+                            for (String slotKey : connRestrictEntry.getKeys()) {
+                                if (!existKeys.containsKey(slotKey)) {
+                                    existKeys.put(slotKey, entry);
+                                } else if (ConnRestrictEntry.isWildcard(slotKey)) {
+                                    logger.error("[connRestrict Error] hash config [" + entry + "] conflict with ["
+                                                 + existKeys.get(slotKey) + "]");
+                                } else if (ConnRestrictEntry.isNullKey(slotKey)) {
+                                    logger.error("[connRestrict Error] null-key config [" + entry + "] conflict with ["
+                                                 + existKeys.get(slotKey) + "]");
+                                } else {
+                                    logger.error("[connRestrict Error] " + slotKey + " config [" + entry
+                                                 + "] conflict with [" + existKeys.get(slotKey) + "]");
+                                }
+                            }
+                            connRestrictEntries.add(connRestrictEntry);
+                        }
+                    } else {
+                        logger.error("[connRestrict Error] unknown entry: " + entry);
+                    }
+                }
+            }
+        }
+        return connRestrictEntries;
     }
 }
