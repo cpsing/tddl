@@ -29,7 +29,11 @@ public class MergeNode extends QueryTreeNode {
     }
 
     public void build() {
-        this.builder.build();
+        if (this.isNeedBuild()) {
+            this.builder.build();
+        }
+
+        setNeedBuild(false);
     }
 
     public MergeNode merge(ASTNode o) {

@@ -189,9 +189,10 @@ public class FilterPusher {
         }
 
         // 对于 or连接的条件，就不能下推了
-        IFilter filterInOtherJoin = qtn.getOtherJoinOnFilter();
+        IFilter filterInOtherJoin = (IFilter) qtn.getOtherJoinOnFilter();
         if (filterInOtherJoin != null && FilterUtils.isCNFNode(filterInOtherJoin)) {
-            List<IFilter> DNFNode = FilterUtils.toDNFNode(filterInOtherJoin);
+            // 需要复制，下推到子节点后，会改变column/value的tableName
+            List<IFilter> DNFNode = FilterUtils.toDNFNode((IFilter) filterInOtherJoin.copy());
             if (DNFNodeToPush == null) {
                 DNFNodeToPush = new ArrayList<IFilter>();
             }

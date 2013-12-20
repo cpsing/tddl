@@ -1045,6 +1045,14 @@ public class SqlParserTest extends BaseOptimizerTest {
         Assert.assertTrue(((QueryNode) ((JoinNode) qn).getRightNode()).getChild() instanceof JoinNode);
     }
 
+    @Test
+    public void testQuery_多字段in() throws SqlParserException, QueryException {
+        String sql = "SELECT * FROM TABLE1 WHERE (ID,NAME) IN ((1,2),(2,3))";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+        System.out.println(qn);
+    }
+
     public void testQuery_join_子查询_in模式() throws SqlParserException, QueryException {
         String sql = "SELECT * FROM TABLE1 WHERE ID IN (SELECT ID FROM TABLE2)";
         QueryTreeNode qn = query(sql);

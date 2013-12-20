@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.query.KVIndexNode;
-import com.taobao.tddl.optimizer.core.ast.query.QueryNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
@@ -61,20 +60,32 @@ public abstract class QueryTreeNodeBuilder {
         if (filter == null) {
             return;
         }
+
         if (filter.getColumn() instanceof ISelectable) {
             filter.setColumn(this.buildSelectable((ISelectable) filter.getColumn(), findInSelectList));
         }
 
-        if (filter.getValue() instanceof ISelectable) {
-            filter.setValue(this.buildSelectable((ISelectable) filter.getValue(), findInSelectList));
-        } else if (filter.getValue() instanceof TableNode) {
+        if (filter.getColumn() instanceof QueryTreeNode) {
             // subQuery，比如WHERE ID = (SELECT ID FROM A)
-            ((TableNode) filter.getValue()).build();
-        } else if (filter.getValue() instanceof QueryNode) {
-            // 两层subQuery，比如WHERE ID = (SELECT * FROM (SELECT ID FROM A) B)
-            ((QueryNode) filter.getValue()).build();
+            ((QueryTreeNode) filter.getColumn()).build();
         }
 
+        if (filter.getValue() instanceof ISelectable) {
+            filter.setValue(this.buildSelectable((ISelectable) filter.getValue(), findInSelectList));
+        }
+
+        if (filter.getValue() instanceof QueryTreeNode) {
+            // subQuery，比如WHERE ID = (SELECT ID FROM A)
+            ((QueryTreeNode) filter.getValue()).build();
+        }
+
+        if (filter.getOperation() == OPERATION.IN) {
+            List<Comparable> values = filter.getValues();
+            if (values != null && !values.isEmpty() && values.get(0) instanceof QueryTreeNode) {
+                // in的子查询
+                ((QueryTreeNode) values.get(0)).build();
+            }
+        }
     }
 
     public ISelectable buildSelectable(ISelectable c) {
@@ -291,7 +302,8 @@ public abstract class QueryTreeNodeBuilder {
             if (isThis) {
                 if (res != null) {
                     // 说明出现两个ID，需要明确指定TABLE
-                    throw new IllegalArgumentException("column: '" + c.getFullName() + "' is ambiguous");
+                    throw new IllegalArgumentException("column: '" + c.getFullName() + "' is ambiguous by exist ["
+                                                       + selected.getFullName() + "," + res.getFullName() + "]");
                 }
                 res = selected;
             }
@@ -299,4 +311,5 @@ public abstract class QueryTreeNodeBuilder {
 
         return res;
     }
+
 }

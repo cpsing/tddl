@@ -21,12 +21,8 @@ import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.query.QueryNode;
-import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
-import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-import com.taobao.tddl.optimizer.core.expression.bean.LogicalFilter;
-import com.taobao.tddl.optimizer.exceptions.OptimizerException;
 
 /**
  * select表达式的解析
@@ -207,63 +203,4 @@ public class MySqlSelectVisitor extends EmptySQLASTVisitor {
         }
     }
 
-    private IFilter handleSubQuery(IFilter filter, boolean existOr) {
-        if (filter instanceof IBooleanFilter) {
-            Comparable column = ((IBooleanFilter) filter).getColumn();
-            Comparable value = ((IBooleanFilter) filter).getValue();
-            boolean columnIsSubQuery = (column != null && column instanceof QueryTreeNode);
-            boolean valueIsSubQuery = (value != null && value instanceof QueryTreeNode);
-            if (columnIsSubQuery && valueIsSubQuery) {
-                throw new OptimizerException("条件左右两边都是子查询,暂时不支持...");
-            } else if (columnIsSubQuery || valueIsSubQuery) {
-                if (existOr) {
-                    throw new OptimizerException("出现子查询条件时,不支持和另一个条件的OR关系");
-                }
-
-                QueryTreeNode query = (QueryTreeNode) (columnIsSubQuery ? column : value);
-                Comparable c = columnIsSubQuery ? value : column;
-                if (!(c instanceof ISelectable)) {
-                    throw new OptimizerException("不支持常量和子查询组合的条件");
-                }
-
-                ISelectable leftColumn = (ISelectable) c;
-                // 出现子查询
-                if (filter.getOperation() == OPERATION.EQ || filter.getOperation() == OPERATION.IN) {
-                    query.build();// 生成select字段列表,好做判断
-                    if (query.getColumnsSelected().size() > 1) {
-                        throw new OptimizerException("条件子查询只能返回一个字段");
-                    }
-
-                    ISelectable rightColumn = query.getColumnsSelected().get(0);
-                    tableNode = tableNode.join(query).addJoinKeys(leftColumn, rightColumn);
-                    if (filter.getOperation() == OPERATION.IN && filter.isNot()) {
-                        // not in的语法
-                        // http://dev.mysql.com/doc/refman/5.6/en/rewriting-subqueries.html
-                        IBooleanFilter f = ASTNodeFactory.getInstance().createBooleanFilter();
-                        f.setOperation(OPERATION.IS_NULL);
-                        f.setColumn(rightColumn);
-                        return f;
-                    }
-
-                    IBooleanFilter f = ASTNodeFactory.getInstance().createBooleanFilter();
-                    f.setOperation(OPERATION.CONSTANT);
-                    f.setColumn("1");
-                    return f;
-                } else {
-                    throw new OptimizerException("条件子查询,暂时不支持操作符:" + filter.getOperation().getOPERATIONString());
-                }
-            }
-        } else if (filter instanceof LogicalFilter) {
-            LogicalFilter logical = (LogicalFilter) filter;
-            if (filter.getOperation().equals(OPERATION.OR)) {
-                existOr = true;
-            }
-
-            for (int i = 0; i < logical.getSubFilter().size(); i++) {
-                logical.getSubFilter().set(i, handleSubQuery(logical.getSubFilter().get(i), existOr));
-            }
-        }
-
-        return filter;
-    }
 }

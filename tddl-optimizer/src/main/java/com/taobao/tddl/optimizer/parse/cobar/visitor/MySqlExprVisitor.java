@@ -51,6 +51,7 @@ import com.alibaba.cobar.parser.ast.expression.primary.ExistsPrimary;
 import com.alibaba.cobar.parser.ast.expression.primary.Identifier;
 import com.alibaba.cobar.parser.ast.expression.primary.MatchExpression;
 import com.alibaba.cobar.parser.ast.expression.primary.ParamMarker;
+import com.alibaba.cobar.parser.ast.expression.primary.RowExpression;
 import com.alibaba.cobar.parser.ast.expression.primary.function.FunctionExpression;
 import com.alibaba.cobar.parser.ast.expression.primary.function.groupby.Avg;
 import com.alibaba.cobar.parser.ast.expression.primary.function.groupby.Count;
@@ -278,6 +279,21 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
             ifunc.setArgs(new ArrayList());
         }
 
+        ifunc.setColumnName(getSqlExprStr(node));
+        columnOrValue = ifunc;
+    }
+
+    public void visit(RowExpression node) {
+        IFunction ifunc = ASTNodeFactory.getInstance().createFunction();
+        ifunc.setFunctionName("ROW");
+        List<Comparable> args = new ArrayList<Comparable>();
+        for (int i = 0; i < node.getRowExprList().size(); i++) {
+            MySqlExprVisitor mv = new MySqlExprVisitor();
+            node.getRowExprList().get(i).accept(mv);
+            Object obj = mv.getColumnOrValue();
+            args.add((Comparable) obj);
+        }
+        ifunc.setArgs(args);
         ifunc.setColumnName(getSqlExprStr(node));
         columnOrValue = ifunc;
     }
@@ -656,7 +672,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
             }
             filter.setValues(values);
         } else if (ex instanceof QueryExpression) {
-            MySqlExprVisitor v = new MySqlExprVisitor();
+            MySqlSelectVisitor v = new MySqlSelectVisitor();
             ex.accept(v);
             filter.setValues(Arrays.asList((Comparable) v.getTableNode()));
         }

@@ -216,7 +216,7 @@ public class JoinNodeBuilder extends QueryTreeNodeBuilder {
         boolean isLeft = left.hasColumn(c);
         boolean isRight = right.hasColumn(c);
         if (isLeft && isRight) {
-            throw new IllegalArgumentException("Column '" + c.getColumnName() + "' is ambiguous");
+            throw new IllegalArgumentException("Column '" + c.getColumnName() + "' is ambiguous in JoinNode");
         }
 
         if (isLeft) {// 可能在select/from中

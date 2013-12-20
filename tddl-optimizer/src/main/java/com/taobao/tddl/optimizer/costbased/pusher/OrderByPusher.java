@@ -244,7 +244,6 @@ public class OrderByPusher {
                             if (!leftOrders.isEmpty() || !rightOrders.isEmpty()) {
                                 pushJoinOrder(leftOrders, join.getLeftNode(), join.isUedForIndexJoinPK());
                                 pushJoinOrder(rightOrders, join.getRightNode(), join.isUedForIndexJoinPK());
-
                             }
                         }
                     }

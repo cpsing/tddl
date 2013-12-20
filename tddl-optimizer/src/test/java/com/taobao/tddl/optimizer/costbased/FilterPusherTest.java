@@ -155,7 +155,7 @@ public class FilterPusherTest extends BaseOptimizerTest {
         join.build();
 
         JoinNode nextJoin = join.join(table3);
-        nextJoin.query("NAME = 6 AND ID = TABLE3.ID");
+        nextJoin.query("TABLE1.NAME = 6 AND TABLE1.ID = TABLE3.ID");
         nextJoin.build();
         FilterPusher.optimize(nextJoin);
 

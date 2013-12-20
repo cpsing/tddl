@@ -275,6 +275,9 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
 
     private QueryTreeNode optimizeQuery(QueryTreeNode qn, Map<String, Comparable> extraCmd) throws QueryException {
 
+        // / 预先处理子查询
+        qn = SubQueryPreProcessor.optimize(qn);
+
         qn = JoinPreProcessor.optimize(qn);
 
         // 预处理filter，比如过滤永假式/永真式

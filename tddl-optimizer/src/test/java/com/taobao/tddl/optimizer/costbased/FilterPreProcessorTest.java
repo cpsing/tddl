@@ -83,10 +83,10 @@ public class FilterPreProcessorTest extends BaseOptimizerTest {
     @Test
     public void test_列调整_函数() {
         TableNode table = new TableNode("TABLE1");
-        table.query("2 = ID+1 AND 'HELLO'= HEX(NAME)");
+        table.query("2 = ID+1");
         table.build();
         FilterPreProcessor.optimize(table);
-        Assert.assertEquals(table.getWhereFilter().toString(), "(ID + 1 = 2 AND HEX(NAME) = HELLO)");
+        Assert.assertEquals(table.getWhereFilter().toString(), "ID + 1 = 2");
     }
 
     @Test

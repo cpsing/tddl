@@ -295,16 +295,20 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
             return c;
         }
 
-        ISelectable s = this.getColumnFromOtherNode(c, child);
-        if (s == null) {
-            // 下推select
-            for (int i = 0; i < this.getNode().getChildren().size(); i++) {
-                QueryTreeNode sub = (QueryTreeNode) this.getNode().getChildren().get(i);
-                sub.addColumnsSelected(c.copy());
+        if (child.hasColumn(c)) {
+            ISelectable s = this.getColumnFromOtherNode(c, child);
+            if (s == null) {
+                // 下推select
+                for (int i = 0; i < this.getNode().getChildren().size(); i++) {
+                    QueryTreeNode sub = (QueryTreeNode) this.getNode().getChildren().get(i);
+                    sub.addColumnsSelected(c.copy());
+                }
+                s = this.getColumnFromOtherNode(c, child);
             }
-            s = this.getColumnFromOtherNode(c, child);
+            return s;
+        } else {
+            return null;
         }
-        return s;
     }
 
 }

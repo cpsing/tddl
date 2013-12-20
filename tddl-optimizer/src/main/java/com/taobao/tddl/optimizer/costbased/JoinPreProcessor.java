@@ -14,6 +14,11 @@ import com.taobao.tddl.optimizer.exceptions.QueryException;
  * 比如 A right join B on A.id = B.id
  * 转化为 B left join B on A.id = B.id
  * 
+ * 2. 尝试将子查询调整为join
+ * 
+ * 比如 select * from table1 where table1.id = (select id from table2) 
+ * 转化为 selct table1.* from table1 join table2 on (table1.id = table2.id)
+ * 
  * </pre>
  */
 public class JoinPreProcessor {
@@ -37,7 +42,6 @@ public class JoinPreProcessor {
         }
 
         if (qtn instanceof JoinNode && ((JoinNode) qtn).isRightOuterJoin()) {
-
             /**
              * 如果带有其他非column=column条件，不能做这种转换，否则语义改变
              */
@@ -52,4 +56,5 @@ public class JoinPreProcessor {
 
         return qtn;
     }
+
 }

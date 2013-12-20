@@ -85,6 +85,12 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
     protected IFilter           havingFilter;
 
     /**
+     * 上一层父节点，比如子查询会依赖父节点的字段信息
+     * http://dev.mysql.com/doc/refman/5.0/en/correlated-subqueries.html
+     */
+    protected ASTNode           parent          = null;
+
+    /**
      * join的子节点
      */
     protected List<ASTNode>     children        = new ArrayList<ASTNode>(2);
@@ -322,6 +328,11 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
 
     public void addChild(ASTNode childNode) {
         this.children.add(childNode);
+    }
+
+    public QueryTreeNode parent(QueryTreeNode qtn) {
+        this.parent = qtn;
+        return this;
     }
 
     public List<ISelectable> getColumnsSelected() {
