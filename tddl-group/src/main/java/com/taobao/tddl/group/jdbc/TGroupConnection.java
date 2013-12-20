@@ -15,6 +15,7 @@ import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
+import java.sql.Wrapper;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -23,19 +24,20 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import com.alibaba.druid.pool.DruidPooledConnection;
-import com.mysql.jdbc.ConnectionImpl;
+import org.apache.commons.lang.reflect.MethodUtils;
+
 import com.taobao.tddl.atom.jdbc.TConnectionWrapper;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.jdbc.TExceptionUtils;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.group.config.GroupIndex;
 import com.taobao.tddl.group.dbselector.DBSelector;
 import com.taobao.tddl.group.dbselector.DBSelector.AbstractDataSourceTryer;
 import com.taobao.tddl.group.dbselector.DBSelector.DataSourceTryer;
 import com.taobao.tddl.group.hint.GroupHintParser;
 import com.taobao.tddl.monitor.unit.UnitDeployProtect;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * 相关的JDBC规范： 1.
@@ -682,20 +684,25 @@ public class TGroupConnection implements Connection {
 
         try {
             Connection atomConnection = this.rBaseConnection;
-
-            if (atomConnection == null) atomConnection = this.wBaseConnection;
+            if (atomConnection == null) {
+                atomConnection = this.wBaseConnection;
+            }
 
             /**
              * 这个连接上没做过查询，不会创建真正连接的
              */
-            if (atomConnection == null) return -1;
+            if (atomConnection == null) {
+                return -1;
+            }
             TConnectionWrapper conn = (TConnectionWrapper) atomConnection;
-
-            DruidPooledConnection druidConnection = (DruidPooledConnection) conn.getTargetConnection();
-
-            ConnectionImpl mysqlConn = (ConnectionImpl) druidConnection.getConnection();
-
-            return mysqlConn.getId();
+            Connection delegate = conn.getTargetConnection();
+            if (delegate instanceof Wrapper) {
+                delegate = delegate.unwrap(Connection.class);
+            }
+            // DruidPooledConnection druidConnection = (DruidPooledConnection)
+            // conn.getTargetConnection();
+            // Connection delegateConn = druidConnection.getConnection();
+            return (Long) MethodUtils.invokeMethod(delegate, "getId", new Object[] {});
         } catch (Exception ex) {
             throw new TddlRuntimeException("connection get thread id fail !", ex);
         }

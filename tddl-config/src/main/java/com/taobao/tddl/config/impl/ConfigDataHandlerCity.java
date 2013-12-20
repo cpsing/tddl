@@ -20,9 +20,9 @@ public class ConfigDataHandlerCity {
      * @return
      */
     public static ConfigDataHandlerFactory getFactory(String appName, String unitName, Map<String, String> localValues) {
-
-        if (localValues == null) return getFactory(appName, unitName);
-
+        if (localValues == null) {
+            return getFactory(appName, unitName);
+        }
         return new LocalFirstConfigDataHandlerFactory(getFactory(appName, unitName), localValues);
 
     }

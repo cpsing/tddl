@@ -4,11 +4,19 @@ import com.taobao.tddl.atom.common.TAtomConstants;
 import com.taobao.tddl.common.utils.TStringUtil;
 
 /**
+ * 数据库状态变量
+ * 
  * @author JIECHEN
  */
 public enum TAtomDbStatusEnum {
 
-    R_STATUS(TAtomConstants.DB_STATUS_R), W_STATUS(TAtomConstants.DB_STATUS_W), RW_STATUS(TAtomConstants.DB_STATUS_RW),
+    /** R只读 */
+    R_STATUS(TAtomConstants.DB_STATUS_R),
+    /** W只写 */
+    W_STATUS(TAtomConstants.DB_STATUS_W),
+    /** RW可读写 */
+    RW_STATUS(TAtomConstants.DB_STATUS_RW),
+    /** NA不可读/写 */
     NA_STATUS(TAtomConstants.DB_STATUS_NA);
 
     private String status;

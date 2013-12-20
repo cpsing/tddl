@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
+import org.apache.commons.lang.StringUtils;
+
 import com.taobao.tddl.config.ConfigDataHandler;
 import com.taobao.tddl.config.ConfigDataHandlerFactory;
 import com.taobao.tddl.config.ConfigDataListener;
@@ -18,6 +18,9 @@ import com.taobao.tddl.monitor.stat.BufferedLogWriter;
 import com.taobao.tddl.monitor.stat.LoggerLogWriter;
 import com.taobao.tddl.monitor.stat.MinMaxAvgLogWriter;
 import com.taobao.tddl.monitor.stat.SoftRefLogWriter;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * 维护Monitor需要的参数
@@ -80,6 +83,10 @@ public class MonitorConfig {
         ConfigDataListener tddlConfigListener = new ConfigDataListener() {
 
             public void onDataRecieved(String dataId, String data) {
+                if (StringUtils.isEmpty(data)) {
+                    return;
+                }
+
                 Properties p = new Properties();
                 try {
                     p.load(new ByteArrayInputStream(data.getBytes()));
