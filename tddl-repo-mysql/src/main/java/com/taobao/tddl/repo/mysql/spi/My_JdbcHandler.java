@@ -5,15 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
@@ -29,7 +25,6 @@ import com.taobao.tddl.executor.cursor.impl.ResultSetCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.spi.ITable;
-import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IPut;
@@ -48,22 +43,19 @@ import com.taobao.tddl.repo.mysql.sqlconvertor.SqlAndParam;
  */
 public class My_JdbcHandler implements GeneralQueryHandler {
 
-    private static final Logger       log              = LoggerFactory.getLogger(My_JdbcHandler.class);
-    protected My_Transaction          myTransaction    = null;
-    protected ResultSet               resultSet        = null;
-    protected PreparedStatement       ps               = null;
-    protected ExecutionType           executionType    = null;
-    protected IRowSet                 current          = null;
-    protected IRowSet                 prev_kv          = null;
+    private static final Logger logger           = LoggerFactory.getLogger(My_JdbcHandler.class);
+    protected My_Transaction    myTransaction    = null;
+    protected ResultSet         resultSet        = null;
+    protected PreparedStatement ps               = null;
+    protected ExecutionType     executionType    = null;
+    protected IRowSet           current          = null;
+    protected IRowSet           prev_kv          = null;
     @SuppressWarnings("unchecked")
-    protected Map<String, Comparable> extraCmd         = Collections.EMPTY_MAP;
-    protected final static Log        logger           = LogFactory.getLog(My_JdbcHandler.class);
-    protected ICursorMeta             cursorMeta;
-    protected boolean                 isStreaming      = false;
-    protected String                  groupName        = null;
-    protected DataSource              ds               = null;
-    protected boolean                 strongConsistent = false;
-    private ExecutionContext          executionContext = null;
+    protected ICursorMeta       cursorMeta;
+    protected boolean           isStreaming      = false;
+    protected String            groupName        = null;
+    protected DataSource        ds               = null;
+    private ExecutionContext    executionContext = null;
 
     public enum ExecutionType {
         PUT, GET
@@ -88,8 +80,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
 
         } else {
             cursorMeta.setIsSureLogicalIndexEqualActualIndex(true);
-            // buildRetColumns(oneQuery, meta);
-            // sqlAndParam = oneQuery.buildSqlAndParam(true);
+
             if (plan instanceof IQueryTree) {
                 ((IQueryTree) plan).setTopQuery(true);
                 MysqlPlanVisitorImpl visitor = new MysqlPlanVisitorImpl((IQueryTree) plan, null, null, true);
@@ -178,54 +169,8 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         this.resultSet = urw;
     }
 
-    // private void putOperater(ExecutionContext executionContext, IPut put,
-    // OnePut onePut, DataSource ds)
-    // throws SQLException {
-    // My_Transaction myTransaction = transaction(executionContext);
-    // logger.warn("onePut:\n" + onePut);
-    //
-    // int count = 0;
-    // for (Entry<String, Map<String, MyParamSqlContext>> tmp :
-    // onePut.sqls.entrySet()) {
-    // for (Entry<String, MyParamSqlContext> context :
-    // tmp.getValue().entrySet()) {
-    // if (count == 1) {
-    // throw new IllegalArgumentException("should not be here");
-    // }
-    // count++;
-    // Connection conn = null;
-    // try {
-    // conn = myTransaction.getConnection(tmp.getKey(), ds, true);
-    // SqlAndParam sqlAndParam = new SqlAndParam();
-    // sqlAndParam.sql = context.getValue().getSql();
-    // sqlAndParam.param = context.getValue().param;
-    // executeUpdate(sqlAndParam, conn);
-    // } catch (Exception e) {
-    // throw new RuntimeException(e);
-    // }
-    // }
-    // }
-    // }
-
-    public My_Transaction transaction(ExecutionContext executionContext) throws SQLException {
-        ITransaction tra = executionContext.getTransaction();
-        My_Transaction myTrans = null;
-        if (tra != null) {
-            // 有事务，使用事务jdbcHandler
-            if (!(tra instanceof My_Transaction)) {
-                throw new SQLException("not my transaction ");
-            }
-            myTrans = (My_Transaction) tra;
-        } else {// 无事务
-            myTrans = new My_Transaction();
-        }
-        this.myTransaction = myTrans;
-        executionContext.setTransaction(myTrans);
-        return myTrans;
-    }
-
     public Connection getConnection() throws SQLException {
-        Connection con = myTransaction.getConnection(groupName, ds, strongConsistent);
+        Connection con = myTransaction.getConnection(groupName, ds);
         return con;
     }
 
@@ -293,7 +238,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
             } else {
                 try {
                     if (resultSet != null && !resultSet.isClosed()) {
-                        My_Transaction.closeStreaming(myTransaction, groupName, ds, strongConsistent);
+                        My_Transaction.closeStreaming(myTransaction, groupName, ds);
                     }
                 } catch (Throwable e) {
                     logger.warn("", e);
@@ -344,7 +289,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
             } else {
                 try {
                     if (resultSet != null && !resultSet.isClosed()) {
-                        My_Transaction.closeStreaming(myTransaction, groupName, ds, strongConsistent);
+                        My_Transaction.closeStreaming(myTransaction, groupName, ds);
                     }
                 } catch (Throwable e) {
                     logger.warn("", e);
@@ -384,17 +329,6 @@ public class My_JdbcHandler implements GeneralQueryHandler {
 
         checkInitedInRsNext();
         throw new RuntimeException("暂时不支持skip to");
-        // while (getResultSet().next()) {
-        // for (String keyName : key.getColumnList()) {
-        // Object v = key.get(keyName);
-        // Object v2 = getResultSet().getObject(keyName);
-        // if (v.equals(v2)) {
-        // current = My_Convertor.convert(getResultSet(), indexMeta);
-        // return true;
-        // }
-        // }
-        // }
-        // return false;
     }
 
     /*
@@ -561,14 +495,6 @@ public class My_JdbcHandler implements GeneralQueryHandler {
     public boolean isCanceled() {
 
         return false;
-    }
-
-    public boolean isStrongConsistent() {
-        return strongConsistent;
-    }
-
-    public void setStrongConsistent(boolean strongConsistent) {
-        this.strongConsistent = strongConsistent;
     }
 
     public My_Transaction getMyTransaction() {

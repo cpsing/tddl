@@ -3,7 +3,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.taobao.tddl.common.exception.TddlException;
-import com.taobao.tddl.executor.ExecutorContext;
+import com.taobao.tddl.executor.common.ExecutorContext;
 import com.taobao.tddl.executor.common.TopologyHandler;
 import com.taobao.tddl.optimizer.config.table.StaticSchemaManager;
 import com.taobao.tddl.optimizer.rule.OptimizerRule;

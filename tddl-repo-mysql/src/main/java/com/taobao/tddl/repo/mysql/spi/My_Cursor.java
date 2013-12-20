@@ -39,7 +39,6 @@ public class My_Cursor implements Cursor {
 
     protected My_JdbcHandler    myJdbcHandler;
     protected IDataNodeExecutor query;
-    protected String            groupNodeName;
     protected ICursorMeta       meta;
     protected boolean           inited        = false;
     // private boolean directlyExecuteSql = false;
@@ -47,19 +46,13 @@ public class My_Cursor implements Cursor {
     protected boolean           isStreaming   = false;
     protected List<ColumnMeta>  returnColumns = null;
 
-    public My_Cursor(My_JdbcHandler myJdbcHandler, ICursorMeta meta, String groupNodeName, IDataNodeExecutor executor,
-                     boolean isStreaming){
+    public My_Cursor(My_JdbcHandler myJdbcHandler, ICursorMeta meta, IDataNodeExecutor executor, boolean isStreaming){
         super();
         this.myJdbcHandler = myJdbcHandler;
         this.query = executor;
-        this.groupNodeName = groupNodeName;
         this.meta = meta;
         this.isStreaming = isStreaming;
-        // init();
     }
-
-    // public My_Cursor() {
-    // }
 
     @Override
     public boolean skipTo(CloneableRecord key) throws TddlException {
@@ -94,14 +87,7 @@ public class My_Cursor implements Cursor {
         }
         try {
 
-            if (this.groupNodeName == null) {
-                // directlyExecuteSql = false;
-                throw new IllegalArgumentException("should not be here");
-            } else {
-                // directlyExecuteSql = true;
-                myJdbcHandler.executeQuery(meta, isStreaming);
-
-            }
+            myJdbcHandler.executeQuery(meta, isStreaming);
 
             ResultSetMetaData rsmd = this.myJdbcHandler.getResultSet().getMetaData();
             returnColumns = new ArrayList();
@@ -111,7 +97,7 @@ public class My_Cursor implements Cursor {
                                                                      + rsmd.getColumnType(i) + "无法识别,联系沈询");
 
                 String name = rsmd.getColumnLabel(i);
-                // String tableName = rsmd.getTableName(i);
+
                 ColumnMeta cm = new ColumnMeta(null, name, type, null, true);
                 returnColumns.add(cm);
             }
@@ -173,15 +159,6 @@ public class My_Cursor implements Cursor {
         throw new UnsupportedOperationException("not support yet");
     }
 
-    // =======================================================================
-    // ==============Getters and Setters=======
-
-    // public OneQuery getSql() {
-    // oneQ = OneQuery.buildOne(new OneQuery(), iQuery);
-    // oneQ.isJoin = false;
-    // return oneQ;
-    // }
-
     public ICursorMeta getCursorMeta() {
         return meta;
     }
@@ -189,19 +166,6 @@ public class My_Cursor implements Cursor {
     public void setCursorMeta(ICursorMeta cursorMeta) {
         this.meta = cursorMeta;
     }
-
-    public String getGroupNodeName() {
-        return groupNodeName;
-    }
-
-    public void setGroupNodeName(String groupNodeName) {
-        this.groupNodeName = groupNodeName;
-    }
-
-    // @Override
-    // public boolean canCondense() {
-    // return true;
-    // }
 
     public IDataNodeExecutor getiQuery() {
         return query;
@@ -228,7 +192,6 @@ public class My_Cursor implements Cursor {
     @Override
     public Map<CloneableRecord, DuplicateKVPair> mgetWithDuplicate(List<CloneableRecord> keys, boolean prefixMatch,
                                                                    boolean keyFilterOrValueFilter) throws TddlException {
-        // oneQ = OneQuery.buildOne(new OneQuery(), iQuery);
 
         IQuery tmpQuery = (IQuery) query.copy();
 
@@ -244,7 +207,6 @@ public class My_Cursor implements Cursor {
         targetFilter.setOperation(OPERATION.IN);
         targetFilter.setColumn(ic);
         targetFilter.setValues(values);
-        // OneQuery.appendAndFilter(oneQ, targetFilter);
 
         tmpQuery.setKeyFilter(FilterUtils.and(tmpQuery.getKeyFilter(), targetFilter));
 

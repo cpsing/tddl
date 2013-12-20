@@ -11,11 +11,10 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.ExceptionErrorCodeUtils;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.AtomicNumberCreator;
 import com.taobao.tddl.executor.spi.ITHLog;
 import com.taobao.tddl.executor.spi.ITransaction;
@@ -28,10 +27,11 @@ import com.taobao.tddl.group.jdbc.TGroupConnection;
 public class My_Transaction implements ITransaction {
 
     private AtomicNumberCreator             idGen                 = AtomicNumberCreator.getNewInstance();
+    private Integer                         id                    = idGen.getIntegerNextNumber();
     /**
      * 连接管理
      */
-    protected Map<String, List<Connection>> connMap               = new HashMap<String, List<Connection>>(1); ;
+    protected Map<String, List<Connection>> connMap               = new HashMap<String, List<Connection>>(1);
 
     /**
      * 当前进行事务的节点
@@ -40,7 +40,7 @@ public class My_Transaction implements ITransaction {
     boolean                                 autoCommit            = true;
     Stragety                                stragety              = Stragety.STRONG;
 
-    protected final static Log              logger                = LogFactory.getLog(My_Transaction.class);
+    protected final static Logger           logger                = LoggerFactory.getLogger(My_Transaction.class);
 
     public enum Stragety {
         ALLOW_READ/* 跨机允许读不允许写 */, STRONG/* 跨机读写都不允许 */, NONE
@@ -73,7 +73,7 @@ public class My_Transaction implements ITransaction {
      * true时，会创建事务链接，而如果sConsistent=false则会创建非事务链接
      * @return
      */
-    public Connection getConnection(String groupName, DataSource ds, boolean strongConsistent) throws SQLException {
+    public Connection getConnection(String groupName, DataSource ds) throws SQLException {
         if (groupName == null) {
             throw new IllegalArgumentException("group name is null");
         }
@@ -99,7 +99,7 @@ public class My_Transaction implements ITransaction {
         } else {// 没有事务建立，新建事务
             transactionalNodeName = groupName;
 
-            Connection handler = getConnection(groupName, ds, true);
+            Connection handler = getConnection(groupName, ds);
             return handler;
         }
     }
@@ -178,7 +178,7 @@ public class My_Transaction implements ITransaction {
 
     @Override
     public long getId() {
-        return idGen.getLongNextNumber();
+        return id;
     }
 
     @Override
@@ -210,9 +210,8 @@ public class My_Transaction implements ITransaction {
         }
     }
 
-    public static void closeStreaming(My_Transaction trans, String groupName, DataSource ds, boolean beginTransaction)
-                                                                                                                      throws SQLException {
-        List<Connection> conns = trans.getConnections(groupName, ds, beginTransaction);
+    public static void closeStreaming(My_Transaction trans, String groupName, DataSource ds) throws SQLException {
+        List<Connection> conns = trans.getConnections(groupName, ds, false);
         for (Connection con : conns) {
             // 后面的代码主要是为了从各种包装类里面取出真正的链接里面的query id。。。蛋略微痛。。
             // 弄掉TDDL包装

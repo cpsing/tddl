@@ -8,25 +8,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.springframework.stereotype.Repository;
 
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseConfig;
 import com.sleepycat.je.Durability;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
-import com.sleepycat.je.SecondaryConfig;
-import com.sleepycat.je.SecondaryDatabase;
-import com.sleepycat.je.Transaction;
 import com.sleepycat.je.rep.ReplicaWriteException;
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.common.utils.ExceptionErrorCodeUtils;
-import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.TransactionConfig;
@@ -37,10 +29,7 @@ import com.taobao.tddl.executor.spi.IRepository;
 import com.taobao.tddl.executor.spi.ITHLog;
 import com.taobao.tddl.executor.spi.ITable;
 import com.taobao.tddl.executor.spi.ITransaction;
-import com.taobao.tddl.optimizer.config.table.IndexMeta;
-import com.taobao.tddl.optimizer.config.table.Relationship;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
-import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 
 //import com.taobao.ustore.thl.ITHLog2Applier;
 
@@ -115,7 +104,6 @@ public class JE_Repository implements IRepository {
     }
 
     protected final AtomicReference<ITHLog> historyLog = new AtomicReference<ITHLog>();
-    // private static Log logger = LogFactory.getLog(JE_Repository.class);
 
     protected ICommandHandlerFactory        cef        = null;
 
@@ -268,73 +256,6 @@ public class JE_Repository implements IRepository {
     private Database buildPrimaryIndex(DatabaseConfig dbConfig, Environment _env, String dbName) {
         Database database = _env.openDatabase(null, dbName, dbConfig);
         return database;
-    }
-
-    private void buildSecondaryIndex(TableMeta table_schema, Map<String, Database> databases, Environment _env,
-                                     Database database, IndexMeta secondaryIndexMeta, String dbName) {
-        SecondaryConfig sc = new SecondaryConfig();
-        sc.setAllowCreate(true);
-        if (table_schema.isTmp()) {
-            sc.setTemporary(table_schema.isTmp());
-        } else {
-            if (!config.isTransactional()) {
-                sc.setDeferredWrite(config.isCommitSync());
-            } else {
-                sc.setTransactional(true);
-            }
-        }
-        sc.setSortedDuplicates(true);
-        sc.setKeyPrefixing(true);
-        if (secondaryIndexMeta.getRelationship() == Relationship.MANY_TO_MANY
-            || secondaryIndexMeta.getRelationship() == Relationship.MANY_TO_ONE) {
-            sc.setMultiKeyCreator(new IndexKeyCreator(table_schema.getPrimaryIndex(), secondaryIndexMeta));
-        } else {
-            sc.setKeyCreator(new IndexKeyCreator(table_schema.getPrimaryIndex(), secondaryIndexMeta));
-        }
-        SecondaryDatabase secondaryIndex = _env.openSecondaryDatabase(null, dbName, database, sc);
-        databases.put(dbName, secondaryIndex);
-    }
-
-    private static boolean hasSuffixString(String targetIndexName) {
-        int size = TStringUtil.lastIndexOf(targetIndexName, "_");
-
-        if (size == -1) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private static String getSuffixString(String targetIndexName) {
-
-        Pattern pattern = Pattern.compile("\\d+$");
-        Matcher matcher = pattern.matcher(targetIndexName);
-        if (matcher.find()) {
-            return (matcher.group());
-        } else {
-            throw new IllegalArgumentException(targetIndexName + " has no _ . pattern mismatch. recheck ");
-        }
-
-    }
-
-    public void setCursorFactoryBDBImp(ICursorFactory cursorFactoryBDBImp) {
-        this.cursorFactoryBDBImp = cursorFactoryBDBImp;
-    }
-
-    /**
-     * 建立连接
-     * 
-     * @param createTxn
-     * @param command
-     * @param context
-     * @param repo
-     * @param executionContext
-     * @throws Exception
-     */
-    public Transaction createTransaction(boolean createTxn, IDataNodeExecutor command, Map<String, Comparable> context,
-                                         Repository repo) throws Exception {
-
-        return null;
     }
 
     // @Override

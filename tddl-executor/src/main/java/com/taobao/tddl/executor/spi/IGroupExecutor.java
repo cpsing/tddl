@@ -14,7 +14,7 @@ public interface IGroupExecutor extends IExecutor {
     public Group getGroupInfo();
 
     /**
-     * 可能是个datasource ，也可能是个rpc客户端。放在一起的原因是
+     * 可能是个datasource ，也可能是个rpc客户端
      */
     public Object getRemotingExecutableObject();
 

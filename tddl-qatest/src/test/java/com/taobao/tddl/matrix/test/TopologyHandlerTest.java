@@ -2,7 +2,7 @@ package com.taobao.tddl.matrix.test;
 import org.junit.Test;
 
 import com.taobao.tddl.common.exception.TddlException;
-import com.taobao.tddl.executor.ExecutorContext;
+import com.taobao.tddl.executor.common.ExecutorContext;
 import com.taobao.tddl.executor.common.TopologyHandler;
 
 public class TopologyHandlerTest {

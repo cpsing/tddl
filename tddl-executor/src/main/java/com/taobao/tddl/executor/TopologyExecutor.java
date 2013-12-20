@@ -1,4 +1,4 @@
-package com.taobao.tddl.executor.local;
+package com.taobao.tddl.executor;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -6,17 +6,16 @@ import java.util.concurrent.Future;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
-import com.taobao.tddl.executor.ExecutorContext;
 import com.taobao.tddl.executor.common.ExecutionContext;
+import com.taobao.tddl.executor.common.ExecutorContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.ResultCursor;
-import com.taobao.tddl.executor.spi.IGroupExecutor;
 import com.taobao.tddl.executor.spi.ITopologyExecutor;
 import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 
 @SuppressWarnings("rawtypes")
-public class LocalTopologyExecutor implements ITopologyExecutor {
+public class TopologyExecutor implements ITopologyExecutor {
 
     public String dataNode = "localhost";
 
@@ -54,7 +53,7 @@ public class LocalTopologyExecutor implements ITopologyExecutor {
 
     }
 
-    private IGroupExecutor getGroupExecutor(IDataNodeExecutor qc, ExecutionContext executionContext) {
+    private IExecutor getGroupExecutor(IDataNodeExecutor qc, ExecutionContext executionContext) {
         if (executionContext == null) executionContext = new ExecutionContext();
 
         String group = qc.getDataNode();
@@ -65,9 +64,9 @@ public class LocalTopologyExecutor implements ITopologyExecutor {
         return getGroupExecutor(group, executionContext);
     }
 
-    private IGroupExecutor getGroupExecutor(String group, ExecutionContext executionContext) {
+    private IExecutor getGroupExecutor(String group, ExecutionContext executionContext) {
 
-        IGroupExecutor executor = null;
+        IExecutor executor = null;
 
         executor = ExecutorContext.getContext().getTopologyHandler().get(group);
 

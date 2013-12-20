@@ -4,9 +4,9 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
-import com.taobao.tddl.executor.ExecutorContext;
+import com.taobao.tddl.executor.TopologyExecutor;
+import com.taobao.tddl.executor.common.ExecutorContext;
 import com.taobao.tddl.executor.common.TopologyHandler;
-import com.taobao.tddl.executor.local.LocalTopologyExecutor;
 import com.taobao.tddl.optimizer.Optimizer;
 import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.config.table.IndexManager;
@@ -54,7 +54,7 @@ public class ConfigHolder extends AbstractLifecycle {
         optimizerInit();
 
         executorContext.setTopologyHandler(topologyHandler);
-        executorContext.setTopologyExecutor(new LocalTopologyExecutor());
+        executorContext.setTopologyExecutor(new TopologyExecutor());
 
         oc.setIndexManager(this.indexManger);
         oc.setMatrix(topologyHandler.getMatrix());

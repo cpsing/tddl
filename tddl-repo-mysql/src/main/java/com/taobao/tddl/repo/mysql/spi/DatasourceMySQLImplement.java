@@ -5,7 +5,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import com.taobao.tddl.common.model.Group;
-import com.taobao.tddl.executor.ExecutorContext;
+import com.taobao.tddl.executor.common.ExecutorContext;
 import com.taobao.tddl.executor.common.TopologyHandler;
 import com.taobao.tddl.executor.spi.IDataSourceGetter;
 import com.taobao.tddl.executor.spi.IGroupExecutor;

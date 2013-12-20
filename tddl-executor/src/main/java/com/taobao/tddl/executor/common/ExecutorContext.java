@@ -1,7 +1,6 @@
-package com.taobao.tddl.executor;
+package com.taobao.tddl.executor.common;
 
 import com.taobao.tddl.common.utils.thread.ThreadLocalMap;
-import com.taobao.tddl.executor.common.TopologyHandler;
 import com.taobao.tddl.executor.repo.RepositoryHolder;
 import com.taobao.tddl.executor.spi.ITopologyExecutor;
 

@@ -46,11 +46,12 @@ public class QueryMyHandler extends QueryHandler implements ICommandHandler {
         if (!canComposeOneSql(executor)) return super.handle(executor, executionContext);
 
         IndexMeta indexMeta = null;
+
         My_JdbcHandler jdbcHandler = MysqlRepoUtils.getJdbcHandler(dsGetter, executor, executionContext);
 
         ICursorMeta meta = ExecUtils.convertToICursorMeta((IQueryTree) executor);
 
-        My_Cursor my_cursor = new My_Cursor(jdbcHandler, meta, executor.getDataNode(), executor, executor.isStreaming());
+        My_Cursor my_cursor = new My_Cursor(jdbcHandler, meta, executor, executor.isStreaming());
 
         if (executor.getSql() != null) {
             // TODO shenxun : 排序信息似乎丢了啊。。

@@ -73,10 +73,8 @@ public class MysqlRepoUtils {
             my_transaction = new My_Transaction();
             executionContext.setTransaction(my_transaction);
         }
-        jdbcHandler.setStrongConsistent(true);
         jdbcHandler.setDs(ds);
         jdbcHandler.setGroupName(executor.getDataNode());
-        jdbcHandler.setStrongConsistent(false);
         jdbcHandler.setMyTransaction(my_transaction);
         jdbcHandler.setPlan(executor);
         return jdbcHandler;
