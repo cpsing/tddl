@@ -12,7 +12,6 @@ import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.utils.ExecUtils;
-import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 
 /**
  * n个cursor的归并排序，假设子cursor都是有序的
@@ -23,8 +22,7 @@ import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 public class MergeSortedCursors extends SortCursor {
 
     private ValueMappingIRowSetConvertor valueMappingIRowSetConvertor;
-    private List<ISchematicCursor>       cursors;
-    private String                       tableAlias;
+    private final List<ISchematicCursor> cursors;
 
     /**
      * 保存每个cursor当前的值得wrapper
@@ -33,17 +31,15 @@ public class MergeSortedCursors extends SortCursor {
 
     private boolean                      templateIsLeft = true;
 
-    public MergeSortedCursors(List<ISchematicCursor> cursors, String tableAlias, boolean duplicated)
-                                                                                                    throws TddlException{
+    public MergeSortedCursors(List<ISchematicCursor> cursors, boolean duplicated) throws TddlException{
         super(cursors.get(0), null);
         this.cursors = cursors;
         this.allowDuplicated = duplicated;
         values = new ArrayList(cursors.size());
-        this.tableAlias = tableAlias;
-        buildAndSetOrderBy(cursors.get(0), tableAlias);
+        this.orderBys = cursors.get(0).getOrderBy();
     }
 
-    public MergeSortedCursors(ISchematicCursor cursor, String tableAlias, boolean duplicated) throws TddlException{
+    public MergeSortedCursors(ISchematicCursor cursor, boolean duplicated) throws TddlException{
         super(cursor, null);
         List<ISchematicCursor> cursors = new ArrayList(1);
         cursors.add(cursor);
@@ -51,8 +47,6 @@ public class MergeSortedCursors extends SortCursor {
         this.cursors = cursors;
         this.allowDuplicated = duplicated;
         values = new ArrayList(cursors.size());
-
-        buildAndSetOrderBy(cursor, tableAlias);
 
     }
 
@@ -65,33 +59,11 @@ public class MergeSortedCursors extends SortCursor {
             cursor.beforeFirst();
     }
 
-    /**
-     * Whisper . 这里加了一个方法，复制order by 然后把column的名字改成了tableAlias。
-     * 否则无法从结果集中拿到正确的名字。。因为结果集的CursorMeta里面实际上存储的是tableAlias.column(or
-     * columnAlias) 所以，在需要用到合并排序的时候，只能也使用类似的方法来完成了。
-     * 
-     * @param cursor
-     * @param tableAlias
-     */
-    private void buildAndSetOrderBy(ISchematicCursor cursor, String tableAlias) {
-        if (cursor != null) {
-            List<IOrderBy> orderBy = cursor.getOrderBy();
-            List<IOrderBy> orderbyAfterCopy = ExecUtils.copyOrderBys(orderBy);
-            if (tableAlias != null && !tableAlias.isEmpty()) {
-                for (IOrderBy orderby : orderbyAfterCopy) {
-                    orderby.getColumn().setTableName(tableAlias);
-                }
-            }
-            this.tableAlias = tableAlias;
-
-            setOrderBy(orderbyAfterCopy);
-        }
-    }
-
     boolean allowDuplicated = false;
     IRowSet current         = null;
     boolean inited          = false;
 
+    @Override
     public void init() throws TddlException {
         if (inited) return;
         inited = true;

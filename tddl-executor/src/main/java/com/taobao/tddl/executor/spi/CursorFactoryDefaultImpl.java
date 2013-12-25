@@ -109,9 +109,9 @@ public class CursorFactoryDefaultImpl implements ICursorFactory {
 
     @Override
     public SortCursor mergeSortedCursor(ExecutionContext executionContext, List<ISchematicCursor> cursors,
-                                        boolean duplicated, String tableAlias) throws TddlException {
+                                        boolean duplicated) throws TddlException {
         try {
-            return new MergeSortedCursors(cursors, tableAlias, duplicated);
+            return new MergeSortedCursors(cursors, duplicated);
         } catch (Exception e) {
             for (ISchematicCursor cursor : cursors) {
                 closeParentCursor(cursor);

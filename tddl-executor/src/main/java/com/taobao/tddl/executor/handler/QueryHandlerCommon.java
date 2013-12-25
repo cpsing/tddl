@@ -42,32 +42,32 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
         super();
     }
 
-    private static final int thread              = Integer.parseInt(System.getProperty("com.ustore.concurrentThread",
-                                                     "8"));
+    private static final int      thread              = Integer.parseInt(System.getProperty("com.ustore.concurrentThread",
+                                                          "8"));
 
-    private ExecutorService  concurrentExecutors = Executors.newFixedThreadPool(thread, new ThreadFactory() {
+    private final ExecutorService concurrentExecutors = Executors.newFixedThreadPool(thread, new ThreadFactory() {
 
-                                                     @Override
-                                                     public Thread newThread(Runnable arg0) {
-                                                         return new Thread(arg0, "concurrent_query_executor");
-                                                     }
-                                                 });
+                                                          @Override
+                                                          public Thread newThread(Runnable arg0) {
+                                                              return new Thread(arg0, "concurrent_query_executor");
+                                                          }
+                                                      });
 
     /**
      * 完全匹配
      */
-    public static int        MATCH               = 0;
+    public static int             MATCH               = 0;
 
     /**
      * 前缀匹配
      */
-    public static int        PREFIX_MATCH        = 1;
+    public static int             PREFIX_MATCH        = 1;
 
     /**
      * 不匹配
      */
-    public static int        NOT_MATCH           = -1;
-    public Logger            logger              = LoggerFactory.getLogger(QueryHandlerCommon.class);
+    public static int             NOT_MATCH           = -1;
+    public Logger                 logger              = LoggerFactory.getLogger(QueryHandlerCommon.class);
 
     @Override
     public ISchematicCursor handle(IDataNodeExecutor executor, ExecutionContext executionContext) throws TddlException {
@@ -119,7 +119,7 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
 
         if (isDistinct(IQueryTree)) {
             cursor = processOrderBy(cursor, getOrderBy(IQueryTree.getColumns()), executionContext, IQueryTree, false);
-            cursor = new DistinctCursor(cursor, getOrderBy(IQueryTree.getColumns()));
+            cursor = new DistinctCursor(cursor);
         }
 
         return cursor;
@@ -302,7 +302,7 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
             case temporaryTable: {
 
                 return repo.getCursorFactory().tempTableSortCursor(executionContext,
-                    (ISchematicCursor) cursor,
+                    cursor,
                     ordersInRequest,
                     true,
                     IQueryTree.getRequestID());
@@ -519,10 +519,7 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
         IRepository repo = executionContext.getCurrentRepository();
         List<ISelectable> retColumns = IQueryTree.getColumns();
         // 过滤多其它不必要的select字段
-        cursor = repo.getCursorFactory().columnAliasCursor(executionContext,
-            (ISchematicCursor) cursor,
-            retColumns,
-            IQueryTree.getAlias());
+        cursor = repo.getCursorFactory().columnAliasCursor(executionContext, cursor, retColumns, IQueryTree.getAlias());
         return cursor;
     }
 
@@ -533,7 +530,7 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
         if (_valueFilter != null) {
             cursor = executionContext.getCurrentRepository()
                 .getCursorFactory()
-                .valueFilterCursor(executionContext, (ISchematicCursor) cursor, IQueryTree.getValueFilter());
+                .valueFilterCursor(executionContext, cursor, IQueryTree.getValueFilter());
         }
         return cursor;
     }
@@ -545,7 +542,7 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
         if (havingFilter != null) {
             cursor = executionContext.getCurrentRepository()
                 .getCursorFactory()
-                .valueFilterCursor(executionContext, (ISchematicCursor) cursor, IQueryTree.getHavingFilter());
+                .valueFilterCursor(executionContext, cursor, IQueryTree.getHavingFilter());
         }
         return cursor;
     }
@@ -616,9 +613,7 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
 
     protected Future<ISchematicCursor> executeFuture(final ExecutionContext executionContext,
                                                      final IDataNodeExecutor query) throws TddlException {
-        return ExecutorContext.getContext()
-            .getTopologyExecutor()
-            .execByExecPlanNodeFuture(query, executionContext);
+        return ExecutorContext.getContext().getTopologyExecutor().execByExecPlanNodeFuture(query, executionContext);
     }
 
 }

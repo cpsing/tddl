@@ -6,7 +6,6 @@ import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 
 public interface ISchematicCursor extends Cursor {
 
-    // public ICursorMeta getMeta() ;
     public List<IOrderBy> getOrderBy();
 
 }

@@ -238,6 +238,6 @@ public interface ICursorFactory {
     ISetOrderCursor setOrderCursor(ExecutionContext context, ISchematicCursor cursor, List<IOrderBy> ordersInRequest)
                                                                                                                      throws TddlException;
 
-    SortCursor mergeSortedCursor(ExecutionContext context, List<ISchematicCursor> cursors, boolean duplicated,
-                                 String tableAlias) throws TddlException;
+    SortCursor mergeSortedCursor(ExecutionContext context, List<ISchematicCursor> cursors, boolean duplicated)
+                                                                                                              throws TddlException;
 }

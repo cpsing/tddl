@@ -306,6 +306,7 @@ public class My_Cursor implements Cursor {
         }
     }
 
+    @Override
     public List<ColumnMeta> getReturnColumns() throws TddlException {
         init();
         return this.returnColumns;

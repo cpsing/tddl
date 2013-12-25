@@ -1,4 +1,5 @@
 package com.taobao.tddl.executor.cursor.test;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -173,6 +174,8 @@ public class TempTableCursorTest {
             0,
             new ExecutionContext());
         Assert.assertEquals("[T1.ID, T1.NAME, T1.SCHOOL]", c.getReturnColumns().toString());
+        Assert.assertEquals("[OrderBy [columnName=T1.ID, direction=true]]", c.getOrderBy().toString());
+
     }
 
     @Test
@@ -202,5 +205,7 @@ public class TempTableCursorTest {
             ;
 
         Assert.assertEquals("[T1.ID, T1.NAME, T1.SCHOOL]", c.getReturnColumns().toString());
+        Assert.assertEquals("[OrderBy [columnName=T1.ID, direction=true]]", c.getOrderBy().toString());
     }
+
 }

@@ -31,6 +31,11 @@ public class SchematicCursor extends AbstractCursor implements ISchematicCursor 
             orderBys = Collections.emptyList();
         }
     }
+    
+    public SchematicCursor(Cursor cursor,List<IOrderBy> orderBys){
+        super(cursor);
+        this.orderBys = orderBys;
+    }
 
     public SchematicCursor(Cursor cursor, ICursorMeta meta, List<IOrderBy> orderBys){
         super(cursor);
