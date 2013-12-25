@@ -1,5 +1,5 @@
 //Copyright(c) Taobao.com
-package com.taobao.tddl.group.hint;
+package com.taobao.tddl.group.utils;
 
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.logger.Logger;

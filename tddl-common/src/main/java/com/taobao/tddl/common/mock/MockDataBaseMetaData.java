@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.mockdatasource;
+package com.taobao.tddl.common.mock;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -424,10 +424,6 @@ public class MockDataBaseMetaData implements DatabaseMetaData {
         return false;
     }
 
-    /**
-     * Spring JdbcTemplate��batchUpdate�ȷ������������жϣ�
-     * ����oracle��mysql��֧�֣�supportBatchUpdates����true��
-     */
     public boolean supportsBatchUpdates() throws SQLException {
         return true;
     }

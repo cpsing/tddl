@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.mockdatasource;
+package com.taobao.tddl.common.mock;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -25,8 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.taobao.tddl.common.mockdatasource.MockDataSource.ExecuteInfo;
-import com.taobao.tddl.common.mockdatasource.MockDataSource.QueryResult;
+import com.taobao.tddl.common.exception.NotSupportException;
+import com.taobao.tddl.common.mock.MockDataSource.ExecuteInfo;
+import com.taobao.tddl.common.mock.MockDataSource.QueryResult;
 
 public class MockResultSet implements ResultSet {
 
@@ -34,7 +35,11 @@ public class MockResultSet implements ResultSet {
     private ResultSetMetaData                          resultSetMetaData;
     public final Map<String/* 列名 */, Integer/* 列序号 */> columns;
     public final List<Object[]>                        rows;
-    private int                                        cursor = -1;
+    private int                                        cursor               = -1;
+    private boolean                                    closed;
+    private int                                        closeInvocatingTimes = 0;
+    private int                                        nextInvokingTimes    = 0;
+    private long                                       nextSleepTime        = 0;
 
     public MockResultSet(MockDataSource mockDataSource, Map<String, Integer> columns, List<Object[]> values){
         this.mds = mockDataSource;
@@ -55,72 +60,75 @@ public class MockResultSet implements ResultSet {
         resultSetMetaData = new MockResultSetMetaData(columns);
     }
 
+    public int getCloseInvocatingTimes() {
+        return closeInvocatingTimes;
+    }
+
+    public int getNextInvokingTimes() {
+        return nextInvokingTimes;
+    }
+
     public boolean absolute(int row) throws SQLException {
-        throw new UnsupportedOperationException("absolute");
+        throw new NotSupportException("absolute");
     }
 
     public void afterLast() throws SQLException {
-        throw new UnsupportedOperationException("afterLast");
+        throw new NotSupportException("afterLast");
     }
 
     public void beforeFirst() throws SQLException {
-        throw new UnsupportedOperationException("beforeFirst");
+        throw new NotSupportException("beforeFirst");
     }
 
     public void cancelRowUpdates() throws SQLException {
-        throw new UnsupportedOperationException("cancelRowUpdates");
+        throw new NotSupportException("cancelRowUpdates");
     }
 
     public void clearWarnings() throws SQLException {
-        throw new UnsupportedOperationException("clearWarnings");
+        throw new NotSupportException("clearWarnings");
     }
-
-    private boolean closed;
-    private int     closeInvocatingTimes = 0;
 
     public void close() throws SQLException {
         closed = true;
         closeInvocatingTimes++;
-
     }
 
     protected void checkClose() throws SQLException {
-        if (closed) throw new SQLException("closed");
+        if (closed) {
+            throw new SQLException("closed");
+        }
     }
 
     public void deleteRow() throws SQLException {
-        throw new UnsupportedOperationException("deleteRow");
+        throw new NotSupportException("deleteRow");
     }
 
     public void closeInternal(boolean removeThis) throws SQLException {
-        throw new UnsupportedOperationException("closeInternal");
+        throw new NotSupportException("closeInternal");
     }
 
     public int findColumn(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("findColumn");
+        throw new NotSupportException("findColumn");
     }
 
     public boolean first() throws SQLException {
-        throw new UnsupportedOperationException("first");
+        throw new NotSupportException("first");
     }
 
     public Array getArray(int i) throws SQLException {
         return (Array) getObject(i);
     }
 
-    // public Object getVal(int i ){
-    // return result[i];
-    // }
     public Array getArray(String colName) throws SQLException {
-        throw new UnsupportedOperationException("getArray(String colName)");
+        throw new NotSupportException("getArray(String colName)");
     }
 
     public InputStream getAsciiStream(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("getAsciiStream(int columnIndex)");
+        throw new NotSupportException("getAsciiStream(int columnIndex)");
     }
 
     public InputStream getAsciiStream(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("getAsciiStream(String columnName)");
+        throw new NotSupportException("getAsciiStream(String columnName)");
     }
 
     public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
@@ -128,15 +136,15 @@ public class MockResultSet implements ResultSet {
     }
 
     public BigDecimal getBigDecimal(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("getBigDecimal(String columnName)");
+        throw new NotSupportException("getBigDecimal(String columnName)");
     }
 
     public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
-        throw new UnsupportedOperationException("getBigDecimal(int columnIndex, int scale)");
+        throw new NotSupportException("getBigDecimal(int columnIndex, int scale)");
     }
 
     public BigDecimal getBigDecimal(String columnName, int scale) throws SQLException {
-        throw new UnsupportedOperationException("getBigDecimal(String columnName, int scale)");
+        throw new NotSupportException("getBigDecimal(String columnName, int scale)");
     }
 
     public InputStream getBinaryStream(int columnIndex) throws SQLException {
@@ -144,7 +152,7 @@ public class MockResultSet implements ResultSet {
     }
 
     public InputStream getBinaryStream(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("getBinaryStream(String columnName)");
+        throw new NotSupportException("getBinaryStream(String columnName)");
     }
 
     public Blob getBlob(int i) throws SQLException {
@@ -152,7 +160,7 @@ public class MockResultSet implements ResultSet {
     }
 
     public Blob getBlob(String colName) throws SQLException {
-        throw new UnsupportedOperationException("getBlob(String colName)");
+        throw new NotSupportException("getBlob(String colName)");
     }
 
     public boolean getBoolean(int columnIndex) throws SQLException {
@@ -160,7 +168,7 @@ public class MockResultSet implements ResultSet {
     }
 
     public boolean getBoolean(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("getBoolean(String columnName)");
+        throw new NotSupportException("getBoolean(String columnName)");
     }
 
     public byte getByte(int columnIndex) throws SQLException {
@@ -168,7 +176,7 @@ public class MockResultSet implements ResultSet {
     }
 
     public byte getByte(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("getByte(String columnName)");
+        throw new NotSupportException("getByte(String columnName)");
     }
 
     public byte[] getBytes(int columnIndex) throws SQLException {
@@ -176,7 +184,7 @@ public class MockResultSet implements ResultSet {
     }
 
     public byte[] getBytes(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("getBytes(String columnName)");
+        throw new NotSupportException("getBytes(String columnName)");
     }
 
     public Reader getCharacterStream(int columnIndex) throws SQLException {
@@ -184,7 +192,7 @@ public class MockResultSet implements ResultSet {
     }
 
     public Reader getCharacterStream(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("getCharacterStream(String columnName)");
+        throw new NotSupportException("getCharacterStream(String columnName)");
     }
 
     public Clob getClob(int i) throws SQLException {
@@ -192,15 +200,15 @@ public class MockResultSet implements ResultSet {
     }
 
     public Clob getClob(String colName) throws SQLException {
-        throw new UnsupportedOperationException("getClob(String colName)");
+        throw new NotSupportException("getClob(String colName)");
     }
 
     public int getConcurrency() throws SQLException {
-        throw new UnsupportedOperationException("getConcurrency");
+        throw new NotSupportException("getConcurrency");
     }
 
     public String getCursorName() throws SQLException {
-        throw new UnsupportedOperationException("getCursorName");
+        throw new NotSupportException("getCursorName");
     }
 
     public Date getDate(int columnIndex) throws SQLException {
@@ -208,39 +216,39 @@ public class MockResultSet implements ResultSet {
     }
 
     public Date getDate(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("getDate(String columnName)");
+        throw new NotSupportException("getDate(String columnName)");
     }
 
     public Date getDate(int columnIndex, Calendar cal) throws SQLException {
-        throw new UnsupportedOperationException("getDate(int columnIndex, Calendar cal)");
+        throw new NotSupportException("getDate(int columnIndex, Calendar cal)");
     }
 
     public Date getDate(String columnName, Calendar cal) throws SQLException {
-        throw new UnsupportedOperationException("getDate(String columnName, Calendar cal)");
+        throw new NotSupportException("getDate(String columnName, Calendar cal)");
     }
 
     public double getDouble(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("getDouble(int columnIndex)");
+        throw new NotSupportException("getDouble(int columnIndex)");
     }
 
     public double getDouble(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("getDouble(String columnName)");
+        throw new NotSupportException("getDouble(String columnName)");
     }
 
     public int getFetchDirection() throws SQLException {
-        throw new UnsupportedOperationException("getFetchDirection");
+        throw new NotSupportException("getFetchDirection");
     }
 
     public int getFetchSize() throws SQLException {
-        throw new UnsupportedOperationException("getFetchSize");
+        throw new NotSupportException("getFetchSize");
     }
 
     public float getFloat(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("getFloat(int columnIndex)");
+        throw new NotSupportException("getFloat(int columnIndex)");
     }
 
     public float getFloat(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("getFloat(String columnName)");
+        throw new NotSupportException("getFloat(String columnName)");
     }
 
     public int getInt(int columnIndex) throws SQLException {
@@ -249,7 +257,7 @@ public class MockResultSet implements ResultSet {
     }
 
     public int getInt(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("getInt(String columnName)");
+        throw new NotSupportException("getInt(String columnName)");
     }
 
     public long getLong(int columnIndex) throws SQLException {
@@ -258,7 +266,7 @@ public class MockResultSet implements ResultSet {
     }
 
     public long getLong(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("getLong(String columnName)");
+        throw new NotSupportException("getLong(String columnName)");
     }
 
     public ResultSetMetaData getMetaData() throws SQLException {
@@ -267,35 +275,31 @@ public class MockResultSet implements ResultSet {
     }
 
     public Object getObject(int columnIndex) throws SQLException {
-        // throw new
-        // UnsupportedOperationException("getObject(int columnIndex)");
         return this.rows.get(cursor)[columnIndex - 1];
     }
 
     public Object getObject(String columnName) throws SQLException {
-        // throw new
-        // UnsupportedOperationException("getObject(String columnName)");
         return this.rows.get(cursor)[this.columns.get(columnName) - 1];
     }
 
     public Object getObject(int i, Map<String, Class<?>> map) throws SQLException {
-        throw new UnsupportedOperationException("getObject(int i, Map<String, Class<?>> map)");
+        throw new NotSupportException("getObject(int i, Map<String, Class<?>> map)");
     }
 
     public Object getObject(String colName, Map<String, Class<?>> map) throws SQLException {
-        throw new UnsupportedOperationException("getObject(String colName, Map<String, Class<?>> map)");
+        throw new NotSupportException("getObject(String colName, Map<String, Class<?>> map)");
     }
 
     public Ref getRef(int i) throws SQLException {
-        throw new UnsupportedOperationException("getRef(int i)");
+        throw new NotSupportException("getRef(int i)");
     }
 
     public Ref getRef(String colName) throws SQLException {
-        throw new UnsupportedOperationException("getRef(String colName)");
+        throw new NotSupportException("getRef(String colName)");
     }
 
     public int getRow() throws SQLException {
-        throw new UnsupportedOperationException("getRow");
+        throw new NotSupportException("getRow");
     }
 
     public short getShort(int columnIndex) throws SQLException {
@@ -307,7 +311,7 @@ public class MockResultSet implements ResultSet {
     }
 
     public Statement getStatement() throws SQLException {
-        throw new UnsupportedOperationException("getStatement");
+        throw new NotSupportException("getStatement");
     }
 
     public String getString(int columnIndex) throws SQLException {
@@ -327,11 +331,11 @@ public class MockResultSet implements ResultSet {
     }
 
     public Time getTime(int columnIndex, Calendar cal) throws SQLException {
-        throw new UnsupportedOperationException("getTime(int columnIndex, Calendar cal)");
+        throw new NotSupportException("getTime(int columnIndex, Calendar cal)");
     }
 
     public Time getTime(String columnName, Calendar cal) throws SQLException {
-        throw new UnsupportedOperationException("getTime(String columnName, Calendar cal)");
+        throw new NotSupportException("getTime(String columnName, Calendar cal)");
     }
 
     public Timestamp getTimestamp(int columnIndex) throws SQLException {
@@ -343,11 +347,11 @@ public class MockResultSet implements ResultSet {
     }
 
     public Timestamp getTimestamp(int columnIndex, Calendar cal) throws SQLException {
-        throw new UnsupportedOperationException("getTimestamp(int columnIndex, Calendar cal)");
+        throw new NotSupportException("getTimestamp(int columnIndex, Calendar cal)");
     }
 
     public Timestamp getTimestamp(String columnName, Calendar cal) throws SQLException {
-        throw new UnsupportedOperationException("getTimestamp(String columnName, Calendar cal)");
+        throw new NotSupportException("getTimestamp(String columnName, Calendar cal)");
     }
 
     /**
@@ -358,65 +362,61 @@ public class MockResultSet implements ResultSet {
     }
 
     public URL getURL(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("getURL(int columnIndex)");
+        throw new NotSupportException("getURL(int columnIndex)");
     }
 
     public URL getURL(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("getURL(String columnName)");
+        throw new NotSupportException("getURL(String columnName)");
     }
 
     public InputStream getUnicodeStream(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("getUnicodeStream(int columnIndex)");
+        throw new NotSupportException("getUnicodeStream(int columnIndex)");
     }
 
     public InputStream getUnicodeStream(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("getUnicodeStream(String columnName)");
+        throw new NotSupportException("getUnicodeStream(String columnName)");
     }
 
     public SQLWarning getWarnings() throws SQLException {
-        throw new UnsupportedOperationException("getWarnings");
+        throw new NotSupportException("getWarnings");
     }
 
     public void insertRow() throws SQLException {
-        throw new UnsupportedOperationException("insertRow");
+        throw new NotSupportException("insertRow");
     }
 
     public boolean isAfterLast() throws SQLException {
-        throw new UnsupportedOperationException("isAfterLast");
+        throw new NotSupportException("isAfterLast");
     }
 
     public boolean isBeforeFirst() throws SQLException {
-        throw new UnsupportedOperationException("isBeforeFirst");
+        throw new NotSupportException("isBeforeFirst");
     }
 
     public boolean isFirst() throws SQLException {
-        throw new UnsupportedOperationException("isFirst");
+        throw new NotSupportException("isFirst");
     }
 
     public boolean isLast() throws SQLException {
-        throw new UnsupportedOperationException("isLast");
+        throw new NotSupportException("isLast");
     }
 
     public boolean last() throws SQLException {
-        throw new UnsupportedOperationException("last");
+        throw new NotSupportException("last");
     }
 
     public void moveToCurrentRow() throws SQLException {
-        throw new UnsupportedOperationException("moveToCurrentRow");
+        throw new NotSupportException("moveToCurrentRow");
     }
 
     public void moveToInsertRow() throws SQLException {
-        throw new UnsupportedOperationException("moveToInsertRow");
+        throw new NotSupportException("moveToInsertRow");
     }
-
-    private int nextInvokingTimes = 0;
 
     protected boolean hasNext() {
         cursor++;
         return cursor < this.rows.size();
     }
-
-    private long nextSleepTime = 0;
 
     public boolean next() throws SQLException {
         try {
@@ -429,223 +429,223 @@ public class MockResultSet implements ResultSet {
     }
 
     public boolean previous() throws SQLException {
-        throw new UnsupportedOperationException("previous");
+        throw new NotSupportException("previous");
     }
 
     public void refreshRow() throws SQLException {
-        throw new UnsupportedOperationException("refreshRow");
+        throw new NotSupportException("refreshRow");
     }
 
     public boolean relative(int rows) throws SQLException {
-        throw new UnsupportedOperationException("relative");
+        throw new NotSupportException("relative");
     }
 
     public boolean rowDeleted() throws SQLException {
-        throw new UnsupportedOperationException("rowDeleted");
+        throw new NotSupportException("rowDeleted");
     }
 
     public boolean rowInserted() throws SQLException {
-        throw new UnsupportedOperationException("rowInserted");
+        throw new NotSupportException("rowInserted");
     }
 
     public boolean rowUpdated() throws SQLException {
-        throw new UnsupportedOperationException("rowUpdated");
+        throw new NotSupportException("rowUpdated");
     }
 
     public void setFetchDirection(int direction) throws SQLException {
-        throw new UnsupportedOperationException("setFetchDirection");
+        throw new NotSupportException("setFetchDirection");
     }
 
     public void setFetchSize(int rows) throws SQLException {
-        throw new UnsupportedOperationException("setFetchSize");
+        throw new NotSupportException("setFetchSize");
     }
 
     public void updateArray(int columnIndex, Array x) throws SQLException {
-        throw new UnsupportedOperationException("updateArray(int columnIndex, Array x)");
+        throw new NotSupportException("updateArray(int columnIndex, Array x)");
     }
 
     public void updateArray(String columnName, Array x) throws SQLException {
-        throw new UnsupportedOperationException("updateArray(String columnName, Array x)");
+        throw new NotSupportException("updateArray(String columnName, Array x)");
     }
 
     public void updateAsciiStream(int columnIndex, InputStream x, int length) throws SQLException {
-        throw new UnsupportedOperationException("updateAsciiStream(int columnIndex, InputStream x, int length)");
+        throw new NotSupportException("updateAsciiStream(int columnIndex, InputStream x, int length)");
     }
 
     public void updateAsciiStream(String columnName, InputStream x, int length) throws SQLException {
-        throw new UnsupportedOperationException("updateAsciiStream(String columnName, InputStream x, int length)");
+        throw new NotSupportException("updateAsciiStream(String columnName, InputStream x, int length)");
     }
 
     public void updateBigDecimal(int columnIndex, BigDecimal x) throws SQLException {
-        throw new UnsupportedOperationException("updateBigDecimal(int columnIndex, BigDecimal x)");
+        throw new NotSupportException("updateBigDecimal(int columnIndex, BigDecimal x)");
     }
 
     public void updateBigDecimal(String columnName, BigDecimal x) throws SQLException {
-        throw new UnsupportedOperationException("updateBigDecimal(String columnName, BigDecimal x)");
+        throw new NotSupportException("updateBigDecimal(String columnName, BigDecimal x)");
     }
 
     public void updateBinaryStream(int columnIndex, InputStream x, int length) throws SQLException {
-        throw new UnsupportedOperationException("updateBinaryStream(int columnIndex, InputStream x, int length)");
+        throw new NotSupportException("updateBinaryStream(int columnIndex, InputStream x, int length)");
     }
 
     public void updateBinaryStream(String columnName, InputStream x, int length) throws SQLException {
-        throw new UnsupportedOperationException("updateBinaryStream(String columnName, InputStream x, int length)");
+        throw new NotSupportException("updateBinaryStream(String columnName, InputStream x, int length)");
     }
 
     public void updateBlob(int columnIndex, Blob x) throws SQLException {
-        throw new UnsupportedOperationException("updateBlob(int columnIndex, Blob x)");
+        throw new NotSupportException("updateBlob(int columnIndex, Blob x)");
     }
 
     public void updateBlob(String columnName, Blob x) throws SQLException {
-        throw new UnsupportedOperationException("updateBlob(String columnName, Blob x)");
+        throw new NotSupportException("updateBlob(String columnName, Blob x)");
     }
 
     public void updateBoolean(int columnIndex, boolean x) throws SQLException {
-        throw new UnsupportedOperationException("updateBoolean(int columnIndex, boolean x)");
+        throw new NotSupportException("updateBoolean(int columnIndex, boolean x)");
     }
 
     public void updateBoolean(String columnName, boolean x) throws SQLException {
-        throw new UnsupportedOperationException("updateBoolean(String columnName, boolean x)");
+        throw new NotSupportException("updateBoolean(String columnName, boolean x)");
     }
 
     public void updateByte(int columnIndex, byte x) throws SQLException {
-        throw new UnsupportedOperationException("updateByte(int columnIndex, byte x)");
+        throw new NotSupportException("updateByte(int columnIndex, byte x)");
     }
 
     public void updateByte(String columnName, byte x) throws SQLException {
-        throw new UnsupportedOperationException("updateByte(String columnName, byte x)");
+        throw new NotSupportException("updateByte(String columnName, byte x)");
     }
 
     public void updateBytes(int columnIndex, byte[] x) throws SQLException {
-        throw new UnsupportedOperationException("updateBytes(int columnIndex, byte[] x)");
+        throw new NotSupportException("updateBytes(int columnIndex, byte[] x)");
     }
 
     public void updateBytes(String columnName, byte[] x) throws SQLException {
-        throw new UnsupportedOperationException("updateBytes(String columnName, byte[] x)");
+        throw new NotSupportException("updateBytes(String columnName, byte[] x)");
     }
 
     public void updateCharacterStream(int columnIndex, Reader x, int length) throws SQLException {
-        throw new UnsupportedOperationException("updateCharacterStream(int columnIndex, Reader x, int length)");
+        throw new NotSupportException("updateCharacterStream(int columnIndex, Reader x, int length)");
     }
 
     public void updateCharacterStream(String columnName, Reader reader, int length) throws SQLException {
-        throw new UnsupportedOperationException("updateCharacterStream(String columnName, Reader reader, int length)");
+        throw new NotSupportException("updateCharacterStream(String columnName, Reader reader, int length)");
     }
 
     public void updateClob(int columnIndex, Clob x) throws SQLException {
-        throw new UnsupportedOperationException("updateClob(int columnIndex, Clob x)");
+        throw new NotSupportException("updateClob(int columnIndex, Clob x)");
     }
 
     public void updateClob(String columnName, Clob x) throws SQLException {
-        throw new UnsupportedOperationException("updateClob(String columnName, Clob x)");
+        throw new NotSupportException("updateClob(String columnName, Clob x)");
     }
 
     public void updateDate(int columnIndex, Date x) throws SQLException {
-        throw new UnsupportedOperationException("updateDate(int columnIndex, Date x)");
+        throw new NotSupportException("updateDate(int columnIndex, Date x)");
     }
 
     public void updateDate(String columnName, Date x) throws SQLException {
-        throw new UnsupportedOperationException("updateDate(String columnName, Date x)");
+        throw new NotSupportException("updateDate(String columnName, Date x)");
     }
 
     public void updateDouble(int columnIndex, double x) throws SQLException {
-        throw new UnsupportedOperationException("updateDouble(int columnIndex, double x)");
+        throw new NotSupportException("updateDouble(int columnIndex, double x)");
     }
 
     public void updateDouble(String columnName, double x) throws SQLException {
-        throw new UnsupportedOperationException("updateDouble(String columnName, double x)");
+        throw new NotSupportException("updateDouble(String columnName, double x)");
     }
 
     public void updateFloat(int columnIndex, float x) throws SQLException {
-        throw new UnsupportedOperationException("updateFloat(int columnIndex, float x)");
+        throw new NotSupportException("updateFloat(int columnIndex, float x)");
     }
 
     public void updateFloat(String columnName, float x) throws SQLException {
-        throw new UnsupportedOperationException("updateFloat(String columnName, float x)");
+        throw new NotSupportException("updateFloat(String columnName, float x)");
     }
 
     public void updateInt(int columnIndex, int x) throws SQLException {
-        throw new UnsupportedOperationException("updateInt(int columnIndex, int x)");
+        throw new NotSupportException("updateInt(int columnIndex, int x)");
     }
 
     public void updateInt(String columnName, int x) throws SQLException {
-        throw new UnsupportedOperationException("updateInt(String columnName, int x)");
+        throw new NotSupportException("updateInt(String columnName, int x)");
     }
 
     public void updateLong(int columnIndex, long x) throws SQLException {
-        throw new UnsupportedOperationException("updateLong(int columnIndex, long x)");
+        throw new NotSupportException("updateLong(int columnIndex, long x)");
     }
 
     public void updateLong(String columnName, long x) throws SQLException {
-        throw new UnsupportedOperationException("updateLong(String columnName, long x)");
+        throw new NotSupportException("updateLong(String columnName, long x)");
     }
 
     public void updateNull(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("updateNull(int columnIndex)");
+        throw new NotSupportException("updateNull(int columnIndex)");
     }
 
     public void updateNull(String columnName) throws SQLException {
-        throw new UnsupportedOperationException("updateNull(String columnName)");
+        throw new NotSupportException("updateNull(String columnName)");
     }
 
     public void updateObject(int columnIndex, Object x) throws SQLException {
-        throw new UnsupportedOperationException("updateObject(int columnIndex, Object x)");
+        throw new NotSupportException("updateObject(int columnIndex, Object x)");
     }
 
     public void updateObject(String columnName, Object x) throws SQLException {
-        throw new UnsupportedOperationException("updateObject(String columnName, Object x)");
+        throw new NotSupportException("updateObject(String columnName, Object x)");
     }
 
     public void updateObject(int columnIndex, Object x, int scale) throws SQLException {
-        throw new UnsupportedOperationException("updateObject(int columnIndex, Object x, int scale)");
+        throw new NotSupportException("updateObject(int columnIndex, Object x, int scale)");
     }
 
     public void updateObject(String columnName, Object x, int scale) throws SQLException {
-        throw new UnsupportedOperationException("updateObject(String columnName, Object x, int scale)");
+        throw new NotSupportException("updateObject(String columnName, Object x, int scale)");
     }
 
     public void updateRef(int columnIndex, Ref x) throws SQLException {
-        throw new UnsupportedOperationException("updateRef(int columnIndex, Ref x)");
+        throw new NotSupportException("updateRef(int columnIndex, Ref x)");
     }
 
     public void updateRef(String columnName, Ref x) throws SQLException {
-        throw new UnsupportedOperationException("updateRef(String columnName, Ref x)");
+        throw new NotSupportException("updateRef(String columnName, Ref x)");
     }
 
     public void updateRow() throws SQLException {
-        throw new UnsupportedOperationException("updateRow");
+        throw new NotSupportException("updateRow");
     }
 
     public void updateShort(int columnIndex, short x) throws SQLException {
-        throw new UnsupportedOperationException("updateShort(int columnIndex, short x)");
+        throw new NotSupportException("updateShort(int columnIndex, short x)");
     }
 
     public void updateShort(String columnName, short x) throws SQLException {
-        throw new UnsupportedOperationException("updateShort(String columnName, short x)");
+        throw new NotSupportException("updateShort(String columnName, short x)");
     }
 
     public void updateString(int columnIndex, String x) throws SQLException {
-        throw new UnsupportedOperationException("updateString(int columnIndex, String x)");
+        throw new NotSupportException("updateString(int columnIndex, String x)");
     }
 
     public void updateString(String columnName, String x) throws SQLException {
-        throw new UnsupportedOperationException("updateString(String columnName, String x)");
+        throw new NotSupportException("updateString(String columnName, String x)");
     }
 
     public void updateTime(int columnIndex, Time x) throws SQLException {
-        throw new UnsupportedOperationException("updateTime(int columnIndex, Time x)");
+        throw new NotSupportException("updateTime(int columnIndex, Time x)");
     }
 
     public void updateTime(String columnName, Time x) throws SQLException {
-        throw new UnsupportedOperationException("updateTime(String columnName, Time x)");
+        throw new NotSupportException("updateTime(String columnName, Time x)");
     }
 
     public void updateTimestamp(int columnIndex, Timestamp x) throws SQLException {
-        throw new UnsupportedOperationException("updateTimestamp(int columnIndex, Timestamp x)");
+        throw new NotSupportException("updateTimestamp(int columnIndex, Timestamp x)");
     }
 
     public void updateTimestamp(String columnName, Timestamp x) throws SQLException {
-        throw new UnsupportedOperationException("updateTimestamp(String columnName, Timestamp x)");
+        throw new NotSupportException("updateTimestamp(String columnName, Timestamp x)");
     }
 
     public boolean wasNull() throws SQLException {

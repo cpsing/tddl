@@ -8,7 +8,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import com.taobao.tddl.common.jdbc.TExceptionUtils;
-import com.taobao.tddl.common.jdbc.sort.ExceptionSorter;
+import com.taobao.tddl.common.jdbc.sorter.ExceptionSorter;
 import com.taobao.tddl.common.model.DBType;
 import com.taobao.tddl.group.jdbc.DataSourceWrapper;
 

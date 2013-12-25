@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
 
-public interface TUnitDeployProtect {
+public interface TddlUnitDeployProtect {
 
     void unitDeployProtect(String sql, Map<Integer, ParameterContext> params) throws SQLException;
 

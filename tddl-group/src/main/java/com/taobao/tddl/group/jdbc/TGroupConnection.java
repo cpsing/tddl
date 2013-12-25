@@ -33,7 +33,7 @@ import com.taobao.tddl.group.config.GroupIndex;
 import com.taobao.tddl.group.dbselector.DBSelector;
 import com.taobao.tddl.group.dbselector.DBSelector.AbstractDataSourceTryer;
 import com.taobao.tddl.group.dbselector.DBSelector.DataSourceTryer;
-import com.taobao.tddl.group.hint.GroupHintParser;
+import com.taobao.tddl.group.utils.GroupHintParser;
 import com.taobao.tddl.monitor.unit.UnitDeployProtect;
 
 import com.taobao.tddl.common.utils.logger.Logger;
