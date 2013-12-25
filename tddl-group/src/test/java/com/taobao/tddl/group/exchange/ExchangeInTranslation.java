@@ -35,7 +35,7 @@ public class ExchangeInTranslation {
             jdbcTemplate.update("delete from complextbl_0001");
             Connection connection = dataSource.getConnection();
             connection.setAutoCommit(false);
-            PreparedStatement ps1 = connection.prepareStatement("insert into complextbl_0000 (pk,name) values(?,?)");
+            PreparedStatement ps1 = connection.prepareStatement("insert into complextbl_0000 (id,name) values(?,?)");
             ps1.setObject(1, 10);
             ps1.setObject(2, "TEST");
             ps1.execute();
@@ -44,7 +44,7 @@ public class ExchangeInTranslation {
             // this time exchange and wait untill exchange complete
             connection.rollback();
 
-            PreparedStatement ps2 = connection.prepareStatement("insert into complextbl_0001 (pk,name) values(?,?)");
+            PreparedStatement ps2 = connection.prepareStatement("insert into complextbl_0001 (id,name) values(?,?)");
             ps2.setObject(1, 10);
             ps2.setObject(2, "TEST");
             ps2.execute();

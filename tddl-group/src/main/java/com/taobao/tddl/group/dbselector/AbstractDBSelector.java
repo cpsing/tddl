@@ -12,9 +12,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.sql.DataSource;
 
 import com.taobao.tddl.common.jdbc.SQLPreParser;
-import com.taobao.tddl.common.jdbc.sort.ExceptionSorter;
-import com.taobao.tddl.common.jdbc.sort.MySQLExceptionSorter;
-import com.taobao.tddl.common.jdbc.sort.OracleExceptionSorter;
+import com.taobao.tddl.common.jdbc.sorter.ExceptionSorter;
+import com.taobao.tddl.common.jdbc.sorter.MySQLExceptionSorter;
+import com.taobao.tddl.common.jdbc.sorter.OracleExceptionSorter;
 import com.taobao.tddl.common.model.DBType;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.logger.Logger;

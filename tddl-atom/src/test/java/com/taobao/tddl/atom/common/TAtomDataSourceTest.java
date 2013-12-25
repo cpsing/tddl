@@ -3,36 +3,25 @@ package com.taobao.tddl.atom.common;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.taobao.diamond.mockserver.MockServer;
+import com.taobao.tddl.atom.BaseAtomTest;
 import com.taobao.tddl.atom.TAtomDataSource;
 import com.taobao.tddl.atom.config.TAtomConfParser;
 import com.taobao.tddl.atom.config.TAtomDsConfDO;
 import com.taobao.tddl.atom.exception.AtomAlreadyInitException;
 
-public class TAtomDataSourceUnitTest {
+public class TAtomDataSourceTest extends BaseAtomTest {
 
-    static String TEST_SQL = "select 1 from druid_0000";
-
-    @Before
-    public void beforeClass() {
-        MockServer.setUpMockServer();
-    }
-
-    @After
-    public void after() {
-        MockServer.tearDownMockServer();
-    }
+    static String TEST_SQL = "select 1 from dual";
 
     @Test
     public void testInitTAtomDataSource_初始化() throws Exception {
-        String appName = "DRUID_APP";
-        String dbKey = "druid_atom_0";
+        String appName = "tddl_sample";
+        String dbKey = "tddl_sample_0";
         // Oracle测试
         // TAtomDataSource tAtomDataSource = createTAtomDataSource(appName,
         // dbKey, "oracle");
@@ -43,7 +32,7 @@ public class TAtomDataSourceUnitTest {
         // mysql测试
         TAtomDataSource tAtomDataSource = createTAtomDataSource(appName, dbKey, "mysql");
         JdbcTemplate jtp = new JdbcTemplate(tAtomDataSource);
-        int actual = jtp.queryForInt(TAtomDataSourceUnitTest.TEST_SQL);
+        int actual = jtp.queryForInt(TAtomDataSourceTest.TEST_SQL);
         Assert.assertEquals(actual, 1);
         tAtomDataSource.destroyDataSource();
     }
@@ -138,7 +127,7 @@ public class TAtomDataSourceUnitTest {
         testChange(new ChangeTestConfig() {
 
             public Properties doChange(Properties prop) {
-                prop.setProperty(TAtomConfParser.GLOBA_DB_NAME_KEY, "tddl_sample_1");
+                prop.setProperty(TAtomConfParser.GLOBA_DB_NAME_KEY, "tddl_sample_x");
                 return prop;
             }
         }, new ChangeTestConfig() {
@@ -259,10 +248,10 @@ public class TAtomDataSourceUnitTest {
                                                                                                    throws IOException,
                                                                                                    AtomAlreadyInitException,
                                                                                                    Exception {
-        String appName = "DRUID_APP";
+        String appName = "tddl_sample";
         String dbKey = "unitTestDb-" + dbType;
         String configName = "";
-        String testSql = TAtomDataSourceUnitTest.TEST_SQL;
+        String testSql = TAtomDataSourceTest.TEST_SQL;
         configName = dbType;
         TAtomDataSource tAtomDataSource = createTAtomDataSource(appName, dbKey, configName);
         JdbcTemplate jtp = new JdbcTemplate(tAtomDataSource);
@@ -282,7 +271,7 @@ public class TAtomDataSourceUnitTest {
             tAtomDsConfDO.getDbType(),
             tAtomDsConfDO.getUserName());
         MockServer.setConfigInfo(passwdDataId, PropLoadTestUtil.convertProp2Str(change.doChange(passwdProp)));
-        Thread.sleep(1200);
+        Thread.sleep(3000);
         // 期待出现错误
         boolean result = false;
         try {
@@ -294,7 +283,7 @@ public class TAtomDataSourceUnitTest {
         MockServer.setConfigInfo(passwdDataId,
             PropLoadTestUtil.convertProp2Str(restore.doChange(PropLoadTestUtil.loadPropFromFile("conf/" + configName
                                                                                                 + "/passwd.properties"))));
-        Thread.sleep(1200);
+        Thread.sleep(3000);
         // 期待结果正常
         actual = jtp.queryForInt(testSql);
         Assert.assertEquals(actual, 1);
@@ -304,10 +293,10 @@ public class TAtomDataSourceUnitTest {
 
     private void testChange(ChangeTestConfig change, ChangeTestConfig restore, String type, String dbType,
                             String methodName) throws IOException, AtomAlreadyInitException, Exception {
-        String appName = "DRUID_APP";
+        String appName = "tddl_sample";
         String dbKey = "unitTestDb-" + methodName;
         String configName = dbType;
-        String testSql = TAtomDataSourceUnitTest.TEST_SQL;
+        String testSql = TAtomDataSourceTest.TEST_SQL;
         TAtomDataSource tAtomDataSource = createTAtomDataSource(appName, dbKey, configName);
         JdbcTemplate jtp = new JdbcTemplate(tAtomDataSource);
         int actual = jtp.queryForInt(testSql);

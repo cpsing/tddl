@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.mockdatasource;
+package com.taobao.tddl.common.mock;
 
 import java.sql.ResultSet;
 

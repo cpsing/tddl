@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.mockdatasource;
+package com.taobao.tddl.common.mock;
 
 import java.sql.Array;
 import java.sql.Blob;
@@ -20,17 +20,21 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.taobao.tddl.common.exception.NotSupportException;
-import com.taobao.tddl.common.mockdatasource.MockDataSource.ExecuteInfo;
+import com.taobao.tddl.common.mock.MockDataSource.ExecuteInfo;
 
 public class MockConnection implements Connection {
 
     private MockDataSource mockDataSource;
 
-    private long           timeToClose         = 0;
-    private int            closeInvokingTimes  = 0;
-    private boolean        isClosed            = false;
-    private boolean        autoCommit          = true;
-    private int            commitInvokingTimes = 0;
+    private long           timeToClose              = 0;
+    private int            closeInvokingTimes       = 0;
+    private boolean        isClosed                 = false;
+    private boolean        autoCommit               = true;
+    private int            commitInvokingTimes      = 0;
+    private int            getMetadataInvokingTimes = 0;
+    private int            transactionIsolation     = -1;
+    private boolean        isReadOnly;
+    private int            rollbackInvotingTimes    = 0;
 
     public void clearWarnings() throws SQLException {
         throw new NotSupportException("");
@@ -51,7 +55,9 @@ public class MockConnection implements Connection {
     }
 
     protected void checkClose() throws SQLException {
-        if (isClosed) throw new SQLException("closed");
+        if (isClosed) {
+            throw new SQLException("closed");
+        }
     }
 
     public void commit() throws SQLException {
@@ -98,11 +104,8 @@ public class MockConnection implements Connection {
     }
 
     public int getHoldability() throws SQLException {
-        // throw new NotSupportException("");
         return ResultSet.CLOSE_CURSORS_AT_COMMIT;
     }
-
-    private int getMetadataInvokingTimes = 0;
 
     public DatabaseMetaData getMetaData() throws SQLException {
         mockDataSource.checkState();
@@ -110,8 +113,6 @@ public class MockConnection implements Connection {
         getMetadataInvokingTimes++;
         return new MockDataBaseMetaData();
     }
-
-    int transactionIsolation = -1;
 
     public int getTransactionIsolation() throws SQLException {
         mockDataSource.checkState();
@@ -132,8 +133,6 @@ public class MockConnection implements Connection {
         mockDataSource.checkState();
         return isClosed;
     }
-
-    private boolean isReadOnly;
 
     public boolean isReadOnly() throws SQLException {
         mockDataSource.checkState();
@@ -196,11 +195,8 @@ public class MockConnection implements Connection {
     }
 
     public void releaseSavepoint(Savepoint savepoint) throws SQLException {
-        mockDataSource.checkState();
-        throw new NotSupportException("");
+        throw new NotSupportException();
     }
-
-    private int rollbackInvotingTimes = 0;
 
     public void rollback() throws SQLException {
         mockDataSource.checkState();
@@ -233,7 +229,12 @@ public class MockConnection implements Connection {
 
     public void setReadOnly(boolean readOnly) throws SQLException {
         mockDataSource.checkState();
-        // TODO:
+        this.isReadOnly = true;
+    }
+
+    public void setTransactionIsolation(int level) throws SQLException {
+        mockDataSource.checkState();
+        this.transactionIsolation = level;
     }
 
     public Savepoint setSavepoint() throws SQLException {
@@ -244,32 +245,23 @@ public class MockConnection implements Connection {
         throw new NotSupportException("");
     }
 
-    public void setTransactionIsolation(int level) throws SQLException {
-        mockDataSource.checkState();
-        this.transactionIsolation = level;
-    }
-
     public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
         throw new NotSupportException("");
     }
 
     public <T> T unwrap(Class<T> iface) throws SQLException {
-
         return null;
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-
         return false;
     }
 
     public Clob createClob() throws SQLException {
-
         return null;
     }
 
     public Blob createBlob() throws SQLException {
-
         return null;
     }
 
@@ -279,41 +271,49 @@ public class MockConnection implements Connection {
     }
 
     public SQLXML createSQLXML() throws SQLException {
-
         return null;
     }
 
     public boolean isValid(int timeout) throws SQLException {
-
         return false;
     }
 
     public void setClientInfo(String name, String value) throws SQLClientInfoException {
-
     }
 
     public void setClientInfo(Properties properties) throws SQLClientInfoException {
-
     }
 
     public String getClientInfo(String name) throws SQLException {
-
         return null;
     }
 
     public Properties getClientInfo() throws SQLException {
-
         return null;
     }
 
     public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
-
         return null;
     }
 
     public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
-
         return null;
+    }
+
+    public int getCloseInvokingTimes() {
+        return closeInvokingTimes;
+    }
+
+    public int getCommitInvokingTimes() {
+        return commitInvokingTimes;
+    }
+
+    public int getGetMetadataInvokingTimes() {
+        return getMetadataInvokingTimes;
+    }
+
+    public int getRollbackInvotingTimes() {
+        return rollbackInvotingTimes;
     }
 
 }

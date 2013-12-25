@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.mockdatasource;
+package com.taobao.tddl.common.mock;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -9,21 +9,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.taobao.tddl.common.exception.NotSupportException;
-import com.taobao.tddl.common.mockdatasource.MockDataSource.ExecuteInfo;
+import com.taobao.tddl.common.mock.MockDataSource.ExecuteInfo;
 
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 public class MockStatement implements Statement {
 
-    private static final Logger logger = LoggerFactory.getLogger(MockStatement.class);
+    private static final Logger logger                  = LoggerFactory.getLogger(MockStatement.class);
     protected MockDataSource    mds;
     protected String            sql;
-    protected List<String>      sqls   = new ArrayList<String>();
-    // protected UpdateHandler updateHandler;
-    protected int               queryTimeOut;
+    protected List<String>      sqls                    = new ArrayList<String>();
+    protected int               queryTimeout;
     protected int               fetchSize;
     protected int               maxRows;
+    private boolean             isClosed;
+    private int                 closeInvokingTimes      = 0;
+    private boolean             success                 = true;
+    private int                 executeSqlInvokingTimes = 0;
 
     public MockStatement(String method, MockDataSource mockDataSource, String sql){
         this.sql = sql;
@@ -55,21 +58,16 @@ public class MockStatement implements Statement {
         throw new NotSupportException("");
     }
 
-    private int closeInvokingTimes = 0;
-
     public void close() throws SQLException {
         mds.checkState();
         closeInvokingTimes++;
     }
 
-    private boolean isClosed;
-
     protected void checkClosed() throws SQLException {
-        if (isClosed) throw new SQLException("closed");
+        if (isClosed) {
+            throw new SQLException("closed");
+        }
     }
-
-    private boolean success                 = true;
-    private int     executeSqlInvokingTimes = 0;
 
     public boolean execute(String sql) throws SQLException {
         mds.checkState();
@@ -128,7 +126,6 @@ public class MockStatement implements Statement {
     public int[] executeBatch() throws SQLException {
         mds.checkState();
         logger.warn("[executeBatch]" + sql);
-        // throw new NotSupportException("");
         MockDataSource.record(new ExecuteInfo(this.mds, "executeBatch", this.sql, null));
         return new int[] { -1, -1 };
     }
@@ -205,7 +202,7 @@ public class MockStatement implements Statement {
     }
 
     public int getQueryTimeout() throws SQLException {
-        return this.queryTimeOut;
+        return this.queryTimeout;
     }
 
     public ResultSet getResultSet() throws SQLException {
@@ -230,7 +227,6 @@ public class MockStatement implements Statement {
     }
 
     public SQLWarning getWarnings() throws SQLException {
-        // throw new NotSupportException("");
         return null;
     }
 
@@ -261,7 +257,7 @@ public class MockStatement implements Statement {
     }
 
     public void setQueryTimeout(int seconds) throws SQLException {
-        this.queryTimeOut = seconds;
+        this.queryTimeout = seconds;
     }
 
     public String getSql() {
@@ -312,12 +308,6 @@ public class MockStatement implements Statement {
         this.executerHandler = executerHandler;
     }
 
-    /*
-     * public UpdateHandler getUpdateHandler() { return updateHandler; } public
-     * void setUpdateHandler(UpdateHandler updateHandler) { this.updateHandler =
-     * updateHandler; }
-     */
-
     public long getInsertSleepTime() {
         return insertSleepTime;
     }
@@ -327,22 +317,17 @@ public class MockStatement implements Statement {
     }
 
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
     public void setPoolable(boolean poolable) throws SQLException {
-        // TODO Auto-generated method stub
-
     }
 
     public boolean isPoolable() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 

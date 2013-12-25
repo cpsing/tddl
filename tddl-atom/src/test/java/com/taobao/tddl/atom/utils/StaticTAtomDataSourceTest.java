@@ -6,7 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.taobao.tddl.atom.StaticTAtomDataSource;
 
-public class StaticTAtomDataSourceUnitTest {
+public class StaticTAtomDataSourceTest {
 
     @Test
     public void createStaticTAtomDataSource() throws Exception {

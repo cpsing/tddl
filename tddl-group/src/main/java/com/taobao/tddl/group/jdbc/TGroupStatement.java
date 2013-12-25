@@ -18,7 +18,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.group.config.GroupIndex;
 import com.taobao.tddl.group.dbselector.DBSelector.AbstractDataSourceTryer;
 import com.taobao.tddl.group.dbselector.DBSelector.DataSourceTryer;
-import com.taobao.tddl.group.hint.GroupHintParser;
+import com.taobao.tddl.group.utils.GroupHintParser;
 
 /**
  * @author linxuan

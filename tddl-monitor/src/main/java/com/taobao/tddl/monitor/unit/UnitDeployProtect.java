@@ -12,9 +12,9 @@ import com.taobao.tddl.common.utils.extension.ExtensionLoader;
  */
 public class UnitDeployProtect {
 
-    static TUnitDeployProtect delegate = null;
+    static TddlUnitDeployProtect delegate = null;
     static {
-        delegate = ExtensionLoader.load(TUnitDeployProtect.class);
+        delegate = ExtensionLoader.load(TddlUnitDeployProtect.class);
     }
 
     public static void unitDeployProtect(String sql, Map<Integer, ParameterContext> params) throws SQLException {
@@ -29,19 +29,19 @@ public class UnitDeployProtect {
         UnitDeployProtect.unitDeployProtect(null);
     }
 
-    private static void unitDeployProtectWithCause(String sql, Map<Integer, ParameterContext> params)
-                                                                                                     throws UnitDeployInvalidException,
-                                                                                                     SQLException {
+    protected static void unitDeployProtectWithCause(String sql, Map<Integer, ParameterContext> params)
+                                                                                                       throws UnitDeployInvalidException,
+                                                                                                       SQLException {
 
         delegate.unitDeployProtectWithCause(sql, params);
     }
 
-    private static void eagleEyeRecord(boolean result, Object c) throws UnitDeployInvalidException {
+    protected static void eagleEyeRecord(boolean result, Object c) throws UnitDeployInvalidException {
 
         delegate.eagleEyeRecord(result, c);
     }
 
-    private static Object getValidKeyFromThread() {
+    protected static Object getValidKeyFromThread() {
 
         return delegate.getValidKeyFromThread();
 
@@ -60,11 +60,11 @@ public class UnitDeployProtect {
         return tryRemoveUnitValidHintAndParameter(sql, null);
     }
 
-    private static String tryRemoveUnitValidHintAndParameter(String sql, Map<Integer, ParameterContext> params) {
+    protected static String tryRemoveUnitValidHintAndParameter(String sql, Map<Integer, ParameterContext> params) {
         return delegate.tryRemoveUnitValidHintAndParameter(sql, params);
     }
 
-    private static String replaceWithParams(String sql, Map<Integer, ParameterContext> params) throws SQLException {
+    protected static String replaceWithParams(String sql, Map<Integer, ParameterContext> params) throws SQLException {
         return delegate.replaceWithParams(sql, params);
     }
 }

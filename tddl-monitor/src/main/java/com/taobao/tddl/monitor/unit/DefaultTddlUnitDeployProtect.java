@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
 
-public class DefaultUnitDeployProtect implements TUnitDeployProtect {
+public class DefaultTddlUnitDeployProtect implements TddlUnitDeployProtect {
 
     @Override
     public void unitDeployProtect(String sql, Map<Integer, ParameterContext> params) {

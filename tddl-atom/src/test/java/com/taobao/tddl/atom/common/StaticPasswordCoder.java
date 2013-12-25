@@ -1,4 +1,4 @@
-package com.taobao.tddl.atom.securety.impl;
+package com.taobao.tddl.atom.common;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -8,33 +8,46 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import com.taobao.tddl.atom.securety.TPasswordCoder;
+import com.taobao.tddl.common.utils.extension.Activate;
 
-public class PasswordCoderDefaultImpl implements TPasswordCoder {
+@Activate(order = 1)
+public class StaticPasswordCoder implements TPasswordCoder {
 
-    @Override
     public String encode(String encKey, String secret) throws NoSuchAlgorithmException, NoSuchPaddingException,
                                                       InvalidKeyException, IllegalBlockSizeException,
                                                       BadPaddingException {
-        return secret;
+        if (secret.equals("change")) {
+            return "change";
+        } else {
+            return "tddl";
+        }
     }
 
-    @Override
     public String encode(String secret) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
                                        BadPaddingException, IllegalBlockSizeException {
-        return secret;
+        if (secret.equals("change")) {
+            return "change";
+        } else {
+            return "tddl";
+        }
     }
 
-    @Override
     public String decode(String encKey, String secret) throws NoSuchPaddingException, NoSuchAlgorithmException,
                                                       InvalidKeyException, BadPaddingException,
                                                       IllegalBlockSizeException {
-        return secret;
+        if (secret.equals("change")) {
+            return "change";
+        } else {
+            return "tddl";
+        }
     }
 
-    @Override
     public char[] decode(String secret) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
                                        BadPaddingException, IllegalBlockSizeException {
-        return secret.toCharArray();
+        if (secret.equals("change")) {
+            return "change".toCharArray();
+        } else {
+            return "tddl".toCharArray();
+        }
     }
-
 }

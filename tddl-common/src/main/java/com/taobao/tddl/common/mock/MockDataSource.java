@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.mockdatasource;
+package com.taobao.tddl.common.mock;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -143,7 +143,7 @@ public class MockDataSource implements DataSource, Cloneable {
                                                                                        }
                                                                                    };
 
-    // TODO 下面这些变量改成一个enum类
+    // 下面这些变量改成一个enum类
     public static final String                                  m_getConnection    = "getConnection";
     public static final String                                  m_prepareStatement = "prepareStatement";
     public static final String                                  m_createStatement  = "createStatement";
@@ -380,6 +380,14 @@ public class MockDataSource implements DataSource, Cloneable {
 
     public void setClosed(boolean isClosed) {
         this.isClosed = isClosed;
+    }
+
+    public int getGetConnectionInvokingTimes() {
+        return getConnectionInvokingTimes;
+    }
+
+    public void setGetConnectionInvokingTimes(int getConnectionInvokingTimes) {
+        this.getConnectionInvokingTimes = getConnectionInvokingTimes;
     }
 
     @Override
