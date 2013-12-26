@@ -34,12 +34,13 @@ import com.taobao.tddl.common.jdbc.ParameterMethod;
 import com.taobao.tddl.common.jdbc.Parameters;
 import com.taobao.tddl.common.jdbc.SqlTypeParser;
 import com.taobao.tddl.common.model.SqlType;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.group.config.GroupIndex;
 import com.taobao.tddl.group.dbselector.DBSelector.AbstractDataSourceTryer;
 import com.taobao.tddl.group.dbselector.DBSelector.DataSourceTryer;
 import com.taobao.tddl.group.utils.GroupHintParser;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author linxuan
@@ -151,7 +152,6 @@ public class TGroupPreparedStatement extends TGroupStatement implements TPrepare
         ensureResultSetIsEmpty();
 
         Connection conn = tGroupConnection.getBaseConnection(sql, false);
-
         if (conn != null) {
             sql = GroupHintParser.removeTddlGroupHint(sql);
             // #bug 2011-10-28,modify by junyu,updateCount not set,fixed
@@ -369,7 +369,6 @@ public class TGroupPreparedStatement extends TGroupStatement implements TPrepare
         newArg.putAll(parameterSettings);
 
         parameterSettings.clear();
-
         pstArgs.add(newArg);
     }
 
@@ -401,7 +400,9 @@ public class TGroupPreparedStatement extends TGroupStatement implements TPrepare
                     dataSourceIndex);
             }
         } finally {
-            if (pstArgs != null) pstArgs.clear();
+            if (pstArgs != null) {
+                pstArgs.clear();
+            }
         }
     }
 

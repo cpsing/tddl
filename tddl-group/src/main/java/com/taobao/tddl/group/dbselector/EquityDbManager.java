@@ -9,14 +9,15 @@ import java.util.Random;
 
 import javax.sql.DataSource;
 
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.group.config.GroupConfigManager;
 import com.taobao.tddl.group.config.GroupExtraConfig;
 import com.taobao.tddl.group.exception.NoMoreDataSourceException;
 import com.taobao.tddl.group.jdbc.DataSourceWrapper;
 import com.taobao.tddl.group.utils.WeightRandom;
 import com.taobao.tddl.monitor.utils.NagiosUtils;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * 对等数据库管理器 可以是读对等：如多个读库，每个库的数据完全相同。对等读取 可以是写对等：如日志库，每个库数据不同，一条数据写入哪个库都可以。对等写入
@@ -81,7 +82,9 @@ public class EquityDbManager extends AbstractDBSelector {
     public DataSourceWrapper get(String dsKey) {
         DataSourceHolder holder = dataSourceMap.get(dsKey);
         Integer weigthValue = this.weightRandom.getWeightConfig().get(dsKey);
-        if (weigthValue == null || weigthValue.equals(0)) return null;
+        if (weigthValue == null || weigthValue.equals(0)) {
+            return null;
+        }
         return holder == null ? null : holder.dsw;
     }
 
@@ -198,13 +201,16 @@ public class EquityDbManager extends AbstractDBSelector {
     private final Random random = new Random();
 
     /**
+     * <pre>
      * 分流：随机返回权重串里包含值为dataSourceIndex的i的数据源
      * 如果权重串没有定义i/I，则dataSourceIndex等于几，就路由到group中的第几个的数据源
-     * 一个db可以同时配置多个i；不同的db可以配置相同的i，例如权重串= db0:rwi0i2, db1:ri1, db2:ri1, db3:ri2
-     * 则 用户指定dataSourceIndex=0，路由到db0；（只有db0有i0）
-     * 用户指定dataSourceIndex=1，随机路由到db1和db2；（db1和db2都有i1）
-     * 用户指定dataSourceIndex=2，随机路由到db0和db3；（db0和db3都有i2） 如果没有配置i，例如db0:rw, db1:r;
-     * 指定dataSourceIndex=1则路由到db1
+     * 一个db可以同时配置多个i；不同的db可以配置相同的i，
+     * 例如权重串= db0:rwi0i2, db1:ri1, db2:ri1, db3:ri2
+     * a. 用户指定dataSourceIndex=0，路由到db0；（只有db0有i0）
+     * b. 用户指定dataSourceIndex=1，随机路由到db1和db2；（db1和db2都有i1）
+     * c. 用户指定dataSourceIndex=2，随机路由到db0和db3；（db0和db3都有i2） 
+     * d. 如果没有配置i，例如db0:rw, db1:r;指定dataSourceIndex=1则路由到db1
+     * </pre>
      */
     protected DataSourceHolder findDataSourceWrapperByIndex(int dataSourceIndex) {
         List<DataSourceHolder> holders = new ArrayList<DataSourceHolder>();

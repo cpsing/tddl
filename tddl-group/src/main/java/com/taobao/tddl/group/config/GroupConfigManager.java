@@ -108,10 +108,10 @@ public class GroupConfigManager {
         // initConfigHoderFactory();
 
         Group group = this.tGroupDataSource.getGroup();
-
         Map<String, String> localValues = null;
-
-        if (group != null) localValues = group.getProperties();
+        if (group != null) {
+            localValues = group.getProperties();
+        }
 
         configFactory = ConfigDataHandlerCity.getFactory(tGroupDataSource.getAppName(),
             tGroupDataSource.getUnitName(),
@@ -171,7 +171,6 @@ public class GroupConfigManager {
                 }
 
                 TAtomDsStandard atomDataSource = new TAtomDataSource();
-
                 atomDataSource.setAtom(atom);
                 atomDataSource.init(appName, dsKey, unitName);
                 atomDataSource.setLogWriter(tGroupDataSource.getLogWriter());
@@ -371,8 +370,10 @@ public class GroupConfigManager {
         this.readDBSelectorWrapper = r_DBSelector;
         this.writeDBSelectorWrapper = w_DBSelector;
 
-        if (tGroupDataSource.getAutoSelectWriteDataSource()) runtimeWritableAtomDBSelectorWrapper = new RuntimeWritableAtomDBSelector(dataSourceWrapperMap,
-            groupExtraConfig);
+        if (tGroupDataSource.getAutoSelectWriteDataSource()) {
+            runtimeWritableAtomDBSelectorWrapper = new RuntimeWritableAtomDBSelector(dataSourceWrapperMap,
+                groupExtraConfig);
+        }
 
         // System.out.println("dataSourceWrapperMap=" + dataSourceWrapperMap);
         if (this.dataSourceChangeListener != null) {
@@ -622,16 +623,26 @@ public class GroupConfigManager {
      * TAtomDataSource如果当前的状态是NA返回false, 否则根据WR状态以及isRead的值决定
      */
     public static boolean isDataSourceAvailable(DataSource ds, boolean isRead) {
-        if (ds instanceof DataSourceWrapper) ds = ((DataSourceWrapper) ds).getWrappedDataSource();
+        if (ds instanceof DataSourceWrapper) {
+            ds = ((DataSourceWrapper) ds).getWrappedDataSource();
+        }
 
-        if (!(ds instanceof TAtomDsStandard)) return true;
+        if (!(ds instanceof TAtomDsStandard)) {
+            return true;
+        }
 
         if (ds instanceof TAtomDsStandard) {
             TAtomDbStatusEnum status = ((TAtomDsStandard) ds).getDbStatus();
-            if (status.isNaStatus()) return false;
+            if (status.isNaStatus()) {
+                return false;
+            }
 
-            if (status.isRstatus() && isRead) return true;
-            if (status.isWstatus() && !isRead) return true;
+            if (status.isRstatus() && isRead) {
+                return true;
+            }
+            if (status.isWstatus() && !isRead) {
+                return true;
+            }
         }
         return false;
     }

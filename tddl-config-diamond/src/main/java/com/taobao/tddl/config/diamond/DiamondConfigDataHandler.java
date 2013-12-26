@@ -11,6 +11,7 @@ import com.taobao.diamond.client.impl.DiamondUnitSite;
 import com.taobao.diamond.common.Constants;
 import com.taobao.diamond.manager.ManagerListener;
 import com.taobao.diamond.manager.SkipInitialCallbackListener;
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.extension.Activate;
 import com.taobao.tddl.common.utils.mbean.TddlMBean;
 import com.taobao.tddl.common.utils.mbean.TddlMBeanServer;
@@ -110,6 +111,10 @@ public class DiamondConfigDataHandler extends UnitConfigDataHandler {
         for (ManagerListener l : listeners) {
             env.removeListener(dataId, null, l);
         }
+    }
+
+    protected void doDestory() throws TddlException {
+        closeUnderManager();
     }
 
     /**

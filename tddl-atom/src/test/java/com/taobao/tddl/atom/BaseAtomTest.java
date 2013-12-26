@@ -1,19 +1,19 @@
 package com.taobao.tddl.atom;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
 import com.taobao.diamond.mockserver.MockServer;
 
 public class BaseAtomTest {
 
-    @Before
-    public void beforeClass() {
+    @BeforeClass
+    public static void beforeClass() {
         MockServer.setUpMockServer();
     }
 
-    @After
-    public void after() {
+    @AfterClass
+    public static void after() {
         MockServer.tearDownMockServer();
     }
 }

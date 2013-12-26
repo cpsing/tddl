@@ -9,16 +9,24 @@ import javax.sql.DataSource;
 
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.jdbc.sorter.ExceptionSorter;
-
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.group.exception.NoMoreDataSourceException;
 import com.taobao.tddl.group.jdbc.DataSourceWrapper;
 
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
+
 /**
- * 按优先级选择的selector 每次选择只从优先级最高的一组DB中选择，若都不可用，才继续在下一个优先级的DB组中选择 优先级相同的DB还用随机选择
- * 原始需求：TC要求在每个dbgroup中优先读备库，当备库不可用时，自动读主库 扩展需求：一主多备，优先随机读备库。当备库都不可用时，才读主库
- * 为了方便处理和接口一致，有如下要求： 1. 目前只支持读分优先级组 2. 一个权重推送的信息中，。。。 3. 一个数据源只能在一个优先级组中？
+ * <pre>
+ * 按优先级选择的selector 每次选择只从优先级最高的一组DB中选择，若都不可用，才继续在下一个优先级的DB组中选择,优先级相同的DB还用随机选择
+ * 
+ * 原始需求：TC要求在每个dbgroup中优先读备库，当备库不可用时，自动读主库 
+ * 扩展需求：一主多备，优先随机读备库。当备库都不可用时，才读主库
+ * 
+ * 为了方便处理和接口一致，有如下要求： 
+ * 1. 目前只支持读分优先级组 
+ * 2. 一个权重推送的信息中，。。。 
+ * 3. 一个数据源只能在一个优先级组中？
+ * </pre>
  * 
  * @author linxuan
  */
@@ -153,7 +161,9 @@ public class PriorityDbGroupSelector extends AbstractDBSelector {
     protected DataSourceHolder findDataSourceWrapperByIndex(int dataSourceIndex) {
         for (int i = 0; i < priorityGroups.length; i++) {
             DataSourceHolder holder = priorityGroups[i].findDataSourceWrapperByIndex(dataSourceIndex);
-            if (holder != null) return holder;
+            if (holder != null) {
+                return holder;
+            }
 
         }
         return null;
