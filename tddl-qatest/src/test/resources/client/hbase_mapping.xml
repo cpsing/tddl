@@ -1,0 +1,39 @@
+<tables>
+	<table name="hbase_normaltbl_oneGroup_oneAtom">
+		<columns>
+			<column name="rowkey" mapping="rowkey" />
+			<column name="id" mapping="cf1:id" />
+			<column name="gmt_create" mapping="cf2:gmt_create" />
+			<column name="gmt_timestamp" mapping="cf2:gmt_timestamp" />
+			<column name="gmt_datetime" mapping="cf2:gmt_datetime" />
+			<column name="name" mapping="cf1:name" />
+			<column name="floatCol" mapping="cf1:floatCol" />
+		</columns>
+		<rowkey>rowkey</rowkey>
+		<rowkey-generator-class>com.taobao.ustore.repo.hbase.RowCoderSample</rowkey-generator-class>
+	</table>
+
+	<table name="student">
+		<columns>
+			<column name="id" mapping="rowkey" />
+			<column name="name" mapping="rowkey" />
+			<column name="gmt_create" mapping="rowkey" />
+			<column name="school" mapping="cf1:school" />
+		</columns>
+		<rowkey>id,name,gmt_create</rowkey>
+		<rowkey-generator-class>com.taobao.ustore.repo.hbase.RowCoderSample2</rowkey-generator-class>
+	</table>
+	
+	<table name="cn_ipage_pageclick_analysis">
+		<columns>
+		<column name="host" mapping="rowkey" />
+			<column name="gmt_create" mapping="rowkey" />
+			<column name="type" mapping="rowkey" />
+			<column name="url" mapping="rowkey" />
+			<column name="click_uv" mapping="info:click_uv" />
+			<column name="click_pv" mapping="info:click_pv" />
+		</columns>
+		<rowkey>host,gmt_create,type,url</rowkey>
+		<rowkey-generator-class>com.taobao.ustore.repo.hbase.RowCoderSample3</rowkey-generator-class>
+	</table>
+</tables>

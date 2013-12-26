@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables>
+	<table name="hbase_normaltbl_oneGroup_oneAtom"  usePKRule = "true">
+		<columns>
+			<column name="rowKey" type="long" />
+			<column name="id" type="int" />
+			<column name="gmt_create" type="date" />
+			<column name="gmt_timestamp" type="timestamp" />
+			<column name="gmt_datetime" type="datetime" />
+			<column name="name" type="string" />
+			<column name="floatCol" type="float" />
+		</columns>
+		<primaryKey>rowKey</primaryKey>
+	</table>
+	
+	<table name="student"  usePKRule = "true">
+		<columns>
+			<column name="id" type="int" />
+			<column name="name" type="string" />
+			<column name="gmt_create" type="date" />
+			<column name="school" type="string" />
+		</columns>
+		<primaryKey>id,name,gmt_create</primaryKey>
+	</table>
+	
+	<table name="cn_ipage_pageclick_analysis"  usePKRule = "true">
+		<columns>
+			<column name="host" type="string" />
+			<column name="gmt_create" type="date" />
+			<column name="type" type="string" />
+			<column name="url" type="string" />
+			<column name="click_uv" type="string" />
+			<column name="click_pv" type="string" />
+		</columns>
+		<primaryKey>host,gmt_create,type,url</primaryKey>
+	</table>
+</tables>

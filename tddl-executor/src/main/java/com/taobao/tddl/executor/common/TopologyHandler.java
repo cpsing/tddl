@@ -46,6 +46,7 @@ public class TopologyHandler extends AbstractLifecycle {
         return executorMap;
     }
 
+    @Override
     protected void doInit() {
 
         if (topologyFilePath != null) {
@@ -63,10 +64,16 @@ public class TopologyHandler extends AbstractLifecycle {
                     dataid }));
         }
 
-        Matrix matrix = MatrixParser.parse(data);
+        try {
+            Matrix matrix = MatrixParser.parse(data);
 
-        this.matrix = matrix;
-
+            this.matrix = matrix;
+        } catch (Exception ex) {
+            logger.error("matrix topology init error,file is: " + this.getTopologyFilePath() + ", appname is: "
+                         + this.getAppName(),
+                ex);
+            throw new TddlRuntimeException(ex);
+        }
         for (Group group : matrix.getGroups()) {
             group.setAppName(this.appName);
             IRepository repo = ExecutorContext.getContext()
@@ -102,7 +109,7 @@ public class TopologyHandler extends AbstractLifecycle {
 
     public class TopologyListener implements ConfigDataListener {
 
-        private TopologyHandler topologyHandler;
+        private final TopologyHandler topologyHandler;
 
         public TopologyListener(TopologyHandler topologyHandler){
             this.topologyHandler = topologyHandler;

@@ -158,6 +158,9 @@ public class TGroupDataSource implements DataSource {
         }
 
         if (appName == null) {
+            if (group != null) appName = group.getAppName();
+        }
+        if (appName == null) {
             throw new TGroupDataSourceException("appName不能为null");
         }
         appName = appName.trim();
@@ -243,18 +246,22 @@ public class TGroupDataSource implements DataSource {
      * ======================================================================
      */
 
+    @Override
     public TGroupConnection getConnection() throws SQLException {
         return new TGroupConnection(this);
     }
 
+    @Override
     public TGroupConnection getConnection(String username, String password) throws SQLException {
         return new TGroupConnection(this, username, password);
     }
 
+    @Override
     public PrintWriter getLogWriter() throws SQLException {
         return out;
     }
 
+    @Override
     public void setLogWriter(PrintWriter out) throws SQLException {
         this.out = out;
     }
@@ -262,10 +269,12 @@ public class TGroupDataSource implements DataSource {
     // jdbc规范: DataSource刚建立时LoginTimeout为0
     private int seconds = 0;
 
+    @Override
     public int getLoginTimeout() throws SQLException {
         return seconds;
     }
 
+    @Override
     public void setLoginTimeout(int seconds) throws SQLException {
         this.seconds = seconds;
     }
@@ -353,10 +362,12 @@ public class TGroupDataSource implements DataSource {
         return PREFIX + dbGroupKey;
     }
 
+    @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return this.getClass().isAssignableFrom(iface);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T unwrap(Class<T> iface) throws SQLException {
         try {

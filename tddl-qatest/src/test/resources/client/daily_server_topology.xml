@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<matrix name="test_matrix" xmlns="https://github.com/tddl/tddl/schema/matrix"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://github.com/tddl/tddl/schema/matrix https://raw.github.com/tddl/tddl/master/tddl-optimizer/src/main/resources/META-INF/matrix.xsd">
+
+	<!-- mysql group -->
+
+	<!--  group name是execute on中的，也是规则中的dbPattern，可以自己定，my_groupName是rtools上的-->
+	<group name="andor_performance_test_group0" type="my_jdbc" my_groupName="andor_performance_test_group0"
+		my_appName="andor_performance_test">
+	</group>
+
+</machine-tapologic>

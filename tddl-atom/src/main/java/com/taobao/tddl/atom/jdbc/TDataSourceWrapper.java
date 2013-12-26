@@ -210,6 +210,7 @@ public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallB
 
     private volatile long lastRetryTime = 0;
 
+    @Override
     public Connection getConnection() throws SQLException {
         return getConnection(null, null);
     }
@@ -217,6 +218,7 @@ public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallB
     /**
      * 这里只做了tryLock连接尝试，真正的逻辑委派给getConnection0
      */
+    @Override
     public Connection getConnection(String username, String password) throws SQLException {
         SmoothValve valve = smoothValve;
         try {
@@ -426,18 +428,22 @@ public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallB
      * ======================================================================
      */
 
+    @Override
     public PrintWriter getLogWriter() throws SQLException {
         return targetDataSource.getLogWriter();
     }
 
+    @Override
     public void setLogWriter(PrintWriter out) throws SQLException {
         targetDataSource.setLogWriter(out);
     }
 
+    @Override
     public void setLoginTimeout(int seconds) throws SQLException {
         targetDataSource.setLoginTimeout(seconds);
     }
 
+    @Override
     public int getLoginTimeout() throws SQLException {
         return targetDataSource.getLoginTimeout();
     }
@@ -445,6 +451,7 @@ public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallB
     /**
      * jdk1.6 新增接口
      */
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T unwrap(Class<T> iface) throws SQLException {
         if (isWrapperFor(iface)) {
@@ -454,6 +461,7 @@ public class TDataSourceWrapper implements DataSource, SnapshotValuesOutputCallB
         }
     }
 
+    @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return TDataSourceWrapper.class.isAssignableFrom(iface);
     }
