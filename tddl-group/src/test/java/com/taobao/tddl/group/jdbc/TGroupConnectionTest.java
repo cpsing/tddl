@@ -1,4 +1,4 @@
-package com.taobao.tddl.group;
+package com.taobao.tddl.group.jdbc;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.taobao.tddl.common.mock.MockDataSource;
@@ -26,7 +27,12 @@ import com.taobao.tddl.group.jdbc.TGroupStatement;
 /**
  * @author yangzhu
  */
-public class TGroupConnectionTest extends BaseGroupTest {
+public class TGroupConnectionTest {
+
+    @Before
+    public void setUp() {
+        MockDataSource.clearTrace();
+    }
 
     @Test
     public void java_sql_Connection_api_support() throws Exception {
@@ -54,17 +60,17 @@ public class TGroupConnectionTest extends BaseGroupTest {
         assertTrue((conn.prepareStatement("sql", new int[0]) instanceof TGroupPreparedStatement));
         assertTrue((conn.prepareStatement("sql", new String[0]) instanceof TGroupPreparedStatement));
 
+        // assertTrue((conn.prepareCall("sql") instanceof
+        // TGroupCallableStatement));
+        // assertTrue((conn.prepareCall("sql",
+        // ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE)
+        // instanceof TGroupCallableStatement));
+        // assertTrue((conn.prepareCall("sql",
+        // ResultSet.TYPE_SCROLL_INSENSITIVE,
+        // ResultSet.CONCUR_UPDATABLE,
+        // ResultSet.HOLD_CURSORS_OVER_COMMIT) instanceof
+        // TGroupCallableStatement));
     }
-
-    // 已经支持存储过程
-    // @Test(expected = UnsupportedOperationException.class)
-    // public void java_sql_Connection_api_not_support() throws Exception {
-    // TGroupDataSource ds = new TGroupDataSource();
-    //
-    // Connection conn = ds.getConnection();
-    // conn.prepareCall("sql");
-    //
-    // }
 
     @Test
     public void test_一个连接上创建两个Statement() {
@@ -84,6 +90,7 @@ public class TGroupConnectionTest extends BaseGroupTest {
         try {
             db1.setClosed(true);
             db2.setClosed(false);
+            // 链接一旦选定就会保持所选择的库，直到close
             conn = tgds.getConnection();
             stat = conn.createStatement();
             stat.executeQuery("select 1 from test");
@@ -100,19 +107,23 @@ public class TGroupConnectionTest extends BaseGroupTest {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         } finally {
-            if (conn != null) try {
-                conn.close();
-            } catch (SQLException e) {
-            }
-            if (stat != null) try {
-                stat.close();
-            } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                }
+                if (stat != null) {
+                    try {
+                        stat.close();
+                    } catch (SQLException e) {
+                    }
+                }
             }
         }
     }
 
     @Test
-    public void test_创建Statement失败重试() {
+    public void test_创建Statement失败重试_读请求() {
         TGroupDataSource tgds = new TGroupDataSource();
         tgds.setDbGroupKey("dbKey0");
         List<DataSourceWrapper> dataSourceWrappers = new ArrayList<DataSourceWrapper>();
@@ -129,29 +140,73 @@ public class TGroupConnectionTest extends BaseGroupTest {
         try {
             conn = tgds.getConnection();
             stat = conn.createStatement();
-
             MockDataSource.addPreException(MockDataSource.m_createStatement, db1.genFatalSQLException());
             stat.executeQuery("select 1 from test");
             MockDataSource.showTrace();
             Assert.assertTrue(MockDataSource.hasMethod("db", "db1", "getConnection"));
+            // 会在db2做重试
             Assert.assertTrue(MockDataSource.hasMethod("db", "db2", "getConnection"));
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         } finally {
-            if (conn != null) try {
-                conn.close();
-            } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                }
+                if (stat != null) {
+                    try {
+                        stat.close();
+                    } catch (SQLException e) {
+                    }
+                }
             }
-            if (stat != null) try {
-                stat.close();
-            } catch (SQLException e) {
+        }
+    }
+
+    @Test
+    public void test_创建Statement失败不重试_写请求() {
+        TGroupDataSource tgds = new TGroupDataSource();
+        tgds.setDbGroupKey("dbKey0");
+        List<DataSourceWrapper> dataSourceWrappers = new ArrayList<DataSourceWrapper>();
+        MockDataSource db1 = new MockDataSource("db", "db1");
+        MockDataSource db2 = new MockDataSource("db", "db2");
+        DataSourceWrapper dsw1 = new DataSourceWrapper("db1", "rw", db1, DBType.MYSQL);
+        DataSourceWrapper dsw2 = new DataSourceWrapper("db2", "r", db2, DBType.MYSQL);
+        dataSourceWrappers.add(dsw1);
+        dataSourceWrappers.add(dsw2);
+        tgds.init(dataSourceWrappers);
+
+        TGroupConnection conn = null;
+        Statement stat = null;
+        try {
+            conn = tgds.getConnection();
+            stat = conn.createStatement();
+            MockDataSource.addPreException(MockDataSource.m_createStatement, db1.genFatalSQLException());
+            stat.executeQuery("update test set name = 'newname'");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            Assert.assertTrue(MockDataSource.hasMethod("db", "db1", "getConnection"));
+            // 写操作不会在db2做重试
+            Assert.assertFalse(MockDataSource.hasMethod("db", "db2", "getConnection"));
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                }
+                if (stat != null) {
+                    try {
+                        stat.close();
+                    } catch (SQLException e) {
+                    }
+                }
             }
         }
     }
 
     @Test
     public void test_autocommit() {
-        MockDataSource.clearTrace();
         TGroupDataSource tgds = new TGroupDataSource();
         tgds.setDbGroupKey("dbKey0");
         List<DataSourceWrapper> dataSourceWrappers = new ArrayList<DataSourceWrapper>();
@@ -175,13 +230,17 @@ public class TGroupConnectionTest extends BaseGroupTest {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         } finally {
-            if (conn != null) try {
-                conn.close();
-            } catch (SQLException e) {
-            }
-            if (stat != null) try {
-                stat.close();
-            } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                }
+                if (stat != null) {
+                    try {
+                        stat.close();
+                    } catch (SQLException e) {
+                    }
+                }
             }
         }
         MockDataSource.showTrace();
@@ -197,7 +256,6 @@ public class TGroupConnectionTest extends BaseGroupTest {
 
     @Test
     public void test_no_trans() {
-        MockDataSource.clearTrace();
         TGroupDataSource tgds = new TGroupDataSource();
         tgds.setDbGroupKey("dbKey0");
         List<DataSourceWrapper> dataSourceWrappers = new ArrayList<DataSourceWrapper>();
@@ -218,13 +276,17 @@ public class TGroupConnectionTest extends BaseGroupTest {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         } finally {
-            if (conn != null) try {
-                conn.close();
-            } catch (SQLException e) {
-            }
-            if (stat != null) try {
-                stat.close();
-            } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                }
+                if (stat != null) {
+                    try {
+                        stat.close();
+                    } catch (SQLException e) {
+                    }
+                }
             }
         }
         MockDataSource.showTrace();
@@ -240,7 +302,6 @@ public class TGroupConnectionTest extends BaseGroupTest {
 
     @Test
     public void test_write_trans() {
-        MockDataSource.clearTrace();
         TGroupDataSource tgds = new TGroupDataSource();
         tgds.setDbGroupKey("dbKey0");
         List<DataSourceWrapper> dataSourceWrappers = new ArrayList<DataSourceWrapper>();
@@ -263,13 +324,17 @@ public class TGroupConnectionTest extends BaseGroupTest {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         } finally {
-            if (conn != null) try {
-                conn.close();
-            } catch (SQLException e) {
-            }
-            if (stat != null) try {
-                stat.close();
-            } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                }
+                if (stat != null) {
+                    try {
+                        stat.close();
+                    } catch (SQLException e) {
+                    }
+                }
             }
         }
         MockDataSource.showTrace();
@@ -285,7 +350,6 @@ public class TGroupConnectionTest extends BaseGroupTest {
 
     @Test
     public void test_read_trans() {
-        MockDataSource.clearTrace();
         TGroupDataSource tgds = new TGroupDataSource();
         tgds.setDbGroupKey("dbKey0");
         List<DataSourceWrapper> dataSourceWrappers = new ArrayList<DataSourceWrapper>();
@@ -308,16 +372,21 @@ public class TGroupConnectionTest extends BaseGroupTest {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         } finally {
-            if (conn != null) try {
-                conn.close();
-            } catch (SQLException e) {
-            }
-            if (stat != null) try {
-                stat.close();
-            } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                }
+                if (stat != null) {
+                    try {
+                        stat.close();
+                    } catch (SQLException e) {
+                    }
+                }
             }
         }
         MockDataSource.showTrace();
+        // 如果是事务读，强制选择了写库
         Assert.assertTrue(MockDataSource.hasMethod("db", "db1", "getConnection"));
         Assert.assertFalse(MockDataSource.hasMethod("db", "db2", "getConnection"));
         Assert.assertTrue(MockDataSource.hasMethod("db", "db1", "setAutoCommit"));
@@ -330,7 +399,6 @@ public class TGroupConnectionTest extends BaseGroupTest {
 
     @Test
     public void test_write_and_read_trans() {
-        MockDataSource.clearTrace();
         TGroupDataSource tgds = new TGroupDataSource();
         tgds.setDbGroupKey("dbKey0");
         List<DataSourceWrapper> dataSourceWrappers = new ArrayList<DataSourceWrapper>();
@@ -354,13 +422,67 @@ public class TGroupConnectionTest extends BaseGroupTest {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         } finally {
-            if (conn != null) try {
-                conn.close();
-            } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                }
+                if (stat != null) {
+                    try {
+                        stat.close();
+                    } catch (SQLException e) {
+                    }
+                }
             }
-            if (stat != null) try {
-                stat.close();
-            } catch (SQLException e) {
+        }
+        MockDataSource.showTrace();
+        // 事务中的读请求，选择写库
+        Assert.assertTrue(MockDataSource.hasMethod("db", "db1", "getConnection"));
+        Assert.assertFalse(MockDataSource.hasMethod("db", "db2", "getConnection"));
+        Assert.assertTrue(MockDataSource.hasMethod("db", "db1", "setAutoCommit"));
+        Assert.assertTrue(MockDataSource.hasMethod("db", "db1", "commit"));
+        Assert.assertFalse(MockDataSource.hasMethod("db", "db1", "rollback"));
+        Assert.assertFalse(MockDataSource.hasMethod("db", "db2", "setAutoCommit"));
+        Assert.assertFalse(MockDataSource.hasMethod("db", "db2", "commit"));
+        Assert.assertFalse(MockDataSource.hasMethod("db", "db2", "rollback"));
+    }
+
+    @Test
+    public void test_read_and_write_trans() {
+        TGroupDataSource tgds = new TGroupDataSource();
+        tgds.setDbGroupKey("dbKey0");
+        List<DataSourceWrapper> dataSourceWrappers = new ArrayList<DataSourceWrapper>();
+        MockDataSource db1 = new MockDataSource("db", "db1");
+        MockDataSource db2 = new MockDataSource("db", "db2");
+        DataSourceWrapper dsw1 = new DataSourceWrapper("db1", "w", db1, DBType.MYSQL);
+        DataSourceWrapper dsw2 = new DataSourceWrapper("db2", "r", db2, DBType.MYSQL);
+        dataSourceWrappers.add(dsw1);
+        dataSourceWrappers.add(dsw2);
+        tgds.init(dataSourceWrappers);
+
+        TGroupConnection conn = null;
+        Statement stat = null;
+        try {
+            conn = tgds.getConnection();
+            stat = conn.createStatement();
+            conn.setAutoCommit(false);
+            stat.executeQuery("select 1 from test");
+            stat.executeQuery("update t set name='newName'");
+            conn.commit();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                }
+                if (stat != null) {
+                    try {
+                        stat.close();
+                    } catch (SQLException e) {
+                    }
+                }
             }
         }
         MockDataSource.showTrace();
@@ -375,8 +497,7 @@ public class TGroupConnectionTest extends BaseGroupTest {
     }
 
     @Test
-    public void test_read_and_write_trans() {
-        MockDataSource.clearTrace();
+    public void test_read_untrans_write_trans() {
         TGroupDataSource tgds = new TGroupDataSource();
         tgds.setDbGroupKey("dbKey0");
         List<DataSourceWrapper> dataSourceWrappers = new ArrayList<DataSourceWrapper>();
@@ -393,25 +514,30 @@ public class TGroupConnectionTest extends BaseGroupTest {
         try {
             conn = tgds.getConnection();
             stat = conn.createStatement();
-            conn.setAutoCommit(false);
             stat.executeQuery("select 1 from test");
+            conn.setAutoCommit(false);
             stat.executeQuery("update t set name='newName'");
             conn.commit();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         } finally {
-            if (conn != null) try {
-                conn.close();
-            } catch (SQLException e) {
-            }
-            if (stat != null) try {
-                stat.close();
-            } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                }
+                if (stat != null) {
+                    try {
+                        stat.close();
+                    } catch (SQLException e) {
+                    }
+                }
             }
         }
         MockDataSource.showTrace();
+        // 刚开始读不处于事务中，选择读请求
         Assert.assertTrue(MockDataSource.hasMethod("db", "db1", "getConnection"));
-        Assert.assertFalse(MockDataSource.hasMethod("db", "db2", "getConnection"));
+        Assert.assertTrue(MockDataSource.hasMethod("db", "db2", "getConnection"));
         Assert.assertTrue(MockDataSource.hasMethod("db", "db1", "setAutoCommit"));
         Assert.assertTrue(MockDataSource.hasMethod("db", "db1", "commit"));
         Assert.assertFalse(MockDataSource.hasMethod("db", "db1", "rollback"));

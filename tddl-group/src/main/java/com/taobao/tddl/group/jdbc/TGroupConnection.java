@@ -91,9 +91,16 @@ public class TGroupConnection implements Connection {
     // private int wBaseDataSourceIndex = -2; // wBaseConnection对应的数据源Index
     private DataSourceWrapper      rBaseDsWrapper;
     private DataSourceWrapper      wBaseDsWrapper;
+    private Set<TGroupStatement>   openedStatements     = new HashSet<TGroupStatement>(2);
+    // TODO: 以后让这个值真正的起作用
+    private int                    transactionIsolation = -1;
 
-    public static final GroupIndex DEFAULT_GROUPINDEX = new GroupIndex(DBSelector.NOT_EXIST_USER_SPECIFIED_INDEX, false);
+    public static final GroupIndex DEFAULT_GROUPINDEX   = new GroupIndex(DBSelector.NOT_EXIST_USER_SPECIFIED_INDEX,
+                                                            false);
 
+    /**
+     * 获取事务中的上一个操作的链接
+     */
     Connection getBaseConnection(String sql, boolean isRead) throws SQLException {
         GroupIndex dataSourceIndex = DEFAULT_GROUPINDEX;
         if (sql == null) {
@@ -106,19 +113,26 @@ public class TGroupConnection implements Connection {
             }
         }
 
+        // 代表出现自定义index请求
         if (dataSourceIndex.index != DBSelector.NOT_EXIST_USER_SPECIFIED_INDEX) {
             if (log.isDebugEnabled()) {
                 log.debug("dataSourceIndex=" + dataSourceIndex);
             }
             // 在事务状态下，设置不同的数据源索引会导致异常。
             if (!isAutoCommit) {
-                if (wBaseDsWrapper != null && !wBaseDsWrapper.isMatchDataSourceIndex(dataSourceIndex.index)) throw new SQLException("Transaction in another dataSourceIndex: "
-                                                                                                                                    + dataSourceIndex);
+                if (wBaseDsWrapper != null && !wBaseDsWrapper.isMatchDataSourceIndex(dataSourceIndex.index)) {
+                    throw new SQLException("Transaction in another dataSourceIndex: " + dataSourceIndex);
+                }
             }
+
             if (isRead) {
-                if (rBaseDsWrapper != null && !rBaseDsWrapper.isMatchDataSourceIndex(dataSourceIndex.index)) closeReadConnection();
+                if (rBaseDsWrapper != null && !rBaseDsWrapper.isMatchDataSourceIndex(dataSourceIndex.index)) {
+                    closeReadConnection();
+                }
             } else {
-                if (wBaseDsWrapper != null && !wBaseDsWrapper.isMatchDataSourceIndex(dataSourceIndex.index)) closeWriteConnection();
+                if (wBaseDsWrapper != null && !wBaseDsWrapper.isMatchDataSourceIndex(dataSourceIndex.index)) {
+                    closeWriteConnection();
+                }
             }
         }
 
@@ -135,7 +149,9 @@ public class TGroupConnection implements Connection {
                 // 在写连接null的情况下，如果读连接已经建立，且对应的库可写，则复用
                 wBaseConnection = rBaseConnection; // wBaseConnection赋值，以确保事务能够正确提交回滚
                 // 在写连接上设置事务
-                if (wBaseConnection.getAutoCommit() != isAutoCommit) wBaseConnection.setAutoCommit(isAutoCommit);
+                if (wBaseConnection.getAutoCommit() != isAutoCommit) {
+                    wBaseConnection.setAutoCommit(isAutoCommit);
+                }
                 // wBaseDsKey = rBaseDsKey;
                 wBaseDsWrapper = rBaseDsWrapper;
                 this.tGroupDataSource.setWriteTarget(wBaseDsWrapper);
@@ -153,14 +169,19 @@ public class TGroupConnection implements Connection {
     Connection createNewConnection(DataSourceWrapper dsw, boolean isRead) throws SQLException {
         // 这个方法只发生在第一次建立读/写连接的时候，以后都是复用了
         Connection conn;
-        if (username != null) conn = dsw.getConnection(username, password);
-        else conn = dsw.getConnection();
+        if (username != null) {
+            conn = dsw.getConnection(username, password);
+        } else {
+            conn = dsw.getConnection();
+        }
 
         // 为了保证事务正确关闭，在事务状态下只设置写连接
         setBaseConnection(conn, dsw, isRead && isAutoCommit);
 
         // 只在写连接上调用 setAutoCommit, 与 TGroupConnection#setAutoCommit 的代码保持一致
-        if (!isRead || !isAutoCommit) conn.setAutoCommit(isAutoCommit); // 新建连接的AutoCommit要与当前isAutoCommit的状态同步
+        if (!isRead || !isAutoCommit) {
+            conn.setAutoCommit(isAutoCommit); // 新建连接的AutoCommit要与当前isAutoCommit的状态同步
+        }
 
         return conn;
     }
@@ -170,8 +191,11 @@ public class TGroupConnection implements Connection {
             log.warn("setBaseConnection to null !!");
         }
 
-        if (isRead) closeReadConnection();
-        else closeWriteConnection();
+        if (isRead) {
+            closeReadConnection();
+        } else {
+            closeWriteConnection();
+        }
 
         if (isRead) {
             rBaseConnection = baseConnection;
@@ -212,8 +236,6 @@ public class TGroupConnection implements Connection {
             wBaseConnection = null;
         }
     }
-
-    private Set<TGroupStatement> openedStatements = new HashSet<TGroupStatement>(2);
 
     void removeOpenedStatements(Statement statement) {
         if (!openedStatements.remove(statement)) {
@@ -414,6 +436,7 @@ public class TGroupConnection implements Connection {
                 resultSetHoldability,
                 dataSourceIndex);
         }
+
         TGroupCallableStatement stmt = new TGroupCallableStatement(tGroupDataSource, this, target, sql);
         if (resultSetType != Integer.MIN_VALUE) {
             stmt.setResultSetType(resultSetType);
@@ -509,9 +532,6 @@ public class TGroupConnection implements Connection {
         }
     }
 
-    // TODO: 以后让这个值真正的起作用
-    private int transactionIsolation = -1;
-
     public int getTransactionIsolation() throws SQLException {
         checkClosed();
         return transactionIsolation;
@@ -529,22 +549,73 @@ public class TGroupConnection implements Connection {
      */
     public SQLWarning getWarnings() throws SQLException {
         checkClosed();
-        if (rBaseConnection != null) return rBaseConnection.getWarnings();
-        else if (wBaseConnection != null) return wBaseConnection.getWarnings();
-        else return null;
+        if (rBaseConnection != null) {
+            return rBaseConnection.getWarnings();
+        } else if (wBaseConnection != null) {
+            return wBaseConnection.getWarnings();
+        } else {
+            return null;
+        }
     }
 
     public void clearWarnings() throws SQLException {
         checkClosed();
-        if (rBaseConnection != null) rBaseConnection.clearWarnings();
-        if (wBaseConnection != null) wBaseConnection.clearWarnings();
+        if (rBaseConnection != null) {
+            rBaseConnection.clearWarnings();
+        }
+        if (wBaseConnection != null) {
+            wBaseConnection.clearWarnings();
+        }
     }
 
     public DatabaseMetaData getMetaData() throws SQLException {
         checkClosed();
-        if (rBaseConnection != null) return rBaseConnection.getMetaData();
-        else if (wBaseConnection != null) return wBaseConnection.getMetaData();
-        else return new TGroupDatabaseMetaData(this, tGroupDataSource);
+        if (rBaseConnection != null) {
+            return rBaseConnection.getMetaData();
+        } else if (wBaseConnection != null) {
+            return wBaseConnection.getMetaData();
+        } else {
+            return new TGroupDatabaseMetaData(this, tGroupDataSource);
+        }
+    }
+
+    /**
+     * @return thread id
+     */
+    public long getId() {
+        try {
+            // TODO 判断是否为mysql
+            Connection atomConnection = this.rBaseConnection;
+            if (atomConnection == null) {
+                atomConnection = this.wBaseConnection;
+            }
+
+            /**
+             * 这个连接上没做过查询，不会创建真正连接的
+             */
+            if (atomConnection == null) {
+                return -1;
+            }
+            TConnectionWrapper conn = (TConnectionWrapper) atomConnection;
+            Connection delegate = conn.getTargetConnection();
+            if (delegate instanceof Wrapper) {
+                delegate = delegate.unwrap(Connection.class);
+            }
+            // DruidPooledConnection druidConnection = (DruidPooledConnection)
+            // conn.getTargetConnection();
+            // Connection delegateConn = druidConnection.getConnection();
+            return (Long) MethodUtils.invokeMethod(delegate, "getId", new Object[] {});
+        } catch (Exception ex) {
+            throw new TddlRuntimeException("connection get thread id fail !", ex);
+        }
+
+    }
+
+    public Connection duplicate() throws SQLException {
+        if (this.tGroupDataSource == null) {
+            return null;
+        }
+        return this.tGroupDataSource.getConnection();
     }
 
     /*
@@ -677,41 +748,4 @@ public class TGroupConnection implements Connection {
         throw new SQLException("not support exception");
     }
 
-    /**
-     * @return thread id
-     */
-    public long getId() {
-
-        try {
-            Connection atomConnection = this.rBaseConnection;
-            if (atomConnection == null) {
-                atomConnection = this.wBaseConnection;
-            }
-
-            /**
-             * 这个连接上没做过查询，不会创建真正连接的
-             */
-            if (atomConnection == null) {
-                return -1;
-            }
-            TConnectionWrapper conn = (TConnectionWrapper) atomConnection;
-            Connection delegate = conn.getTargetConnection();
-            if (delegate instanceof Wrapper) {
-                delegate = delegate.unwrap(Connection.class);
-            }
-            // DruidPooledConnection druidConnection = (DruidPooledConnection)
-            // conn.getTargetConnection();
-            // Connection delegateConn = druidConnection.getConnection();
-            return (Long) MethodUtils.invokeMethod(delegate, "getId", new Object[] {});
-        } catch (Exception ex) {
-            throw new TddlRuntimeException("connection get thread id fail !", ex);
-        }
-
-    }
-
-    public Connection duplicate() throws SQLException {
-        if (this.tGroupDataSource == null) return null;
-
-        return this.tGroupDataSource.getConnection();
-    }
 }

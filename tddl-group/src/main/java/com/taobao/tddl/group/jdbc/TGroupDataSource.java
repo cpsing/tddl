@@ -53,9 +53,11 @@ public class TGroupDataSource implements DataSource {
     private String                                dsKeyAndWeightCommaArray;
     private DataSourceFetcher                     dataSourceFetcher;
     private DBType                                dbType                    = DBType.MYSQL;
-    private Group                                 group                     = new Group();
+    private Group                                 group                     = new Group();                           // matrix上层可mock的配置
+    private String                                appName;                                                           // app名字
+    private String                                unitName;                                                          // 单元化名字
     private String                                dbGroupKey;
-    private String                                fullDbGroupKey            = null;
+    private String                                fullDbGroupKey            = null;                                  // dataId
     private int                                   retryingTimes             = 3;                                     // 默认读写失败时重试3次
     private long                                  configReceiveTimeout      = TddlConstants.DIAMOND_GET_DATA_TIMEOUT; // 取配置信息的默认超时时间为30秒
     // 当运行期间主备发生切换时是否需要查找第一个可写的库
@@ -70,15 +72,13 @@ public class TGroupDataSource implements DataSource {
     // 下面两个字段当建立实际的DataSource时必须传递过去
     // jdbc规范: DataSource刚建立时LogWriter为null
     private PrintWriter                           out                       = null;
+    // jdbc规范: DataSource刚建立时LoginTimeout为0
+    private int                                   seconds                   = 0;
 
     /**
      * 使用tbdatasource还是druid
      */
     private DataSourceType                        dataSourceType            = DataSourceType.DruidDataSource;
-
-    private String                                appName;
-
-    private String                                unitName;
 
     public TGroupDataSource(){
     }
@@ -259,9 +259,6 @@ public class TGroupDataSource implements DataSource {
         this.out = out;
     }
 
-    // jdbc规范: DataSource刚建立时LoginTimeout为0
-    private int seconds = 0;
-
     public int getLoginTimeout() throws SQLException {
         return seconds;
     }
@@ -378,6 +375,10 @@ public class TGroupDataSource implements DataSource {
         this.dataSourceType = DataSourceType.valueOf(dataSourceType);
     }
 
+    public DBType getDbType() {
+        return dbType;
+    }
+
     /**
      * 销毁数据源，慎用
      * 
@@ -387,7 +388,6 @@ public class TGroupDataSource implements DataSource {
         if (configManager != null) {
             configManager.destroyDataSource();
         }
-
     }
 
     public void setGroup(Group group) {

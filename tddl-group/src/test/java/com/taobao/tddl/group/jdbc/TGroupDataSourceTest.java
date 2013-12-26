@@ -1,4 +1,4 @@
-package com.taobao.tddl.group;
+package com.taobao.tddl.group.jdbc;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

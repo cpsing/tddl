@@ -1,4 +1,4 @@
-package com.taobao.tddl.common.utils;
+package com.taobao.tddl.rule.utils;
 
 import java.util.ArrayList;
 import java.util.List;

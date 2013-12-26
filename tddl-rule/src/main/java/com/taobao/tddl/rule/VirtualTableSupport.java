@@ -12,12 +12,12 @@ import java.util.Set;
 import com.taobao.tddl.common.model.DBType;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.model.lifecycle.Lifecycle;
-import com.taobao.tddl.common.utils.SimpleNamedMessageFormat;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.rule.impl.DbVirtualNodeRule;
 import com.taobao.tddl.rule.impl.GroovyRule;
 import com.taobao.tddl.rule.impl.TableVirtualNodeRule;
 import com.taobao.tddl.rule.impl.WrappedGroovyRule;
+import com.taobao.tddl.rule.utils.SimpleNamedMessageFormat;
 import com.taobao.tddl.rule.virtualnode.DBTableMap;
 import com.taobao.tddl.rule.virtualnode.TableSlotMap;
 

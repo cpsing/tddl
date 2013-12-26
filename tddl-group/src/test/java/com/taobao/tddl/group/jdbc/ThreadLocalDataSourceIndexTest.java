@@ -1,4 +1,4 @@
-package com.taobao.tddl.group;
+package com.taobao.tddl.group.jdbc;
 
 import javax.sql.DataSource;
 
