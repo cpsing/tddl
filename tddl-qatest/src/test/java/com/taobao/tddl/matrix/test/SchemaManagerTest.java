@@ -1,4 +1,5 @@
 package com.taobao.tddl.matrix.test;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -14,37 +15,29 @@ public class SchemaManagerTest {
 
     @Test
     public void initTestStaticSchemaManager() throws TddlException {
-
         ExecutorContext executorContext = new ExecutorContext();
         ExecutorContext.setContext(executorContext);
 
         StaticSchemaManager s = new StaticSchemaManager(null, "andor_show", null);
-
         s.init();
 
         Assert.assertTrue(s.getTable("BMW_USERS") != null);
-
         Assert.assertEquals(8, s.getAllTables().size());
     }
 
     @Test
     public void initTestStaticSchemaManagerWithSchemaFile() throws TddlException {
-
         ExecutorContext executorContext = new ExecutorContext();
         ExecutorContext.setContext(executorContext);
-
         StaticSchemaManager s = new StaticSchemaManager("test_schema.xml", "andor_show", null);
-
         s.init();
 
         Assert.assertTrue(s.getTable("BMW_USERS") != null);
-
         Assert.assertEquals(8, s.getAllTables().size());
     }
 
     @Test
     public void initTestRuleSchemaManager() throws TddlException {
-
         ExecutorContext executorContext = new ExecutorContext();
         ExecutorContext.setContext(executorContext);
         TopologyHandler topology = new TopologyHandler("andor_show", null, "test_matrix_without_group_config.xml");
@@ -56,13 +49,8 @@ public class SchemaManagerTest {
         rule.init();
 
         OptimizerRule optimizerRule = new OptimizerRule(rule);
-
         RuleSchemaManager s = new RuleSchemaManager(optimizerRule, topology.getMatrix());
-
         s.init();
-
         Assert.assertTrue(s.getTable("BMW_USERS") != null);
-
     }
-
 }

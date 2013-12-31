@@ -3,6 +3,7 @@ package com.taobao.tddl.executor.handler;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.spi.ICommandHandler;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.core.plan.IPut;
@@ -48,11 +49,9 @@ public abstract class HandlerCommon implements ICommandHandler {
     protected void nestBuildTableAndSchema(String groupDataNode, ExecutionContext executionContext, String indexName,
                                            String actualTable, boolean logicalIndex) throws TddlException {
         if (indexName != null && !"".equals(indexName)) {
-            String tableName = indexName.substring(0, indexName.indexOf('.'));
+            String tableName = ExecUtils.getLogicTableName(indexName);
             TableMeta ts = null;
-
             ts = getTableMeta(tableName);
-
             if (ts == null) {
                 throw new IllegalArgumentException("table :" + tableName + " is not found");
             }

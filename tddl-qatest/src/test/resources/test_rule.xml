@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="vtabroot" class="com.taobao.tddl.interact.rule.VirtualTableRoot"
+		init-method="init">
+		<property name="dbType" value="MYSQL" />
+		<property name="defaultDbIndex" value="andor_show_group0" />
+		<property name="tableRules">
+			<map>
+				<entry key="auction_auctions._auction_id" value-ref="auction_auctions._auction_id" />
+				<entry key="bmw_users._id" value-ref="bmw_users._id" />
+				<entry key="buyer_tc_biz_order._biz_order_id" value-ref="buyer_tc_biz_order._biz_order_id" />
+				<entry key="seller_tc_biz_order._biz_order_id" value-ref="seller_tc_biz_order._biz_order_id" />
+				<entry key="sqls._id" value-ref="sqls._id" />
+				<entry key="testtable._id" value-ref="testtable._id" />
+				<entry key="testtable2._id" value-ref="testtable2._id" />
+				<entry key="bmw_users" value-ref="bmw_users._id" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="testtable._id" class="com.taobao.tddl.interact.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_show_group0" />
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,4#)) % 4" />
+		<property name="tbNamePattern"
+			value="testtable_{0000}" />
+	</bean>
+	
+	<bean id="testtable2._id" class="com.taobao.tddl.interact.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_show_group0" />
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,4#)) % 4" />
+		<property name="tbNamePattern"
+			value="testtable2_{0000}" />
+	</bean>
+	<bean id="auction_auctions._auction_id" class="com.taobao.tddl.interact.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_show_group0" />
+		<property name="tbRules" value="Math.abs(Long.valueOf(#auction_id,1,4#)) % 4" />
+		<property name="tbNamePattern"
+			value="auction_auctions_{0000}" />
+	</bean>
+	
+	<bean id="bmw_users._id" class="com.taobao.tddl.interact.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_show_group{0}" />
+		<property name="dbRules" value="Math.abs(Long.valueOf(#id,1,1#)) % 2" />
+		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,4#)) % 4" />
+		<property name="tbNamePattern"
+			value="bmw_users_{0000}" />
+	</bean>
+	
+	<bean id="buyer_tc_biz_order._biz_order_id" class="com.taobao.tddl.interact.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_show_group0" />
+		<property name="tbRules" value="Math.abs(Long.valueOf(#buyer_id,1,4#)) % 4" />
+		<property name="tbNamePattern"
+			value="buyer_tc_biz_order_{0000}" />
+	</bean>
+	
+	<bean id="seller_tc_biz_order._biz_order_id" class="com.taobao.tddl.interact.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_show_group0" />
+		<property name="tbRules" value="Math.abs(Long.valueOf(#seller_id,1,4#)) % 4" />
+		<property name="tbNamePattern"
+			value="seller_tc_biz_order_{0000}" />
+	</bean>
+	
+	<bean id="sqls._id" class="com.taobao.tddl.interact.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_show_group0" />
+		<property name="tbNamePattern"
+			value="sqls" />
+	</bean>
+</beans>

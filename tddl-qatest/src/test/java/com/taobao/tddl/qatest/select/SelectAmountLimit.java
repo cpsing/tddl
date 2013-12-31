@@ -21,8 +21,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
-import com.taobao.tddl.qatest.ExecuteTableName;
-import com.taobao.tddl.qatest.Validator;
+import com.taobao.tddl.qatest.util.ExecuteTableName;
+import com.taobao.tddl.qatest.util.Validator;
 
 /**
  * Comment for SelcetAmountLimit
@@ -79,7 +79,7 @@ public class SelectAmountLimit extends BaseAndorTestCase {
         param.add(start);
         param.add(limit);
         rc = andorQueryData(sql, param);
-        Assert.assertEquals(limit, ResultsSize(rc));
+        Assert.assertEquals(limit, resultsSize(rc));
     }
 
     @Test
@@ -92,7 +92,7 @@ public class SelectAmountLimit extends BaseAndorTestCase {
         param.add(start);
         param.add(limit);
         rc = andorQueryData(sql, param);
-        Assert.assertEquals(limit, ResultsSize(rc));
+        Assert.assertEquals(limit, resultsSize(rc));
     }
 
     private class InsertTask implements Runnable {

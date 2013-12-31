@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <matrix name="test_matrix" xmlns="https://github.com/tddl/tddl/schema/matrix"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://github.com/tddl/tddl/schema/matrix https://raw.github.com/tddl/tddl/master/tddl-optimizer/src/main/resources/META-INF/matrix.xsd">
+	xsi:schemaLocation="https://github.com/tddl/tddl/schema/matrix https://raw.github.com/tddl/tddl/master/tddl-common/src/main/resources/META-INF/matrix.xsd">
 
 	<group name="andor_show_group0" type="MYSQL_JDBC">
 		<properties>
@@ -11,7 +11,6 @@
 		</properties>
 
 		<atom name="andor_show_group0_atom0">
-
 			<properties>
 				<property name="com.taobao.tddl.atom.global.andor_show_group0_atom0">
 					<value>
@@ -22,8 +21,7 @@
 					dbStatus=RW
 				</value>
 				</property>
-				<property
-					name="com.taobao.tddl.atom.app.andor_show.andor_show_group0_atom0">
+				<property name="com.taobao.tddl.atom.app.andor_show.andor_show_group0_atom0">
 					<value>
 					userName=andor
 					minPoolSize=20
@@ -39,7 +37,7 @@
 				</property>
 
 				<property name="com.taobao.tddl.atom.passwd.andor_show.mysql.andor">
-					<value>encPasswd=364e198e1cfa74ef</value>
+					<value>encPasswd=andor</value>
 				</property>
 			</properties>
 		</atom>
@@ -53,8 +51,5 @@
 
 
 	<group name="andor_show_group1" type="MYSQL_JDBC">
-
 	</group>
-
-
 </matrix>

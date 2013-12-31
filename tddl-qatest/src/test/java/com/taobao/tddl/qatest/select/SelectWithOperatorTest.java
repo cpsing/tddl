@@ -15,8 +15,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
-import com.taobao.tddl.qatest.ExecuteTableName;
-import com.taobao.tddl.qatest.Validator;
+import com.taobao.tddl.qatest.util.ExecuteTableName;
+import com.taobao.tddl.qatest.util.Validator;
 
 /**
  * 带条件的选择查询
@@ -192,7 +192,7 @@ public class SelectWithOperatorTest extends BaseAndorTestCase {
         {
             rs = mysqlQueryData(sql, param);
             rc = andorQueryData(sql, param);
-            Assert.assertEquals(ResultsSize(rs), ResultsSize(rc));
+            Assert.assertEquals(resultsSize(rs), resultsSize(rc));
         }
     }
 

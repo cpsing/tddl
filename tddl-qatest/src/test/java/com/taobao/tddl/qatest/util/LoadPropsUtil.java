@@ -1,4 +1,4 @@
-package com.taobao.tddl.qatest;
+package com.taobao.tddl.qatest.util;
 
 
 import java.io.IOException;

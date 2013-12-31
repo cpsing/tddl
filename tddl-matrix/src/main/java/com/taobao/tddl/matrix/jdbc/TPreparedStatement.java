@@ -26,10 +26,11 @@ import java.util.Map;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.jdbc.ParameterMethod;
 import com.taobao.tddl.common.model.SqlType;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.matrix.jdbc.utils.PreParser;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author mengshi.sunmengshi 2013-11-22 下午3:26:18
@@ -51,7 +52,6 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
         ensureResultSetIsEmpty();
         this.currentResultSet = this.conn.executeSQL(sql, parameterSettings, this, extraCmd, this.executionContext);
         return currentResultSet;
-        // return this.uConnection.executeSQL(sql);
     }
 
     public int executeUpdate() throws SQLException {
@@ -203,8 +203,6 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
     }
 
     public void setObject(int parameterIndex, Object x) throws SQLException {
-        String className = null;
-
         // /*
         // * 对于int long之类的类型，使用反射去调用其专属的setter，其他的加if判断，暂不支持
         // */

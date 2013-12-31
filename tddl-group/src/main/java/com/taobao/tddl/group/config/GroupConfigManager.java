@@ -516,7 +516,8 @@ public class GroupConfigManager {
             Collections.sort(priorityKeys); // 优先级从小到大排序
             EquityDbManager[] priorityGroups = new EquityDbManager[priorityKeys.size()];
             for (int i = 0; i < priorityGroups.length; i++) { // 最大的优先级放到最前面
-                List<DataSourceWrapper> dswList = priority2DswList.get(priorityGroups.length - 1 - i); // 倒序
+                int priority = priorityKeys.get(priorityGroups.length - 1 - i);// 倒序
+                List<DataSourceWrapper> dswList = priority2DswList.get(priority);
                 // PriorityDbGroupSelector依赖EquityDbManager抛出的NoMoreDataSourceException来实现，
                 // 所以这里即使只有一个ds也只能仍然用EquityDbManager
                 priorityGroups[i] = createEquityDbManager(dswList, isRead, groupExtraConfig);

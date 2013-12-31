@@ -59,9 +59,7 @@ public class TConnection implements Connection {
     }
 
     public PreparedStatement prepareStatement(String sql) throws SQLException {
-
         checkClosed();
-
         if (isAutoCommit) {
             executionContext = new ExecutionContext();
         } else {
@@ -78,7 +76,6 @@ public class TConnection implements Connection {
 
     public Statement createStatement() throws SQLException {
         checkClosed();
-
         if (isAutoCommit) {
             executionContext = new ExecutionContext();
         } else {
@@ -198,9 +195,9 @@ public class TConnection implements Connection {
         if (closed) {
             return;
         }
+
         List<SQLException> exceptions = new LinkedList<SQLException>();
         try {
-
             // 关闭statement
             for (TStatement stmt : openedStatements) {
                 try {
@@ -209,7 +206,6 @@ public class TConnection implements Connection {
                     exceptions.add(e);
                 }
             }
-
         } finally {
             openedStatements.clear();
         }
@@ -263,7 +259,6 @@ public class TConnection implements Connection {
         ResultCursor resultCursor;
         ResultSet rs = null;
         extraCmd.putAll(buildExtraCommand(sql));
-
         if (this.ds.getExecutorService() != null) {
             executionContext.setExecutorService(ds.getExecutorService());
         } else {
@@ -296,8 +291,11 @@ public class TConnection implements Connection {
             throw new SQLException(e);
         }
 
-        if (resultCursor instanceof ResultSetCursor) rs = ((ResultSetCursor) resultCursor).getResultSet();
-        else rs = new TResultSet(resultCursor);
+        if (resultCursor instanceof ResultSetCursor) {
+            rs = ((ResultSetCursor) resultCursor).getResultSet();
+        } else {
+            rs = new TResultSet(resultCursor);
+        }
 
         return rs;
     }
@@ -504,14 +502,16 @@ public class TConnection implements Connection {
         // return null;
     }
 
-    public <T> T unwrap(Class<T> iface) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        return this.getClass().isAssignableFrom(iface);
     }
 
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        try {
+            return (T) this;
+        } catch (Exception e) {
+            throw new SQLException(e);
+        }
     }
 
     public boolean removeStatement(Object arg0) {

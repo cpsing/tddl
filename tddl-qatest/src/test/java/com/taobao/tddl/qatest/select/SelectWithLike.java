@@ -16,8 +16,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
-import com.taobao.tddl.qatest.ExecuteTableName;
-import com.taobao.tddl.qatest.Validator;
+import com.taobao.tddl.qatest.util.ExecuteTableName;
+import com.taobao.tddl.qatest.util.Validator;
 
 /**
  * Comment for SelectWithLike
@@ -114,7 +114,7 @@ public class SelectWithLike extends BaseAndorTestCase {
         rs = mysqlQueryData(sql, null);
         rc = andorQueryData(sql, null);
 
-        Assert.assertEquals(ResultsSize(rs), ResultsSize(rc));
+        Assert.assertEquals(resultsSize(rs), resultsSize(rc));
     }
 
     /**
@@ -141,27 +141,27 @@ public class SelectWithLike extends BaseAndorTestCase {
         String sql = "select * from " + normaltblTableName + " where name not like 'zhuo%'";
         rs = mysqlQueryData(sql, null);
         rc = andorQueryData(sql, null);
-        Assert.assertEquals(ResultsSize(rs), ResultsSize(rc));
+        Assert.assertEquals(resultsSize(rs), resultsSize(rc));
 
         sql = "select * from " + normaltblTableName + " where name not like 'uo%'";
         rs = mysqlQueryData(sql, null);
         rc = andorQueryData(sql, null);
-        Assert.assertEquals(ResultsSize(rs), ResultsSize(rc));
+        Assert.assertEquals(resultsSize(rs), resultsSize(rc));
 
         sql = "select * from " + normaltblTableName + " where name not like 'zhuoxu_'";
         rs = mysqlQueryData(sql, null);
         rc = andorQueryData(sql, null);
-        Assert.assertEquals(ResultsSize(rs), ResultsSize(rc));
+        Assert.assertEquals(resultsSize(rs), resultsSize(rc));
 
         sql = "select * from " + normaltblTableName + " where name not like 'uoxu_'";
         rs = mysqlQueryData(sql, null);
         rc = andorQueryData(sql, null);
-        Assert.assertEquals(ResultsSize(rs), ResultsSize(rc));
+        Assert.assertEquals(resultsSize(rs), resultsSize(rc));
 
         sql = "select * from " + normaltblTableName + " where name not like 'ZHuoXUE'";
         rs = mysqlQueryData(sql, null);
         rc = andorQueryData(sql, null);
-        Assert.assertEquals(ResultsSize(rs), ResultsSize(rc));
+        Assert.assertEquals(resultsSize(rs), resultsSize(rc));
     }
 
     /**

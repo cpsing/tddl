@@ -42,18 +42,14 @@ public class TddlGroupExecutor implements IGroupExecutor {
 
         executionContext.setCurrentRepository(repo);
         getTransaction(executionContext, qc);
-
         ISchematicCursor returnCursor = null;
-
         returnCursor = executeInner(qc, executionContext);
-
         return returnCursor;
     }
 
     @Override
-    public Future<ISchematicCursor> execByExecPlanNodeFuture(IDataNodeExecutor qc,
-
-    ExecutionContext executionContext) throws TddlException {
+    public Future<ISchematicCursor> execByExecPlanNodeFuture(IDataNodeExecutor qc, ExecutionContext executionContext)
+                                                                                                                     throws TddlException {
         return ExecutorContext.getContext().getTopologyExecutor().execByExecPlanNodeFuture(qc, executionContext);
     }
 
@@ -92,7 +88,6 @@ public class TddlGroupExecutor implements IGroupExecutor {
 
         // 如果有外部的
         TransactionConfig tc = TransactionConfig.DEFAULT;
-
         ITransaction trans = repo.beginTransaction(tc);
         trans.setAutoCommit(executionContext.isAutoCommit());
         executionContext.setTransaction(trans);

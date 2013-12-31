@@ -16,8 +16,6 @@ import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.MatrixExecutor;
 import com.taobao.tddl.matrix.config.ConfigHolder;
 
@@ -26,8 +24,6 @@ import com.taobao.tddl.matrix.config.ConfigHolder;
  * @since 5.1.0
  */
 public class TDataSource extends AbstractLifecycle implements DataSource {
-
-    private final static Logger     log                  = LoggerFactory.getLogger(TDataSource.class);
 
     private String                  ruleFilePath         = null;
     private String                  machineTopologyFile  = null;
@@ -45,38 +41,38 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
 
     @Override
     public PrintWriter getLogWriter() throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("getLogWriter");
     }
 
     @Override
     public int getLoginTimeout() throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        throw new UnsupportedOperationException("getLoginTimeout");
     }
 
     @Override
     public void setLogWriter(PrintWriter arg0) throws SQLException {
-        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("setLogWriter");
 
     }
 
     @Override
     public void setLoginTimeout(int arg0) throws SQLException {
-        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("setLoginTimeout");
 
     }
 
     @Override
-    public boolean isWrapperFor(Class<?> arg0) throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        return this.getClass().isAssignableFrom(iface);
     }
 
     @Override
-    public <T> T unwrap(Class<T> arg0) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        try {
+            return (T) this;
+        } catch (Exception e) {
+            throw new SQLException(e);
+        }
     }
 
     @Override
@@ -103,6 +99,7 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
         configHolder.setAppName(appName);
         configHolder.setTopologyFilePath(this.machineTopologyFile);
         configHolder.setSchemaFilePath(this.schemaFile);
+        configHolder.setRuleFilePath(this.ruleFilePath);
 
         configHolder.init();
 
@@ -167,12 +164,10 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
     }
 
     public MatrixExecutor getExecutor() {
-        // TODO Auto-generated method stub
         return this.executor;
     }
 
     public Map<String, Comparable> getConnectionProperties() {
-        // TODO Auto-generated method stub
         return this.connectionProperties;
     }
 

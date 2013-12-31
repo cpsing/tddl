@@ -14,6 +14,7 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
+import com.taobao.tddl.monitor.Monitor;
 import com.taobao.tddl.optimizer.Optimizer;
 import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.core.ast.ASTNode;
@@ -172,7 +173,7 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
             return node.toDataNodeExecutor();
         }
 
-        // long time = System.currentTimeMillis();
+        long time = System.currentTimeMillis();
         ASTNode optimized = null;
         if (cached && sql != null && !sql.isEmpty()) {
             OptimizeResult or;
@@ -210,9 +211,9 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
             optimized.assignment(parameterSettings);
             // 绑定变量后，再做一次
             if (optimized instanceof DMLNode) {
-                optimized = FilterPreProcessor.optimize(((DMLNode) optimized).getNode());
+                ((DMLNode) optimized).setNode((TableNode) FilterPreProcessor.optimize(((DMLNode) optimized).getNode()));
             } else {
-                FilterPreProcessor.optimize(((QueryTreeNode) optimized));
+                optimized = FilterPreProcessor.optimize(((QueryTreeNode) optimized));
             }
         }
 
@@ -241,7 +242,10 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
             logger.warn(qc.toString());
         }
 
-        // time = System.currentTimeMillis();
+        time = Monitor.monitorAndRenewTime(Monitor.KEY1,
+            Monitor.AndOrExecutorOptimize,
+            Monitor.Key3Success,
+            System.currentTimeMillis() - time);
         return qc;
     }
 

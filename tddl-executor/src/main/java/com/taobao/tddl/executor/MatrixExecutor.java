@@ -7,8 +7,6 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.AtomicNumberCreator;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ExecutorContext;
@@ -23,6 +21,9 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.exceptions.EmptyResultFilterException;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 public class MatrixExecutor extends AbstractLifecycle implements IExecutor {
 
@@ -40,9 +41,7 @@ public class MatrixExecutor extends AbstractLifecycle implements IExecutor {
      * @return
      * @throws DataAccessException
      */
-    public ResultCursor execute(String sql,
-
-    ExecutionContext executionContext) throws TddlException {
+    public ResultCursor execute(String sql, ExecutionContext executionContext) throws TddlException {
 
         if (logger.isDebugEnabled()) {
             logger.warn("extraCmd:\n" + executionContext.getExtraCmds());

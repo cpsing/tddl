@@ -13,12 +13,13 @@ import javax.sql.DataSource;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.ExceptionErrorCodeUtils;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.AtomicNumberCreator;
 import com.taobao.tddl.executor.spi.ITHLog;
 import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.group.jdbc.TGroupConnection;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author mengshi.sunmengshi 2013-12-6 上午11:31:29
@@ -26,10 +27,12 @@ import com.taobao.tddl.group.jdbc.TGroupConnection;
  */
 public class My_Transaction implements ITransaction {
 
+    protected final static Logger           logger                = LoggerFactory.getLogger(My_Transaction.class);
     private AtomicNumberCreator             idGen                 = AtomicNumberCreator.getNewInstance();
     private Integer                         id                    = idGen.getIntegerNextNumber();
+
     /**
-     * 连接管理
+     * 处于事务中的连接管理
      */
     protected Map<String, List<Connection>> connMap               = new HashMap<String, List<Connection>>(1);
 
@@ -40,11 +43,14 @@ public class My_Transaction implements ITransaction {
     boolean                                 autoCommit            = true;
     Stragety                                stragety              = Stragety.STRONG;
 
-    protected final static Logger           logger                = LoggerFactory.getLogger(My_Transaction.class);
-
     public enum Stragety {
-        ALLOW_READ/* 跨机允许读不允许写 */, STRONG/* 跨机读写都不允许 */, NONE
-        /* 随意跨机 */
+
+        /** 跨机允许读不允许写 */
+        ALLOW_READ,
+        /** 跨机读写都不允许 */
+        STRONG,
+        /** 随意跨机 */
+        NONE
     }
 
     public void beginTransaction() {
@@ -77,10 +83,21 @@ public class My_Transaction implements ITransaction {
         if (groupName == null) {
             throw new IllegalArgumentException("group name is null");
         }
+
         if (autoCommit) {// 自动提交，不建立事务链接
-            Connection conn = getNewConnection(groupName, ds);
-            return conn;
+            return newConnection(ds);
         }
+
+        // if (stragety == Stragety.NONE) {
+        // Connection my_JdbcHandler = getConnection(groupName, ds, true);
+        // return my_JdbcHandler;
+        // } else if (stragety == Stragety.ALLOW_READ) {
+        // if (!strongConsistent &&
+        // !groupName.equalsIgnoreCase(transactionalNodeName)) {// 非强一致，又非事务用链接
+        // Connection my_JdbcHandler = getConnection(groupName, ds, true);
+        // return my_JdbcHandler;
+        // }
+        // }
 
         /*
          * 状态是强一致或ALLOW_READ 策略一致
@@ -98,7 +115,6 @@ public class My_Transaction implements ITransaction {
             }
         } else {// 没有事务建立，新建事务
             transactionalNodeName = groupName;
-
             Connection handler = getConnection(groupName, ds);
             return handler;
         }
@@ -113,24 +129,18 @@ public class My_Transaction implements ITransaction {
             conns.add(conn);
             connMap.put(groupName, conns);
         }
+
         if (beginTransaction) {
-            for (Connection conn : conns)
+            for (Connection conn : conns) {
                 conn.setAutoCommit(false);
+            }
         }
         return conns;
     }
 
-    private Connection getNewConnection(String groupName, DataSource ds) throws SQLException {
-        List<Connection> conns = connMap.get(groupName);
-        if (conns == null || conns.isEmpty()) {
-            conns = new ArrayList();
-            connMap.put(groupName, conns);
-        }
-
-        Connection connection = newConnection(ds);
-        conns.add(connection);
-
-        return connection;
+    private Connection newConnection(DataSource ds) throws SQLException {
+        Connection myConn = ds.getConnection();
+        return myConn;
     }
 
     public void commit() throws TddlException {
@@ -142,11 +152,8 @@ public class My_Transaction implements ITransaction {
                     }
                 }
             }
-
         } catch (SQLException e) {
             throw new TddlException(ExceptionErrorCodeUtils.UNKNOWN_EXCEPTION, e);
-        } finally {
-            this.close();
         }
 
         transactionalNodeName = null;
@@ -163,35 +170,25 @@ public class My_Transaction implements ITransaction {
             }
         } catch (SQLException e) {
             throw new TddlException(ExceptionErrorCodeUtils.UNKNOWN_EXCEPTION, e);
-        } finally {
-            this.close();
         }
         transactionalNodeName = null;
     }
 
-    private Connection newConnection(DataSource ds) throws SQLException {
-
-        Connection myConn = ds.getConnection();
-        return myConn;
-
-    }
-
-    @Override
     public long getId() {
         return id;
     }
 
-    @Override
     public ITHLog getHistoryLog() {
         return null;
     }
 
-    @Override
     public void close() throws TddlException {
-        SQLException exception = null;
-        if (!autoCommit) {
+        if (autoCommit) {
+            // 如果是auto commit模式，因为不存在重用，链接关闭自管理
             return;
         }
+
+        SQLException exception = null;
         if (connMap != null && !connMap.isEmpty()) {
             for (List<Connection> conns : connMap.values()) {
                 for (Connection conn : conns) {
@@ -251,7 +248,6 @@ public class My_Transaction implements ITransaction {
                 rs.next();
                 rs.close();
             } catch (Exception e) {
-                // e.printStackTrace();
                 logger.debug("e", e);
             }
         }
@@ -266,12 +262,10 @@ public class My_Transaction implements ITransaction {
         throw new RuntimeException("impossible,connection is not TGroupConnection:" + con.getClass());
     }
 
-    @Override
     public boolean isAutoCommit() throws TddlException {
         return autoCommit;
     }
 
-    @Override
     public void setAutoCommit(boolean autoCommit) {
         this.autoCommit = autoCommit;
 

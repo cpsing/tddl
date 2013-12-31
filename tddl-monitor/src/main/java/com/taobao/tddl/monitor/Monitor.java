@@ -61,7 +61,7 @@ public class Monitor extends MonitorConfig {
 
     public static String                                          AndOrExecutorParse                   = "AndOrExecutor_Parse";
     public static String                                          AndOrExecutorOptimize                = "AndOrExecutorOptimize";
-    public static String                                          TDDL_EXECUTE                 = "AndOrExecutorExecute";
+    public static String                                          TDDL_EXECUTE                         = "AndOrExecutorExecute";
     public static String                                          AndOrExecutorExecuteFuture           = "AndOrExecutorExecuteFuture";
     public static String                                          QueryTdhsHandlerUseTdhsApi           = "QueryTdhsHandlerUseTdhsApi";
 
@@ -73,14 +73,6 @@ public class Monitor extends MonitorConfig {
     public static String                                          ServerExecuteOnOthers                = "Server_ExecuteOnOthers";
     public static String                                          ServerPut                            = "Server_Put";
     public static String                                          ServerQuery                          = "Server_Query";
-    // public static String
-    // public static String
-    // public static String
-    // public static String
-    // public static String
-    // public static String
-    // public static String
-    // public static String
 
     public static String                                          Key3Success                          = "success";
     public static String                                          Key3Fail                             = "fail";
@@ -192,7 +184,7 @@ public class Monitor extends MonitorConfig {
             // MonitorLog.addStat(key1, "", key3, value1, value2); // 哈勃日志暂时保留
         }
         if ((statChannelMask & 2) == 2) { // 010
-            bufferedStatLogWriter.stat(key2, key1, key3, value2, value1); //
+            bufferedStatLogWriter.stat(key2, key1, key3, value1, value2); //
         }
         if ((statChannelMask & 1) == 1) { // 001
             addMonitor(key1, key2, key3, value1, value2); // 平均响应时间等动态监控Nagois

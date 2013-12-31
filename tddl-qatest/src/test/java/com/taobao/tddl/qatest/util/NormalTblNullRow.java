@@ -1,4 +1,4 @@
-package com.taobao.tddl.qatest;
+package com.taobao.tddl.qatest.util;
 
 
 import java.math.BigDecimal;
@@ -11,7 +11,7 @@ import java.sql.Timestamp;
  * <p/>
  * Author By: zhuoxue.yll Created Date: 2013-4-8 上午10:41:49
  */
-public class NormalTblRow {
+public class NormalTblNullRow {
 
     private long       pk;
     private Integer    pkInteger;
@@ -33,14 +33,10 @@ public class NormalTblRow {
     private Timestamp  datetimer;
     private Timestamp  timestampr;
     private Date       yearr;
-    private long       integerLong;
-    private long       bigintLong;
     private Date       datetimeDate;
 
     private Double     floatDouble;
     private Float      doubleFloat;
-    private long       decimalLong;
-    private int        decimalInt;
 
     /**
      * @return the pk
@@ -323,34 +319,6 @@ public class NormalTblRow {
     }
 
     /**
-     * @return the integerLong
-     */
-    public long getIntegerLong() {
-        return integerLong;
-    }
-
-    /**
-     * @param integerLong the integerLong to set
-     */
-    public void setIntegerLong(long integerLong) {
-        this.integerLong = integerLong;
-    }
-
-    /**
-     * @return the bigintLong
-     */
-    public long getBigintLong() {
-        return bigintLong;
-    }
-
-    /**
-     * @param bigintLong the bigintLong to set
-     */
-    public void setBigintLong(long bigintLong) {
-        this.bigintLong = bigintLong;
-    }
-
-    /**
      * @return the datetimeDate
      */
     public Date getDatetimeDate() {
@@ -390,33 +358,5 @@ public class NormalTblRow {
      */
     public void setDoubleFloat(Float doubleFloat) {
         this.doubleFloat = doubleFloat;
-    }
-
-    /**
-     * @return the decimalLong
-     */
-    public long getDecimalLong() {
-        return decimalLong;
-    }
-
-    /**
-     * @param decimalLong the decimalLong to set
-     */
-    public void setDecimalLong(long decimalLong) {
-        this.decimalLong = decimalLong;
-    }
-
-    /**
-     * @return the decimalInt
-     */
-    public int getDecimalInt() {
-        return decimalInt;
-    }
-
-    /**
-     * @param decimalInt the decimalInt to set
-     */
-    public void setDecimalInt(int decimalInt) {
-        this.decimalInt = decimalInt;
     }
 }

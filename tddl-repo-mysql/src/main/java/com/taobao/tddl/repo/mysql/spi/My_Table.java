@@ -8,8 +8,6 @@ import java.util.Map.Entry;
 import javax.sql.DataSource;
 
 import com.taobao.tddl.common.exception.TddlException;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -22,6 +20,9 @@ import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 import com.taobao.tddl.repo.mysql.cursor.SchematicMyCursor;
 import com.taobao.tddl.repo.mysql.utils.MysqlRepoUtils;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 public class My_Table implements ITable {
 
@@ -62,9 +63,7 @@ public class My_Table implements ITable {
     public ISchematicCursor getCursor(ExecutionContext executionContext, IndexMeta indexName, IQuery executor)
                                                                                                               throws TddlException {
 
-        My_JdbcHandler jdbcHandler = null;
-
-        jdbcHandler = MysqlRepoUtils.getJdbcHandler(this.dsGetter, executor, executionContext);
+        My_JdbcHandler jdbcHandler = MysqlRepoUtils.getJdbcHandler(this.dsGetter, executor, executionContext);
 
         ICursorMeta meta = ExecUtils.convertToICursorMeta(indexName);
         My_Cursor my_cursor = new My_Cursor(jdbcHandler, meta, executor, executor.isStreaming());

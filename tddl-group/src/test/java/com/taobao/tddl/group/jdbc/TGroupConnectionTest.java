@@ -11,18 +11,13 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.taobao.tddl.common.mock.MockDataSource;
 import com.taobao.tddl.common.model.DBType;
-import com.taobao.tddl.group.jdbc.DataSourceWrapper;
-import com.taobao.tddl.group.jdbc.TGroupConnection;
-import com.taobao.tddl.group.jdbc.TGroupDataSource;
-import com.taobao.tddl.group.jdbc.TGroupDatabaseMetaData;
-import com.taobao.tddl.group.jdbc.TGroupPreparedStatement;
-import com.taobao.tddl.group.jdbc.TGroupStatement;
 
 /**
  * @author yangzhu
@@ -105,7 +100,7 @@ public class TGroupConnectionTest {
             // "select 1 from test"));
             Assert.fail("没有重用第一个连接");
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            Assert.fail(ExceptionUtils.getFullStackTrace(e));
         } finally {
             if (conn != null) {
                 try {
@@ -147,7 +142,7 @@ public class TGroupConnectionTest {
             // 会在db2做重试
             Assert.assertTrue(MockDataSource.hasMethod("db", "db2", "getConnection"));
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            Assert.fail(ExceptionUtils.getFullStackTrace(e));
         } finally {
             if (conn != null) {
                 try {
@@ -185,7 +180,7 @@ public class TGroupConnectionTest {
             MockDataSource.addPreException(MockDataSource.m_createStatement, db1.genFatalSQLException());
             stat.executeQuery("update test set name = 'newname'");
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            Assert.fail(ExceptionUtils.getFullStackTrace(e));
             Assert.assertTrue(MockDataSource.hasMethod("db", "db1", "getConnection"));
             // 写操作不会在db2做重试
             Assert.assertFalse(MockDataSource.hasMethod("db", "db2", "getConnection"));
@@ -228,7 +223,7 @@ public class TGroupConnectionTest {
             stat.executeUpdate("update t set name='newName'");
             conn.commit();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            Assert.fail(ExceptionUtils.getFullStackTrace(e));
         } finally {
             if (conn != null) {
                 try {
@@ -274,7 +269,7 @@ public class TGroupConnectionTest {
             stat = conn.createStatement();
             stat.executeQuery("select 1 from test");
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            Assert.fail(ExceptionUtils.getFullStackTrace(e));
         } finally {
             if (conn != null) {
                 try {
@@ -322,7 +317,7 @@ public class TGroupConnectionTest {
             stat.executeUpdate("update t set name='newName'");
             conn.commit();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            Assert.fail(ExceptionUtils.getFullStackTrace(e));
         } finally {
             if (conn != null) {
                 try {
@@ -370,7 +365,7 @@ public class TGroupConnectionTest {
             stat.executeQuery("select 1 from test");
             conn.commit();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            Assert.fail(ExceptionUtils.getFullStackTrace(e));
         } finally {
             if (conn != null) {
                 try {
@@ -420,7 +415,7 @@ public class TGroupConnectionTest {
             stat.executeQuery("select 1 from test");
             conn.commit();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            Assert.fail(ExceptionUtils.getFullStackTrace(e));
         } finally {
             if (conn != null) {
                 try {
@@ -470,7 +465,7 @@ public class TGroupConnectionTest {
             stat.executeQuery("update t set name='newName'");
             conn.commit();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            Assert.fail(ExceptionUtils.getFullStackTrace(e));
         } finally {
             if (conn != null) {
                 try {
@@ -519,7 +514,7 @@ public class TGroupConnectionTest {
             stat.executeQuery("update t set name='newName'");
             conn.commit();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            Assert.fail(ExceptionUtils.getFullStackTrace(e));
         } finally {
             if (conn != null) {
                 try {

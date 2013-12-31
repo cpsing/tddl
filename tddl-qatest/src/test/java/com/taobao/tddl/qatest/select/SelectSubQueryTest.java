@@ -13,8 +13,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
-import com.taobao.tddl.qatest.ExecuteTableName;
-import com.taobao.tddl.qatest.Validator;
+import com.taobao.tddl.qatest.util.ExecuteTableName;
+import com.taobao.tddl.qatest.util.Validator;
 
 @Ignore("暂时还未支持好")
 @RunWith(Parameterized.class)

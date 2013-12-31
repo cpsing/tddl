@@ -86,9 +86,7 @@ public class My_Cursor implements Cursor {
             return;
         }
         try {
-
             myJdbcHandler.executeQuery(meta, isStreaming);
-
             ResultSetMetaData rsmd = this.myJdbcHandler.getResultSet().getMetaData();
             returnColumns = new ArrayList();
             for (int i = 1; i <= rsmd.getColumnCount(); i++) {
@@ -177,7 +175,9 @@ public class My_Cursor implements Cursor {
 
     @Override
     public List<TddlException> close(List<TddlException> exs) {
-        if (exs == null) exs = new ArrayList();
+        if (exs == null) {
+            exs = new ArrayList();
+        }
         try {
             myJdbcHandler.close();
         } catch (Exception e) {

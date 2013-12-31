@@ -6,219 +6,153 @@
 		<property name="dbType" value="MYSQL" />
 		<property name="tableRules">
 			<map>
-<!-- ===========================================mysql============================================= -->
+				<!-- ===========================================mysql============================================= -->
+				<!--ibatis table-->
+                <entry key="mysql_ibatis_type" value-ref="mysql_ibatis_type" />
 				<!-- 单库单表 -->
-				<entry key="mysql_student_oneGroup_oneAtom._ID" value-ref="mysql_student_oneGroup_oneAtom._ID" />
-				<entry key="mysql_student_oneGroup_mutilAtom._ID" value-ref="mysql_student_oneGroup_mutilAtom._ID" />
-				<entry key="mysql_student_mutilGroup._ID" value-ref="mysql_student_mutilGroup._ID" />
+				<entry key="mysql_student_oneGroup_oneAtom" value-ref="mysql_student_oneGroup_oneAtom" />
+				<entry key="mysql_student_oneGroup_mutilAtom" value-ref="mysql_student_oneGroup_mutilAtom" />
+				<entry key="mysql_student_mutilGroup" value-ref="mysql_student_mutilGroup" />
 
-				<entry key="mysql_normaltbl_oneGroup_oneAtom._pk" value-ref="mysql_normaltbl_oneGroup_oneAtom._pk" />
-				<entry key="mysql_normaltbl_oneGroup_oneAtom_Index._pk" value-ref="mysql_normaltbl_oneGroup_oneAtom_Index._pk" />
+				<entry key="mysql_normaltbl_oneGroup_oneAtom" value-ref="mysql_normaltbl_oneGroup_oneAtom" />
+				<entry key="mysql_normaltbl_oneGroup_oneAtom_Index" value-ref="mysql_normaltbl_oneGroup_oneAtom_Index" />
 				<entry key="mysql_normaltbl_oneGroup_oneAtom_Index._id" value-ref="mysql_normaltbl_oneGroup_oneAtom_Index._id" />
 
-				<entry key="mysql_normaltbl_oneGroup_oneAtom_twoIndex._pk" value-ref="mysql_normaltbl_oneGroup_oneAtom_twoIndex._pk" />
+				<entry key="mysql_normaltbl_oneGroup_oneAtom_twoIndex" value-ref="mysql_normaltbl_oneGroup_oneAtom_twoIndex" />
 				<entry key="mysql_normaltbl_oneGroup_oneAtom_twoIndex._id" value-ref="mysql_normaltbl_oneGroup_oneAtom_twoIndex._id" />
 				<entry key="mysql_normaltbl_oneGroup_oneAtom_twoIndex._gmt_create_name" value-ref="mysql_normaltbl_oneGroup_oneAtom_twoIndex._gmt_create_name" />
 				<entry key="mysql_normaltbl_oneGroup_oneAtom_threeIndex._pk" value-ref="mysql_normaltbl_oneGroup_oneAtom_threeIndex._pk" />
 				<entry key="mysql_normaltbl_oneGroup_oneAtom_threeIndex._id_gmt_create_name" value-ref="mysql_normaltbl_oneGroup_oneAtom_threeIndex._id_gmt_create_name" />
-                <!--ibatis table-->
-                <entry key="mysql_ibatis_type._pk" value-ref="mysql_ibatis_type._pk" />
 
 				<!-- 一个group 多个atom -->
-				<entry key="mysql_normaltbl_oneGroup_mutilAtom._pk" value-ref="mysql_normaltbl_oneGroup_mutilAtom._pk" />
+				<entry key="mysql_normaltbl_oneGroup_mutilAtom" value-ref="mysql_normaltbl_oneGroup_mutilAtom" />
 
 				<!-- 二级索引，包含一个字段的索引 -->
-				<entry key="mysql_normaltbl_oneGroup_mutilAtom_Index._pk" value-ref="mysql_normaltbl_oneGroup_mutilAtom_Index._pk" />
+				<entry key="mysql_normaltbl_oneGroup_mutilAtom_Index" value-ref="mysql_normaltbl_oneGroup_mutilAtom_Index" />
 				<entry key="mysql_normaltbl_oneGroup_mutilAtom_Index._id" value-ref="mysql_normaltbl_oneGroup_mutilAtom_Index._id" />
 
 				<!-- 二级索引，包含两个字段的组合索引 -->
-				<entry key="mysql_normaltbl_oneGroup_mutilAtom_twoIndex._pk"
-					value-ref="mysql_normaltbl_oneGroup_mutilAtom_twoIndex._pk" />
-				<entry key="mysql_normaltbl_oneGroup_mutilAtom_twoIndex._id"
-					value-ref="mysql_normaltbl_oneGroup_mutilAtom_twoIndex._id" />
-				<entry key="mysql_normaltbl_oneGroup_mutilAtom_twoIndex._gmt_create_name"
-					value-ref="mysql_normaltbl_oneGroup_mutilAtom_twoIndex._gmt_create_name" />
+				<entry key="mysql_normaltbl_oneGroup_mutilAtom_twoIndex" value-ref="mysql_normaltbl_oneGroup_mutilAtom_twoIndex" />
+				<entry key="mysql_normaltbl_oneGroup_mutilAtom_twoIndex._id" value-ref="mysql_normaltbl_oneGroup_mutilAtom_twoIndex._id" />
+				<entry key="mysql_normaltbl_oneGroup_mutilAtom_twoIndex._gmt_create_name" value-ref="mysql_normaltbl_oneGroup_mutilAtom_twoIndex._gmt_create_name" />
 				<!-- 二级索引，包含两个字段的组合索引 ，强一致 -->
-				<entry key="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_Consistent._pk"
-					value-ref="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_Consistent._pk" />
-				<entry key="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_Consistent._id"
-					value-ref="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_Consistent._id" />
-				<entry
-					key="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_Consistent._gmt_create_name"
-					value-ref="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_Consistent._gmt_create_name" />
+				<entry key="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_Consistent" value-ref="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_Consistent" />
+				<entry key="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_Consistent._id" value-ref="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_Consistent._id" />
+				<entry key="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_Consistent._gmt_create_name" value-ref="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_Consistent._gmt_create_name" />
 				<!-- 二级索引，包含三个字段的组合索引 -->
-				<entry key="mysql_normaltbl_oneGroup_mutilAtom_threeIndex._pk"
-					value-ref="mysql_normaltbl_oneGroup_mutilAtom_threeIndex._pk" />
-				<entry key="mysql_normaltbl_oneGroup_mutilAtom_threeIndex._id_gmt_create_name"
-					value-ref="mysql_normaltbl_oneGroup_mutilAtom_threeIndex._id_gmt_create_name" />
-
+				<entry key="mysql_normaltbl_oneGroup_mutilAtom_threeIndex" value-ref="mysql_normaltbl_oneGroup_mutilAtom_threeIndex" />
+				<entry key="mysql_normaltbl_oneGroup_mutilAtom_threeIndex._id_gmt_create_name" value-ref="mysql_normaltbl_oneGroup_mutilAtom_threeIndex._id_gmt_create_name" />
 
 				<!-- 多个group 多个atom -->
-				<entry key="mysql_normaltbl_mutilGroup._pk" value-ref="mysql_normaltbl_mutilGroup._pk" />
+				<entry key="mysql_normaltbl_mutilGroup" value-ref="mysql_normaltbl_mutilGroup" />
 
 				<!-- 二级索引，包含两个字段的索引，复杂规则，模拟线上规则配置 -->
-				<entry key="mysql_normaltbl_mutilGroup_twoIndex_complexRule._pk"
-					value-ref="mysql_normaltbl_mutilGroup_twoIndex_complexRule._pk" />
-				<entry key="mysql_normaltbl_mutilGroup_twoIndex_complexRule._gmt_create"
-					value-ref="mysql_normaltbl_mutilGroup_twoIndex_complexRule._gmt_create" />
-				<entry key="mysql_normaltbl_mutilGroup_twoIndex_complexRule._name"
-					value-ref="mysql_normaltbl_mutilGroup_twoIndex_complexRule._name" />
+				<entry key="mysql_normaltbl_mutilGroup_twoIndex_complexRule" value-ref="mysql_normaltbl_mutilGroup_twoIndex_complexRule" />
+				<entry key="mysql_normaltbl_mutilGroup_twoIndex_complexRule._gmt_create" value-ref="mysql_normaltbl_mutilGroup_twoIndex_complexRule._gmt_create" />
+				<entry key="mysql_normaltbl_mutilGroup_twoIndex_complexRule._name" value-ref="mysql_normaltbl_mutilGroup_twoIndex_complexRule._name" />
 
 				<!-- 二级索引，包含一个字段的索引 -->
-				<entry key="mysql_normaltbl_mutilGroup_Index._pk" value-ref="mysql_normaltbl_mutilGroup_Index._pk" />
+				<entry key="mysql_normaltbl_mutilGroup_Index" value-ref="mysql_normaltbl_mutilGroup_Index" />
 				<entry key="mysql_normaltbl_mutilGroup_Index._id" value-ref="mysql_normaltbl_mutilGroup_Index._id" />
 				<!-- 二级索引，包含一个字段的索引,强一致 -->
-				<entry key="mysql_normaltbl_mutilGroup_Index_Consistent._pk"
-					value-ref="mysql_normaltbl_mutilGroup_Index_Consistent._pk" />
-				<entry key="mysql_normaltbl_mutilGroup_Index_Consistent._id"
-					value-ref="mysql_normaltbl_mutilGroup_Index_Consistent._id" />
+				<entry key="mysql_normaltbl_mutilGroup_Index_Consistent" value-ref="mysql_normaltbl_mutilGroup_Index_Consistent" />
+				<entry key="mysql_normaltbl_mutilGroup_Index_Consistent._id" value-ref="mysql_normaltbl_mutilGroup_Index_Consistent._id" />
 				<!-- 二级索引，包含两个字段的组合索引 -->
-				<entry key="mysql_normaltbl_mutilGroup_twoIndex._pk" value-ref="mysql_normaltbl_mutilGroup_twoIndex._pk" />
+				<entry key="mysql_normaltbl_mutilGroup_twoIndex" value-ref="mysql_normaltbl_mutilGroup_twoIndex" />
 				<entry key="mysql_normaltbl_mutilGroup_twoIndex._id" value-ref="mysql_normaltbl_mutilGroup_twoIndex._id" />
-				<entry key="mysql_normaltbl_mutilGroup_twoIndex._gmt_create_name"
-					value-ref="mysql_normaltbl_mutilGroup_twoIndex._gmt_create_name" />
+				<entry key="mysql_normaltbl_mutilGroup_twoIndex._gmt_create_name" value-ref="mysql_normaltbl_mutilGroup_twoIndex._gmt_create_name" />
 
 				<!-- 二级索引，包含两个字段的组合索引，强一致 -->
-				<entry key="mysql_normaltbl_mutilGroup_twoIndex_Consistent._pk"
-					value-ref="mysql_normaltbl_mutilGroup_twoIndex_Consistent._pk" />
-				<entry key="mysql_normaltbl_mutilGroup_twoIndex_Consistent._id"
-					value-ref="mysql_normaltbl_mutilGroup_twoIndex_Consistent._id" />
-				<entry key="mysql_normaltbl_mutilGroup_twoIndex_Consistent._gmt_create_name"
-					value-ref="mysql_normaltbl_mutilGroup_twoIndex_Consistent._gmt_create_name" />
+				<entry key="mysql_normaltbl_mutilGroup_twoIndex_Consistent" value-ref="mysql_normaltbl_mutilGroup_twoIndex_Consistent" />
+				<entry key="mysql_normaltbl_mutilGroup_twoIndex_Consistent._id" value-ref="mysql_normaltbl_mutilGroup_twoIndex_Consistent._id" />
+				<entry key="mysql_normaltbl_mutilGroup_twoIndex_Consistent._gmt_create_name" value-ref="mysql_normaltbl_mutilGroup_twoIndex_Consistent._gmt_create_name" />
 				<!-- 二级索引，包含三个字段的组合索引 -->
-				<entry key="mysql_normaltbl_mutilGroup_threeIndex._pk" value-ref="mysql_normaltbl_mutilGroup_threeIndex._pk" />
-				<entry key="mysql_normaltbl_mutilGroup_threeIndex._id_gmt_create_name"
-					value-ref="mysql_normaltbl_mutilGroup_threeIndex._id_gmt_create_name" />
+				<entry key="mysql_normaltbl_mutilGroup_threeIndex" value-ref="mysql_normaltbl_mutilGroup_threeIndex" />
+				<entry key="mysql_normaltbl_mutilGroup_threeIndex._id_gmt_create_name" value-ref="mysql_normaltbl_mutilGroup_threeIndex._id_gmt_create_name" />
+				
+				<!-- 单库单表 -->
+				<entry key="mysql_host_info_oneGroup_oneAtom" value-ref="mysql_host_info_oneGroup_oneAtom" />
+				<entry key="mysql_host_info_oneGroup_oneAtom_Index" value-ref="mysql_host_info_oneGroup_oneAtom_Index" />
+				<entry key="mysql_host_info_oneGroup_oneAtom_twoIndex" value-ref="mysql_host_info_oneGroup_oneAtom_twoIndex" />
+				<entry key="mysql_host_info_oneGroup_oneAtom_threeIndex" value-ref="mysql_host_info_oneGroup_oneAtom_threeIndex" />
 
+				<entry key="mysql_host_info_oneGroup_mutilAtom" value-ref="mysql_host_info_oneGroup_mutilAtom" />
 
-				<entry key="mysql_host_info_oneGroup_oneAtom._host_id" value-ref="mysql_host_info_oneGroup_oneAtom._host_id" />
-				<entry key="mysql_host_info_oneGroup_oneAtom_Index._host_id"
-					value-ref="mysql_host_info_oneGroup_oneAtom_Index._host_id" />
-				<entry key="mysql_host_info_oneGroup_oneAtom_twoIndex._host_id"
-					value-ref="mysql_host_info_oneGroup_oneAtom_twoIndex._host_id" />
-				<entry key="mysql_host_info_oneGroup_oneAtom_threeIndex._host_id"
-					value-ref="mysql_host_info_oneGroup_oneAtom_threeIndex._host_id" />
-
-				<entry key="mysql_host_info_oneGroup_mutilAtom._host_id" value-ref="mysql_host_info_oneGroup_mutilAtom._host_id" />
-
-				<entry key="mysql_host_info_mutilGroup._host_id" value-ref="mysql_host_info_mutilGroup._host_id" />
-				<entry key="mysql_host_info_mutilGroup_Index._host_id" value-ref="mysql_host_info_mutilGroup_Index._host_id" />
+				<entry key="mysql_host_info_mutilGroup" value-ref="mysql_host_info_mutilGroup" />
+				<entry key="mysql_host_info_mutilGroup_Index" value-ref="mysql_host_info_mutilGroup_Index" />
 				<entry key="mysql_host_info_mutilGroup_Index._host_name" value-ref="mysql_host_info_mutilGroup_Index._host_name" />
 				<!--主表和索引不在同一台机器上 -->
-				<entry key="mysql_host_info_mutilGroup_Index_difgroup._host_id" value-ref="mysql_host_info_mutilGroup_Index_difgroup._host_id" />
+				<entry key="mysql_host_info_mutilGroup_Index_difgroup" value-ref="mysql_host_info_mutilGroup_Index_difgroup" />
 				<entry key="mysql_host_info_mutilGroup_Index_difgroup._host_name" value-ref="mysql_host_info_mutilGroup_Index_difgroup._host_name" />
 				
-				<entry key="mysql_host_info_mutilGroup_twoIndex._host_id" value-ref="mysql_host_info_mutilGroup_twoIndex._host_id" />
-				<entry key="mysql_host_info_mutilGroup_twoIndex._host_name"
-					value-ref="mysql_host_info_mutilGroup_twoIndex._host_name" />
-				<entry key="mysql_host_info_mutilGroup_twoIndex._hostgroup_id_host_ip"
-					value-ref="mysql_host_info_mutilGroup_twoIndex._hostgroup_id_host_ip" />
+				<entry key="mysql_host_info_mutilGroup_twoIndex" value-ref="mysql_host_info_mutilGroup_twoIndex" />
+				<entry key="mysql_host_info_mutilGroup_twoIndex._host_name" value-ref="mysql_host_info_mutilGroup_twoIndex._host_name" />
+				<entry key="mysql_host_info_mutilGroup_twoIndex._hostgroup_id_host_ip" value-ref="mysql_host_info_mutilGroup_twoIndex._hostgroup_id_host_ip" />
 				
-				<entry key="mysql_host_info_mutilGroup_twoIndex_difgroup._host_id" value-ref="mysql_host_info_mutilGroup_twoIndex_difgroup._host_id" />
-				<entry key="mysql_host_info_mutilGroup_twoIndex_difgroup._host_name"
-					value-ref="mysql_host_info_mutilGroup_twoIndex_difgroup._host_name" />
-				<entry key="mysql_host_info_mutilGroup_twoIndex_difgroup._hostgroup_id_host_ip"
-					value-ref="mysql_host_info_mutilGroup_twoIndex_difgroup._hostgroup_id_host_ip" />
+				<entry key="mysql_host_info_mutilGroup_twoIndex_difgroup" value-ref="mysql_host_info_mutilGroup_twoIndex_difgroup" />
+				<entry key="mysql_host_info_mutilGroup_twoIndex_difgroup._host_name" value-ref="mysql_host_info_mutilGroup_twoIndex_difgroup._host_name" />
+				<entry key="mysql_host_info_mutilGroup_twoIndex_difgroup._hostgroup_id_host_ip" value-ref="mysql_host_info_mutilGroup_twoIndex_difgroup._hostgroup_id_host_ip" />
 					
 				<!--二级索引，包含两个字段的组合索引，强一致 -->
-				<entry key="mysql_host_info_mutilGroup_twoIndex_Consistent._host_id"
-					value-ref="mysql_host_info_mutilGroup_twoIndex_Consistent._host_id" />
-				<entry key="mysql_host_info_mutilGroup_twoIndex_Consistent._host_name"
-					value-ref="mysql_host_info_mutilGroup_twoIndex_Consistent._host_name" />
-				<entry
-					key="mysql_host_info_mutilGroup_twoIndex_Consistent._hostgroup_id_host_ip"
-					value-ref="mysql_host_info_mutilGroup_twoIndex_Consistent._hostgroup_id_host_ip" />
-				<entry key="mysql_host_info_mutilGroup_threeIndex._host_id"
-					value-ref="mysql_host_info_mutilGroup_threeIndex._host_id" />
-				<entry
-					key="mysql_host_info_mutilGroup_threeIndex._host_name_host_ip_host_type_id"
-					value-ref="mysql_host_info_mutilGroup_threeIndex._host_name_host_ip_host_type_id" />
-                 <entry key="mysql_host_info_mutilGroup_threeIndex_difgroup._host_id"
-					value-ref="mysql_host_info_mutilGroup_threeIndex_difgroup._host_id" />
-				<entry
-					key="mysql_host_info_mutilGroup_threeIndex_difgroup._host_name_host_ip_host_type_id"
-					value-ref="mysql_host_info_mutilGroup_threeIndex_difgroup._host_name_host_ip_host_type_id" />
+				<entry key="mysql_host_info_mutilGroup_twoIndex_Consistent" value-ref="mysql_host_info_mutilGroup_twoIndex_Consistent" />
+				<entry key="mysql_host_info_mutilGroup_twoIndex_Consistent._host_name" value-ref="mysql_host_info_mutilGroup_twoIndex_Consistent._host_name" />
+				<entry key="mysql_host_info_mutilGroup_twoIndex_Consistent._hostgroup_id_host_ip" value-ref="mysql_host_info_mutilGroup_twoIndex_Consistent._hostgroup_id_host_ip" />
+				<entry key="mysql_host_info_mutilGroup_threeIndex" value-ref="mysql_host_info_mutilGroup_threeIndex" />
+				<entry key="mysql_host_info_mutilGroup_threeIndex._host_name_host_ip_host_type_id" value-ref="mysql_host_info_mutilGroup_threeIndex._host_name_host_ip_host_type_id" />
+                <entry key="mysql_host_info_mutilGroup_threeIndex_difgroup" value-ref="mysql_host_info_mutilGroup_threeIndex_difgroup" />
+				<entry key="mysql_host_info_mutilGroup_threeIndex_difgroup._host_name_host_ip_host_type_id" value-ref="mysql_host_info_mutilGroup_threeIndex_difgroup._host_name_host_ip_host_type_id" />
 
-				<entry key="mysql_module_info_oneGroup_oneAtom._module_id"
-					value-ref="mysql_module_info_oneGroup_oneAtom._module_id" />
-				<entry key="mysql_module_info_oneGroup_mutilAtom._module_id"
-					value-ref="mysql_module_info_oneGroup_mutilAtom._module_id" />
-				<entry key="mysql_module_info_mutilGroup._module_id" value-ref="mysql_module_info_mutilGroup._module_id" />
+				<!-- 单库单表 -->
+				<entry key="mysql_module_info_oneGroup_oneAtom" value-ref="mysql_module_info_oneGroup_oneAtom" />
+				<entry key="mysql_module_info_oneGroup_mutilAtom" value-ref="mysql_module_info_oneGroup_mutilAtom" />
+				<entry key="mysql_module_info_mutilGroup" value-ref="mysql_module_info_mutilGroup" />
 
-				<entry key="mysql_hostgroup_info_oneGroup_oneAtom._hostgroup_id"
-					value-ref="mysql_hostgroup_info_oneGroup_oneAtom._hostgroup_id" />
-				<entry key="mysql_hostgroup_info_oneGroup_oneAtom_otherDb._hostgroup_id"
-					value-ref="mysql_hostgroup_info_oneGroup_oneAtom_otherDb._hostgroup_id" />
-				<entry key="mysql_hostgroup_info_oneGroup_oneAtom_Index._hostgroup_id"
-					value-ref="mysql_hostgroup_info_oneGroup_oneAtom_Index._hostgroup_id" />
-				<entry key="mysql_hostgroup_info_oneGroup_oneAtom_twoIndex._hostgroup_id"
-					value-ref="mysql_hostgroup_info_oneGroup_oneAtom_twoIndex._hostgroup_id" />
-				<entry key="mysql_hostgroup_info_oneGroup_oneAtom_threeIndex._hostgroup_id"
-					value-ref="mysql_hostgroup_info_oneGroup_oneAtom_threeIndex._hostgroup_id" />
+				<entry key="mysql_hostgroup_info_oneGroup_oneAtom" value-ref="mysql_hostgroup_info_oneGroup_oneAtom" />
+				<entry key="mysql_hostgroup_info_oneGroup_oneAtom_otherDb" value-ref="mysql_hostgroup_info_oneGroup_oneAtom_otherDb" />
+				<entry key="mysql_hostgroup_info_oneGroup_oneAtom_Index" value-ref="mysql_hostgroup_info_oneGroup_oneAtom_Index" />
+				<entry key="mysql_hostgroup_info_oneGroup_oneAtom_twoIndex" value-ref="mysql_hostgroup_info_oneGroup_oneAtom_twoIndex" />
+				<entry key="mysql_hostgroup_info_oneGroup_oneAtom_threeIndex" value-ref="mysql_hostgroup_info_oneGroup_oneAtom_threeIndex" />
 
-				<entry key="mysql_hostgroup_info_oneGroup_mutilAtom._hostgroup_id"
-					value-ref="mysql_hostgroup_info_oneGroup_mutilAtom._hostgroup_id" />
-				<entry key="mysql_hostgroup_info_mutilGroup._hostgroup_id"
-					value-ref="mysql_hostgroup_info_mutilGroup._hostgroup_id" />
-				<entry key="mysql_hostgroup_info_mutilGroup_Index._hostgroup_id"
-					value-ref="mysql_hostgroup_info_mutilGroup_Index._hostgroup_id" />
-				<entry key="mysql_hostgroup_info_mutilGroup_Index._station_id"
-					value-ref="mysql_hostgroup_info_mutilGroup_Index._station_id" />
-				<entry key="mysql_hostgroup_info_mutilGroup_Index_difgroup._hostgroup_id"
-					value-ref="mysql_hostgroup_info_mutilGroup_Index_difgroup._hostgroup_id" />
-				<entry key="mysql_hostgroup_info_mutilGroup_Index_difgroup._station_id"
-					value-ref="mysql_hostgroup_info_mutilGroup_Index_difgroup._station_id" />
-				<entry key="mysql_hostgroup_info_mutilGroup_twoIndex._hostgroup_id"
-					value-ref="mysql_hostgroup_info_mutilGroup_twoIndex._hostgroup_id" />
-				<entry key="mysql_hostgroup_info_mutilGroup_twoIndex._station_id"
-					value-ref="mysql_hostgroup_info_mutilGroup_twoIndex._station_id" />
-				<entry
-					key="mysql_hostgroup_info_mutilGroup_twoIndex._hostgroup_name_module_id"
-					value-ref="mysql_hostgroup_info_mutilGroup_twoIndex._hostgroup_name_module_id" />
+				<entry key="mysql_hostgroup_info_oneGroup_mutilAtom" value-ref="mysql_hostgroup_info_oneGroup_mutilAtom" />
+				
+				<entry key="mysql_hostgroup_info_mutilGroup" value-ref="mysql_hostgroup_info_mutilGroup" />
+				<entry key="mysql_hostgroup_info_mutilGroup_Index" value-ref="mysql_hostgroup_info_mutilGroup_Index" />
+				<entry key="mysql_hostgroup_info_mutilGroup_Index._station_id" value-ref="mysql_hostgroup_info_mutilGroup_Index._station_id" />
+				<entry key="mysql_hostgroup_info_mutilGroup_Index_difgroup" value-ref="mysql_hostgroup_info_mutilGroup_Index_difgroup" />
+				<entry key="mysql_hostgroup_info_mutilGroup_Index_difgroup._station_id" value-ref="mysql_hostgroup_info_mutilGroup_Index_difgroup._station_id" />
+				<entry key="mysql_hostgroup_info_mutilGroup_twoIndex" value-ref="mysql_hostgroup_info_mutilGroup_twoIndex" />
+				<entry key="mysql_hostgroup_info_mutilGroup_twoIndex._station_id" value-ref="mysql_hostgroup_info_mutilGroup_twoIndex._station_id" />
+				<entry key="mysql_hostgroup_info_mutilGroup_twoIndex._hostgroup_name_module_id" value-ref="mysql_hostgroup_info_mutilGroup_twoIndex._hostgroup_name_module_id" />
 					
-				<entry key="mysql_hostgroup_info_mutilGroup_twoIndex_difgroup._hostgroup_id"
-					value-ref="mysql_hostgroup_info_mutilGroup_twoIndex_difgroup._hostgroup_id" />
-				<entry key="mysql_hostgroup_info_mutilGroup_twoIndex_difgroup._station_id"
-					value-ref="mysql_hostgroup_info_mutilGroup_twoIndex_difgroup._station_id" />
-				<entry
-					key="mysql_hostgroup_info_mutilGroup_twoIndex_difgroup._hostgroup_name_module_id"
-					value-ref="mysql_hostgroup_info_mutilGroup_twoIndex_difgroup._hostgroup_name_module_id" />
+				<entry key="mysql_hostgroup_info_mutilGroup_twoIndex_difgroup" value-ref="mysql_hostgroup_info_mutilGroup_twoIndex_difgroup" />
+				<entry key="mysql_hostgroup_info_mutilGroup_twoIndex_difgroup._station_id" value-ref="mysql_hostgroup_info_mutilGroup_twoIndex_difgroup._station_id" />
+				<entry key="mysql_hostgroup_info_mutilGroup_twoIndex_difgroup._hostgroup_name_module_id" value-ref="mysql_hostgroup_info_mutilGroup_twoIndex_difgroup._hostgroup_name_module_id" />
 					
 				<!--二级索引，包含两个字段的组合索引，强一致 -->
-				<entry key="mysql_hostgroup_info_mutilGroup_twoIndex_Consistent._hostgroup_id"
-					value-ref="mysql_hostgroup_info_mutilGroup_twoIndex_Consistent._hostgroup_id" />
-				<entry key="mysql_hostgroup_info_mutilGroup_twoIndex_Consistent._station_id"
-					value-ref="mysql_hostgroup_info_mutilGroup_twoIndex_Consistent._station_id" />
-				<entry
-					key="mysql_hostgroup_info_mutilGroup_twoIndex_Consistent._hostgroup_name_module_id"
-					value-ref="mysql_hostgroup_info_mutilGroup_twoIndex_Consistent._hostgroup_name_module_id" />
+				<entry key="mysql_hostgroup_info_mutilGroup_twoIndex_Consistent" value-ref="mysql_hostgroup_info_mutilGroup_twoIndex_Consistent" />
+				<entry key="mysql_hostgroup_info_mutilGroup_twoIndex_Consistent._station_id" value-ref="mysql_hostgroup_info_mutilGroup_twoIndex_Consistent._station_id" />
+				<entry key="mysql_hostgroup_info_mutilGroup_twoIndex_Consistent._hostgroup_name_module_id" value-ref="mysql_hostgroup_info_mutilGroup_twoIndex_Consistent._hostgroup_name_module_id" />
 
-				<entry key="mysql_hostgroup_info_mutilGroup_threeIndex._hostgroup_id"
-					value-ref="mysql_hostgroup_info_mutilGroup_threeIndex._hostgroup_id" />
-				<entry
-					key="mysql_hostgroup_info_mutilGroup_threeIndex._station_id_hostgroup_name_nagios_id"
-					value-ref="mysql_hostgroup_info_mutilGroup_threeIndex._station_id_hostgroup_name_nagios_id" />
+				<entry key="mysql_hostgroup_info_mutilGroup_threeIndex" value-ref="mysql_hostgroup_info_mutilGroup_threeIndex" />
+				<entry key="mysql_hostgroup_info_mutilGroup_threeIndex._station_id_hostgroup_name_nagios_id" value-ref="mysql_hostgroup_info_mutilGroup_threeIndex._station_id_hostgroup_name_nagios_id" />
 
-				<entry key="mysql_hostgroup_info_mutilGroup_threeIndex_difgroup._hostgroup_id"
-					value-ref="mysql_hostgroup_info_mutilGroup_threeIndex_difgroup._hostgroup_id" />
-				<entry
-					key="mysql_hostgroup_info_mutilGroup_threeIndex_difgroup._station_id_hostgroup_name_nagios_id"
-					value-ref="mysql_hostgroup_info_mutilGroup_threeIndex_difgroup._station_id_hostgroup_name_nagios_id" />
+				<entry key="mysql_hostgroup_info_mutilGroup_threeIndex_difgroup" value-ref="mysql_hostgroup_info_mutilGroup_threeIndex_difgroup" />
+				<entry key="mysql_hostgroup_info_mutilGroup_threeIndex_difgroup._station_id_hostgroup_name_nagios_id" value-ref="mysql_hostgroup_info_mutilGroup_threeIndex_difgroup._station_id_hostgroup_name_nagios_id" />
 					
-				<entry key="mysql_module_host_oneGroup_oneAtom._id" value-ref="mysql_module_host_oneGroup_oneAtom._id" />
-				<entry key="mysql_module_host_oneGroup_mutilAtom._id" value-ref="mysql_module_host_oneGroup_mutilAtom._id" />
-				<entry key="mysql_module_host_mutilGroup._id" value-ref="mysql_module_host_mutilGroup._id" />
+				<entry key="mysql_module_host_oneGroup_oneAtom" value-ref="mysql_module_host_oneGroup_oneAtom" />
+				<entry key="mysql_module_host_oneGroup_mutilAtom" value-ref="mysql_module_host_oneGroup_mutilAtom" />
+				<entry key="mysql_module_host_mutilGroup" value-ref="mysql_module_host_mutilGroup" />
 			</map>
 		</property>
 	</bean>
 <!-- ===========================================mysql group============================================= -->
 
-	<bean id="mysql_normaltbl_oneGroup_oneAtom._pk" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_normaltbl_oneGroup_oneAtom" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_oneAtom" />
 		<property name="tbNamePattern" value="mysql_normaltbl_oneGroup_oneAtom" />
 	</bean>
-	<bean id="mysql_normaltbl_oneGroup_oneAtom_Index._pk" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_normaltbl_oneGroup_oneAtom_Index" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_oneAtom" />
 		<property name="tbNamePattern" value="mysql_normaltbl_oneGroup_oneAtom_Index" />
@@ -230,7 +164,7 @@
 		<property name="tbNamePattern" value="mysql_normaltbl_oneGroup_oneAtom_Index" />
 	</bean>
 
-	<bean id="mysql_normaltbl_oneGroup_oneAtom_twoIndex._pk" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_normaltbl_oneGroup_oneAtom_twoIndex" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_oneAtom" />
 		<property name="tbNamePattern" value="mysql_normaltbl_oneGroup_oneAtom_twoIndex" />
@@ -259,84 +193,84 @@
 		<property name="tbNamePattern" value="mysql_normaltbl_oneGroup_oneAtom_threeIndex" />
 	</bean>
 
-	<bean id="mysql_student_oneGroup_oneAtom._ID" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_student_oneGroup_oneAtom" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_oneAtom" />
 		<property name="tbNamePattern" value="mysql_student_oneGroup_oneAtom" />
 	</bean>
 
-	<bean id="mysql_host_info_oneGroup_oneAtom._host_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_host_info_oneGroup_oneAtom" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_oneAtom" />
 		<property name="tbNamePattern" value="mysql_host_info_oneGroup_oneAtom" />
 	</bean>
-	<bean id="mysql_host_info_oneGroup_oneAtom_Index._host_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_host_info_oneGroup_oneAtom_Index" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_oneAtom" />
 		<property name="tbNamePattern" value="mysql_host_info_oneGroup_oneAtom_Index" />
 	</bean>
-	<bean id="mysql_host_info_oneGroup_oneAtom_twoIndex._host_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_host_info_oneGroup_oneAtom_twoIndex" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_oneAtom" />
 		<property name="tbNamePattern" value="mysql_host_info_oneGroup_oneAtom_twoIndex" />
 	</bean>
-	<bean id="mysql_host_info_oneGroup_oneAtom_threeIndex._host_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_host_info_oneGroup_oneAtom_threeIndex" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_oneAtom" />
 		<property name="tbNamePattern" value="mysql_host_info_oneGroup_oneAtom_threeIndex" />
 	</bean>
 
-	<bean id="mysql_module_info_oneGroup_oneAtom._module_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_module_info_oneGroup_oneAtom" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_oneAtom" />
 		<property name="tbNamePattern" value="mysql_module_info_oneGroup_oneAtom" />
 	</bean>
 
-	<bean id="mysql_hostgroup_info_oneGroup_oneAtom._hostgroup_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_hostgroup_info_oneGroup_oneAtom" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_oneAtom" />
 		<property name="tbNamePattern" value="mysql_hostgroup_info_oneGroup_oneAtom" />
 	</bean>
 
-	<bean id="mysql_hostgroup_info_oneGroup_oneAtom_otherDb._hostgroup_id"
+	<bean id="mysql_hostgroup_info_oneGroup_oneAtom_otherDb"
 		class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_2" />
 		<property name="tbNamePattern" value="mysql_hostgroup_info_oneGroup_oneAtom_otherDb" />
 	</bean>
 
-	<bean id="mysql_hostgroup_info_oneGroup_oneAtom_Index._hostgroup_id"
+	<bean id="mysql_hostgroup_info_oneGroup_oneAtom_Index"
 		class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_oneAtom" />
 		<property name="tbNamePattern" value="mysql_hostgroup_info_oneGroup_oneAtom_Index" />
 	</bean>
-	<bean id="mysql_hostgroup_info_oneGroup_oneAtom_twoIndex._hostgroup_id"
+	<bean id="mysql_hostgroup_info_oneGroup_oneAtom_twoIndex"
 		class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_oneAtom" />
 		<property name="tbNamePattern" value="mysql_hostgroup_info_oneGroup_oneAtom_twoIndex" />
 	</bean>
-	<bean id="mysql_hostgroup_info_oneGroup_oneAtom_threeIndex._hostgroup_id"
+	<bean id="mysql_hostgroup_info_oneGroup_oneAtom_threeIndex"
 		class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_oneAtom" />
 		<property name="tbNamePattern" value="mysql_hostgroup_info_oneGroup_oneAtom_threeIndex" />
 	</bean>
 
-	<bean id="mysql_module_host_oneGroup_oneAtom._id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_module_host_oneGroup_oneAtom" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_oneAtom" />
 		<property name="tbNamePattern" value="mysql_module_host_oneGroup_oneAtom" />
 	</bean>
 
-	<bean id="mysql_ibatis_type._pk" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_ibatis_type" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_oneAtom" />
 		<property name="tbNamePattern" value="mysql_ibatis_type" />
 	</bean>
 	<!-- 单group多个atom 分表 -->
-	<bean id="mysql_normaltbl_oneGroup_mutilAtom._pk" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_normaltbl_oneGroup_mutilAtom" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_2" />
 		<property name="tbRules" value="Math.abs(Long.valueOf(#pk,1,4#)) % 4 % 2" />
@@ -344,7 +278,7 @@
 	</bean>
 
 	<!-- 二级索引，包含一个字段的组合索引 -->
-	<bean id="mysql_normaltbl_oneGroup_mutilAtom_Index._pk" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_normaltbl_oneGroup_mutilAtom_Index" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_2" />
 		<property name="tbRules" value="Math.abs(Long.valueOf(#pk,1,4#)) % 4 % 2" />
@@ -357,7 +291,7 @@
 		<property name="tbNamePattern" value="mysql_normaltbl_oneGroup_mutilAtom_Index_{00}" />
 	</bean>
 	<!-- 二级索引，包含两个个字段的组合索引 -->
-	<bean id="mysql_normaltbl_oneGroup_mutilAtom_twoIndex._pk" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_normaltbl_oneGroup_mutilAtom_twoIndex" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_2" />
 		<property name="tbRules" value="Math.abs(Long.valueOf(#pk,1,4#)) % 4 % 2" />
@@ -380,7 +314,7 @@
 			value="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_{00}" />
 	</bean>
 	<!-- 二级索引，包含两个个字段的组合索引,强一致 -->
-	<bean id="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_Consistent._pk"
+	<bean id="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_Consistent"
 		class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_2" />
@@ -405,7 +339,7 @@
 			value="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_Consistent_{00}" />
 	</bean>
 	<!-- 二级索引，包含三个字段的组合索引 -->
-	<bean id="mysql_normaltbl_oneGroup_mutilAtom_threeIndex._pk" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_normaltbl_oneGroup_mutilAtom_threeIndex" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_2" />
 		<property name="tbRules" value="Math.abs(Long.valueOf(#pk,1,4#)) % 4 % 2" />
@@ -421,14 +355,14 @@
 			value="mysql_normaltbl_oneGroup_mutilAtom_threeIndex_{00}" />
 	</bean>
 
-	<bean id="mysql_student_oneGroup_mutilAtom._ID" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_student_oneGroup_mutilAtom" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_2" />
 		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,4#)) % 4 % 2" />
 		<property name="tbNamePattern" value="mysql_student_oneGroup_mutilAtom_{00}" />
 	</bean>
 
-	<bean id="mysql_host_info_oneGroup_mutilAtom._host_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_host_info_oneGroup_mutilAtom" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_2" />
 		<property name="tbRules"
@@ -436,7 +370,7 @@
 		<property name="tbNamePattern" value="mysql_host_info_oneGroup_mutilAtom_{00}" />
 	</bean>
 
-	<bean id="mysql_module_info_oneGroup_mutilAtom._module_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_module_info_oneGroup_mutilAtom" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_2" />
 		<property name="tbRules"
@@ -445,7 +379,7 @@
 			value="mysql_module_info_oneGroup_mutilAtom_{00}" />
 	</bean>
 
-	<bean id="mysql_hostgroup_info_oneGroup_mutilAtom._hostgroup_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_hostgroup_info_oneGroup_mutilAtom" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_2" />
 		<property name="tbRules"
@@ -454,7 +388,7 @@
 			value="mysql_hostgroup_info_oneGroup_mutilAtom_{00}" />
 	</bean>
 
-	<bean id="mysql_module_host_oneGroup_mutilAtom._id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_module_host_oneGroup_mutilAtom" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_2" />
 		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,4#)) % 4 % 2" />
@@ -462,7 +396,7 @@
 	</bean>
 
 	<!-- 多个group多个atom -->
-	<bean id="mysql_normaltbl_mutilGroup._pk" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_normaltbl_mutilGroup" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -473,7 +407,7 @@
 	</bean>
 
 	<!-- 二级索引，包含一个字段的索引 -->
-	<bean id="mysql_normaltbl_mutilGroup_Index._pk" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_normaltbl_mutilGroup_Index" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -492,7 +426,7 @@
 		<property name="tbNamePattern" value="mysql_normaltbl_mutilGroup_Index_{00}" />
 	</bean>
 	<!-- 二级索引，包含一个字段的索引,强一致 -->
-	<bean id="mysql_normaltbl_mutilGroup_Index_Consistent._pk" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_normaltbl_mutilGroup_Index_Consistent" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -513,7 +447,7 @@
 			value="mysql_normaltbl_mutilGroup_Index_Consistent_{00}" />
 	</bean>
 	<!-- 二级索引，包含两个字段的组合索引 -->
-	<bean id="mysql_normaltbl_mutilGroup_twoIndex._pk" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_normaltbl_mutilGroup_twoIndex" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -543,7 +477,7 @@
 			value="mysql_normaltbl_mutilGroup_twoIndex_{00}" />
 	</bean>
 	<!-- 二级索引，包含两个字段的组合索引 ，强一致 -->
-	<bean id="mysql_normaltbl_mutilGroup_twoIndex_Consistent._pk" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_normaltbl_mutilGroup_twoIndex_Consistent" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -575,7 +509,7 @@
 			value="mysql_normaltbl_mutilGroup_twoIndex_Consistent_{00}" />
 	</bean>
 	<!-- 二级索引，包含三个字段的组合索引 -->
-	<bean id="mysql_normaltbl_mutilGroup_threeIndex._pk" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_normaltbl_mutilGroup_threeIndex" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -597,7 +531,7 @@
 	</bean>
 
 	<!-- 二级索引，包含两个字段的索引，复杂规则，模拟线上规则配置 -->
-	<bean id="mysql_normaltbl_mutilGroup_twoIndex_complexRule._pk" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_normaltbl_mutilGroup_twoIndex_complexRule" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbRuleArray">
 			<value>
@@ -668,7 +602,7 @@
 		<property name="tbNamePattern" value="mysql_normaltbl_mutilGroup_threeIndex_{00}" />
 	</bean>
 
-	<bean id="mysql_student_mutilGroup._ID" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_student_mutilGroup" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -678,7 +612,7 @@
 		<property name="tbNamePattern" value="mysql_student_mutilGroup_{00}" />
 	</bean>
 
-	<bean id="mysql_host_info_mutilGroup._host_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_host_info_mutilGroup" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -687,7 +621,7 @@
 		<property name="tbRules" value="Math.abs(Long.valueOf(#host_id,1,4#)) % 4%2 " />
 		<property name="tbNamePattern" value="mysql_host_info_mutilGroup_{00}" />
 	</bean>
-	<bean id="mysql_host_info_mutilGroup_Index._host_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_host_info_mutilGroup_Index" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -707,7 +641,7 @@
 		<property name="tbNamePattern" value="mysql_host_info_mutilGroup_Index_{00}" />
 	</bean>
 	
-	<bean id="mysql_host_info_mutilGroup_Index_difgroup._host_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_host_info_mutilGroup_Index_difgroup" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -729,7 +663,7 @@
 	</bean>
 	
 	
-	<bean id="mysql_host_info_mutilGroup_twoIndex._host_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_host_info_mutilGroup_twoIndex" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -760,7 +694,7 @@
 			value="mysql_host_info_mutilGroup_twoIndex_{00}" />
 	</bean>
 	
-	<bean id="mysql_host_info_mutilGroup_twoIndex_difgroup._host_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_host_info_mutilGroup_twoIndex_difgroup" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -791,7 +725,7 @@
 			value="mysql_host_info_mutilGroup_twoIndex_difgroup_id_ip_{00}" />
 	</bean>
 	<!--二级索引，包含两个字段的组合索引，强一致 -->
-	<bean id="mysql_host_info_mutilGroup_twoIndex_Consistent._host_id"
+	<bean id="mysql_host_info_mutilGroup_twoIndex_Consistent"
 		class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
@@ -824,7 +758,7 @@
 		<property name="tbNamePattern"
 			value="mysql_host_info_mutilGroup_twoIndex_Consistent_{00}" />
 	</bean>
-	<bean id="mysql_host_info_mutilGroup_threeIndex._host_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_host_info_mutilGroup_threeIndex" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -845,7 +779,7 @@
 			value="mysql_host_info_mutilGroup_threeIndex_{00}" />
 	</bean>
 
-    <bean id="mysql_host_info_mutilGroup_threeIndex_difgroup._host_id" class="com.taobao.tddl.interact.rule.TableRule">
+    <bean id="mysql_host_info_mutilGroup_threeIndex_difgroup" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -867,7 +801,7 @@
 			value="mysql_host_info_mutilGroup_threeIndex_difgroup_name_ip_id{00}" />
 	</bean>
 
-	<bean id="mysql_module_info_mutilGroup._module_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_module_info_mutilGroup" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -878,7 +812,7 @@
 		<property name="tbNamePattern" value="mysql_module_info_mutilGroup_{00}" />
 	</bean>
 
-	<bean id="mysql_hostgroup_info_mutilGroup._hostgroup_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_hostgroup_info_mutilGroup" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -888,7 +822,7 @@
 			value="Math.abs(Long.valueOf(#hostgroup_id,1,4#)) % 4 %2" />
 		<property name="tbNamePattern" value="mysql_hostgroup_info_mutilGroup_{00}" />
 	</bean>
-	<bean id="mysql_hostgroup_info_mutilGroup_Index._hostgroup_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_hostgroup_info_mutilGroup_Index" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -910,7 +844,7 @@
 		<property name="tbNamePattern"
 			value="mysql_hostgroup_info_mutilGroup_Index_{00}" />
 	</bean>
-	<bean id="mysql_hostgroup_info_mutilGroup_Index_difgroup._hostgroup_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_hostgroup_info_mutilGroup_Index_difgroup" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -932,7 +866,7 @@
 		<property name="tbNamePattern"
 			value="mysql_hostgroup_info_mutilGroup_Index_difgroup_station_{00}" />
 	</bean>
-	<bean id="mysql_hostgroup_info_mutilGroup_twoIndex._hostgroup_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_hostgroup_info_mutilGroup_twoIndex" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -967,7 +901,7 @@
 			value="mysql_hostgroup_info_mutilGroup_twoIndex_{00}" />
 	</bean>
 	
-	<bean id="mysql_hostgroup_info_mutilGroup_twoIndex_difgroup._hostgroup_id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_hostgroup_info_mutilGroup_twoIndex_difgroup" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -1003,7 +937,7 @@
 	</bean>
 	
 	<!--二级索引，包含两个字段的组合索引，强一致 -->
-	<bean id="mysql_hostgroup_info_mutilGroup_twoIndex_Consistent._hostgroup_id"
+	<bean id="mysql_hostgroup_info_mutilGroup_twoIndex_Consistent"
 		class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
@@ -1039,7 +973,7 @@
 		<property name="tbNamePattern"
 			value="mysql_hostgroup_info_mutilGroup_twoIndex_Consistent_{00}" />
 	</bean>
-	<bean id="mysql_hostgroup_info_mutilGroup_threeIndex._hostgroup_id"
+	<bean id="mysql_hostgroup_info_mutilGroup_threeIndex"
 		class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
@@ -1064,7 +998,7 @@
 			value="mysql_hostgroup_info_mutilGroup_threeIndex_{00}" />
 	</bean>
 	
-	<bean id="mysql_hostgroup_info_mutilGroup_threeIndex_difgroup._hostgroup_id"
+	<bean id="mysql_hostgroup_info_mutilGroup_threeIndex_difgroup"
 		class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
@@ -1089,7 +1023,7 @@
 			value="mysql_hostgroup_info_mutilGroup_threeIndex_difgroup_id_name_{00}" />
 	</bean>
 
-	<bean id="mysql_module_host_mutilGroup._id" class="com.taobao.tddl.interact.rule.TableRule">
+	<bean id="mysql_module_host_mutilGroup" class="com.taobao.tddl.interact.rule.TableRule">
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_{0}" />
 		<property name="dbRuleArray">
@@ -1098,7 +1032,4 @@
 		<property name="tbRules" value="Math.abs(Long.valueOf(#id,1,4#)) % 4 % 2" />
 		<property name="tbNamePattern" value="mysql_module_host_mutilGroup_{00}" />
 	</bean>
-	
 </beans>
-
-

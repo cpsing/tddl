@@ -10,6 +10,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.matrix.jdbc.TDataSource;
+import com.taobao.tddl.qatest.util.LoadPropsUtil;
+import com.taobao.tddl.qatest.util.PrepareData;
 
 /**
  * 基本测试类，提供创建AndorServer和AndorClient方法
@@ -33,17 +35,6 @@ public class BaseAndorTestCase extends BaseTestCase {
     protected static boolean               needPerparedData        = true;
     private static String                  machineTapologyFile     = "src/test/resources/client/server_topology.xml";
     private static String                  machineTapologyAyncFile = "src/test/resources/client/server_async_topology.xml";
-
-    // --------------server的配置文件路径
-    private static String                  groupAtomServer         = "server/server_group_atom.properties";
-    private static String                  group0Atom0Server       = "server/server_group_0_atom0.properties";
-    private static String                  group0Atom1Server       = "server/server_group_0_atom1.properties";
-    private static String                  group0Atom2Server       = "server/server_group_0_atom2.properties";
-    private static String                  group1Atom0Server       = "server/server_group_1_atom0.properties";
-    private static String                  group1Atom1Server       = "server/server_group_1_atom1.properties";
-    private static String                  group1Atom2Server       = "server/server_group_1_atom2.properties";
-    private static String                  group2Atom0Server       = "server/server_group_2_atom0.properties";
-    private static String                  group2Atom1Server       = "server/server_group_2_atom1.properties";
 
     private static String                  typeFile                = "db_type.properties";
 
@@ -69,7 +60,6 @@ public class BaseAndorTestCase extends BaseTestCase {
 
     public static void JDBCClient(String dbTypeStack, boolean async) throws Exception {
         us = new TDataSource();
-
         if ("tddl".equalsIgnoreCase(dbTypeStack) || "mysql".equalsIgnoreCase(dbTypeStack)) {
             us.setAppName("andor_mysql_qatest");
         } else if ("tdhs".equalsIgnoreCase(dbTypeStack)) {

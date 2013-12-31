@@ -15,7 +15,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.google.common.collect.Lists;
-import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.utils.XmlHelper;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
@@ -223,7 +222,7 @@ public class TableMetaParser {
     }
 
     private static DATA_TYPE getDataType(String type) {
-        if ("INT".equalsIgnoreCase(type)) {
+        if ("INT".equalsIgnoreCase(type) || "INTEGER".equalsIgnoreCase(type)) {
             return DATA_TYPE.INT_VAL;
         } else if ("LONG".equalsIgnoreCase(type)) {
             return DATA_TYPE.LONG_VAL;
@@ -247,7 +246,7 @@ public class TableMetaParser {
             return DATA_TYPE.BLOB;
         }
 
-        throw new NotSupportException();
+        return null;
     }
 
     private static IndexType getIndexType(String type) {

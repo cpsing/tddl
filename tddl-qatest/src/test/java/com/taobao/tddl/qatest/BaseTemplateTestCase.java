@@ -1,10 +1,5 @@
 package com.taobao.tddl.qatest;
 
-/**
- *  Copyright(c) 2010 taobao. All rights reserved.
- *  通用产品测试
- */
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,7 +9,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * <p/>
  * Author By: zhuoxue.yll Created Date: 2013-4-11 下午1:57:19
  */
-
 public class BaseTemplateTestCase extends BaseAndorTestCase {
 
     protected static JdbcTemplate andorJT                    = null;

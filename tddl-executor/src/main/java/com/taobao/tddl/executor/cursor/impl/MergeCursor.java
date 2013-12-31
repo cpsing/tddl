@@ -8,8 +8,6 @@ import java.util.Map.Entry;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.codec.CodecFactory;
 import com.taobao.tddl.executor.codec.RecordCodec;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
@@ -36,6 +34,9 @@ import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
 
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
+
 /**
  * @author mengshi.sunmengshi 2013-12-19 下午12:18:29
  * @since 5.1.0
@@ -44,7 +45,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
 
     private Logger                         logger                       = LoggerFactory.getLogger(MergeCursor.class);
     protected List<ISchematicCursor>       cursors;
-    int                                    sizeLimination               = 10000;
+    protected int                          sizeLimination               = 10000;
     protected final IDataNodeExecutor      currentExecotor;
 
     protected final ExecutionContext       executionContext;

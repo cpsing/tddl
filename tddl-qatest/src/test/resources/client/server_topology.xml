@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <matrix name="test_matrix" xmlns="https://github.com/tddl/tddl/schema/matrix"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://github.com/tddl/tddl/schema/matrix https://raw.github.com/tddl/tddl/master/tddl-optimizer/src/main/resources/META-INF/matrix.xsd">
-
-
+	xsi:schemaLocation="https://github.com/tddl/tddl/schema/matrix https://raw.github.com/tddl/tddl/master/tddl-common/src/main/resources/META-INF/matrix.xsd">
 
 	<!-- mysql group -->
-
 	<group name="andor_mysql_group_0" type="MYSQL_JDBC"  >
 	</group>
 
@@ -15,13 +12,10 @@
 
 	<group name="andor_mysql_group_2" type="MYSQL_JDBC">
 	</group>
-<!--  
-	<group name="andor_mysql_group_oneAtom" type="MYSQL_JDBC"
-		my_groupName="andor_mysql_group_0" my_appName="andor_mysql_qatest" >
-
+	
+	<group name="andor_mysql_group_oneAtom" type="MYSQL_JDBC">
 	</group>
 
--->
 	<!-- hbase group 
 	<group name="andor_hbase_group" type="HBASE_CLIENT">
 		<properties>

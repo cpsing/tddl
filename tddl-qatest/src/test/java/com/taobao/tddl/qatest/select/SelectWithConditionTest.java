@@ -17,8 +17,8 @@ import org.junit.runners.Parameterized.Parameters;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
-import com.taobao.tddl.qatest.ExecuteTableName;
-import com.taobao.tddl.qatest.Validator;
+import com.taobao.tddl.qatest.util.ExecuteTableName;
+import com.taobao.tddl.qatest.util.Validator;
 
 /**
  * 带条件的选择查询
@@ -406,7 +406,7 @@ public class SelectWithConditionTest extends BaseAndorTestCase {
         param.add(name);
         try {
             rc = andorQueryData(sql, param);
-            Assert.assertEquals(1, ResultsSize(rc));
+            Assert.assertEquals(1, resultsSize(rc));
         } finally {
             if (rc != null) {
                 rc.close();
@@ -423,7 +423,7 @@ public class SelectWithConditionTest extends BaseAndorTestCase {
         param.add(name);
         try {
             rc = andorQueryData(sql, param);
-            Assert.assertEquals(1, ResultsSize(rc));
+            Assert.assertEquals(1, resultsSize(rc));
         } finally {
             rc.close();
         }

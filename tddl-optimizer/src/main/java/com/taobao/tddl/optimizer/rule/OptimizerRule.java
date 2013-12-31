@@ -108,18 +108,25 @@ public class OptimizerRule {
      */
     public TargetDB shardAny(String logicTable) {
         TableRule tableRule = getTableRule(logicTable);
-        for (String group : tableRule.getActualTopology().keySet()) {
-            Set<String> tableNames = tableRule.getActualTopology().get(group);
-            if (tableNames == null || tableNames.isEmpty()) {
-                continue;
-            }
-
+        if (tableRule == null) {
+            // 设置为同名，同名不做转化
             TargetDB target = new TargetDB();
-            target.setDbIndex(group);
-            target.addOneTable(tableNames.iterator().next());
+            target.setDbIndex(tddlRule.getCurrentRule().getDefaultDbIndex());
+            target.addOneTable(logicTable);
             return target;
-        }
+        } else {
+            for (String group : tableRule.getActualTopology().keySet()) {
+                Set<String> tableNames = tableRule.getActualTopology().get(group);
+                if (tableNames == null || tableNames.isEmpty()) {
+                    continue;
+                }
 
+                TargetDB target = new TargetDB();
+                target.setDbIndex(group);
+                target.addOneTable(tableNames.iterator().next());
+                return target;
+            }
+        }
         throw new IllegalArgumentException("can't find any target db. table is " + logicTable + ". ");
     }
 

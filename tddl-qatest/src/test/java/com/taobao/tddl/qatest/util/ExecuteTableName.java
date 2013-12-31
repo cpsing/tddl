@@ -1,9 +1,4 @@
-package com.taobao.tddl.qatest;
-/**
- *  Copyright(c) 2010 taobao. All rights reserved.
- *  通用产品测试
- */
-
+package com.taobao.tddl.qatest.util;
 
 /**
  * 此类对运行的表做定义 数组中均为表名 表名后缀是Index表示二级索引，包含一个字段的索引 表名后缀是twoIndex表示二级索引，包含两个字段的组合索引
@@ -12,7 +7,6 @@ package com.taobao.tddl.qatest;
  * 表中名包含msyql字段的调用的mysql数据库，其他的均为bdb数据库
  * 表normaltbl_mutilGroup_twoIndex_complexRule为模拟线上配置规则，特别测试用例
  */
-
 public class ExecuteTableName {
 
     /**

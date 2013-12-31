@@ -14,10 +14,11 @@ import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.SqlType;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.matrix.jdbc.utils.PreParser;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author mengshi.sunmengshi 2013-11-22 下午3:26:28
@@ -158,8 +159,10 @@ public class TStatement implements Statement {
             return;
         }
         try {
+            if (this.proxyStatement != null) {
+                proxyStatement.close();
+            }
 
-            if (this.proxyStatement != null) proxyStatement.close();
             if (currentResultSet != null) {
                 currentResultSet.close();
             }
@@ -167,18 +170,12 @@ public class TStatement implements Statement {
             if (removeThis) {
                 conn.removeStatement(this);
             }
-
-            if (this.executionContext.getTransaction() != null && this.executionContext.getTransaction().isAutoCommit()) {
-                this.executionContext.getTransaction().close();
-            }
         } catch (Exception e) {
-
             throw new TddlRuntimeException(e);
         } finally {
             currentResultSet = null;
         }
         closed = true;
-
     }
 
     /**

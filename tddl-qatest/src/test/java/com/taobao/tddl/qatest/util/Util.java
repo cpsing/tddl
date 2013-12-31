@@ -1,9 +1,4 @@
 package com.taobao.tddl.qatest.util;
-/**
- *  Copyright(c) 2010 taobao. All rights reserved.
- *  通用产品测试
- */
-
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,7 +22,7 @@ public class Util {
 
     static String perfResult = "/home/zhuoxue.yll/perfResult.txt";
 
-    //	static String perfResult="C:/perfResult.txt";
+    // static String perfResult="C:/perfResult.txt";
 
     public static void creatTxtFile() throws IOException {
         String filenameTemp = perfResult;
@@ -119,7 +114,7 @@ public class Util {
             }
 
         } catch (Exception ex) {
-            //			throw new DataAccessException(ex);
+            // throw new DataAccessException(ex);
         } finally {
             if (ps != null) {
                 ps.close();

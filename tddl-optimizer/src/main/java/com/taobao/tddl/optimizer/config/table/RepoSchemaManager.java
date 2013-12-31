@@ -55,8 +55,10 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
     }
 
     protected void doInit() throws TddlException {
+        if (local != null) {
+            local.init();
+        }
 
-        if (local != null) local.init();
         if (!isDelegate) {
             delegate = ExtensionLoader.load(RepoSchemaManager.class, group.getType().name());
             delegate.setGroup(group);

@@ -17,7 +17,6 @@ import com.taobao.tddl.optimizer.core.plan.IPut;
  * @author Whisper 2013-6-20 上午9:32:46
  * @since 3.0.1
  */
-@SuppressWarnings("rawtypes")
 public interface GeneralQueryHandler {
 
     /**
@@ -124,16 +123,6 @@ public interface GeneralQueryHandler {
      */
     public void executeUpdate(ExecutionContext executionContext, IPut put, ITable table, IndexMeta meta)
                                                                                                         throws SQLException;
-
-    /**
-     * 执行一个update语句
-     * 
-     * @param sqlAndParam
-     * @return
-     * @throws SQLException
-     */
-    // public void executeUpdate(My_SqlAndParam sqlAndParam) throws
-    // SQLException;
 
     /**
      * 用于异步化，等同于Future.isDone();

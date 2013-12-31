@@ -1,4 +1,5 @@
 package com.taobao.tddl.matrix.test;
+
 import java.util.concurrent.Executors;
 
 import org.junit.Test;
@@ -23,7 +24,6 @@ public class ConfigHolderTest {
         try {
             configHolder.init();
         } catch (TddlException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

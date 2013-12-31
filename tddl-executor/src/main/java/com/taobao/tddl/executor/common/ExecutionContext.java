@@ -143,8 +143,9 @@ public class ExecutionContext {
 
     public void setAutoCommit(boolean autoCommit) {
         this.autoCommit = autoCommit;
-
-        if (this.getTransaction() != null) this.getTransaction().setAutoCommit(autoCommit);
+        if (this.getTransaction() != null) {
+            this.getTransaction().setAutoCommit(autoCommit);
+        }
     }
 
 }

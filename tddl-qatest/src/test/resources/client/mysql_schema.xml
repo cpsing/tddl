@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tables>
-<!-- ===========================================mysql============================================= -->
-   
-	<table name="mysql_student_oneGroup_oneAtom"  usePKRule = "true">
+<tables xmlns="https://github.com/tddl/tddl/schema/table" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://github.com/tddl/tddl/schema/table https://raw.github.com/tddl/tddl/master/tddl-common/src/main/resources/META-INF/table.xsd">
+
+	<!-- ===========================================mysql============================================= -->
+	<table name="mysql_student_oneGroup_oneAtom">
 		<columns>
 			<column name="ID" type="long" />
 			<column name="name" type="string" />
@@ -11,7 +12,7 @@
 		<primaryKey>ID</primaryKey>
 	</table>
 
-	<table name="mysql_student_oneGroup_mutilAtom"  usePKRule = "true">
+	<table name="mysql_student_oneGroup_mutilAtom">
 		<columns>
 			<column name="ID" type="long" />
 			<column name="name" type="string" />
@@ -20,7 +21,7 @@
 		<primaryKey>ID</primaryKey>
 	</table>
 
-	<table name="mysql_student_mutilGroup"  usePKRule = "true">
+	<table name="mysql_student_mutilGroup">
 		<columns>
 			<column name="ID" type="long" />
 			<column name="name" type="string" />
@@ -29,7 +30,7 @@
 		<primaryKey>ID</primaryKey>
 	</table>
 
-	<table name="mysql_normaltbl_oneGroup_oneAtom"  usePKRule = "true">
+	<table name="mysql_normaltbl_oneGroup_oneAtom">
 		<columns>
 			<column name="pk" type="long" />
 			<column name="id" type="int" />
@@ -42,7 +43,7 @@
 		<primaryKey>pk</primaryKey>
 	</table>
 
-	<table name="mysql_normaltbl_oneGroup_oneAtom_Index"  usePKRule = "true">
+	<table name="mysql_normaltbl_oneGroup_oneAtom_Index">
 		<columns>
 			<column name="pk" type="long" />
 			<column name="id" type="int" />
@@ -61,7 +62,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_normaltbl_oneGroup_oneAtom_twoIndex"  usePKRule = "true">
+	<table name="mysql_normaltbl_oneGroup_oneAtom_twoIndex">
 		<columns>
 			<column name="pk" type="long" />
 			<column name="id" type="int" />
@@ -84,7 +85,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_normaltbl_oneGroup_oneAtom_threeIndex"  usePKRule = "true">
+	<table name="mysql_normaltbl_oneGroup_oneAtom_threeIndex">
 		<columns>
 			<column name="pk" type="long" />
 			<column name="id" type="int" />
@@ -103,12 +104,12 @@
 		</secondaryIndexes>
 	</table>
 	
-	<table name="mysql_ibatis_type"  usePKRule = "true">
+	<table name="mysql_ibatis_type">
 		<columns>
 			<column name="pk" type="long" />
 			<column name="varcharr" type="String" />
 			<column name="charr" type="String" />
-			<column name="blobr" type="byte[]" />
+			<column name="blobr" type="bytes" />
 			<column name="integerr" type="Long" />
 			<column name="tinyintr" type="Integer" />
 			<column name="smallintr" type="Integer" />
@@ -127,7 +128,7 @@
 		<primaryKey>pk</primaryKey>
 	</table>
 
-	<table name="mysql_normaltbl_oneGroup_mutilAtom"  usePKRule = "true">
+	<table name="mysql_normaltbl_oneGroup_mutilAtom">
 		<columns>
 			<column name="pk" type="long" />
 			<column name="id" type="int" />
@@ -140,7 +141,7 @@
 		<primaryKey>pk</primaryKey>
 	</table>
 
-	<table name="mysql_normaltbl_oneGroup_mutilAtom_Index"  usePKRule = "true">
+	<table name="mysql_normaltbl_oneGroup_mutilAtom_Index">
 		<columns>
 			<column name="pk" type="long" />
 			<column name="id" type="int" />
@@ -159,7 +160,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_normaltbl_oneGroup_mutilAtom_twoIndex"  usePKRule = "true">
+	<table name="mysql_normaltbl_oneGroup_mutilAtom_twoIndex">
 		<columns>
 			<column name="pk" type="long" />
 			<column name="id" type="int" />
@@ -182,7 +183,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_Consistent"  usePKRule = "true">
+	<table name="mysql_normaltbl_oneGroup_mutilAtom_twoIndex_Consistent">
 		<columns>
 			<column name="pk" type="long" />
 			<column name="id" type="int" />
@@ -205,7 +206,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_normaltbl_oneGroup_mutilAtom_threeIndex"  usePKRule = "true">
+	<table name="mysql_normaltbl_oneGroup_mutilAtom_threeIndex">
 		<columns>
 			<column name="pk" type="long" />
 			<column name="id" type="int" />
@@ -224,7 +225,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_normaltbl_mutilGroup"  usePKRule = "true">
+	<table name="mysql_normaltbl_mutilGroup">
 		<columns>
 			<column name="pk" type="long" />
 			<column name="id" type="int" />
@@ -237,7 +238,7 @@
 		<primaryKey>pk</primaryKey>
 	</table>
 
-	<table name="mysql_normaltbl_mutilGroup_Index"  usePKRule = "true">
+	<table name="mysql_normaltbl_mutilGroup_Index">
 		<columns>
 			<column name="pk" type="long" />
 			<column name="id" type="int" />
@@ -256,7 +257,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_normaltbl_mutilGroup_Index_Consistent"  usePKRule = "true">
+	<table name="mysql_normaltbl_mutilGroup_Index_Consistent">
 		<columns>
 			<column name="pk" type="long" />
 			<column name="id" type="int" />
@@ -275,7 +276,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_normaltbl_mutilGroup_twoIndex"  usePKRule = "true">
+	<table name="mysql_normaltbl_mutilGroup_twoIndex">
 		<columns>
 			<column name="pk" type="long" />
 			<column name="id" type="int" />
@@ -299,7 +300,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_normaltbl_mutilGroup_twoIndex_Consistent"  usePKRule = "true">
+	<table name="mysql_normaltbl_mutilGroup_twoIndex_Consistent">
 		<columns>
 			<column name="pk" type="long" />
 			<column name="id" type="int" />
@@ -322,7 +323,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_normaltbl_mutilGroup_twoIndex_complexRule"  usePKRule = "true">
+	<table name="mysql_normaltbl_mutilGroup_twoIndex_complexRule">
 		<columns>
 			<column name="pk" type="long" />
 			<column name="id" type="int" />
@@ -334,13 +335,11 @@
 		</columns>
 		<primaryKey>pk</primaryKey>
 		<secondaryIndexes>
-			<indexMeta name="second_name" type="btree"
-				strongConsistent="false">
+			<indexMeta name="second_name" type="btree" strongConsistent="false">
 				<keys>name</keys>
 				<values>pk</values>
 			</indexMeta>
-			<indexMeta name="second_gmt_create" type="btree"
-				strongConsistent="false">
+			<indexMeta name="second_gmt_create" type="btree" strongConsistent="false">
 				<keys>gmt_create</keys>
 				<values>pk</values>
 			</indexMeta>
@@ -348,7 +347,7 @@
 
 	</table>
 
-	<table name="mysql_normaltbl_mutilGroup_threeIndex"  usePKRule = "true"> 
+	<table name="mysql_normaltbl_mutilGroup_threeIndex"> 
 		<columns>
 			<column name="pk" type="long" />
 			<column name="id" type="int" />
@@ -360,15 +359,14 @@
 		</columns>
 		<primaryKey>pk</primaryKey>
 		<secondaryIndexes>
-			<indexMeta name="second_floatnameid" type="btree"
-				strongConsistent="false">
+			<indexMeta name="second_floatnameid" type="btree" strongConsistent="false">
 				<keys>id,gmt_create,name</keys>
 				<values>pk</values>
 			</indexMeta>
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_module_info_oneGroup_oneAtom"  usePKRule = "true">
+	<table name="mysql_module_info_oneGroup_oneAtom">
 		<columns>
 			<column name="module_id" type="long" />
 			<column name="product_id" type="long" />
@@ -383,7 +381,7 @@
 		<primaryKey>module_id</primaryKey>
 	</table>
 
-	<table name="mysql_module_info_oneGroup_mutilAtom"  usePKRule = "true">
+	<table name="mysql_module_info_oneGroup_mutilAtom">
 		<columns>
 			<column name="module_id" type="long" />
 			<column name="product_id" type="long" />
@@ -398,7 +396,7 @@
 		<primaryKey>module_id</primaryKey>
 	</table>
 
-	<table name="mysql_module_info_mutilGroup"  usePKRule = "true">
+	<table name="mysql_module_info_mutilGroup">
 		<columns>
 			<column name="module_id" type="long" />
 			<column name="product_id" type="long" />
@@ -413,7 +411,7 @@
 		<primaryKey>module_id</primaryKey>
 	</table>
 
-	<table name="mysql_host_info_oneGroup_oneAtom"  usePKRule = "true">
+	<table name="mysql_host_info_oneGroup_oneAtom">
 		<columns>
 			<column name="host_id" type="long" />
 			<column name="host_name" type="string" />
@@ -428,7 +426,7 @@
 		<primaryKey>host_id</primaryKey>
 	</table>
 
-	<table name="mysql_host_info_oneGroup_oneAtom_Index"   usePKRule = "true">
+	<table name="mysql_host_info_oneGroup_oneAtom_Index" >
 		<columns>
 			<column name="host_id" type="long" />
 			<column name="host_name" type="string" />
@@ -449,7 +447,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_host_info_oneGroup_oneAtom_twoIndex"  usePKRule = "true">
+	<table name="mysql_host_info_oneGroup_oneAtom_twoIndex">
 		<columns>
 			<column name="host_id" type="long" />
 			<column name="host_name" type="string" />
@@ -474,7 +472,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_host_info_oneGroup_oneAtom_threeIndex"  usePKRule = "true">
+	<table name="mysql_host_info_oneGroup_oneAtom_threeIndex">
 		<columns>
 			<column name="host_id" type="long" />
 			<column name="host_name" type="string" />
@@ -495,7 +493,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_host_info_oneGroup_mutilAtom"  usePKRule = "true">
+	<table name="mysql_host_info_oneGroup_mutilAtom">
 		<columns>
 			<column name="host_id" type="long" />
 			<column name="host_name" type="string" />
@@ -510,7 +508,7 @@
 		<primaryKey>host_id</primaryKey>
 	</table>
 
-	<table name="mysql_host_info_mutilGroup"  usePKRule = "true">
+	<table name="mysql_host_info_mutilGroup">
 		<columns>
 			<column name="host_id" type="long" />
 			<column name="host_name" type="string" />
@@ -525,7 +523,7 @@
 		<primaryKey>host_id</primaryKey>
 	</table>
 
-	<table name="mysql_host_info_mutilGroup_Index"  usePKRule = "true">
+	<table name="mysql_host_info_mutilGroup_Index">
 		<columns>
 			<column name="host_id" type="long" />
 			<column name="host_name" type="string" />
@@ -546,7 +544,7 @@
 		</secondaryIndexes>
 	</table>
 	
-	<table name="mysql_host_info_mutilGroup_Index_difgroup"  usePKRule = "true">
+	<table name="mysql_host_info_mutilGroup_Index_difgroup">
 		<columns>
 			<column name="host_id" type="long" />
 			<column name="host_name" type="string" />
@@ -567,7 +565,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_host_info_mutilGroup_twoIndex"  usePKRule = "true">
+	<table name="mysql_host_info_mutilGroup_twoIndex">
 		<columns>
 			<column name="host_id" type="long" />
 			<column name="host_name" type="string" />
@@ -585,15 +583,14 @@
 				<keys>host_name</keys>
 				<values>host_id</values>
 			</indexMeta>
-			<indexMeta name="second_hghi" type="btree"
-				strongConsistent="false">
+			<indexMeta name="second_hghi" type="btree" strongConsistent="false">
 				<keys>hostgroup_id,host_ip</keys>
 				<values>host_id</values>
 			</indexMeta>
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_host_info_mutilGroup_twoIndex_difgroup"  usePKRule = "true">
+	<table name="mysql_host_info_mutilGroup_twoIndex_difgroup">
 		<columns>
 			<column name="host_id" type="long" />
 			<column name="host_name" type="string" />
@@ -611,15 +608,14 @@
 				<keys>host_name</keys>
 				<values>host_id</values>
 			</indexMeta>
-			<indexMeta name="second_hghi" type="btree"
-				strongConsistent="false">
+			<indexMeta name="second_hghi" type="btree" strongConsistent="false">
 				<keys>hostgroup_id,host_ip</keys>
 				<values>host_id</values>
 			</indexMeta>
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_host_info_mutilGroup_twoIndex_Consistent"  usePKRule = "true">
+	<table name="mysql_host_info_mutilGroup_twoIndex_Consistent">
 		<columns>
 			<column name="host_id" type="long" />
 			<column name="host_name" type="string" />
@@ -644,7 +640,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_host_info_mutilGroup_threeIndex"  usePKRule = "true">
+	<table name="mysql_host_info_mutilGroup_threeIndex">
 		<columns>
 			<column name="host_id" type="long" />
 			<column name="host_name" type="string" />
@@ -666,7 +662,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_host_info_mutilGroup_threeIndex_difgroup"  usePKRule = "true">
+	<table name="mysql_host_info_mutilGroup_threeIndex_difgroup">
 		<columns>
 			<column name="host_id" type="long" />
 			<column name="host_name" type="string" />
@@ -680,15 +676,14 @@
 		</columns>
 		<primaryKey>host_id</primaryKey>
 		<secondaryIndexes>
-			<indexMeta name="second_hnhiht" type="btree"
-				strongConsistent="false">
+			<indexMeta name="second_hnhiht" type="btree" strongConsistent="false">
 				<keys>host_name,host_ip,host_type_id</keys>
 				<values>host_id</values>
 			</indexMeta>
 		</secondaryIndexes>
 	</table>
 	
-	<table name="mysql_hostgroup_info_oneGroup_oneAtom"  usePKRule = "true">
+	<table name="mysql_hostgroup_info_oneGroup_oneAtom">
 		<columns>
 			<column name="hostgroup_id" type="long" />
 			<column name="station_id" type="string" />
@@ -700,7 +695,7 @@
 		<primaryKey>hostgroup_id</primaryKey>
 	</table>
 
-	<table name="mysql_hostgroup_info_oneGroup_oneAtom_otherDb"  usePKRule = "true">
+	<table name="mysql_hostgroup_info_oneGroup_oneAtom_otherDb">
 		<columns>
 			<column name="hostgroup_id" type="long" />
 			<column name="station_id" type="string" />
@@ -712,7 +707,7 @@
 		<primaryKey>hostgroup_id</primaryKey>
 	</table>
 
-	<table name="mysql_hostgroup_info_oneGroup_oneAtom_Index"  usePKRule = "true">
+	<table name="mysql_hostgroup_info_oneGroup_oneAtom_Index">
 		<columns>
 			<column name="hostgroup_id" type="long" />
 			<column name="station_id" type="string" />
@@ -730,7 +725,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_hostgroup_info_oneGroup_oneAtom_twoIndex"  usePKRule = "true">
+	<table name="mysql_hostgroup_info_oneGroup_oneAtom_twoIndex">
 		<columns>
 			<column name="hostgroup_id" type="long" />
 			<column name="station_id" type="string" />
@@ -752,7 +747,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_hostgroup_info_oneGroup_oneAtom_threeIndex"  usePKRule = "true">
+	<table name="mysql_hostgroup_info_oneGroup_oneAtom_threeIndex">
 		<columns>
 			<column name="hostgroup_id" type="long" />
 			<column name="station_id" type="string" />
@@ -770,7 +765,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_hostgroup_info_oneGroup_mutilAtom"  usePKRule = "true">
+	<table name="mysql_hostgroup_info_oneGroup_mutilAtom">
 		<columns>
 			<column name="hostgroup_id" type="long" />
 			<column name="station_id" type="string" />
@@ -782,7 +777,7 @@
 		<primaryKey>hostgroup_id</primaryKey>
 	</table>
 
-	<table name="mysql_hostgroup_info_mutilGroup"  usePKRule = "true">
+	<table name="mysql_hostgroup_info_mutilGroup">
 		<columns>
 			<column name="hostgroup_id" type="long" />
 			<column name="station_id" type="string" />
@@ -794,7 +789,7 @@
 		<primaryKey>hostgroup_id</primaryKey>
 	</table>
 
-	<table name="mysql_hostgroup_info_mutilGroup_Index"  usePKRule = "true">
+	<table name="mysql_hostgroup_info_mutilGroup_Index">
 		<columns>
 			<column name="hostgroup_id" type="long" />
 			<column name="station_id" type="string" />
@@ -812,7 +807,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_hostgroup_info_mutilGroup_Index_difgroup"  usePKRule = "true">
+	<table name="mysql_hostgroup_info_mutilGroup_Index_difgroup">
 		<columns>
 			<column name="hostgroup_id" type="long" />
 			<column name="station_id" type="string" />
@@ -830,7 +825,7 @@
 		</secondaryIndexes>
 	</table>
 	
-	<table name="mysql_hostgroup_info_mutilGroup_twoIndex"  usePKRule = "true">
+	<table name="mysql_hostgroup_info_mutilGroup_twoIndex">
 		<columns>
 			<column name="hostgroup_id" type="long" />
 			<column name="station_id" type="string" />
@@ -853,7 +848,7 @@
 		</secondaryIndexes>
 	</table>
 	
-	<table name="mysql_hostgroup_info_mutilGroup_twoIndex_difgroup"  usePKRule = "true">
+	<table name="mysql_hostgroup_info_mutilGroup_twoIndex_difgroup">
 		<columns>
 			<column name="hostgroup_id" type="long" />
 			<column name="station_id" type="string" />
@@ -876,7 +871,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_hostgroup_info_mutilGroup_twoIndex_Consistent" usePKRule = "true">
+	<table name="mysql_hostgroup_info_mutilGroup_twoIndex_Consistent" >
 		<columns>
 			<column name="hostgroup_id" type="long" />
 			<column name="station_id" type="string" />
@@ -898,7 +893,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_hostgroup_info_mutilGroup_threeIndex"  usePKRule = "true">
+	<table name="mysql_hostgroup_info_mutilGroup_threeIndex">
 		<columns>
 			<column name="hostgroup_id" type="long" />
 			<column name="station_id" type="string" />
@@ -917,7 +912,7 @@
 		</secondaryIndexes>
 	</table>
 
-	<table name="mysql_hostgroup_info_mutilGroup_threeIndex_difgroup"  usePKRule = "true">
+	<table name="mysql_hostgroup_info_mutilGroup_threeIndex_difgroup">
 		<columns>
 			<column name="hostgroup_id" type="long" />
 			<column name="station_id" type="string" />
@@ -936,7 +931,7 @@
 		</secondaryIndexes>
 	</table>
 	
-	<table name="mysql_module_host_oneGroup_oneAtom"  usePKRule = "true">
+	<table name="mysql_module_host_oneGroup_oneAtom">
 		<columns>
 			<column name="id" type="long" />
 			<column name="module_id" type="long" />
@@ -945,7 +940,7 @@
 		<primaryKey>id</primaryKey>
 	</table>
 
-	<table name="mysql_module_host_oneGroup_mutilAtom"  usePKRule = "true">
+	<table name="mysql_module_host_oneGroup_mutilAtom">
 		<columns>
 			<column name="id" type="long" />
 			<column name="module_id" type="long" />
@@ -954,7 +949,7 @@
 		<primaryKey>id</primaryKey>
 	</table>
 
-	<table name="mysql_module_host_mutilGroup"  usePKRule = "true">
+	<table name="mysql_module_host_mutilGroup">
 		<columns>
 			<column name="id" type="long" />
 			<column name="module_id" type="long" />

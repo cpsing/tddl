@@ -69,7 +69,9 @@ public class RuleSchemaManager extends AbstractLifecycle implements SchemaManage
             meta = local.getTable(tableName);
         }
 
-        if (meta != null) return meta;
+        if (meta != null) {
+            return meta;
+        }
 
         TargetDB targetDB = rule.shardAny(tableName);
         Group group = matrix.getGroup(targetDB.getDbIndex()); // 先找到group
@@ -81,12 +83,17 @@ public class RuleSchemaManager extends AbstractLifecycle implements SchemaManage
     }
 
     public void putTable(String tableName, TableMeta tableMeta) {
-        if (local != null) local.putTable(tableName, tableMeta);
+        if (local != null) {
+            local.putTable(tableName, tableMeta);
+        }
     }
 
     public Collection<TableMeta> getAllTables() {
-        if (local != null) return local.getAllTables();
-        throw new NotSupportException();
+        if (local != null) {
+            return local.getAllTables();
+        } else {
+            throw new NotSupportException();
+        }
     }
 
     public void setRule(OptimizerRule rule) {

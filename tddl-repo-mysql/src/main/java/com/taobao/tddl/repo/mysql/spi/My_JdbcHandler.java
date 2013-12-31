@@ -15,8 +15,6 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.jdbc.ParameterMethod;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -35,6 +33,9 @@ import com.taobao.tddl.repo.mysql.common.ResultSetRemeberIfClosed;
 import com.taobao.tddl.repo.mysql.sqlconvertor.MysqlPlanVisitorImpl;
 import com.taobao.tddl.repo.mysql.sqlconvertor.SqlAndParam;
 
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
+
 /**
  * jdbc 方法执行相关的数据封装. 每个需要执行的cursor都可以持有这个对象进行数据库操作。 ps .. fuxk java
  * ，没有多继承。。只能用组合。。你懂的。。 类不是线程安全的哦亲
@@ -45,17 +46,17 @@ public class My_JdbcHandler implements GeneralQueryHandler {
 
     private static final Logger logger           = LoggerFactory.getLogger(My_JdbcHandler.class);
     protected My_Transaction    myTransaction    = null;
+    protected Connection        connection       = null;
     protected ResultSet         resultSet        = null;
     protected PreparedStatement ps               = null;
     protected ExecutionType     executionType    = null;
     protected IRowSet           current          = null;
     protected IRowSet           prev_kv          = null;
-    @SuppressWarnings("unchecked")
     protected ICursorMeta       cursorMeta;
     protected boolean           isStreaming      = false;
     protected String            groupName        = null;
     protected DataSource        ds               = null;
-    private ExecutionContext    executionContext = null;
+    protected ExecutionContext  executionContext = null;
 
     public enum ExecutionType {
         PUT, GET
@@ -68,19 +69,15 @@ public class My_JdbcHandler implements GeneralQueryHandler {
     public void executeQuery(ICursorMeta meta, boolean isStreaming) throws SQLException {
         setContext(meta, isStreaming);
         SqlAndParam sqlAndParam = null;
-        Connection con = null;
         boolean isControlSql = false;
 
         sqlAndParam = new SqlAndParam();
         if (plan instanceof IQuery && ((IQuery) plan).getSql() != null) {
-
             sqlAndParam.sql = ((IQuery) plan).getSql();
             sqlAndParam.param = new HashMap<Integer, ParameterContext>();
             isControlSql = true;
-
         } else {
             cursorMeta.setIsSureLogicalIndexEqualActualIndex(true);
-
             if (plan instanceof IQueryTree) {
                 ((IQueryTree) plan).setTopQuery(true);
                 MysqlPlanVisitorImpl visitor = new MysqlPlanVisitorImpl((IQueryTree) plan, null, null, true);
@@ -90,15 +87,14 @@ public class My_JdbcHandler implements GeneralQueryHandler {
             }
         }
 
-        executionType = ExecutionType.PUT;
-        con = getConnection();
+        executionType = ExecutionType.GET;
+        connection = myTransaction.getConnection(groupName, ds);
 
         if (logger.isDebugEnabled()) {
             logger.warn("sqlAndParam:\n" + sqlAndParam);
         }
 
-        ps = con.prepareStatement(sqlAndParam.sql);
-
+        ps = connection.prepareStatement(sqlAndParam.sql);
         if (isStreaming) {
             // 当prev的时候 不能设置
             setStreamingForStatement(ps);
@@ -108,15 +104,15 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         try {
             ResultSet rs = new ResultSetRemeberIfClosed(ps.executeQuery());
             if (isControlSql) {
-                rs = new ResultSetAutoCloseConnection(rs, con, ps);
+                rs = new ResultSetAutoCloseConnection(rs, connection, ps);
             }
             this.resultSet = rs;
         } catch (SQLException e) {
             if (e.getMessage()
                 .contains("only select, insert, update, delete,replace,truncate,create,drop,load,merge sql is supported")) {
-                ps = con.prepareStatement("select 1");
+                ps = connection.prepareStatement("select 1");
                 this.resultSet = new ResultSetRemeberIfClosed(new ResultSetAutoCloseConnection(ps.executeQuery(),
-                    con,
+                    connection,
                     ps));
 
             } else {
@@ -127,7 +123,6 @@ public class My_JdbcHandler implements GeneralQueryHandler {
 
     protected void setStreamingForStatement(Statement stat) throws SQLException {
         stat.setFetchSize(Integer.MIN_VALUE);
-
         if (logger.isDebugEnabled()) {
             logger.warn("fetchSize:\n" + stat.getFetchSize());
         }
@@ -149,7 +144,6 @@ public class My_JdbcHandler implements GeneralQueryHandler {
 
     public void executeUpdate(ExecutionContext executionContext, IPut put, ITable table, IndexMeta meta)
                                                                                                         throws SQLException {
-
         MysqlPlanVisitorImpl visitor = new MysqlPlanVisitorImpl(put, null, null, true);
         put.accept(visitor);
 
@@ -157,21 +151,28 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         sqlAndParam.sql = visitor.getString();
         sqlAndParam.param = visitor.getParamMap();
 
-        ps = prepareStatement(sqlAndParam.sql, getConnection());
-        ParameterMethod.setParameters(ps, sqlAndParam.param);
-
-        if (logger.isDebugEnabled()) {
-            logger.warn("sqlAndParam:\n" + sqlAndParam);
+        try {
+            // 可能执行过程有失败，需要释放链接
+            connection = myTransaction.getConnection(groupName, ds);
+            ps = prepareStatement(sqlAndParam.sql, connection);
+            ParameterMethod.setParameters(ps, sqlAndParam.param);
+            if (logger.isDebugEnabled()) {
+                logger.warn("sqlAndParam:\n" + sqlAndParam);
+            }
+            int tmpNum = ps.executeUpdate();
+            UpdateResultWrapper urw = new UpdateResultWrapper(tmpNum, this);
+            executionType = ExecutionType.PUT;
+            this.resultSet = urw;
+        } catch (Throwable e) {
+            try {
+                if (myTransaction.isAutoCommit()) {
+                    close();
+                }
+            } catch (TddlException e1) {
+                throw new SQLException(e);
+            }
+            throw new SQLException(e);
         }
-        int tmpNum = ps.executeUpdate();
-        UpdateResultWrapper urw = new UpdateResultWrapper(tmpNum, this);
-        executionType = ExecutionType.PUT;
-        this.resultSet = urw;
-    }
-
-    public Connection getConnection() throws SQLException {
-        Connection con = myTransaction.getConnection(groupName, ds);
-        return con;
     }
 
     public DataSource getDs() {
@@ -197,32 +198,15 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.taobao.ustore.jdbc.mysql.generalQueryHandler#getPs()
-     */
     protected PreparedStatement getPs() {
         return ps;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * com.taobao.ustore.jdbc.mysql.generalQueryHandler#setDs(javax.sql.DataSource
-     * )
-     */
-    @Override
     public void setDs(Object ds) {
         this.ds = (DataSource) ds;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.taobao.ustore.jdbc.mysql.generalQueryHandler#close()
-     */
-    @Override
     public void close() throws SQLException {
-
         try {
             /*
              * 非流计算的时候，用普通的close方法，而如果是streaming的情况下 将按以下模式关闭：
@@ -241,100 +225,42 @@ public class My_JdbcHandler implements GeneralQueryHandler {
                         My_Transaction.closeStreaming(myTransaction, groupName, ds);
                     }
                 } catch (Throwable e) {
-                    logger.warn("", e);
                     if (resultSet != null && !resultSet.isClosed()) {
                         resultSet.close();
                         resultSet = null;
                     }
+
+                    throw new SQLException(e);
                 }
             }
-
         } finally {
-
             try {
                 if (ps != null) {
-
                     ps.setFetchSize(0);
                     ps.close();
                     ps = null;
                 }
-
             } finally {
-
                 try {
-                    myTransaction.close();
+                    // 针对自动提交的事务,链接不会进行重用，各自关闭
+                    if (connection != null && myTransaction.isAutoCommit()) {
+                        connection.close();
+                    }
                 } catch (TddlException e) {
-                    SQLException sqlException = new SQLException(e);
-                    throw sqlException;
+                    throw new SQLException(e);
                 }
             }
         }
+
         executionType = null;
     }
 
-    public void closeResultSetAndConnection() throws SQLException {
-
-        try {
-            /*
-             * 非流计算的时候，用普通的close方法，而如果是streaming的情况下 将按以下模式关闭：
-             * http://jira.taobao.ali.com/browse/ANDOR-149
-             * http://gitlab.alibaba-inc.com/andor/issues/1835
-             */
-            // 这一期不做这个了
-            if (!isStreaming) {
-                if (resultSet != null && !resultSet.isClosed()) {
-                    resultSet.close();
-                    resultSet = null;
-                }
-            } else {
-                try {
-                    if (resultSet != null && !resultSet.isClosed()) {
-                        My_Transaction.closeStreaming(myTransaction, groupName, ds);
-                    }
-                } catch (Throwable e) {
-                    logger.warn("", e);
-                    if (resultSet != null && !resultSet.isClosed()) {
-                        resultSet.close();
-                        resultSet = null;
-                    }
-                }
-            }
-
-        } finally {
-
-            try {
-                if (ps != null) {
-
-                    ps.setFetchSize(0);
-                    ps.close();
-                    ps = null;
-                }
-
-            } finally {
-
-            }
-        }
-        executionType = null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * com.taobao.ustore.jdbc.mysql.generalQueryHandler#skipTo(com.taobao.ustore
-     * .common.inner.bean.CloneableRecord,
-     * com.taobao.ustore.common.inner.ICursorMeta)
-     */
     @Override
     public boolean skipTo(CloneableRecord key, ICursorMeta indexMeta) throws SQLException {
-
         checkInitedInRsNext();
         throw new RuntimeException("暂时不支持skip to");
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.taobao.ustore.jdbc.mysql.generalQueryHandler#next()
-     */
     @Override
     public IRowSet next() throws SQLException {
         if (ds == null) {
@@ -358,12 +284,6 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         return current;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * com.taobao.ustore.jdbc.mysql.generalQueryHandler#prepareStatement(java
-     * .lang.String)
-     */
     protected PreparedStatement prepareStatement(String sql, Connection myJdbcHandler) throws SQLException {
         if (this.ps != null) {
             throw new IllegalStateException("上一个请求还未执行完毕");
@@ -373,15 +293,9 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         }
         PreparedStatement ps = myJdbcHandler.prepareStatement(sql);
         this.ps = ps;
-
         return ps;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.taobao.ustore.jdbc.mysql.generalQueryHandler#first()
-     */
-    @Override
     public IRowSet first() throws SQLException {
         resultSet.beforeFirst();
         resultSet.next();
@@ -390,11 +304,6 @@ public class My_JdbcHandler implements GeneralQueryHandler {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.taobao.ustore.jdbc.mysql.generalQueryHandler#last()
-     */
-    @Override
     public IRowSet last() throws SQLException {
         resultSet.afterLast();
         resultSet.previous();
@@ -403,11 +312,6 @@ public class My_JdbcHandler implements GeneralQueryHandler {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.taobao.ustore.jdbc.mysql.generalQueryHandler#getCurrent()
-     */
-    @Override
     public IRowSet getCurrent() {
         return current;
     }
@@ -418,17 +322,12 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.taobao.ustore.jdbc.mysql.generalQueryHandler#isInited()
-     */
-    @Override
     public boolean isInited() {
         return executionType != null;
     }
 
     public void beforeFirst() throws SQLException {
-        this.closeResultSetAndConnection();
+        this.close();
         this.executeQuery(cursorMeta, isStreaming);
         current = null;
     }
@@ -436,11 +335,6 @@ public class My_JdbcHandler implements GeneralQueryHandler {
     boolean                   initPrev = false;
     private IDataNodeExecutor plan;
 
-    /*
-     * (non-Javadoc)
-     * @see com.taobao.ustore.jdbc.mysql.generalQueryHandler#prev()
-     */
-    @Override
     public IRowSet prev() throws SQLException {
         if (ds == null) {
 
@@ -468,11 +362,6 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         return current;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.taobao.ustore.jdbc.mysql.generalQueryHandler#isDone()
-     */
-    @Override
     public boolean isDone() {
         return true;
     }

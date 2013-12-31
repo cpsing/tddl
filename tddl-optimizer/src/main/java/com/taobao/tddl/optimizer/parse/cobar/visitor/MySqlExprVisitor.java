@@ -117,7 +117,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         Expression third = node.getThird();
 
         MySqlExprVisitor v = new MySqlExprVisitor();
-        first.accept(new MySqlExprVisitor());
+        first.accept(v);
         Comparable col = v.getColumnOrValue();
 
         MySqlExprVisitor lv = new MySqlExprVisitor();

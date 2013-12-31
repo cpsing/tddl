@@ -2,8 +2,6 @@ package com.taobao.tddl.matrix.config;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.TopologyExecutor;
 import com.taobao.tddl.executor.common.ExecutorContext;
 import com.taobao.tddl.executor.common.TopologyHandler;
@@ -20,10 +18,13 @@ import com.taobao.tddl.optimizer.rule.RuleIndexManager;
 import com.taobao.tddl.optimizer.rule.RuleSchemaManager;
 import com.taobao.tddl.rule.TddlRule;
 
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
+
 public class ConfigHolder extends AbstractLifecycle {
 
     final static Logger      logger = LoggerFactory.getLogger(ConfigHolder.class);
-    OptimizerRule            optimizerRule;
+    private OptimizerRule    optimizerRule;
     private String           appName;
     private String           ruleFilePath;
     private String           schemaFilePath;
@@ -64,8 +65,12 @@ public class ConfigHolder extends AbstractLifecycle {
         oc.setStatManager(this.statManager);
     }
 
-    public void topologyInit() throws TddlException {
+    @Override
+    protected void doDestory() throws TddlException {
+        // TODO
+    }
 
+    public void topologyInit() throws TddlException {
         topologyHandler = new TopologyHandler(appName, unitName, topologyFilePath);
         topologyHandler.init();
     }

@@ -1,4 +1,4 @@
-package com.taobao.tddl.qatest;
+package com.taobao.tddl.qatest.util;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -14,9 +14,7 @@ import java.util.List;
 import org.junit.Assert;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
-import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.matrix.jdbc.TDataSource;
-import com.taobao.tddl.qatest.util.DateUtil;
 
 public class Validator {
 
@@ -94,7 +92,7 @@ public class Validator {
      * @return
      * @throws SQLException
      */
-    public int ResultsSize(ResultSet rs) throws SQLException {
+    public int resultsSize(ResultSet rs) throws SQLException {
         int row = 0;
         while (rs.next()) {
             row++;
@@ -114,18 +112,17 @@ public class Validator {
         boolean same = false;
         List<Object> mutilMysqlResult = new ArrayList<Object>();
         List<Object> mutilResult = new ArrayList<Object>();
-        IRowSet kv = null;
         try {
             while (rs.next()) {
                 List<Object> mysqlResult = new ArrayList<Object>();
-                List<Object> Result = new ArrayList<Object>();
+                List<Object> result = new ArrayList<Object>();
                 ret.next();
                 for (int i = 0; i < columnParam.length; i++) {
                     mysqlResult.add(getObject(rs, columnParam, i));
-                    Result.add(getObject(ret, columnParam, i));
+                    result.add(getObject(ret, columnParam, i));
                 }
                 mutilMysqlResult.add(mysqlResult);
-                mutilResult.add(Result);
+                mutilResult.add(result);
             }
             if (mutilMysqlResult.size() != mutilResult.size()) {
                 Assert.fail();
@@ -157,7 +154,6 @@ public class Validator {
         boolean same = false;
         List<Object> mutilMysqlResult = new ArrayList<Object>();
         List<Object> mutilResult = new ArrayList<Object>();
-        IRowSet kv = null;
         try {
             while (rs.next()) {
                 List<Object> mysqlResult = new ArrayList<Object>();
@@ -234,7 +230,7 @@ public class Validator {
             while (rs.next() == true) {
                 ret.next();
                 List<Object> mysqlResult = new ArrayList<Object>();
-                List<Object> Result = new ArrayList<Object>();
+                List<Object> result = new ArrayList<Object>();
 
                 nextClounmValue = rs.getObject(notKeyCloumn);
                 if (nextClounmValue.equals(orderClounmValue) || rs.isFirst()) {
@@ -245,14 +241,12 @@ public class Validator {
                         Object mysqlData = getObject(rs, columnParam, i);
                         mysqlResult.add(mysqlData);
                         mysqlData = getObject(ret, columnParam, i);
-                        Result.add(mysqlData);
+                        result.add(mysqlData);
                         orderClounmValue = rs.getObject(notKeyCloumn);
                     }
                     mutilMysqlResult.add(mysqlResult);
-                    mutilResult.add(Result);
-                }
-
-                else {
+                    mutilResult.add(result);
+                } else {
                     if (mutilMysqlResult.size() != mutilResult.size()) {
                         Assert.fail();
                     }
@@ -267,13 +261,13 @@ public class Validator {
                         Object mysqlData = getObject(rs, columnParam, i);
                         mysqlResult.add(mysqlData);
                         mysqlData = getObject(ret, columnParam, i);
-                        Result.add(mysqlData);
+                        result.add(mysqlData);
                         orderClounmValue = rs.getObject(notKeyCloumn);
                     }
                     mutilMysqlResult.clear();
                     mutilResult.clear();
                     mutilMysqlResult.add(mysqlResult);
-                    mutilResult.add(Result);
+                    mutilResult.add(result);
                 }
             }
             Assert.assertFalse(ret.next());
@@ -295,12 +289,12 @@ public class Validator {
             while (rs.next() == true) {
                 ret.next();
                 List<Object> mysqlResult = new ArrayList<Object>();
-                List<Object> Result = new ArrayList<Object>();
+                List<Object> result = new ArrayList<Object>();
                 for (int i = 0; i < columnParam.length; i++) {
                     mysqlResult.add(rs.getObject(columnParam[i]));
-                    Result.add(ret.getObject(columnParam[i]));
+                    result.add(ret.getObject(columnParam[i]));
                 }
-                Assert.assertEquals(mysqlResult, Result);
+                Assert.assertEquals(mysqlResult, result);
             }
             Assert.assertFalse(ret.next());
         } finally {
@@ -316,12 +310,10 @@ public class Validator {
             this.number = number;
         }
 
-        @Override
         public String toString() {
             return this.number == null ? null : this.number.toString();
         }
 
-        @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
             if (obj == null) return false;
@@ -356,14 +348,16 @@ public class Validator {
         } else if (data instanceof Double) {
             data = new BigDecimal((Double) data);
         } else if (data instanceof BigDecimal) {
-            data = data;
+            data = (BigDecimal) data;
         } else if (data instanceof Date) {
             data = ((Date) data).getTime();
         } else if (data instanceof byte[]) {
             data = rs.getString(columnParam[i]);
         }
 
-        if (data instanceof BigDecimal) data = new MyNumber((BigDecimal) data);
+        if (data instanceof BigDecimal) {
+            data = new MyNumber((BigDecimal) data);
+        }
         return data;
     }
 
@@ -632,7 +626,7 @@ public class Validator {
         try {
             rc = andorQueryData(sql, param);
             rs = mysqlQueryData(sql, param);
-            Assert.assertEquals(ResultsSize(rs), ResultsSize(rc));
+            Assert.assertEquals(resultsSize(rs), resultsSize(rc));
         } finally {
 
         }
@@ -653,7 +647,7 @@ public class Validator {
         try {
             while (rs.next() == true) {
                 List<Object> mysqlResult = new ArrayList<Object>();
-                List<Object> Result = new ArrayList<Object>();
+                List<Object> result = new ArrayList<Object>();
                 if (!rc.next()) {
                     Assert.assertTrue("长度不够", false);
                 }
@@ -663,9 +657,9 @@ public class Validator {
                         obj = ((BigDecimal) obj).longValue();
                     }
                     mysqlResult.add(obj);
-                    Result.add(rc.getObject(columnParam[i]));
+                    result.add(rc.getObject(columnParam[i]));
                 }
-                Assert.assertEquals(mysqlResult, Result);
+                Assert.assertEquals(mysqlResult, result);
             }
             Assert.assertFalse(rc.next());
         } finally {

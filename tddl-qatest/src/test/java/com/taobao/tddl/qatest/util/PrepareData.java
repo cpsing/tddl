@@ -1,4 +1,4 @@
-package com.taobao.tddl.qatest;
+package com.taobao.tddl.qatest.util;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
+import com.taobao.tddl.qatest.BaseTestCase;
 
 public class PrepareData extends BaseTestCase {
 

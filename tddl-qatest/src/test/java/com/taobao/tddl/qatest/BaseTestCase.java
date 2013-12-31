@@ -12,11 +12,11 @@ import java.util.Random;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.junit.Ignore;
 
 import com.taobao.tddl.matrix.jdbc.TDataSource;
 import com.taobao.tddl.qatest.util.DateUtil;
+import com.taobao.tddl.qatest.util.Validator;
 
 /**
  * 基本测试类，提供创建AndorServer和AndorClient方法
@@ -58,11 +58,6 @@ public class BaseTestCase extends Validator {
     protected String                  timeString    = DateUtil.formatDate(new Date(), DateUtil.DATE_FULLHYPHEN);
     protected static final Logger     logger        = Logger.getLogger(BaseTestCase.class);
     protected static final Properties properties    = new Properties();
-
-    // 启动日志
-    static {
-        PropertyConfigurator.configure("src/test/resources/log4j.properties");
-    }
 
     // 获取配置
     static {

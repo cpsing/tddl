@@ -46,20 +46,21 @@ public class PackageUtils {
                     while (entries.hasMoreElements()) {
                         JarEntry entry = entries.nextElement();
                         String name = entry.getName();
+                        String pName = packageName;
                         if (name.charAt(0) == '/') {
                             name = name.substring(1);
                         }
                         if (name.startsWith(packageDirName)) {
                             int idx = name.lastIndexOf('/');
                             if (idx != -1) {
-                                packageName = name.substring(0, idx).replace('/', '.');
+                                pName = name.substring(0, idx).replace('/', '.');
                             }
 
                             if (idx != -1) {
                                 // it's not inside a deeper dir
                                 if (name.endsWith(".class") && !entry.isDirectory()) {
-                                    String className = name.substring(packageName.length() + 1, name.length() - 6);
-                                    classes.add(makeFullClassName(packageName, className));
+                                    String className = name.substring(pName.length() + 1, name.length() - 6);
+                                    classes.add(makeFullClassName(pName, className));
                                 }
                             }
                         }

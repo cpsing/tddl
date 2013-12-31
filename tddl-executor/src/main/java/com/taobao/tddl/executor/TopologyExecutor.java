@@ -21,14 +21,12 @@ public class TopologyExecutor implements ITopologyExecutor {
 
     @Override
     public Future<ISchematicCursor> execByExecPlanNodeFuture(final IDataNodeExecutor qc,
-
-    final ExecutionContext executionContext) throws TddlException {
+                                                             final ExecutionContext executionContext)
+                                                                                                     throws TddlException {
 
         final ExecutorContext executorContext = ExecutorContext.getContext();
         final OptimizerContext optimizerContext = OptimizerContext.getContext();
-
         ExecutorService concurrentExecutors = executionContext.getExecutorService();
-
         if (concurrentExecutors == null) {
             throw new TddlRuntimeException("concurrentExecutors is null, cannot query parallelly");
         }
@@ -48,9 +46,7 @@ public class TopologyExecutor implements ITopologyExecutor {
     @Override
     public ISchematicCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext)
                                                                                                        throws TddlException {
-
         return getGroupExecutor(qc, executionContext).execByExecPlanNode(qc, executionContext);
-
     }
 
     private IExecutor getGroupExecutor(IDataNodeExecutor qc, ExecutionContext executionContext) {
@@ -65,11 +61,8 @@ public class TopologyExecutor implements ITopologyExecutor {
     }
 
     private IExecutor getGroupExecutor(String group, ExecutionContext executionContext) {
-
         IExecutor executor = null;
-
         executor = ExecutorContext.getContext().getTopologyHandler().get(group);
-
         if (executor == null) {
             throw new RuntimeException("cannot find executor for group:" + group + "\ngroups:\n"
                                        + ExecutorContext.getContext().getTopologyHandler());
@@ -89,12 +82,12 @@ public class TopologyExecutor implements ITopologyExecutor {
 
     @Override
     public ResultCursor commit(ExecutionContext executionContext) throws TddlException {
-
         ResultCursor rc = new ResultCursor(null, executionContext);
-        if (executionContext.getTransactionGroup() == null) return rc;
+        if (executionContext.getTransactionGroup() == null) {
+            return rc;
+        }
 
         return getGroupExecutor(executionContext.getTransactionGroup(), executionContext).commit(executionContext);
-
     }
 
     @Override

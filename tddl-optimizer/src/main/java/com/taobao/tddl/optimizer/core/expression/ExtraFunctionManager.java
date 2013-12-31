@@ -90,8 +90,8 @@ public class ExtraFunctionManager {
                        && IExtraFunction.class.isAssignableFrom(clazz);
             }
 
-            public boolean preFilter(String className) {
-                return StringUtils.contains(className, "function");// 包含function名字的类
+            public boolean preFilter(String classFulName) {
+                return StringUtils.contains(classFulName, "function");// 包含function名字的类
             }
 
         };

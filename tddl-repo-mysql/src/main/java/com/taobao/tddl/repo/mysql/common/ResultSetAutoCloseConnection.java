@@ -93,6 +93,7 @@ public class ResultSetAutoCloseConnection implements ResultSet {
         return rs.getAsciiStream(columnLabel);
     }
 
+    @SuppressWarnings("deprecation")
     public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
         return rs.getBigDecimal(columnIndex, scale);
     }
@@ -101,6 +102,7 @@ public class ResultSetAutoCloseConnection implements ResultSet {
         return rs.getBigDecimal(columnIndex);
     }
 
+    @SuppressWarnings("deprecation")
     public BigDecimal getBigDecimal(String columnLabel, int scale) throws SQLException {
         return rs.getBigDecimal(columnLabel, scale);
     }
@@ -369,10 +371,12 @@ public class ResultSetAutoCloseConnection implements ResultSet {
         return rs.getURL(columnLabel);
     }
 
+    @SuppressWarnings("deprecation")
     public InputStream getUnicodeStream(int columnIndex) throws SQLException {
         return rs.getUnicodeStream(columnIndex);
     }
 
+    @SuppressWarnings("deprecation")
     public InputStream getUnicodeStream(String columnLabel) throws SQLException {
         return rs.getUnicodeStream(columnLabel);
     }
@@ -796,17 +800,5 @@ public class ResultSetAutoCloseConnection implements ResultSet {
     public boolean wasNull() throws SQLException {
         return rs.wasNull();
     }
-
-    // @Override
-    // public <T> T getObject(int arg0, Class<T> arg1) throws SQLException {
-    // // TODO Auto-generated method stub
-    // return null;
-    // }
-    //
-    // @Override
-    // public <T> T getObject(String arg0, Class<T> arg1) throws SQLException {
-    // // TODO Auto-generated method stub
-    // return null;
-    // }
 
 }

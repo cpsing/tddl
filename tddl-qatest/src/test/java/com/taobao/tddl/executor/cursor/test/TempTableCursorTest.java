@@ -46,7 +46,7 @@ public class TempTableCursorTest {
     @Test
     public void testSort() throws TddlException {
         RepositoryHolder repoHolder = new RepositoryHolder();
-        StaticSchemaManager sm = new StaticSchemaManager("temp_table_schema.xml", null, null);
+        StaticSchemaManager sm = new StaticSchemaManager("test_schema.xml", null, null);
         sm.init();
         IRepository bdbRepo = repoHolder.getOrCreateRepository("BDB_JE", Collections.EMPTY_MAP);
         ICursorFactory cf = new CursorFactoryDefaultImpl();
@@ -82,7 +82,7 @@ public class TempTableCursorTest {
     @Test
     public void testNull() throws TddlException {
         RepositoryHolder repoHolder = new RepositoryHolder();
-        StaticSchemaManager sm = new StaticSchemaManager("temp_table_schema.xml", null, null);
+        StaticSchemaManager sm = new StaticSchemaManager("test_schema.xml", null, null);
         sm.init();
         IRepository bdbRepo = repoHolder.getOrCreateRepository("BDB_JE", Collections.EMPTY_MAP);
         ICursorFactory cf = new CursorFactoryDefaultImpl();
@@ -119,7 +119,7 @@ public class TempTableCursorTest {
     @Test
     public void testEmpty() throws TddlException {
         RepositoryHolder repoHolder = new RepositoryHolder();
-        StaticSchemaManager sm = new StaticSchemaManager("temp_table_schema.xml", null, null);
+        StaticSchemaManager sm = new StaticSchemaManager("test_schema.xml", null, null);
         sm.init();
         IRepository bdbRepo = repoHolder.getOrCreateRepository("BDB_JE", Collections.EMPTY_MAP);
         ICursorFactory cf = new CursorFactoryDefaultImpl();
@@ -154,7 +154,7 @@ public class TempTableCursorTest {
     @Test
     public void testGetReturnColumnsBeforeNext() throws TddlException {
         RepositoryHolder repoHolder = new RepositoryHolder();
-        StaticSchemaManager sm = new StaticSchemaManager("temp_table_schema.xml", null, null);
+        StaticSchemaManager sm = new StaticSchemaManager("test_schema.xml", null, null);
         sm.init();
         IRepository bdbRepo = repoHolder.getOrCreateRepository("BDB_JE", Collections.EMPTY_MAP);
         ICursorFactory cf = new CursorFactoryDefaultImpl();
@@ -181,7 +181,7 @@ public class TempTableCursorTest {
     @Test
     public void testGetReturnColumnsAfterNext() throws TddlException {
         RepositoryHolder repoHolder = new RepositoryHolder();
-        StaticSchemaManager sm = new StaticSchemaManager("temp_table_schema.xml", null, null);
+        StaticSchemaManager sm = new StaticSchemaManager("test_schema.xml", null, null);
         sm.init();
         IRepository bdbRepo = repoHolder.getOrCreateRepository("BDB_JE", Collections.EMPTY_MAP);
         ICursorFactory cf = new CursorFactoryDefaultImpl();
