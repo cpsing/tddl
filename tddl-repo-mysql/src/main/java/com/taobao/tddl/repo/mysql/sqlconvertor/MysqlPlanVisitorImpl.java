@@ -108,9 +108,7 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
                 }
 
                 MysqlPlanVisitorImpl visitor = this.getNewVisitor(order);
-
                 sqlBuilder.append(visitor.getString());
-
             }
         }
     }
@@ -119,7 +117,6 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
         if (query.getHavingFilter() != null) {
             sqlBuilder.append(" having ");
             MysqlPlanVisitorImpl visitor = this.getNewVisitor(query, query.getHavingFilter());
-
             sqlBuilder.append(visitor.getString());
         }
     }
@@ -131,15 +128,10 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
             return;
         }
         sqlBuilder.append(" limit ");
-
         MysqlPlanVisitorImpl visitor = this.getNewVisitor(limitFrom);
-
         sqlBuilder.append(visitor.getString());
-
         if (limitTo != null && limitTo != -1) {
-
             visitor = this.getNewVisitor(limitTo);
-
             sqlBuilder.append(",").append(visitor.getString());
         }
     }
@@ -157,9 +149,7 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
                 }
 
                 MysqlPlanVisitorImpl visitor = this.getNewVisitor(query, order);
-
                 sqlBuilder.append(visitor.getString());
-
             }
         }
     }
@@ -179,11 +169,10 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
                 hasDistinct = true;
             }
             MysqlPlanVisitorImpl visitor = this.getNewVisitor(query, selected);
-
             sb.append(visitor.getString());
-
-            if (selected.getAlias() != null) sb.append(" as ").append(selected.getAlias());
-
+            if (selected.getAlias() != null) {
+                sb.append(" as ").append(selected.getAlias());
+            }
         }
 
         if (hasDistinct) {
@@ -227,9 +216,9 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
 
     private boolean isMiddle(IFunction func) {
         if (middleFuncName.contains(func.getFunctionName())) {
-
-            if (func.getArgs() != null && func.getArgs().size() == 1) return false;
-
+            if (func.getArgs() != null && func.getArgs().size() == 1) {
+                return false;
+            }
             return true;
         } else {
             return false;
@@ -251,10 +240,10 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
             sqlBuilder.append("null");
             return;
         }
+
         int index = bindValSequence.getAndIncrement();
         ParameterContext context = null;
         if (val != null && !(val instanceof NullValue)) {
-
             context = new ParameterContext(ParameterMethod.setObject1, new Object[] { index, val });
         } else {
             context = new ParameterContext(ParameterMethod.setNull1, new Object[] { index, Types.NULL });
@@ -266,7 +255,7 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
     @Override
     public void visit(IColumn column) {
         // 别名加在select之外，如(select * from table) as t1,列名之前不能使用这个别名
-        // 别名加载select之内，如select * from table as t1，列名之前可以使用这个别名
+        // 别名加在select之内，如select * from table as t1，列名之前可以使用这个别名
         if (query instanceof IQueryTree && !((IQueryTree) query).isSubQuery()
             && ((IQueryTree) query).getAlias() != null && column.getTableName() != null) {
             sqlBuilder.append(((IQueryTree) query).getAlias());
@@ -277,7 +266,6 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
                 if (query instanceof IQueryTree && column.getTableName() != null) {
                     sqlBuilder.append(column.getTableName());
                 } else {
-
                     sqlBuilder.append(column.getColumnName());
                     return;
                 }
@@ -295,7 +283,6 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
 
     @Override
     public void visit(IFunction func) {
-
         if (func.isNot()) {
             sqlBuilder.append("(");
             sqlBuilder.append(" NOT ");
@@ -311,30 +298,25 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
                 this));
         } else {
             boolean isMiddle = isMiddle(func);
-
             if (isMiddle) {
                 sqlBuilder.append("(");
                 if (func instanceof IFilter) {
                     funcName = ((IFilter) func).getOperation().getOPERATIONString();
                 }
-
             }
             if ((func instanceof IFilter) && OPERATION.CONSTANT.equals(((IFilter) func).getOperation())) {
-
                 MysqlPlanVisitorImpl visitor = this.getNewVisitor(func.getArgs().get(0));
-                sqlBuilder.append(visitor.getString());
+                sqlBuilder.append(visitor.getString());// 常量，不太可能走到这一步
             } else if ((func instanceof IBooleanFilter)
-                       && OPERATION.IS.equals(((IBooleanFilter) func).getOperation())
-                       && (((IBooleanFilter) func).getValue() == null
-                           || ((IBooleanFilter) func).getValue() instanceof NullValue || "null".equals(((IBooleanFilter) func).getValue()))) {
-
+                       && (OPERATION.IS_NULL.equals(((IBooleanFilter) func).getOperation()) || OPERATION.IS_NOT_NULL.equals(((IBooleanFilter) func).getOperation()))) {
                 MysqlPlanVisitorImpl visitor = this.getNewVisitor(func.getArgs().get(0));
-
                 sqlBuilder.append(visitor.getString());
-                sqlBuilder.append(" is null");
+                sqlBuilder.append(" ").append(funcName);
             } else {
                 if (!isMiddle) {
-                    sqlBuilder.append(funcName);
+                    if (!"ROW".equals(funcName)) { // row代表向量匹配
+                        sqlBuilder.append(funcName);
+                    }
                     sqlBuilder.append("(");
                 }
                 boolean first = true;
@@ -367,7 +349,6 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
             if (isMiddle) {
                 sqlBuilder.append(")");
             }
-
         }
         if (func.isNot()) {
             sqlBuilder.append(")");
@@ -468,7 +449,6 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
 
     @Override
     public void visit(IOrderBy orderBy) {
-
         MysqlPlanVisitorImpl visitor = this.getNewVisitor(orderBy.getColumn());
         sqlBuilder.append(visitor.getString());
 
@@ -482,19 +462,18 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
 
     @Override
     public void visit(IQuery query) {
-
         if (query.isSubQuery() && !query.isTopQuery()) {
             sqlBuilder.append(" ( ");
         }
         if (query.isSubQuery() || query.isTopQuery()) {
             buildSelect(query);
 
-            if (query.getTableName() == null) return;
-
+            if (query.getTableName() == null) {
+                return;
+            }
             sqlBuilder.append(" from ");
         }
         sqlBuilder.append(query.getTableName());
-
         if (!query.isSubQuery() && query.getAlias() != null) {
             sqlBuilder.append(" ").append(query.getAlias());
         }
@@ -514,29 +493,24 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
             }
 
             if (!TStringUtil.isEmpty(keyFilterStr) || !TStringUtil.isEmpty(resultFilterStr)) {
-
                 sqlBuilder.append(" where ");
-
                 sqlBuilder.append(keyFilterStr);
-                if (!TStringUtil.isEmpty(keyFilterStr)) {
-                    if (!TStringUtil.isEmpty(resultFilterStr)) {
-                        sqlBuilder.append("and ");
-                    }
-
+                if (!TStringUtil.isEmpty(keyFilterStr) && !TStringUtil.isEmpty(resultFilterStr)) {
+                    sqlBuilder.append(" and ");
                 }
                 sqlBuilder.append(resultFilterStr);
             }
             buildGroupBy(query);
             buildHaving(query);
             buildOrderBy(query);
-
             buildLimit(query);
         }
 
         if (query.isSubQuery() && !query.isTopQuery()) {
             sqlBuilder.append(" ) ");
-
-            if (query.getAlias() != null) sqlBuilder.append(" ").append(query.getAlias()).append(" ");
+            if (query.getAlias() != null) {
+                sqlBuilder.append(" ").append(query.getAlias()).append(" ");
+            }
         }
     }
 
@@ -565,7 +539,6 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
 
     @Override
     public void visit(Object s) {
-
         if (s instanceof Comparable) {
             visit((Comparable) s);
         }
@@ -581,38 +554,28 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
         sqlBuilder.append(put.getTableName()).append(" ");
 
         boolean first = true;
-
         if (put.getUpdateColumns() != null && !put.getUpdateValues().isEmpty()) {
-
             sqlBuilder.append("( ");
-
             for (int i = 0; i < put.getUpdateColumns().size(); i++) {
                 if (first) {
                     first = false;
                 } else {
                     sqlBuilder.append(", ");
                 }
-
                 sqlBuilder.append(this.getNewVisitor(put.getUpdateColumns().get(i)).getString());
             }
-
             sqlBuilder.append(") ");
         }
-
         sqlBuilder.append("values ( ");
-
         first = true;
-
         for (int i = 0; i < put.getUpdateValues().size(); i++) {
             if (first) {
                 first = false;
             } else {
                 sqlBuilder.append(", ");
             }
-
             sqlBuilder.append(this.getNewVisitor(put.getUpdateValues().get(i)).getString());
         }
-
         sqlBuilder.append(") ");
     }
 
@@ -620,30 +583,22 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
     public void visit(IReplace put) {
         sqlBuilder.append("replace into ");
         sqlBuilder.append(put.getTableName()).append(" ");
-
         boolean first = true;
-
         if (put.getUpdateColumns() != null && !put.getUpdateValues().isEmpty()) {
-
             sqlBuilder.append("( ");
-
             for (int i = 0; i < put.getUpdateColumns().size(); i++) {
                 if (first) {
                     first = false;
                 } else {
                     sqlBuilder.append(", ");
                 }
-
                 sqlBuilder.append(this.getNewVisitor(put.getUpdateColumns().get(i)).getString());
             }
-
             sqlBuilder.append(") ");
         }
 
         sqlBuilder.append("values ( ");
-
         first = true;
-
         for (int i = 0; i < put.getUpdateValues().size(); i++) {
             if (first) {
                 first = false;
@@ -666,7 +621,6 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
         boolean first = true;
 
         if (put.getUpdateColumns() != null && !put.getUpdateValues().isEmpty()) {
-
             for (int i = 0; i < put.getUpdateColumns().size(); i++) {
                 if (first) {
                     first = false;
@@ -694,9 +648,7 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
         }
 
         if (!TStringUtil.isEmpty(keyFilterStr) || !TStringUtil.isEmpty(resultFilterStr)) {
-
             sqlBuilder.append(" where ");
-
             sqlBuilder.append(keyFilterStr);
             if (!TStringUtil.isEmpty(keyFilterStr)) {
                 if (!TStringUtil.isEmpty(resultFilterStr)) {
@@ -705,7 +657,6 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
 
             }
             sqlBuilder.append(resultFilterStr);
-
             buildLimit(query);
         }
 
@@ -731,9 +682,7 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
         }
 
         if (!TStringUtil.isEmpty(keyFilterStr) || !TStringUtil.isEmpty(resultFilterStr)) {
-
             sqlBuilder.append(" where ");
-
             sqlBuilder.append(keyFilterStr);
             if (!TStringUtil.isEmpty(keyFilterStr)) {
                 if (!TStringUtil.isEmpty(resultFilterStr)) {

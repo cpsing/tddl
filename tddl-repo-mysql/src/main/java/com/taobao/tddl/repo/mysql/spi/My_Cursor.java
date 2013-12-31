@@ -259,7 +259,7 @@ public class My_Cursor implements Cursor {
         }
         if (rowSet == null) {
             try {
-                myJdbcHandler.closeResultSetAndConnection();
+                myJdbcHandler.close();
             } catch (SQLException e) {
                 throw new TddlException(e);
             }

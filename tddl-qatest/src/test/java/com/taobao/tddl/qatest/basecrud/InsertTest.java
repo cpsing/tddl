@@ -102,7 +102,6 @@ public class InsertTest extends BaseAndorTestCase {
         selectOrderAssert(sql, columnParam, Collections.EMPTY_LIST);
     }
 
-    @Ignore(value = "目前insert不支持类似insert into normaltbl set pk=? ,name=?语句")
     @Test
     public void insertWithSetTest() throws Exception {
         String sql = "insert into " + normaltblTableName + " set pk=? ,name=?";

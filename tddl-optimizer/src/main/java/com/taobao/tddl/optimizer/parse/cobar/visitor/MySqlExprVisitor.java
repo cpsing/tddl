@@ -198,13 +198,13 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         } else if (node instanceof ArithmeticAddExpression) {
             this.handleArithmetric(node, IFunction.BuiltInFunction.ADD);
         } else if (node instanceof ArithmeticDivideExpression) {
-            this.handleArithmetric(node, IFunction.BuiltInFunction.DIV);
+            this.handleArithmetric(node, IFunction.BuiltInFunction.DIVISION);
         } else if (node instanceof ArithmeticIntegerDivideExpression) {
             this.handleArithmetric(node, node.getOperator());
         } else if (node instanceof ArithmeticModExpression) {
             this.handleArithmetric(node, node.getOperator());
         } else if (node instanceof ArithmeticMultiplyExpression) {
-            this.handleArithmetric(node, IFunction.BuiltInFunction.MUL);
+            this.handleArithmetric(node, IFunction.BuiltInFunction.MULTIPLY);
         } else if (node instanceof ArithmeticSubtractExpression) {
             this.handleArithmetric(node, IFunction.BuiltInFunction.SUB);
         } else if (node instanceof AssignmentExpression) {

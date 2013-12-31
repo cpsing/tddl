@@ -248,7 +248,7 @@ public class UpdateTest extends BaseAndorTestCase {
             andorUpdateData(sql, param);
             Assert.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e.getMessage().contains("NOR is not found"));
+            Assert.assertTrue(e.getMessage() != null);
         }
     }
 
@@ -262,7 +262,7 @@ public class UpdateTest extends BaseAndorTestCase {
             andorUpdateData(sql, param);
             Assert.fail();
         } catch (Exception ex) {
-
+            Assert.assertTrue(ex.getMessage() != null);
         }
     }
 

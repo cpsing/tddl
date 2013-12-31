@@ -105,7 +105,16 @@ public class ExtraFunctionManager {
     }
 
     private static String buildKey(String name) {
-        return name.toLowerCase();
-    }
+        if (IFunction.BuiltInFunction.ADD.equals(name)) {
+            return "ADD";
+        } else if (IFunction.BuiltInFunction.SUB.equals(name)) {
+            return "SUB";
+        } else if (IFunction.BuiltInFunction.MULTIPLY.equals(name)) {
+            return "MULTIPLY";
+        } else if (IFunction.BuiltInFunction.DIVISION.equals(name)) {
+            return "DIVISION";
+        }
 
+        return name.toUpperCase();
+    }
 }

@@ -12,15 +12,11 @@ import com.taobao.tddl.optimizer.exceptions.SqlParserException;
 import com.taobao.tddl.optimizer.parse.SqlAnalysisResult;
 import com.taobao.tddl.optimizer.parse.SqlParseManager;
 
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
-
 /**
  * 基于cobar解析器实现parse
  */
 public class CobarSqlParseManager extends AbstractLifecycle implements SqlParseManager {
 
-    private static final Logger                          logger     = LoggerFactory.getLogger(CobarSqlParseManager.class);
     private int                                          cacheSize  = 1000;
     private int                                          expireTime = 30000;
     private static Cache<String, CobarSqlAnalysisResult> cache      = null;
@@ -58,10 +54,8 @@ public class CobarSqlParseManager extends AbstractLifecycle implements SqlParseM
             if (e.getCause() instanceof RuntimeException) {
                 throw (RuntimeException) e.getCause();
             } else {
-                logger.error("You have an error in your SQL syntax,the sql is:" + sql, e.getCause());
-                throw new SqlParserException("You have an error in your SQL syntax,the sql is:" + sql, e.getCause());
+                throw new SqlParserException("You have an error in your SQL syntax,the sql is:" + sql, e);
             }
-
         }
 
         return result;

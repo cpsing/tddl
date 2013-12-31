@@ -42,7 +42,6 @@ public class MatrixExecutor extends AbstractLifecycle implements IExecutor {
      * @throws DataAccessException
      */
     public ResultCursor execute(String sql, ExecutionContext executionContext) throws TddlException {
-
         if (logger.isDebugEnabled()) {
             logger.warn("extraCmd:\n" + executionContext.getExtraCmds());
             logger.warn("ParameterContext:\n" + executionContext.getParams());
