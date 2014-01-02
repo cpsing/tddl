@@ -5,29 +5,25 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
-import com.taobao.tddl.qatest.util.Validator;
 
 /**
  * Comment for SelectWithLike
  * <p/>
  * Author By: zhuoxue.yll Created Date: 2012-7-9 下午12:39:15
  */
-@RunWith(Parameterized.class)
+@RunWith(EclipseParameterized.class)
 public class SelectWithLike extends BaseAndorTestCase {
-
-    Validator validator = new Validator();
 
     @Parameters(name = "{index}:table={0}")
     public static List<String[]> prepareData() {
@@ -40,15 +36,8 @@ public class SelectWithLike extends BaseAndorTestCase {
 
     @Before
     public void prepareDate() throws Exception {
-        validator.con = validator.getConnection();
-        validator.andorCon = us.getConnection();
-        prepareData.normaltblPrepare(0, 20);
-        prepareData.normaltblTwoPrepare();
-    }
-
-    @After
-    public void destory() throws Exception {
-        validator.psConRcRsClose(rc, rs);
+        normaltblPrepare(0, 20);
+        normaltblTwoPrepare();
     }
 
     /**

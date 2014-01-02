@@ -4,26 +4,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
-import com.taobao.tddl.qatest.util.Validator;
 
 /**
  * 主要针对合并约束条件的测试 Author By: zhuoxue.yll Created Date: 2012-9-14 下午02:35:55
  */
-@RunWith(Parameterized.class)
+@RunWith(EclipseParameterized.class)
 public class SelectComplexConditionTest extends BaseAndorTestCase {
 
-    Validator validator   = new Validator();
-    String[]  columnParam = { "PK", "NAME", "ID" };
+    String[] columnParam = { "PK", "NAME", "ID" };
 
     @Parameters(name = "{index}:table1={0}")
     public static List<String[]> prepareData() {
@@ -36,14 +33,7 @@ public class SelectComplexConditionTest extends BaseAndorTestCase {
 
     @Before
     public void prepareDate() throws Exception {
-        validator.con = validator.getConnection();
-        validator.andorCon = us.getConnection();
-        prepareData.normaltblPrepare(0, 50);
-    }
-
-    @After
-    public void clearDate() throws Exception {
-        prepareData.psConRcRsClose(rc, rs);
+        normaltblPrepare(0, 50);
     }
 
     @Test

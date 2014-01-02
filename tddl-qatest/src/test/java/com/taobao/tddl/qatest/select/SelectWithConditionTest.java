@@ -5,20 +5,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
-import com.taobao.tddl.qatest.util.Validator;
 
 /**
  * 带条件的选择查询
@@ -26,10 +24,8 @@ import com.taobao.tddl.qatest.util.Validator;
  * Author By: yaolingling.pt Created Date: 2012-2-21 上午11:30:18
  */
 @SuppressWarnings("unchecked")
-@RunWith(Parameterized.class)
+@RunWith(EclipseParameterized.class)
 public class SelectWithConditionTest extends BaseAndorTestCase {
-
-    Validator validator = new Validator();
 
     @Parameters(name = "{index}:table0={0},table1={1}")
     public static List<String[]> prepare() {
@@ -43,19 +39,8 @@ public class SelectWithConditionTest extends BaseAndorTestCase {
 
     @Before
     public void prepareDate() throws Exception {
-
-        validator.con = validator.getConnection();
-        validator.andorCon = us.getConnection();
-        // if(needPerparedData)
-        {
-            prepareData.normaltblPrepare(0, 20);
-            prepareData.studentPrepare(0, MAX_DATA_SIZE);
-        }
-    }
-
-    @After
-    public void clearDate() throws Exception {
-        validator.psConRcRsClose(rc, rs);
+        normaltblPrepare(0, 20);
+        studentPrepare(0, MAX_DATA_SIZE);
     }
 
     @Test

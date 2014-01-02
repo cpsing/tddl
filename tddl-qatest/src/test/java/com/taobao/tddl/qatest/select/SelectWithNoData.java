@@ -5,16 +5,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
 import com.taobao.tddl.qatest.util.Validator;
 
@@ -23,7 +21,7 @@ import com.taobao.tddl.qatest.util.Validator;
  * <p/>
  * Author By: zhuoxue.yll Created Date: 2012-11-12 下午05:26:41
  */
-@RunWith(Parameterized.class)
+@RunWith(EclipseParameterized.class)
 public class SelectWithNoData extends BaseAndorTestCase {
 
     Validator validator = new Validator();
@@ -42,15 +40,8 @@ public class SelectWithNoData extends BaseAndorTestCase {
 
     @Before
     public void prepareData() throws Exception {
-        validator.con = validator.getConnection();
-        validator.andorCon = us.getConnection();
-        prepareData.andorUpdateData("delete from  " + normaltblTableName, null);
-        prepareData.mysqlUpdateData("delete from  " + normaltblTableName, null);
-    }
-
-    @After
-    public void destory() throws Exception {
-        validator.psConRcRsClose(rc, rs);
+        andorUpdateData("delete from  " + normaltblTableName, null);
+        mysqlUpdateData("delete from  " + normaltblTableName, null);
     }
 
     @Test
@@ -129,7 +120,6 @@ public class SelectWithNoData extends BaseAndorTestCase {
     public void LimitWithStart() throws Exception {
         int start = 5;
         int limit = 6;
-        IRowSet pair = null;
         String sql = "SELECT * FROM " + normaltblTableName + " order by pk LIMIT " + start + "," + limit;
         String[] columnParam = { "name", "pk", "id" };
         selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);

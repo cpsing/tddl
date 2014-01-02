@@ -4,28 +4,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
-import com.taobao.tddl.qatest.util.Validator;
 
 /**
  * 在缓存情况下，执行计划是否正确
  * <p/>
  * Author By: zhuoxue.yll Created Date: 2012-9-17 上午11:14:23
  */
-@RunWith(Parameterized.class)
+@RunWith(EclipseParameterized.class)
 public class SelectCacheTest extends BaseAndorTestCase {
 
-    Validator validator   = new Validator();
-    String[]  columnParam = { "PK", "NAME", "ID", "gmt_create", "GMT_TIMESTAMP", "GMT_DATETIME", "floatCol" };
+    String[] columnParam = { "PK", "NAME", "ID", "gmt_create", "GMT_TIMESTAMP", "GMT_DATETIME", "floatCol" };
 
     @Parameters(name = "{index}:table1={0}")
     public static List<String[]> prepareData() {
@@ -38,14 +35,7 @@ public class SelectCacheTest extends BaseAndorTestCase {
 
     @Before
     public void prepareDate() throws Exception {
-        validator.con = validator.getConnection();
-        validator.andorCon = us.getConnection();
-        prepareData.normaltblPrepare(0, 20);
-    }
-
-    @After
-    public void destory() throws Exception {
-        validator.psConRcRsClose(rc, rs);
+        normaltblPrepare(0, 20);
     }
 
     /**

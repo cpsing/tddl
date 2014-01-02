@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -39,17 +38,9 @@ public class InsertTest extends BaseAndorTestCase {
 
     @Before
     public void initData() throws Exception {
-        con = getConnection();
-        andorCon = us.getConnection();
-
         andorUpdateData("delete from  " + normaltblTableName, null);
         mysqlUpdateData("delete from  " + normaltblTableName, null);
 
-    }
-
-    @After
-    public void clearData() throws Exception {
-        psConRcRsClose(rc, rs);
     }
 
     @Test

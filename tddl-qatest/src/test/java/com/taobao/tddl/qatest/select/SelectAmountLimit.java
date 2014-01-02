@@ -11,28 +11,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
-import com.taobao.tddl.qatest.util.Validator;
 
 /**
  * Comment for SelcetAmountLimit
  * <p/>
  * Author By: zhuoxue.yll Created Date: 2012-7-2 上午11:10:59
  */
-@RunWith(Parameterized.class)
+@RunWith(EclipseParameterized.class)
 public class SelectAmountLimit extends BaseAndorTestCase {
 
-    Validator         validator   = new Validator();
     private final int AMOUNT_DATA = 100;
     private final int thread_size = 5;
     long              pk          = 1l;
@@ -50,9 +47,6 @@ public class SelectAmountLimit extends BaseAndorTestCase {
 
     @Before
     public void MutilDataPrepare() throws SQLException {
-        validator.con = validator.getConnection();
-        validator.andorCon = us.getConnection();
-
         CountDownLatch latch = new CountDownLatch(thread_size);
         for (int i = 0; i < thread_size; i++) {
             Thread thread = new Thread(new InsertTask(latch), "Insert Task " + i);
@@ -62,11 +56,6 @@ public class SelectAmountLimit extends BaseAndorTestCase {
             latch.await();
         } catch (InterruptedException e) {
         }
-    }
-
-    @After
-    public void destory() throws Exception {
-        psConRcRsClose(rc, rs);
     }
 
     @Test

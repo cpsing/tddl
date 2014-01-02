@@ -4,30 +4,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
-import com.taobao.tddl.qatest.util.Validator;
 
 /**
  * 带条件的选择查询
  * <p/>
  * Author By: yaolingling.pt Created Date: 2012-3-15 下午04:30:18
  */
-@RunWith(Parameterized.class)
+@RunWith(EclipseParameterized.class)
 public class SelectWithOperatorTest extends BaseAndorTestCase {
 
-    Validator validator   = new Validator();
-    String[]  columnParam = { "PK", "NAME", "ID" };
+    String[] columnParam = { "PK", "NAME", "ID" };
 
     @Parameters(name = "{index}:table={0}")
     public static List<String[]> prepareData() {
@@ -40,14 +37,7 @@ public class SelectWithOperatorTest extends BaseAndorTestCase {
 
     @Before
     public void prepareDate() throws Exception {
-        validator.con = validator.getConnection();
-        validator.andorCon = us.getConnection();
-        prepareData.normaltblPrepare(0, 20);
-    }
-
-    @After
-    public void clearDate() throws Exception {
-        validator.psConRcRsClose(rc, rs);
+        normaltblPrepare(0, 20);
     }
 
     @Test

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -32,15 +31,8 @@ public class DeleteTest extends BaseAndorTestCase {
 
     @Before
     public void prepare() throws Exception {
-        con = getConnection();
-        andorCon = us.getConnection();
         andorUpdateData("delete from " + normaltblTableName, null);
-        prepareData.normaltblPrepare(0, 20);
-    }
-
-    @After
-    public void destory() throws Exception {
-        psConRcRsClose(rc, rs);
+        normaltblPrepare(0, 20);
     }
 
     @Test
@@ -95,10 +87,10 @@ public class DeleteTest extends BaseAndorTestCase {
         try {
             String sql = String.format("delete from %s where gmt_create < now()", normaltblTableName);
             executeCountAssert(sql, Collections.EMPTY_LIST);
-            prepareData.normaltblPrepare(0, 20);
+            normaltblPrepare(0, 20);
             sql = String.format("delete from %s where gmt_timestamp < now()", normaltblTableName);
             executeCountAssert(sql, Collections.EMPTY_LIST);
-            prepareData.normaltblPrepare(0, 20);
+            normaltblPrepare(0, 20);
             sql = String.format("delete from %s where gmt_datetime > now()", normaltblTableName);
             executeCountAssert(sql, Collections.EMPTY_LIST);
         } catch (Exception e) {

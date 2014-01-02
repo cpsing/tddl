@@ -1,10 +1,13 @@
 package com.taobao.tddl.qatest;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -18,11 +21,9 @@ import com.taobao.tddl.qatest.util.PrepareData;
  * <p/>
  * Author By: zhuoxue.yll Created Date: 2012-2-16 下午2:05:24
  */
-@SuppressWarnings("rawtypes")
-public class BaseAndorTestCase extends BaseTestCase {
+public class BaseAndorTestCase extends PrepareData {
 
     protected static final ExecutorService pool                    = Executors.newCachedThreadPool();
-    protected static PrepareData           prepareData             = new PrepareData();
     private static String                  ruleFile                = "V0#classpath:client/";
     private static String                  rule                    = "rule.xml";
 
@@ -52,6 +53,17 @@ public class BaseAndorTestCase extends BaseTestCase {
                 JDBCClient(dbType, false);
             }
         }
+    }
+
+    @Before
+    public void prepareConnection() throws SQLException {
+        con = getConnection();
+        andorCon = us.getConnection();
+    }
+
+    @After
+    public void clearDate() throws Exception {
+        psConRcRsClose(rc, rs);
     }
 
     public static void JDBCClient(String dbType) throws Exception {

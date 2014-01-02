@@ -49,10 +49,10 @@ public class BaseTestCase extends Validator {
     protected static String           hostgroup_info;
     protected static String           module_info;
     protected static String           module_host;
-
-    public static TDataSource         us;
-    protected static ResultSet        rc            = null;
-    protected static ResultSet        rs            = null;
+    // datasource为static，一个测试类只启动一次
+    protected static TDataSource      us;
+    protected ResultSet               rc            = null;
+    protected ResultSet               rs            = null;
 
     protected final NumberFormat      nf            = new DecimalFormat("#.#");
     protected String                  timeString    = DateUtil.formatDate(new Date(), DateUtil.DATE_FULLHYPHEN);

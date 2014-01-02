@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,14 +30,7 @@ public class UpdateTest extends BaseAndorTestCase {
 
     @Before
     public void prepare() throws Exception {
-        con = getConnection();
-        andorCon = us.getConnection();
-        prepareData.normaltblPrepare(0, 20);
-    }
-
-    @After
-    public void destory() throws Exception {
-        psConRcRsClose(rc, rs);
+        normaltblPrepare(0, 20);
     }
 
     @Test

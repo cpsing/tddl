@@ -9,27 +9,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
-import com.taobao.tddl.qatest.util.Validator;
 
 /**
  * Comment for SelcetAmountLimit
  * <p/>
  * Author By: zhuoxue.yll Created Date: 2012-7-2 上午11:10:59
  */
-@RunWith(Parameterized.class)
+@RunWith(EclipseParameterized.class)
 public class SelectMinusTest extends BaseAndorTestCase {
-
-    Validator validator = new Validator();
 
     @Parameters(name = "{index}:table={0}")
     public static List<String[]> prepareData() {
@@ -42,14 +38,7 @@ public class SelectMinusTest extends BaseAndorTestCase {
 
     @Before
     public void MutilDataPrepare() throws Exception {
-        validator.con = validator.getConnection();
-        validator.andorCon = us.getConnection();
-        prepareData.normaltblPrepare(-10, 20);
-    }
-
-    @After
-    public void destory() throws Exception {
-        psConRcRsClose(rc, rs);
+        normaltblPrepare(-10, 20);
     }
 
     @Test

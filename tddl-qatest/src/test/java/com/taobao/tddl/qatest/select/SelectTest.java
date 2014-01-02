@@ -16,23 +16,20 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
-import com.taobao.tddl.qatest.util.Validator;
 
 /**
  * Comment for LocalServerSelectTest
  * <p/>
  * Author By: yaolingling.pt Created Date: 2012-2-17 上午11:30:55
  */
-@RunWith(Parameterized.class)
+@RunWith(EclipseParameterized.class)
 public class SelectTest extends BaseAndorTestCase {
-
-    Validator validator = new Validator();
 
     @Parameters(name = "{index}:table={0}")
     public static List<String[]> prepare() {
@@ -45,15 +42,8 @@ public class SelectTest extends BaseAndorTestCase {
 
     @Before
     public void initData() throws Exception {
-        validator.con = validator.getConnection();
-        validator.andorCon = us.getConnection();
         andorUpdateData("delete from  " + studentTableName, null);
         mysqlUpdateData("delete from  " + studentTableName, null);
-    }
-
-    @After
-    public void clearData() throws Exception {
-        prepareData.psConRcRsClose(rc, rs);
     }
 
     @Test

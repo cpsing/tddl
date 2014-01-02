@@ -5,29 +5,26 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
-import com.taobao.tddl.qatest.util.Validator;
 
 /**
  * Comment for AliasTest
  * <p/>
  * Author By: zhuoxue.yll Created Date: 2012-3-14 上午11:18:55
  */
-@RunWith(Parameterized.class)
+@RunWith(EclipseParameterized.class)
 public class SelectAliasTest extends BaseAndorTestCase {
 
-    Validator validator = new Validator();
-    long      pk        = 1l;
-    int       id        = 1;
+    long pk = 1l;
+    int  id = 1;
 
     @Parameters(name = "{index}:table0={0},table1={1}")
     public static List<String[]> prepare() {
@@ -41,16 +38,8 @@ public class SelectAliasTest extends BaseAndorTestCase {
 
     @Before
     public void prepareData() throws Exception {
-        validator.con = validator.getConnection();
-        validator.andorCon = us.getConnection();
-
-        prepareData.normaltblPrepare(0, MAX_DATA_SIZE);
-        prepareData.studentPrepare(0, MAX_DATA_SIZE);
-    }
-
-    @After
-    public void clearDate() throws Exception {
-        validator.psConRcRsClose(rc, rs);
+        normaltblPrepare(0, MAX_DATA_SIZE);
+        studentPrepare(0, MAX_DATA_SIZE);
     }
 
     @Test
@@ -60,7 +49,7 @@ public class SelectAliasTest extends BaseAndorTestCase {
         List<Object> param = new ArrayList<Object>();
         param.add(pk);
         String[] columnParam = { "PK", "NAME", "ID" };
-        validator.assertAlias(sql, columnParam, "nor", param);
+        assertAlias(sql, columnParam, "nor", param);
     }
 
     @Test
@@ -127,7 +116,7 @@ public class SelectAliasTest extends BaseAndorTestCase {
         String sql = "select n.name,s.name studentName,n.pk,s.id from  " + normaltblTableName + "  n , "
                      + studentTableName + "  s where n.pk=s.id";
         String[] columnParam = { "name", "studentName", "pk", "id" };
-        validator.selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
+        selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
 
         sql = "select n.name,s.name studentName,n.pk,s.id from  " + normaltblTableName + "  as n , " + studentTableName
               + "  AS s where n.pk=s.id";

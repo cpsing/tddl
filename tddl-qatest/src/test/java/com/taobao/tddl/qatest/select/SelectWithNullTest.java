@@ -4,26 +4,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
-import com.taobao.tddl.qatest.util.Validator;
 
 /**
  * @author zhuoxue.yll 2013.01.23
  */
-@RunWith(Parameterized.class)
+@RunWith(EclipseParameterized.class)
 public class SelectWithNullTest extends BaseAndorTestCase {
 
-    Validator validator   = new Validator();
-    String[]  columnParam = { "PK", "NAME", "ID" };
+    String[] columnParam = { "PK", "NAME", "ID" };
 
     @Parameters(name = "{index}:table={0}")
     public static List<String[]> prepareData() {
@@ -36,14 +33,7 @@ public class SelectWithNullTest extends BaseAndorTestCase {
 
     @Before
     public void prepareDate() throws Exception {
-        validator.con = validator.getConnection();
-        validator.andorCon = us.getConnection();
-        prepareData.normaltblNullPrepare(0, 20);
-    }
-
-    @After
-    public void clearDate() throws Exception {
-        validator.psConRcRsClose(rc, rs);
+        normaltblNullPrepare(0, 20);
     }
 
     @Test
