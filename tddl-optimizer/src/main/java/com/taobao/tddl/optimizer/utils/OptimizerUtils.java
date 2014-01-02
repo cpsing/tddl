@@ -248,7 +248,7 @@ public class OptimizerUtils {
                 if (arg instanceof IColumn) {
                     setColumn((IColumn) arg, tableName);
                 } else if (arg instanceof IFilter) {
-                    setFilter((IFilter) f, tableName);
+                    setFilter((IFilter) arg, tableName);
                 } else if (arg instanceof IFunction) {
                     setFunction((IFunction) arg, tableName);
                 }

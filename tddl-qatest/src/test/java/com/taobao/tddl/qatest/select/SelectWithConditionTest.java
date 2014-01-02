@@ -23,7 +23,6 @@ import com.taobao.tddl.qatest.util.ExecuteTableName;
  * <p/>
  * Author By: yaolingling.pt Created Date: 2012-2-21 上午11:30:18
  */
-@SuppressWarnings("unchecked")
 @RunWith(EclipseParameterized.class)
 public class SelectWithConditionTest extends BaseAndorTestCase {
 
