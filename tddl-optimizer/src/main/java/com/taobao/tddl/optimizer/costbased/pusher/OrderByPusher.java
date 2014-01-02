@@ -39,16 +39,21 @@ import com.taobao.tddl.optimizer.exceptions.OptimizerException;
  *  优化：下推c3
  * 
  * 2. 
- *  父节点：order by c2 ,c3  (顺序不一致，下推也没效果，反而增加负担)
- *  子节点: order by c1, c2
+ *  父节点：order by c2 ,c3  (顺序不一致，强制下推)
+ *  子节点: order by c2, c3，无limit
+ *  优化：不下推
+ *  
+ * 3.
+ *  父节点：order by c2 ,c3  (顺序不一致，因为子节点存在limit，不可下推order by)
+ *  子节点: order by c2, c3，存在limit
  *  优化：不下推
  * 
- * 3. 
+ * 4. 
  *  父节点：order by c1, c2 ,c3
  *  子节点: 无
  *  优化：下推c1,c2,c3
  * 
- * 4. 
+ * 5. 
  *  父节点：order by count(*)  (函数不下推)
  *  子节点: 无
  *  优化：不下推
@@ -167,7 +172,7 @@ public class OrderByPusher {
             JoinNode join = (JoinNode) qtn;
             if (join.getJoinStrategy() == JoinStrategy.INDEX_NEST_LOOP
                 || join.getJoinStrategy() == JoinStrategy.NEST_LOOP_JOIN) {
-                List<IOrderBy> orders = getPushOrderBys(join, join.getImplicitOrderBys(), join.getLeftNode());
+                List<IOrderBy> orders = getPushOrderBys(join, join.getImplicitOrderBys(), join.getLeftNode(), true);
                 pushJoinOrder(orders, join.getLeftNode(), join.isUedForIndexJoinPK());
             } else if (join.getJoinStrategy() == JoinStrategy.SORT_MERGE_JOIN) {
                 // 如果是sort merge join中的order by，需要推到左/右节点
@@ -211,15 +216,16 @@ public class OrderByPusher {
                 adjustJoinColumnByImplicitOrders(leftJoinColumnOrderbys, rightJoinColumnOrderbys, implicitOrders);
                 // 先推join列，
                 // 如果join列推失败了，比如join列是函数列，这问题就蛋疼了，需要提前做判断
-                List<IOrderBy> leftOrders = getPushOrderBys(join, leftJoinColumnOrderbys, join.getLeftNode());
+                List<IOrderBy> leftOrders = getPushOrderBys(join, leftJoinColumnOrderbys, join.getLeftNode(), true);
                 pushJoinOrder(leftOrders, join.getLeftNode(), join.isUedForIndexJoinPK());
 
-                List<IOrderBy> rightOrders = getPushOrderBys(join, rightJoinColumnOrderbys, join.getRightNode());
+                List<IOrderBy> rightOrders = getPushOrderBys(join, rightJoinColumnOrderbys, join.getRightNode(), true);
                 pushJoinOrder(rightOrders, join.getRightNode(), join.isUedForIndexJoinPK());
                 if (!implicitOrders.isEmpty()) {
                     // group by + order by的隐藏列，如果和join列前缀相同，则下推，否则忽略
-                    leftOrders = getPushOrderBys(join, implicitOrders, join.getLeftNode());
-                    rightOrders = getPushOrderBys(join, implicitOrders, join.getRightNode());
+                    // 已经推了一次join column，这里不能再强推了
+                    leftOrders = getPushOrderBys(join, implicitOrders, join.getLeftNode(), false);
+                    rightOrders = getPushOrderBys(join, implicitOrders, join.getRightNode(), false);
                     if (!leftOrders.isEmpty() || !rightOrders.isEmpty()) {
                         pushJoinOrder(leftOrders, join.getLeftNode(), join.isUedForIndexJoinPK());
                         pushJoinOrder(rightOrders, join.getRightNode(), join.isUedForIndexJoinPK());
@@ -228,8 +234,6 @@ public class OrderByPusher {
                         if (join.getGroupBys() != null && !join.getGroupBys().isEmpty()) {
                             List<IOrderBy> leftImplicitOrders = getPushOrderBysCombileGroupAndJoinColumns(join.getGroupBys(),
                                 leftJoinColumnOrderbys);
-                            leftOrders = getPushOrderBys(join, leftImplicitOrders, join.getLeftNode());
-
                             List<IOrderBy> rightImplicitOrders = getPushOrderBysCombileGroupAndJoinColumns(join.getGroupBys(),
                                 rightJoinColumnOrderbys);
 
@@ -240,7 +244,8 @@ public class OrderByPusher {
                                 join.setGroupBys(rightImplicitOrders);
                             }
 
-                            rightOrders = getPushOrderBys(join, rightImplicitOrders, join.getRightNode());
+                            leftOrders = getPushOrderBys(join, leftImplicitOrders, join.getLeftNode(), false);
+                            rightOrders = getPushOrderBys(join, rightImplicitOrders, join.getRightNode(), false);
                             if (!leftOrders.isEmpty() || !rightOrders.isEmpty()) {
                                 pushJoinOrder(leftOrders, join.getLeftNode(), join.isUedForIndexJoinPK());
                                 pushJoinOrder(rightOrders, join.getRightNode(), join.isUedForIndexJoinPK());
@@ -254,7 +259,7 @@ public class OrderByPusher {
         } else if (qtn instanceof QueryNode) {
             // 可以将order推到子查询
             QueryNode query = (QueryNode) qtn;
-            List<IOrderBy> orders = getPushOrderBys(query, query.getImplicitOrderBys(), query.getChild());
+            List<IOrderBy> orders = getPushOrderBys(query, query.getImplicitOrderBys(), query.getChild(), true);
             if (orders != null && !orders.isEmpty()) {
                 for (IOrderBy order : orders) {
                     query.getChild().orderBy(order.getColumn(), order.getDirection());
@@ -369,18 +374,24 @@ public class OrderByPusher {
      * 返回为c3
      * 
      * 2. 
-     *  父节点：order by c2 ,c3  (顺序不一致，下推也没效果，反而增加负担)
-     *  子节点: order by c1, c2
+     *  父节点：order by c2 ,c3 
+     *  子节点: order by c1, c2，不存在limit
+     *  
+     * 返回为c2,c3
+     * 
+     * 3. 
+     *  父节点：order by c2 ,c3 
+     *  子节点: order by c1, c2，存在limit
      *  
      * 返回为空
      * 
-     * 3. 
+     * 4. 
      *  父节点：order by c1, c2 ,c3
      *  子节点: 无
      *  
      * 返回为c1,c2,c3
      * 
-     * 4. 
+     * 5. 
      *  父节点：order by count(*)  (函数不下推)
      *  子节点: 无
      * 
@@ -388,7 +399,7 @@ public class OrderByPusher {
      * </pre>
      */
     private static List<IOrderBy> getPushOrderBys(QueryTreeNode qtn, List<IOrderBy> implicitOrderBys,
-                                                  QueryTreeNode child) {
+                                                  QueryTreeNode child, boolean forcePush) {
         List<IOrderBy> newOrderBys = new LinkedList<IOrderBy>();
         List<IOrderBy> targetOrderBys = child.getOrderBys();
         if (implicitOrderBys == null || implicitOrderBys.size() == 0) {
@@ -409,18 +420,32 @@ public class OrderByPusher {
                 return new LinkedList<IOrderBy>();
             }
 
-            if (targetOrderBys != null && targetOrderBys.size() > i) {
-                IOrderBy targetOrder = targetOrderBys.get(i);
-                if (!(column.equals(targetOrder.getColumn()) && order.getDirection().equals(targetOrder.getDirection()))) {// 如果不相同
-                    return new LinkedList<IOrderBy>();
+            forcePush &= (child.getLimitFrom() == null && child.getLimitTo() == null);
+            if (!forcePush) {
+                // 如果非强制下推，判断一下orderby顺序
+                if (targetOrderBys != null && targetOrderBys.size() > i) {
+                    IOrderBy targetOrder = targetOrderBys.get(i);
+                    if (!(column.equals(targetOrder.getColumn()) && order.getDirection()
+                        .equals(targetOrder.getDirection()))) {
+                        // 如果不相同
+                        return new LinkedList<IOrderBy>();
+                    }
+                } else {
+                    // 如果出现父类的长度>子类
+                    IOrderBy newOrder = order.copy().setColumn(column.copy().setAlias(null));
+                    newOrderBys.add(newOrder);
                 }
             } else {
-                // 如果出现父类的长度>子类
+                // 直接复制
                 IOrderBy newOrder = order.copy().setColumn(column.copy().setAlias(null));
                 newOrderBys.add(newOrder);
             }
         }
 
+        if (!newOrderBys.isEmpty() && forcePush) {
+            // 干掉子节点原本的order by
+            child.setOrderBys(new LinkedList<IOrderBy>());
+        }
         return newOrderBys;
     }
 

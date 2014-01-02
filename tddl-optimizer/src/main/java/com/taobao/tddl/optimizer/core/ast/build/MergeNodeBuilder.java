@@ -32,6 +32,7 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
         for (ASTNode sub : this.getNode().getChildren()) {
             sub.build();
         }
+
         if (!(this.getNode().getChild() instanceof QueryTreeNode)) {
             return;
         }
@@ -44,6 +45,7 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
         this.buildHaving();
         this.buildLimit();
         this.buildFunction();
+        this.buildExistAggregate();
     }
 
     /**

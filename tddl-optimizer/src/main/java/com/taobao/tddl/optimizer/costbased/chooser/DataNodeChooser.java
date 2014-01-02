@@ -96,12 +96,13 @@ public class DataNodeChooser {
             QueryNode query = (QueryNode) qtn;
             QueryTreeNode child = query.getChild();
             child = shardQuery(child, parameterSettings, extraCmd);
-            if (child instanceof MergeNode) {
+            if (child instanceof MergeNode && !child.isExistAggregate()) {
                 return buildMergeQuery(query, (MergeNode) child);
             } else {
                 query.setChild(child);
                 query.setBroadcast(child.isBroadcast());// 传递一下
                 query.executeOn(child.getDataNode());
+                query.setExistAggregate(child.isExistAggregate());
                 return query;
             }
         } else if (qtn instanceof TableNode) {
@@ -739,6 +740,9 @@ public class DataNodeChooser {
             return join;// 两个广播表之间的join，直接返回
         } else if (leftBroadCast) {// 左边是广播表
             for (QueryTreeNode r : rights) {
+                if (r.isExistAggregate()) {// 存在聚合计算，不能展开
+                    return null;
+                }
                 JoinNode newj = join.copy();
                 QueryTreeNode newL = left.copy();
                 setExecuteOn(newL, r.getDataNode());// 广播表的执行节点跟着右边走
@@ -750,6 +754,9 @@ public class DataNodeChooser {
             }
         } else if (rightBroadCast) {
             for (QueryTreeNode l : lefts) {
+                if (l.isExistAggregate()) {// 存在聚合计算，不能展开
+                    return null;
+                }
                 QueryTreeNode newR = right.copy();
                 setExecuteOn(newR, l.getDataNode());// 广播表的执行节点跟着右边走
                 JoinNode newj = join.copy();
@@ -765,6 +772,10 @@ public class DataNodeChooser {
                 QueryTreeNode l = leftIdentifierExtras.get(r.getExtra());
                 if (l == null) {
                     return null; // 转化失败，直接退回merge join merge的处理
+                }
+
+                if (l.isExistAggregate() || r.isExistAggregate()) {// 存在聚合计算，不能展开
+                    return null;
                 }
 
                 JoinNode newj = join.copy();

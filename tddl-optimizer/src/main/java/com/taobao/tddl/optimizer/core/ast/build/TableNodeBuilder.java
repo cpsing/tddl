@@ -30,7 +30,7 @@ public class TableNodeBuilder extends QueryTreeNodeBuilder {
         this.buildGroupBy();
         this.buildOrderBy();
         this.buildHaving();
-
+        this.buildExistAggregate();
     }
 
     public TableNode getNode() {

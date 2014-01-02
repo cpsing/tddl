@@ -33,6 +33,7 @@ public class KVIndexNodeBuilder extends QueryTreeNodeBuilder {
         this.buildGroupBy();
         this.buildOrderBy();
         this.buildWhere();
+        this.buildExistAggregate();
     }
 
     /**

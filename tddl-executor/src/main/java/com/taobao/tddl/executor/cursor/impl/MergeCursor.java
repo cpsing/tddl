@@ -127,7 +127,6 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
     public List<TddlException> close(List<TddlException> exs) {
         exs.addAll(exceptionsWhenCloseSubCursor);
         TddlException e = null;
-
         for (ISchematicCursor _cursor : cursors) {
             exs = _cursor.close(exs);
         }

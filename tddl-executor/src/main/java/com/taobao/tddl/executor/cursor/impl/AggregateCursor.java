@@ -9,8 +9,6 @@ import java.util.Map.Entry;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.cursor.IAggregateCursor;
 import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -25,6 +23,9 @@ import com.taobao.tddl.optimizer.core.expression.IFunction.FunctionType;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * 用来计算聚合函数，group by
@@ -134,12 +135,10 @@ public class AggregateCursor extends SchematicCursor implements IAggregateCursor
                 }
                 for (IFunction aggregate : aggregates) {
                     if (this.isMerge() && !aggregate.isNeedDistinctArg()) {
-
                         ((ExtraFunction) aggregate.getExtraFunction()).serverReduce(kv);
                         // aggregate.serverReduce(kv);
                     } else {
                         ((ExtraFunction) aggregate.getExtraFunction()).serverMap(kv);
-
                     }
                 }
             } while ((kv = super.next()) != null);

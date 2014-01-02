@@ -45,6 +45,8 @@ public class QueryNodeBuilder extends QueryTreeNodeBuilder {
         if (this.getNode().getDataNode() == null) {
             this.getNode().executeOn(this.getNode().getChild().getDataNode());
         }
+
+        this.buildExistAggregate();
     }
 
     private void buildAlias() {

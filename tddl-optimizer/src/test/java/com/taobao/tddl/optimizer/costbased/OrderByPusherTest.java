@@ -34,11 +34,31 @@ public class OrderByPusherTest extends BaseOptimizerTest {
     }
 
     @Test
-    public void test_order条件下推_子表_case2_不下推() {
+    public void test_order条件下推_子表_case2_强制下推() {
         TableNode table1 = new TableNode("TABLE1");
         table1.alias("A");
         table1.orderBy("ID");
         table1.orderBy("NAME");
+
+        QueryNode query = new QueryNode(table1);
+        query.orderBy("A.NAME");
+        query.orderBy("A.SCHOOL");
+        query.build();
+
+        OrderByPusher.optimize(query);
+
+        Assert.assertEquals(2, table1.getOrderBys().size());
+        Assert.assertEquals("TABLE1.NAME", table1.getOrderBys().get(0).getColumn().toString());
+        Assert.assertEquals("TABLE1.SCHOOL", table1.getOrderBys().get(1).getColumn().toString());
+    }
+
+    @Test
+    public void test_order条件下推_子表_case3_不下推() {
+        TableNode table1 = new TableNode("TABLE1");
+        table1.alias("A");
+        table1.orderBy("ID");
+        table1.orderBy("NAME");
+        table1.limit(0, 10);
 
         QueryNode query = new QueryNode(table1);
         query.orderBy("A.NAME");
@@ -53,7 +73,7 @@ public class OrderByPusherTest extends BaseOptimizerTest {
     }
 
     @Test
-    public void test_order条件下推_子表_case3_下推IDNAME() {
+    public void test_order条件下推_子表_case4_下推IDNAME() {
         TableNode table1 = new TableNode("TABLE1");
         table1.alias("A");
 
@@ -70,7 +90,7 @@ public class OrderByPusherTest extends BaseOptimizerTest {
     }
 
     @Test
-    public void test_order条件下推_子表_case4_不下推函数() {
+    public void test_order条件下推_子表_case5_不下推函数() {
         TableNode table1 = new TableNode("TABLE1");
         table1.alias("A");
 
@@ -107,7 +127,7 @@ public class OrderByPusherTest extends BaseOptimizerTest {
     }
 
     @Test
-    public void test_join条件下推_子表_case2_不下推() {
+    public void test_join条件下推_子表_case2_强制下推() {
         TableNode table1 = new TableNode("TABLE1");
         TableNode table2 = new TableNode("TABLE2");
         table1.alias("A");
@@ -124,12 +144,37 @@ public class OrderByPusherTest extends BaseOptimizerTest {
         OrderByPusher.optimize(join);
 
         Assert.assertEquals(2, table1.getOrderBys().size());
-        Assert.assertEquals("TABLE1.ID", table1.getOrderBys().get(0).getColumn().toString());
-        Assert.assertEquals("TABLE1.NAME", table1.getOrderBys().get(1).getColumn().toString());
+        Assert.assertEquals("TABLE1.NAME", table1.getOrderBys().get(0).getColumn().toString());
+        Assert.assertEquals("TABLE1.SCHOOL", table1.getOrderBys().get(1).getColumn().toString());
     }
 
     @Test
-    public void test_join条件下推_子表_case3_下推IDNAME() {
+    public void test_join条件下推_子表_case3_不下推() {
+        TableNode table1 = new TableNode("TABLE1");
+        TableNode table2 = new TableNode("TABLE2");
+        table1.alias("A");
+        QueryNode query = new QueryNode(table1);
+        query.orderBy("ID");
+        query.orderBy("NAME");
+        query.limit(0, 10);
+
+        table2.alias("B");
+
+        JoinNode join = query.join(table2);
+        join.setJoinStrategy(JoinStrategy.INDEX_NEST_LOOP);
+        join.orderBy("A.NAME");
+        join.orderBy("A.SCHOOL");
+        join.build();
+
+        OrderByPusher.optimize(join);
+
+        Assert.assertEquals(2, query.getOrderBys().size());
+        Assert.assertEquals("A.ID", query.getOrderBys().get(0).getColumn().toString());
+        Assert.assertEquals("A.NAME", query.getOrderBys().get(1).getColumn().toString());
+    }
+
+    @Test
+    public void test_join条件下推_子表_case4_下推IDNAME() {
         TableNode table1 = new TableNode("TABLE1");
         TableNode table2 = new TableNode("TABLE2");
         table1.alias("A");
@@ -149,7 +194,7 @@ public class OrderByPusherTest extends BaseOptimizerTest {
     }
 
     @Test
-    public void test_join条件下推_子表_case4_函数不下推() {
+    public void test_join条件下推_子表_case5_函数不下推() {
         TableNode table1 = new TableNode("TABLE1");
         TableNode table2 = new TableNode("TABLE2");
         table1.alias("A");
