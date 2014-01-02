@@ -4,17 +4,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseAndorTestCase;
-import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
 
-@Ignore("暂时还未支持好")
 @RunWith(EclipseParameterized.class)
 public class SelectSubQueryTest extends BaseAndorTestCase {
 
@@ -26,12 +23,13 @@ public class SelectSubQueryTest extends BaseAndorTestCase {
         return Arrays.asList(ExecuteTableName.hostinfoHostgoupStudentModuleinfoModulehostTable(dbType));
     }
 
-    public SelectSubQueryTest(String monitor_host_infoTableName, String monitor_hostgroup_infoTableName,
-                              String monitor_module_infoTableName){
-        BaseTestCase.host_info = monitor_host_infoTableName;
-        BaseTestCase.hostgroup = monitor_hostgroup_infoTableName;
-        BaseTestCase.module_info = monitor_module_infoTableName;
-    }
+    // public SelectSubQueryTest(String monitor_host_infoTableName, String
+    // monitor_hostgroup_infoTableName,
+    // String monitor_module_infoTableName){
+    // BaseTestCase.host_info = monitor_host_infoTableName;
+    // BaseTestCase.hostgroup = monitor_hostgroup_infoTableName;
+    // BaseTestCase.module_info = monitor_module_infoTableName;
+    // }
 
     public SelectSubQueryTest(String monitor_host_infoTableName, String monitor_hostgroup_infoTableName,
                               String studentTableName, String monitor_module_infoTableName,

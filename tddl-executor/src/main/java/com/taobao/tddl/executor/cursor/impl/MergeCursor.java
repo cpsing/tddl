@@ -8,6 +8,8 @@ import java.util.Map.Entry;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.codec.CodecFactory;
 import com.taobao.tddl.executor.codec.RecordCodec;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
@@ -34,16 +36,13 @@ import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
 
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
-
 /**
  * @author mengshi.sunmengshi 2013-12-19 下午12:18:29
  * @since 5.1.0
  */
 public class MergeCursor extends SchematicCursor implements IMergeCursor {
 
-    private Logger                         logger                       = LoggerFactory.getLogger(MergeCursor.class);
+    private final Logger                   logger                       = LoggerFactory.getLogger(MergeCursor.class);
     protected List<ISchematicCursor>       cursors;
     protected int                          sizeLimination               = 10000;
     protected final IDataNodeExecutor      currentExecotor;
@@ -140,6 +139,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
         return super.skipTo(key);
     }
 
+    @Override
     public List<ISchematicCursor> getISchematicCursors() {
         return cursors;
     }
@@ -227,6 +227,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
 
                 ExecutionContext tempContext = new ExecutionContext();
                 tempContext.setCurrentRepository(executionContext.getCurrentRepository());
+                tempContext.setExecutorService(executionContext.getExecutorService());
                 cursor = ExecutorContext.getContext().getTopologyExecutor().execByExecPlanNode(idne, tempContext);
                 // 用于关闭，统一管理
                 this.returnColumns = cursor.getReturnColumns();
@@ -270,7 +271,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
         IColumn col = ExecUtils.getIColumn(icol);
         while ((kvPair = cursor.next()) != null) {
             kvPair = ExecUtils.fromIRowSetToArrayRowSet(kvPair);
-            Object v = ExecUtils.getValueByIColumn(kvPair, (IColumn) icol);
+            Object v = ExecUtils.getValueByIColumn(kvPair, icol);
 
             CloneableRecord key = codec.newEmptyRecord();
             key.put(col.getColumnName(), v);

@@ -1,5 +1,6 @@
 package com.taobao.tddl.optimizer.costbased.after;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
@@ -34,6 +35,26 @@ public class LimitOptimizer implements QueryPlanOptimizer {
     }
 
     void findMergeAndOptimizerLimit(IDataNodeExecutor dne) {
+
+        if (dne instanceof IQueryTree) {
+            IQueryTree q = (IQueryTree) dne;
+
+            if (q.getLimitFrom() instanceof Integer) {
+                q.setLimitFrom(new Long((Integer) q.getLimitFrom()));
+            }
+
+            if (q.getLimitFrom() instanceof BigDecimal) {
+                q.setLimitFrom(new Long(((BigDecimal) q.getLimitFrom()).longValue()));
+            }
+
+            if (q.getLimitTo() instanceof Integer) {
+                q.setLimitTo(new Long((Integer) q.getLimitTo()));
+            }
+            if (q.getLimitTo() instanceof BigDecimal) {
+                q.setLimitTo(new Long(((BigDecimal) q.getLimitTo()).longValue()));
+            }
+        }
+
         if (dne instanceof IMerge) {
             Comparable from = ((IMerge) dne).getLimitFrom();
             Comparable to = ((IMerge) dne).getLimitTo();
@@ -46,10 +67,11 @@ public class LimitOptimizer implements QueryPlanOptimizer {
                             ((IQueryTree) child).setLimitTo((Long) from + (Long) to);
                         }
 
-                        this.findMergeAndOptimizerLimit(child);
                     }
                 }
             }
+            for (IDataNodeExecutor child : ((IMerge) dne).getSubNode())
+                this.findMergeAndOptimizerLimit(child);
         }
 
         if (dne instanceof IJoin) {

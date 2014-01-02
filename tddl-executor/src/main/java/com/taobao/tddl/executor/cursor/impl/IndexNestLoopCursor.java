@@ -4,13 +4,14 @@ import java.util.List;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.executor.codec.CodecFactory;
 import com.taobao.tddl.executor.codec.RecordCodec;
 import com.taobao.tddl.executor.cursor.IIndexNestLoopCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.utils.ExecUtils;
-import com.taobao.tddl.optimizer.core.expression.IColumn;
+import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 
 /**
@@ -33,7 +34,7 @@ public class IndexNestLoopCursor extends JoinSchematicCursor implements IIndexNe
     protected List<IOrderBy>    orderBys;
     protected ISchematicCursor  dup_cursor;
     protected CloneableRecord   right_key;
-    protected RecordCodec       rightCodec;
+    protected RecordCodec       rightJoinOnColumnCodec;
     protected CloneableRecord   left_key;
 
     public IndexNestLoopCursor(ISchematicCursor leftCursor, ISchematicCursor rightCursor, List leftJoinOnColumns,
@@ -43,6 +44,13 @@ public class IndexNestLoopCursor extends JoinSchematicCursor implements IIndexNe
         super(leftCursor, rightCursor, leftJoinOnColumns, rightJoinOnColumns);
         this.right_prefix = prefix;
         this.orderBys = leftCursor.getOrderBy();
+
+        this.left_cursor = leftCursor;
+        this.right_cursor = rightCursor;
+
+        List<ColumnMeta> colMetas = ExecUtils.convertIColumnsToColumnMeta(rightJoinOnColumns);
+        rightJoinOnColumnCodec = CodecFactory.getInstance(CodecFactory.FIXED_LENGTH).getCodec(colMetas);
+        this.right_key = rightJoinOnColumnCodec.newEmptyRecord();
     }
 
     /**
@@ -159,10 +167,10 @@ public class IndexNestLoopCursor extends JoinSchematicCursor implements IIndexNe
      * 将左面的Join on columns找到。 放到右边key这个对象里。
      */
     protected void putLeftCursorValueIntoReturnVal() {
-        right_key = rightCodec.newEmptyRecord();
+        right_key = rightJoinOnColumnCodec.newEmptyRecord();
         for (int k = 0; k < leftJoinOnColumns.size(); k++) {
 
-            Object v = ExecUtils.getValueByIColumn(left, (IColumn) leftJoinOnColumns.get(k));
+            Object v = ExecUtils.getValueByIColumn(left, leftJoinOnColumns.get(k));
 
             right_key.put(ExecUtils.getColumn(rightJoinOnColumns.get(k)).getColumnName(), v);
         }
