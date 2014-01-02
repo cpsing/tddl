@@ -9,9 +9,11 @@ import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
+import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.expression.bean.BindVal;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.query.IParallelizableQueryTree;
+import com.taobao.tddl.optimizer.utils.OptimizerUtils;
 
 public abstract class QueryTree extends DataNodeExecutor<IQueryTree> implements IParallelizableQueryTree<IQueryTree> {
 
@@ -181,17 +183,15 @@ public abstract class QueryTree extends DataNodeExecutor<IQueryTree> implements 
         }
 
         Comparable limtFrom = getLimitFrom();
-        if (limtFrom != null) {
-            if (limtFrom instanceof BindVal) {
-                this.setLimitFrom(((BindVal) limtFrom).assignment(parameterSettings));
-            }
+        if (limtFrom != null && limtFrom instanceof BindVal) {
+            Comparable value = ((BindVal) limtFrom).assignment(parameterSettings);
+            this.setLimitFrom(OptimizerUtils.convertType(value, DATA_TYPE.LONG_VAL));// 强制转化为long类型
         }
 
         Comparable limtTo = getLimitTo();
-        if (limtTo != null) {
-            if (limtTo instanceof BindVal) {
-                this.setLimitTo(((BindVal) limtTo).assignment(parameterSettings));
-            }
+        if (limtTo != null && limtTo instanceof BindVal) {
+            Comparable value = ((BindVal) limtTo).assignment(parameterSettings);
+            this.setLimitTo(OptimizerUtils.convertType(value, DATA_TYPE.LONG_VAL)); // 强制转化为long类型
         }
         return this;
     }
