@@ -8,6 +8,7 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.DBType;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.model.lifecycle.Lifecycle;
+import com.taobao.tddl.rule.exceptions.TddlRuleException;
 import com.taobao.tddl.rule.utils.RuleUtils;
 
 import com.taobao.tddl.common.utils.logger.Logger;
@@ -29,21 +30,13 @@ public class VirtualTableRoot extends AbstractLifecycle implements Lifecycle {
     protected String                            defaultDbIndex;
     protected boolean                           needIdInGroup    = false;
     protected boolean                           completeDistinct = false;
+    protected boolean                           lazyInit         = false;
 
     public void init() throws TddlException {
         for (Map.Entry<String, TableRule> entry : virtualTableMap.entrySet()) {
-            logger.warn("virtual table start to init :" + entry.getKey());
-            TableRule vtab = entry.getValue();
-            if (vtab.getDbType() == null) {
-                // 如果虚拟表中dbType为null,那指定全局dbType
-                vtab.setDbType(this.getDbTypeEnumObj());
+            if (!lazyInit) {
+                initTableRule(entry.getKey(), entry.getValue());
             }
-
-            if (vtab.getVirtualTbName() == null) {
-                vtab.setVirtualTbName(entry.getKey());
-            }
-            vtab.init();
-            logger.warn("virtual table inited :" + entry.getKey());
         }
     }
 
@@ -55,7 +48,16 @@ public class VirtualTableRoot extends AbstractLifecycle implements Lifecycle {
      */
     public TableRule getVirtualTable(String virtualTableName) {
         RuleUtils.notNull(virtualTableName, "virtual table name is null");
-        return virtualTableMap.get(virtualTableName.toLowerCase());
+        TableRule tablRule = virtualTableMap.get(virtualTableName.toLowerCase());
+        if (lazyInit && !tablRule.isInited()) {
+            try {
+                initTableRule(virtualTableName.toLowerCase(), tablRule);
+            } catch (TddlException e) {
+                throw new TddlRuleException(e);
+            }
+        }
+
+        return tablRule;
     }
 
     public void setTableRules(Map<String, TableRule> virtualTableMap) {
@@ -72,6 +74,20 @@ public class VirtualTableRoot extends AbstractLifecycle implements Lifecycle {
             lowerKeysDbIndexMap.put(entry.getKey().toLowerCase(), entry.getValue());// 转化小写
         }
         this.dbIndexMap = lowerKeysDbIndexMap;
+    }
+
+    private void initTableRule(String tableNameKey, TableRule tableRule) throws TddlException {
+        logger.warn("virtual table start to init :" + tableNameKey);
+        if (tableRule.getDbType() == null) {
+            // 如果虚拟表中dbType为null,那指定全局dbType
+            tableRule.setDbType(this.getDbTypeEnumObj());
+        }
+
+        if (tableRule.getVirtualTbName() == null) {
+            tableRule.setVirtualTbName(tableNameKey);
+        }
+        tableRule.init();
+        logger.warn("virtual table inited :" + tableNameKey);
     }
 
     public Map<String, TableRule> getVirtualTableMap() {
@@ -125,4 +141,9 @@ public class VirtualTableRoot extends AbstractLifecycle implements Lifecycle {
     public void setCompleteDistinct(boolean completeDistinct) {
         this.completeDistinct = completeDistinct;
     }
+
+    public void setLazyInit(boolean lazyInit) {
+        this.lazyInit = lazyInit;
+    }
+
 }

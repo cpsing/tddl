@@ -4,6 +4,7 @@
 	<bean id="vtabroot" class="com.taobao.tddl.interact.rule.VirtualTableRoot"
 		init-method="init">
 		<property name="dbType" value="MYSQL" />
+		<property name="lazyInit" value="true" />
 		<property name="tableRules">
 			<map>
 				<!-- ===========================================mysql============================================= -->
