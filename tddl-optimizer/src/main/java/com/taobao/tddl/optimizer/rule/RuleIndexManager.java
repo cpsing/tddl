@@ -23,6 +23,11 @@ public class RuleIndexManager extends AbstractLifecycle implements IndexManager 
             index = name.length();
         }
         String tableName = name.substring(0, index);
-        return schemaManager.getTable(tableName).getIndexMeta(name);
+        IndexMeta in = schemaManager.getTable(tableName).getIndexMeta(name);
+        if (in == null) {
+            throw new IllegalArgumentException("table : " + tableName + " index : " + index + " is not found");
+        }
+
+        return in;
     }
 }

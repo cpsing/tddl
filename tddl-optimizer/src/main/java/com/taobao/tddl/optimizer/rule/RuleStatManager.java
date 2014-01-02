@@ -60,21 +60,33 @@ public class RuleStatManager extends AbstractLifecycle implements StatManager {
 
     public KVIndexStat getKVIndex(String indexName) {
         TargetDB targetDB = rule.shardAny(indexName);
-        Group group = matrix.getGroup(targetDB.getDbIndex()); // 先找到group
-        try {
-            return repos.get(group).getKVIndex(targetDB.getTableNames().iterator().next());
-        } catch (ExecutionException e) {
-            throw new OptimizerException(e);
+        if (targetDB.getDbIndex() == null) {
+            // 没有对应的规则，也没有default group，则可能是一个不存在的表
+            // 尝试找一下local
+            return local.getKVIndex(indexName);
+        } else {
+            Group group = matrix.getGroup(targetDB.getDbIndex()); // 先找到group
+            try {
+                return repos.get(group).getKVIndex(targetDB.getTableNames().iterator().next());
+            } catch (ExecutionException e) {
+                throw new OptimizerException(e);
+            }
         }
     }
 
     public TableStat getTable(String tableName) {
         TargetDB targetDB = rule.shardAny(tableName);
-        Group group = matrix.getGroup(targetDB.getDbIndex()); // 先找到group
-        try {
-            return repos.get(group).getTable(targetDB.getTableNames().iterator().next());
-        } catch (ExecutionException e) {
-            throw new OptimizerException(e);
+        if (targetDB.getDbIndex() == null) {
+            // 没有对应的规则，也没有default group，则可能是一个不存在的表
+            // 尝试找一下local
+            return local.getTable(tableName);
+        } else {
+            Group group = matrix.getGroup(targetDB.getDbIndex()); // 先找到group
+            try {
+                return repos.get(group).getTable(targetDB.getTableNames().iterator().next());
+            } catch (ExecutionException e) {
+                throw new OptimizerException(e);
+            }
         }
     }
 

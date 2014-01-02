@@ -49,10 +49,6 @@ public class TableNodeBuilder extends QueryTreeNodeBuilder {
         }
 
         TableMeta ts = OptimizerContext.getContext().getSchemaManager().getTable(tableName);
-        if (ts == null) {
-            throw new IllegalArgumentException("table :" + tableName + " is not found");
-        }
-
         getNode().setTableMeta(ts);
     }
 

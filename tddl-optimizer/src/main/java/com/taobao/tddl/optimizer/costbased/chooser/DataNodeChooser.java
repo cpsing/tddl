@@ -344,11 +344,7 @@ public class DataNodeChooser {
         }
 
         String tableName = logicalName.split("\\.")[0];
-        TableMeta ts = OptimizerContext.getContext().getSchemaManager().getTable(tableName);
-        if (ts == null) {
-            throw new OptimizerException("can't find logic table " + tableName);
-        }
-
+        OptimizerContext.getContext().getSchemaManager().getTable(tableName); // 验证下表是否存在
         List<TargetDB> dataNodeChoosed = OptimizerContext.getContext().getRule().shard(logicalName, f, isWrite);
         if (dataNodeChoosed == null || dataNodeChoosed.isEmpty()) {
             throw new EmptyResultFilterException("无对应执行节点");

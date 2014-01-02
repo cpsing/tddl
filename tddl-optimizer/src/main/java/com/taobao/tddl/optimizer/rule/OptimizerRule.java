@@ -111,7 +111,7 @@ public class OptimizerRule {
         if (tableRule == null) {
             // 设置为同名，同名不做转化
             TargetDB target = new TargetDB();
-            target.setDbIndex(tddlRule.getCurrentRule().getDefaultDbIndex());
+            target.setDbIndex(getDefaultDbIndex(logicTable, tddlRule.getCurrentRule()));
             target.addOneTable(logicTable);
             return target;
         } else {
@@ -155,6 +155,14 @@ public class OptimizerRule {
         logicTable = logicTable.toLowerCase();
         TableRule table = root.getTableRules().get(logicTable);
         return table;
+    }
+
+    private String getDefaultDbIndex(String vtab, VirtualTableRoot vtrCurrent) {
+        Map<String, String> dbIndexMap = vtrCurrent.getDbIndexMap();
+        if (dbIndexMap != null && dbIndexMap.get(vtab) != null) {
+            return dbIndexMap.get(vtab);
+        }
+        return vtrCurrent.getDefaultDbIndex();
     }
 
     /**

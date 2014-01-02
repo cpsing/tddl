@@ -134,7 +134,7 @@ public class SelectTest extends BaseAndorTestCase {
             rc = andorQueryData(sql, null);
             Assert.fail();
         } catch (Exception ex) {
-            Assert.assertTrue(ex != null);
+            Assert.assertTrue(ex.getMessage().contains("STU is not found"));
         }
     }
 }

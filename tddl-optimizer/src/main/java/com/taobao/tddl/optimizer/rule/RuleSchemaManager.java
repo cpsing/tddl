@@ -63,7 +63,6 @@ public class RuleSchemaManager extends AbstractLifecycle implements SchemaManage
     }
 
     public TableMeta getTable(String tableName) {
-
         TableMeta meta = null;
         if (local != null) {// 本地如果开启了，先找本地
             meta = local.getTable(tableName);
@@ -74,12 +73,25 @@ public class RuleSchemaManager extends AbstractLifecycle implements SchemaManage
         }
 
         TargetDB targetDB = rule.shardAny(tableName);
-        Group group = matrix.getGroup(targetDB.getDbIndex()); // 先找到group
-        try {
-            return repos.get(group).getTable(tableName, targetDB.getTableNames().iterator().next());
-        } catch (ExecutionException e) {
-            throw new OptimizerException(e);
+        TableMeta ts = null;
+        if (targetDB.getDbIndex() == null) {
+            // 没有对应的规则，也没有default group，则可能是一个不存在的表
+            // 尝试找一下local
+            ts = local.getTable(tableName);
+        } else {
+            Group group = matrix.getGroup(targetDB.getDbIndex()); // 先找到group
+            try {
+                ts = repos.get(group).getTable(tableName, targetDB.getTableNames().iterator().next());
+            } catch (ExecutionException e) {
+                throw new OptimizerException(e);
+            }
         }
+
+        if (ts == null) {
+            throw new IllegalArgumentException("table : " + tableName + " is not found");
+        }
+
+        return ts;
     }
 
     public void putTable(String tableName, TableMeta tableMeta) {
