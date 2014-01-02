@@ -67,6 +67,20 @@ public class DataNodeChooserTest extends BaseOptimizerTest {
     }
 
     @Test
+    public void test_子查询_不生成merge_存在聚合查询() {
+        KVIndexNode table7 = new KVIndexNode("TABLE1");
+        table7.limit(0, 1);
+        table7.build();
+
+        QueryNode query = new QueryNode(table7);
+        QueryTreeNode qtn = shard(query, false, false);
+
+        Assert.assertTrue(qtn instanceof QueryNode);
+        Assert.assertTrue(qtn.getChild() instanceof MergeNode);
+        Assert.assertEquals(8, ((MergeNode) qtn.getChild()).getChildren().size());
+    }
+
+    @Test
     public void test_join查询_不生成merge() {
         KVIndexNode table1 = new KVIndexNode("TABLE1");
         table1.keyQuery("ID = 1");
@@ -194,6 +208,34 @@ public class DataNodeChooserTest extends BaseOptimizerTest {
         Assert.assertTrue(qtn.getChild() instanceof JoinNode);// join merge join
         Assert.assertTrue(((JoinNode) qtn.getChild()).getLeftNode() instanceof QueryNode);
         Assert.assertTrue(((JoinNode) qtn.getChild()).getRightNode() instanceof JoinNode);
+    }
+
+    @Test
+    public void test_join查询_不生成JoinMergeJoin_嵌套子查询全表扫描_存在聚合查询_开启优化参数() {
+        KVIndexNode table1 = new KVIndexNode("TABLE1");
+        table1.keyQuery("TABLE1.ID IN (1,2,3)");
+        table1.alias("A");
+        table1.limit(0, 1);// 需要聚合操作
+        QueryNode query1 = new QueryNode(table1);
+        query1.select("A.ID AS AID , A.NAME AS ANAME , A.SCHOOL AS ASCHOOL");
+
+        KVIndexNode table2 = new KVIndexNode("TABLE2");
+        table2.keyQuery("TABLE2.ID IN (1,2,3)");
+
+        KVIndexNode table3 = new KVIndexNode("TABLE3");
+        table3.keyQuery("TABLE3.ID IN (1,2,3)");
+
+        JoinNode join = table2.join(table3, "ID", "ID");
+
+        // 两层join，左边是query，右边是join
+        JoinNode nextJoin = query1.join(join, "AID", "TABLE2.ID");// 用的是子表的别名
+        nextJoin.build();
+        QueryTreeNode qtn = shard(nextJoin, false, true);
+
+        Assert.assertTrue(qtn instanceof JoinNode);
+        Assert.assertTrue(((JoinNode) qtn).getLeftNode() instanceof QueryNode);
+        Assert.assertEquals(3, ((MergeNode) ((JoinNode) qtn).getLeftNode().getChild()).getChildren().size());
+        Assert.assertTrue(((JoinNode) qtn).getRightNode() instanceof MergeNode);
     }
 
     @Test

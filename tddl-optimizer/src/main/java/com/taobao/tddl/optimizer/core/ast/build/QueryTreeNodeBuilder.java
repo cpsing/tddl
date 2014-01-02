@@ -2,6 +2,7 @@ package com.taobao.tddl.optimizer.core.ast.build;
 
 import java.util.List;
 
+import com.taobao.tddl.optimizer.core.ast.ASTNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.query.KVIndexNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
@@ -10,6 +11,7 @@ import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
+import com.taobao.tddl.optimizer.core.expression.IFunction.FunctionType;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
@@ -159,6 +161,9 @@ public abstract class QueryTreeNodeBuilder {
 
         if ((column instanceof IColumn) && !IColumn.STAR.equals(column.getColumnName())) {
             node.addColumnsRefered(column); // refered不需要重复字段,select添加允许重复
+            if (column.isDistinct()) {
+                setExistAggregate();
+            }
         }
 
         if (column instanceof IFunction) {
@@ -208,6 +213,10 @@ public abstract class QueryTreeNodeBuilder {
                 order.setColumn(this.buildSelectable((ISelectable) order.getColumn(), true));
             }
         }
+
+        if (node.getGroupBys() != null && !node.getGroupBys().isEmpty()) {
+            setExistAggregate();
+        }
     }
 
     public void buildHaving() {
@@ -224,6 +233,10 @@ public abstract class QueryTreeNodeBuilder {
     }
 
     public void buildFunction(IFunction f, boolean findInSelectList) {
+        if (FunctionType.Aggregate == f.getFunctionType()) {
+            setExistAggregate();
+        }
+
         if (f.getArgs().size() == 0) {
             return;
         }
@@ -243,6 +256,32 @@ public abstract class QueryTreeNodeBuilder {
         }
 
         return column;
+    }
+
+    public void buildExistAggregate() {
+        // 存在distinct
+        for (ISelectable select : this.node.getColumnsRefered()) {
+            if (select.isDistinct()) {
+                setExistAggregate();
+                return;
+            }
+        }
+
+        // 存在limit
+        if (this.node.getLimitFrom() != null || this.node.getLimitTo() != null) {
+            setExistAggregate();
+            return;
+        }
+
+        // 如果子节点中有一个是聚合查询，则传递到父节点
+        for (ASTNode sub : this.getNode().getChildren()) {
+            if (sub instanceof QueryTreeNode) {
+                if (((QueryTreeNode) sub).isExistAggregate()) {
+                    setExistAggregate();
+                    return;
+                }
+            }
+        }
     }
 
     /**
@@ -310,6 +349,10 @@ public abstract class QueryTreeNodeBuilder {
         }
 
         return res;
+    }
+
+    private void setExistAggregate() {
+        this.node.setExistAggregate(true);
     }
 
 }

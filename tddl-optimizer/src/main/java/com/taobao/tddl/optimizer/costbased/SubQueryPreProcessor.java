@@ -1,5 +1,7 @@
 package com.taobao.tddl.optimizer.costbased;
 
+import java.util.List;
+
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.ASTNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
@@ -95,9 +97,8 @@ public class SubQueryPreProcessor {
                     throw new OptimizerException("不支持常量和子查询组合的条件");
                 }
 
-                if (!query.getOrderBys().isEmpty() || !query.getGroupBys().isEmpty() || query.getLimitFrom() != null
-                    || query.getLimitTo() != null || query.getHavingFilter() != null) {
-                    throw new OptimizerException("子查询条件太复杂，无法转化为semi-join");
+                if (!query.getOrderBys().isEmpty() || query.isExistAggregate()) {
+                    throw new OptimizerException("子查询存在聚合查询条件太复杂，无法转化为semi-join");
                 }
 
                 ISelectable leftColumn = (ISelectable) c;
@@ -109,7 +110,11 @@ public class SubQueryPreProcessor {
 
                     SubQueryAndFilter result = new SubQueryAndFilter();
                     ISelectable rightColumn = query.getColumnsSelected().get(0);
+
+                    List<ISelectable> newSelects = qtn.query.getColumnsSelected();
                     result.query = qtn.query.join(query).addJoinKeys(leftColumn, rightColumn);
+                    result.query.select(newSelects);
+
                     if (filter.getOperation() == OPERATION.IN && filter.isNot()) {
                         // not in的语法
                         // http://dev.mysql.com/doc/refman/5.6/en/rewriting-subqueries.html

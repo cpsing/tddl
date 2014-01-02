@@ -58,27 +58,27 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
     /**
      * 包含所有子节点的filter，用于拼sql
      */
-    protected IFilter           allWhereFilter  = null;
+    protected IFilter           allWhereFilter   = null;
 
     /**
      * select查询中的列
      */
-    protected List<ISelectable> columnsSelected = new ArrayList<ISelectable>();
+    protected List<ISelectable> columnsSelected  = new ArrayList<ISelectable>();
 
     /**
      * 依赖的所有列，可以理解为columnsSelected + implicitSelectable的总合
      */
-    protected List<ISelectable> columnsRefered  = new ArrayList<ISelectable>();
+    protected List<ISelectable> columnsRefered   = new ArrayList<ISelectable>();
 
     /**
      * 显式的由查询接口指定的orderBy，注意需要保证顺序
      */
-    protected List<IOrderBy>    orderBys        = new LinkedList<IOrderBy>();
+    protected List<IOrderBy>    orderBys         = new LinkedList<IOrderBy>();
 
     /**
      * 显式的由查询接口指定的group by，注意需要保证顺序
      */
-    protected List<IOrderBy>    groups          = new LinkedList<IOrderBy>();
+    protected List<IOrderBy>    groups           = new LinkedList<IOrderBy>();
 
     /**
      * having条件
@@ -89,27 +89,27 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
      * 上一层父节点，比如子查询会依赖父节点的字段信息
      * http://dev.mysql.com/doc/refman/5.0/en/correlated-subqueries.html
      */
-    protected ASTNode           parent          = null;
+    protected ASTNode           parent           = null;
 
     /**
      * join的子节点
      */
-    protected List<ASTNode>     children        = new ArrayList<ASTNode>(2);
+    protected List<ASTNode>     children         = new ArrayList<ASTNode>(2);
 
     /**
      * 从哪里开始
      */
-    protected Comparable        limitFrom       = null;
+    protected Comparable        limitFrom        = null;
 
     /**
      * 到哪里结束
      */
-    protected Comparable        limitTo         = null;
+    protected Comparable        limitTo          = null;
 
     /**
      * filter in where
      */
-    protected IFilter           whereFilter     = null;
+    protected IFilter           whereFilter      = null;
 
     /**
      * 非column=column的join列
@@ -126,16 +126,22 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
      */
     protected String            subAlias;
 
-    protected boolean           consistent      = true;
+    protected boolean           consistent       = true;
 
-    protected LOCK_MODEL        lockModel       = LOCK_MODEL.SHARED_LOCK;
+    protected LOCK_MODEL        lockModel        = LOCK_MODEL.SHARED_LOCK;
 
     /**
      * 当前节点是否为子查询
      */
-    protected boolean           subQuery        = false;
-    protected boolean           needBuild       = true;
+    protected boolean           subQuery         = false;
+    protected boolean           needBuild        = true;
     protected QUERY_CONCURRENCY queryConcurrency;
+
+    /**
+     * 是否为存在聚合信息，比如出现limit/group by/count/max等，此节点就会被标记为true，不允许进行join merge
+     * join的展开优化
+     */
+    protected boolean           isExistAggregate = false;
 
     /**
      * 获取完整的order by列信息(包括隐藏，比如group by会转化为order by)
@@ -680,6 +686,15 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         return lockModel;
     }
 
+    public boolean isExistAggregate() {
+        return isExistAggregate;
+    }
+
+    public QueryTreeNode setExistAggregate(boolean isExistAggregate) {
+        this.isExistAggregate = isExistAggregate;
+        return this;
+    }
+
     // ==================== helper method =================
 
     /**
@@ -768,6 +783,7 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         to.setNeedBuild(this.needBuild);
         to.setSql(this.getSql());
         to.setSubQuery(subQuery);
+        to.setExistAggregate(isExistAggregate);
     }
 
     /**
@@ -791,6 +807,7 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         to.setSql(this.getSql());
         to.setSubQuery(this.isSubQuery());
         to.setNeedBuild(this.isNeedBuild());
+        to.setExistAggregate(isExistAggregate);
     }
 
 }

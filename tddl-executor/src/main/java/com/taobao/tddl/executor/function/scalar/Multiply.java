@@ -23,7 +23,6 @@ public class Multiply extends ScalarFunction {
         } else if (args[0] instanceof BigDecimal || args[1] instanceof BigDecimal) {
             BigDecimal o = new BigDecimal(args[0].toString());
             BigDecimal o2 = new BigDecimal(args[1].toString());
-
             return o.multiply(o2);
         }
         throw new IllegalArgumentException("not supported yet");

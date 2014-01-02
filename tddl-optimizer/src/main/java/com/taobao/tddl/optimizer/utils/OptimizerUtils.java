@@ -270,7 +270,7 @@ public class OptimizerUtils {
 
             Comparable value = ((IBooleanFilter) f).getValue();
             if (value instanceof IColumn) {
-                setColumn((IColumn) column, tableName);
+                setColumn((IColumn) value, tableName);
             } else if (value instanceof IFilter) {
                 setFilter((IFilter) value, tableName);
             } else if (value instanceof IFunction) {

@@ -14,7 +14,6 @@ import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
-import com.taobao.tddl.qatest.util.Validator;
 
 /**
  * Comment for SelectWithNoData
@@ -24,10 +23,8 @@ import com.taobao.tddl.qatest.util.Validator;
 @RunWith(EclipseParameterized.class)
 public class SelectWithNoData extends BaseAndorTestCase {
 
-    Validator validator = new Validator();
-
-    long      pk        = 1l;
-    int       id        = 1;
+    long pk = 1l;
+    int  id = 1;
 
     @Parameters(name = "{index}:table0={0}")
     public static List<String[]> prepare() {

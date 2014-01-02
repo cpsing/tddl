@@ -38,23 +38,13 @@ public class SelectWithNullTest extends BaseAndorTestCase {
 
     @Test
     public void isNull() throws Exception {
-        String sql = "select * from " + normaltblTableName + " where name is ?";
-        List<Object> param = new ArrayList<Object>();
-        param.add(null);
-        selectContentSameAssert(sql, columnParam, param);
-
-        sql = "select * from " + normaltblTableName + " where name is null";
+        String sql = "select * from " + normaltblTableName + " where name is null";
         selectContentSameAssert(sql, columnParam, null);
     }
 
     @Test
     public void isNotNull() throws Exception {
-        String sql = "select * from " + normaltblTableName + " where name is not ?";
-        List<Object> param = new ArrayList<Object>();
-        param.add(null);
-        selectContentSameAssert(sql, columnParam, param);
-
-        sql = "select * from " + normaltblTableName + " where name is not null";
+        String sql = "select * from " + normaltblTableName + " where name is not null";
         selectContentSameAssert(sql, columnParam, null);
     }
 

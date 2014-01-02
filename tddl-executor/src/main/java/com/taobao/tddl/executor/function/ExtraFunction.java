@@ -2,6 +2,7 @@ package com.taobao.tddl.executor.function;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.executor.rowset.IRowSet;
@@ -94,12 +95,11 @@ public abstract class ExtraFunction implements IExtraFunction {
         for (Object funcArg : argsArr) {
             if (funcArg instanceof IFunction
                 && ((IFunction) funcArg).getExtraFunction().getFunctionType().equals(FunctionType.Aggregate)) {
-                // Map<String, Object> resMap = (Map<String, Object>)
-                // ((IFunction) funcArg).getResult();
-                // for (Object ob : resMap.values()) {
-                // inputArg[index] = ob;
-                // index++;
-                // }
+                Map<String, Object> resMap = (Map<String, Object>) ((IFunction) funcArg);
+                for (Object ob : resMap.values()) {
+                    inputArg[index] = ob;
+                    index++;
+                }
             } else if (funcArg instanceof ISelectable) {// 如果是IColumn，那么应该从输入的参数中获取对应column
                 if (IColumn.STAR.equals(((ISelectable) funcArg).getColumnName())) {
                     inputArg[index] = kvPair;

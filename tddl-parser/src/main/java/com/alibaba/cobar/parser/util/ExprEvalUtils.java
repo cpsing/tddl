@@ -24,6 +24,7 @@ import java.sql.SQLSyntaxErrorException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.alibaba.cobar.parser.ast.expression.Expression;
 import com.alibaba.cobar.parser.ast.expression.primary.literal.LiteralBoolean;
 import com.alibaba.cobar.parser.recognizer.mysql.lexer.MySQLLexer;
 
@@ -39,8 +40,7 @@ public class ExprEvalUtils {
     private static final int                                   CLASS_MAP_BIG_ING     = 3;
     private static final int                                   CLASS_MAP_BIG_DECIMAL = 4;
     private static final int                                   CLASS_MAP_LONG        = 5;
-    private static final Map<Class<? extends Number>, Integer> classMap              = new HashMap<Class<? extends Number>, Integer>(
-                                                                                                                                     5);
+    private static final Map<Class<? extends Number>, Integer> classMap              = new HashMap<Class<? extends Number>, Integer>(5);
     static {
         classMap.put(Double.class, CLASS_MAP_DOUBLE);
         classMap.put(Float.class, CLASS_MAP_FLOAT);
@@ -87,22 +87,32 @@ public class ExprEvalUtils {
     private static final int NUM_BIG_INTEGER = 3;
     private static final int NUM_BIG_DECIMAL = 4;
 
-    public static Number calculate(UnaryOperandCalculator cal, Number num) {
-        if (num == null) return null;
-        if (num instanceof Integer) return cal.calculate((Integer) num);
-        if (num instanceof Long) return cal.calculate((Long) num);
-        if (num instanceof BigDecimal) return cal.calculate((BigDecimal) num);
-        if (num instanceof BigInteger) return cal.calculate((BigInteger) num);
-        throw new IllegalArgumentException("unsupported add calculate: " + num.getClass());
+    public static Object calculate(UnaryOperandCalculator cal, Number num) {
+        try {
+            if (num == null) return null;
+            if (num instanceof Integer) return cal.calculate((Integer) num);
+            if (num instanceof Long) return cal.calculate((Long) num);
+            if (num instanceof BigDecimal) return cal.calculate((BigDecimal) num);
+            if (num instanceof BigInteger) return cal.calculate((BigInteger) num);
+        } catch (Throwable e) {
+            return Expression.UNEVALUATABLE;// 不支持的话推到数据库去做，这里不抛异常
+        }
+
+        return Expression.UNEVALUATABLE;
     }
 
-    public static Number calculate(BinaryOperandCalculator cal, Number n1, Number n2) {
-        if (n1 == null || n2 == null) return null;
-        if (n1 instanceof Integer) return cal.calculate((Integer) n1, (Integer) n2);
-        if (n1 instanceof Long) return cal.calculate((Long) n1, (Long) n2);
-        if (n1 instanceof BigDecimal) return cal.calculate((BigDecimal) n1, (BigDecimal) n2);
-        if (n1 instanceof BigInteger) return cal.calculate((BigInteger) n1, (BigInteger) n2);
-        throw new IllegalArgumentException("unsupported add calculate: " + n1.getClass());
+    public static Object calculate(BinaryOperandCalculator cal, Number n1, Number n2) {
+        try {
+            if (n1 == null || n2 == null) return null;
+            if (n1 instanceof Integer) return cal.calculate((Integer) n1, (Integer) n2);
+            if (n1 instanceof Long) return cal.calculate((Long) n1, (Long) n2);
+            if (n1 instanceof BigDecimal) return cal.calculate((BigDecimal) n1, (BigDecimal) n2);
+            if (n1 instanceof BigInteger) return cal.calculate((BigInteger) n1, (BigInteger) n2);
+        } catch (Throwable e) {
+            return Expression.UNEVALUATABLE;// 不支持的话推到数据库去做，这里不抛异常
+        }
+
+        return Expression.UNEVALUATABLE;
     }
 
     /**

@@ -44,6 +44,7 @@ public class JoinNodeBuilder extends QueryTreeNodeBuilder {
         this.buildOrderBy();
         this.buildHaving();
         this.buildColumnRefered();
+        this.buildExistAggregate();
     }
 
     private void buildColumnRefered() {
