@@ -30,7 +30,7 @@ public class EclipseParameterized extends Parameterized {
 
         @Override
         public boolean shouldRun(Description description) {
-            return delegate.shouldRun(wrap(description));
+            return delegate.shouldRun(description) || delegate.shouldRun(wrap(description));
         }
 
         @Override

@@ -1,18 +1,11 @@
 package com.taobao.tddl.qatest.select;
 
-/**
- *  Copyright(c) 2010 taobao. All rights reserved.
- *  通用产品测试
- */
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
