@@ -127,13 +127,13 @@ public class TableMetaParser {
         }
 
         IndexMeta primaryIndex = new IndexMeta(tableName,
-            toColumnMeta(primaryKeys, columnMetas),
-            toColumnMeta(primaryValues, columnMetas),
+            toColumnMeta(primaryKeys, columnMetas, tableName),
+            toColumnMeta(primaryValues, columnMetas, tableName),
             IndexType.BTREE,
             Relationship.NONE,
             strongConsistent,
             true,
-            toColumnMeta(partitionColumns, columnMetas));
+            toColumnMeta(partitionColumns, columnMetas, tableName));
 
         return new TableMeta(tableName, columns, primaryIndex, indexs);
     }
@@ -203,19 +203,26 @@ public class TableMetaParser {
         }
 
         return new IndexMeta(tableName,
-            toColumnMeta(keys, columnMetas),
-            toColumnMeta(values, columnMetas),
+            toColumnMeta(keys, columnMetas, tableName),
+            toColumnMeta(values, columnMetas, tableName),
             getIndexType(type),
             getRelationship(rel),
             strongConsistent,
             false,
-            toColumnMeta(partitionColumns, columnMetas));
+            toColumnMeta(partitionColumns, columnMetas, tableName));
     }
 
-    private static List<ColumnMeta> toColumnMeta(String[] columns, Map<String, ColumnMeta> columnMetas) {
+    private static List<ColumnMeta> toColumnMeta(String[] columns, Map<String, ColumnMeta> columnMetas, String tableName) {
         List<ColumnMeta> metas = Lists.newArrayList();
         for (int i = 0; i < columns.length; i++) {
-            metas.add(columnMetas.get(columns[i].toUpperCase()));
+
+            String cname = columns[i].toUpperCase();
+
+            if (!columnMetas.containsKey(cname)) {
+                throw new RuntimeException("column: " + cname + ", is not a column of table " + tableName);
+            }
+
+            metas.add(columnMetas.get(cname));
         }
 
         return metas;

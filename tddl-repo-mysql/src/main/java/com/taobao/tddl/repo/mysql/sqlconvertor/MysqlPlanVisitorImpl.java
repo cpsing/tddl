@@ -372,7 +372,7 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
 
         MysqlPlanVisitorImpl visitor = this.getNewVisitor(left, left);
         sqlBuilder.append(visitor.getString());
-        if (!join.getLeftOuter() && !join.getRightOuter()) {
+        if (join.getLeftOuter() && join.getRightOuter()) {
             throw new RuntimeException("full outter join 不支持");
         } else if (join.getLeftOuter() && !join.getRightOuter()) {
             sqlBuilder.append(" left");
@@ -502,7 +502,7 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
 
     @Override
     public void visit(List cl) {
-        List<Comparable> list = (List<Comparable>) cl;
+        List<Comparable> list = cl;
         sqlBuilder.append("(");
         boolean first = true;
         for (Comparable o : list) {

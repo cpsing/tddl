@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IExtraFunction;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
@@ -16,6 +17,7 @@ public abstract class ExtraFunction implements IExtraFunction {
 
     protected IFunction function;
 
+    @Override
     public void setFunction(IFunction function) {
         this.function = function;
     }
@@ -157,9 +159,7 @@ public abstract class ExtraFunction implements IExtraFunction {
             Object[] inputArg = new Object[reduceArgs.size()];
             for (int i = 0; i < reduceArgs.size(); i++) {
                 String name = reduceArgs.get(i).toString();
-                // Object val = GeneralUtil.getValueByTableAndName(kvPair,
-                // getTableName(), name);
-                Object val = null;
+                Object val = ExecUtils.getValueByTableAndName(kvPair, this.function.getTableName(), name);
                 inputArg[i] = val;
             }
 

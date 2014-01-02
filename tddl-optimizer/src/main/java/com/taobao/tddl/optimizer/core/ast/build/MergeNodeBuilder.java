@@ -22,10 +22,12 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
         this.setNode(mergeNode);
     }
 
+    @Override
     public MergeNode getNode() {
         return (MergeNode) super.getNode();
     }
 
+    @Override
     public void build() {
         for (ASTNode sub : this.getNode().getChildren()) {
             sub.build();
@@ -50,6 +52,7 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
      * 2. substring(),to_date()等简单scalar函数(不包含条件1的函数)，推到子节点去，然后在父节点留一个字段，而不是函数
      * </pre>
      */
+    @Override
     public void buildFunction() {
         super.buildFunction();
 
@@ -64,7 +67,7 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
                     if (!argsAggregateFunctions.isEmpty()) {
                         aggregateInScalar.addAll(argsAggregateFunctions);
                     } else {
-                        simpleScalar.add((ISelectable) s);
+                        simpleScalar.add(s);
                     }
                 }
             }
@@ -122,6 +125,7 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
         }
     }
 
+    @Override
     public void buildHaving() {
         if (this.getNode().getChild() instanceof QueryTreeNode) {
             // 干掉子节点查询的having条件，转移到父节点中
@@ -176,6 +180,7 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
         }
     }
 
+    @Override
     public void buildOrderBy() {
         // 如果merge本身没指定order by，则继承子节点的order by
         if (this.getNode().getOrderBys() == null || this.getNode().getOrderBys().isEmpty()) {
@@ -197,6 +202,7 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
         super.buildOrderBy();
     }
 
+    @Override
     public void buildGroupBy() {
         // 如果merge本身没指定group by，则继承子节点的group by
         if (this.getNode().getGroupBys() == null || this.getNode().getGroupBys().isEmpty()) {
@@ -262,7 +268,8 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
                     }
                 }
 
-                IColumn newS = ASTNodeFactory.getInstance().createColumn();
+                ISelectable newS = selectedFromChild.copy();
+                // IColumn newS = ASTNodeFactory.getInstance().createColumn();
 
                 if (child.getAlias() != null) {
                     newS.setTableName(child.getAlias());
@@ -285,6 +292,7 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
         }
     }
 
+    @Override
     public ISelectable getSelectableFromChild(ISelectable c) {
         QueryTreeNode child = (QueryTreeNode) this.getNode().getChild();
         if (IColumn.STAR.equals(c.getColumnName())) {
