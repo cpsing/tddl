@@ -104,8 +104,9 @@ public abstract class ExtraFunction implements IExtraFunction {
                 if (IColumn.STAR.equals(((ISelectable) funcArg).getColumnName())) {
                     inputArg[index] = kvPair;
                 } else {
-                    // ((ISelectable) funcArg).serverMap(kvPair);
-                    // inputArg[index] = ((ISelectable) funcArg).getResult();
+
+                    inputArg[index] = ExecUtils.getValueByIColumn(kvPair, ((ISelectable) funcArg));
+
                 }
                 index++;
             } else {
@@ -127,28 +128,25 @@ public abstract class ExtraFunction implements IExtraFunction {
         if (this.getFunctionType().equals(FunctionType.Scalar)) {
             if (this.getClass().equals(Dummy.class)) {
                 // TODO
-                // Integer index = kvPair.getParentCursorMeta().getIndex(null,
-                // this.getColumnName());
-                // if (index != null) {
-                // Object v = kvPair.getObject(index);
-                // ((ScalarFunction) getiExtraFunctionCache()).setResult(v);
-                // } else {
-                // throw new RuntimeException(this.function.getFunctionName() +
-                // " 没有实现，结果集中也没有");
-                // }
+                Integer index = kvPair.getParentCursorMeta().getIndex(null, this.function.getColumnName());
+                if (index != null) {
+                    Object v = kvPair.getObject(index);
+
+                    ((ScalarFunction) this).setResult(v);
+                } else {
+                    throw new RuntimeException(this.function.getFunctionName() + " 没有实现，结果集中也没有");
+                }
             } else {
                 try {
                     this.serverMap(kvPair);
                 } catch (RuntimeException e) {
-                    // Integer index =
-                    // kvPair.getParentCursorMeta().getIndex(null,
-                    // this.getColumnName());
-                    // if (index != null) {
-                    // Object v = kvPair.getObject(index);
-                    // ((ScalarFunction) getiExtraFunctionCache()).setResult(v);
-                    // } else {
-                    // throw e;
-                    // }
+                    Integer index = kvPair.getParentCursorMeta().getIndex(null, this.function.getColumnName());
+                    if (index != null) {
+                        Object v = kvPair.getObject(index);
+                        ((ScalarFunction) this).setResult(v);
+                    } else {
+                        throw e;
+                    }
                 }
 
             }

@@ -22,8 +22,8 @@ import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.record.MapRecord;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.executor.rowset.RowSetWrapper;
 import com.taobao.tddl.executor.rowset.ResultSetRowSet;
+import com.taobao.tddl.executor.rowset.RowSetWrapper;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
@@ -277,7 +277,7 @@ public class ExecUtils {
     public static IColumn getIColumn(Object column) {
         if (column instanceof IFunction) {
 
-            return (IColumn) ASTNodeFactory.getInstance()
+            return ASTNodeFactory.getInstance()
                 .createColumn()
                 .setTableName(((IFunction) column).getTableName())
 
@@ -391,6 +391,7 @@ public class ExecUtils {
     }
 
     public static Object getValueByIColumn(IRowSet from_kv, ISelectable c) {
+        if (from_kv == null) return null;
         Integer index = from_kv.getParentCursorMeta().getIndex(c.getTableName(), c.getColumnName());
         if (index == null) return null;
         Object v = from_kv.getObject(index);
@@ -585,11 +586,12 @@ public class ExecUtils {
             {
                 cols = new ArrayList<ISelectable>();
                 for (IOrderBy ord : orderBys) {
-                    cols.add((ISelectable) ord.getColumn());
+                    cols.add(ord.getColumn());
                 }
                 leftScaner = new RowsValueScanerImp(meta, cols);
             }
 
+            @Override
             public int compare(IRowSet o1, IRowSet o2) {
                 if (rightScaner == null) {
                     ICursorMeta rightCursorMeta = o2.getParentCursorMeta();
@@ -598,7 +600,7 @@ public class ExecUtils {
                 Iterator<Object> leftIter = leftScaner.rowValueIterator(o1);
                 Iterator<Object> rightIter = rightScaner.rowValueIterator(o2);
                 for (IOrderBy orderBy : orderBys) {
-                    ISelectable ic = (ISelectable) orderBy.getColumn();
+                    ISelectable ic = orderBy.getColumn();
                     Comparable c1 = (Comparable) leftIter.next();
                     Comparable c2 = (Comparable) rightIter.next();
 
