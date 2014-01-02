@@ -176,7 +176,6 @@ public class OptimizerUtils {
         }
 
         return newOrders;
-
     }
 
     public static List<ISelectable> copySelectables(List<ISelectable> selects, String tableName) {
@@ -190,11 +189,13 @@ public class OptimizerUtils {
 
         List<ISelectable> news = new ArrayList(selects.size());
         for (ISelectable s : selects) {
-            ISelectable a = s.copy().setTableName(tableName);
-            if (a instanceof IFunction) {
-                setFunction((IFunction) a, tableName);
+            ISelectable a = s.copy();
+            if (a instanceof IColumn) {
+                setColumn((IColumn) a, tableName);
             } else if (a instanceof IFilter) {
                 setFilter((IFilter) a, tableName);
+            } else if (a instanceof IFunction) {
+                setFunction((IFunction) a, tableName);
             }
 
             news.add(a);
@@ -214,11 +215,13 @@ public class OptimizerUtils {
 
         List<IOrderBy> news = new ArrayList(orderBys.size());
         for (IOrderBy o : orderBys) {
-            IOrderBy a = o.copy().setTableName(null);
-            if (a.getColumn() instanceof IFunction) {
-                setFunction((IFunction) a.getColumn(), tableName);
+            IOrderBy a = o.copy();
+            if (a.getColumn() instanceof IColumn) {
+                setColumn((IColumn) a.getColumn(), tableName);
             } else if (a.getColumn() instanceof IFilter) {
                 setFilter((IFilter) a.getColumn(), tableName);
+            } else if (a.getColumn() instanceof IFunction) {
+                setFunction((IFunction) a.getColumn(), tableName);
             }
 
             news.add(a);
@@ -242,8 +245,11 @@ public class OptimizerUtils {
     private static void setFunction(IFunction f, String tableName) {
         for (Object arg : f.getArgs()) {
             if (arg instanceof ISelectable) {
-                ((ISelectable) arg).setTableName(tableName);
-                if (arg instanceof IFunction) {
+                if (arg instanceof IColumn) {
+                    setColumn((IColumn) arg, tableName);
+                } else if (arg instanceof IFilter) {
+                    setFilter((IFilter) f, tableName);
+                } else if (arg instanceof IFunction) {
                     setFunction((IFunction) arg, tableName);
                 }
             }
@@ -255,25 +261,31 @@ public class OptimizerUtils {
         if (f instanceof IBooleanFilter) {
             Comparable column = ((IBooleanFilter) f).getColumn();
             if (column instanceof IColumn) {
-                ((IColumn) column).setTableName(tableName);
-            } else if (column instanceof IFunction) {
-                setFunction((IFunction) column, tableName);
+                setColumn((IColumn) column, tableName);
             } else if (column instanceof IFilter) {
                 setFilter((IFilter) column, tableName);
+            } else if (column instanceof IFunction) {
+                setFunction((IFunction) column, tableName);
             }
 
             Comparable value = ((IBooleanFilter) f).getValue();
             if (value instanceof IColumn) {
-                ((IColumn) value).setTableName(tableName);
-            } else if (value instanceof IFunction) {
-                setFunction((IFunction) value, tableName);
+                setColumn((IColumn) column, tableName);
             } else if (value instanceof IFilter) {
                 setFilter((IFilter) value, tableName);
+            } else if (value instanceof IFunction) {
+                setFunction((IFunction) value, tableName);
             }
         } else if (f instanceof ILogicalFilter) {
             for (IFilter sf : ((ILogicalFilter) f).getSubFilter()) {
                 setFilter(sf, tableName);
             }
+        }
+    }
+
+    private static void setColumn(IColumn c, String tableName) {
+        if (tableName != null && c.getTableName() != null) {
+            c.setTableName(tableName);
         }
     }
 

@@ -133,7 +133,9 @@ public class Validator {
                 mutilResult.remove(mResult);
             }
 
-            if (mutilResult.size() == 0 && ret.next() == false) same = true;
+            if (mutilResult.size() == 0 && ret.next() == false) {
+                same = true;
+            }
             if (same != true) {
                 Assert.fail("Results not same!" + mutilResult);
             }
@@ -174,7 +176,9 @@ public class Validator {
                 mutilResult.contains(mResult);
                 mutilResult.remove(mResult);
             }
-            if (mutilResult.size() == 0 && ret.next() == false) same = true;
+            if (mutilResult.size() == 0 && ret.next() == false) {
+                same = true;
+            }
             if (same != true) {
                 Assert.fail("Results not same!");
             }
