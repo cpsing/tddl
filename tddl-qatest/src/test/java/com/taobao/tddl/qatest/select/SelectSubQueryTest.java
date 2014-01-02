@@ -20,8 +20,9 @@ import com.taobao.tddl.qatest.util.Validator;
 @RunWith(Parameterized.class)
 public class SelectSubQueryTest extends BaseAndorTestCase {
 
-    String modlueName = "module12";
-    long   pk         = 12l;
+    Validator validator  = new Validator();
+    String    modlueName = "module12";
+    long      pk         = 12l;
 
     @Parameters(name = "{index}:table0={0},table1={1},table2={2},table3={3},table4={4}")
     public static List<String[]> prepareDate() {
@@ -47,8 +48,8 @@ public class SelectSubQueryTest extends BaseAndorTestCase {
 
     @Before
     public void prepare() throws Exception {
-        Validator.con = Validator.getConnection();
-        Validator.andorCon = us.getConnection();
+        validator.con = validator.getConnection();
+        validator.andorCon = us.getConnection();
         prepareData.hostinfoPrepare(0, 20);
         prepareData.hostgroupPrepare(10, 30);
         prepareData.module_infoPrepare(0, 40);
@@ -56,7 +57,7 @@ public class SelectSubQueryTest extends BaseAndorTestCase {
 
     @After
     public void clean() throws Exception {
-        Validator.psConRcRsClose(rc, rs);
+        validator.psConRcRsClose(rc, rs);
     }
 
     /**

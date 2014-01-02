@@ -42,8 +42,8 @@ public class SelectMinusTest extends BaseAndorTestCase {
 
     @Before
     public void MutilDataPrepare() throws Exception {
-        Validator.con = Validator.getConnection();
-        Validator.andorCon = us.getConnection();
+        validator.con = validator.getConnection();
+        validator.andorCon = us.getConnection();
         prepareData.normaltblPrepare(-10, 20);
     }
 

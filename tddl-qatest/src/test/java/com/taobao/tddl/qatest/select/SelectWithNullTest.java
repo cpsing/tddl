@@ -22,7 +22,8 @@ import com.taobao.tddl.qatest.util.Validator;
 @RunWith(Parameterized.class)
 public class SelectWithNullTest extends BaseAndorTestCase {
 
-    String[] columnParam = { "PK", "NAME", "ID" };
+    Validator validator   = new Validator();
+    String[]  columnParam = { "PK", "NAME", "ID" };
 
     @Parameters(name = "{index}:table={0}")
     public static List<String[]> prepareData() {
@@ -35,14 +36,14 @@ public class SelectWithNullTest extends BaseAndorTestCase {
 
     @Before
     public void prepareDate() throws Exception {
-        Validator.con = Validator.getConnection();
-        Validator.andorCon = us.getConnection();
+        validator.con = validator.getConnection();
+        validator.andorCon = us.getConnection();
         prepareData.normaltblNullPrepare(0, 20);
     }
 
     @After
     public void clearDate() throws Exception {
-        Validator.psConRcRsClose(rc, rs);
+        validator.psConRcRsClose(rc, rs);
     }
 
     @Test

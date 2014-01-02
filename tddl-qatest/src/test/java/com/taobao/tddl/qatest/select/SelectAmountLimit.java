@@ -50,8 +50,8 @@ public class SelectAmountLimit extends BaseAndorTestCase {
 
     @Before
     public void MutilDataPrepare() throws SQLException {
-        Validator.con = Validator.getConnection();
-        Validator.andorCon = us.getConnection();
+        validator.con = validator.getConnection();
+        validator.andorCon = us.getConnection();
 
         CountDownLatch latch = new CountDownLatch(thread_size);
         for (int i = 0; i < thread_size; i++) {

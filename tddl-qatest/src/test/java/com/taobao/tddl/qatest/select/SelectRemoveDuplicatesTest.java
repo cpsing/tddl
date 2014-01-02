@@ -24,6 +24,8 @@ import com.taobao.tddl.qatest.util.Validator;
 @RunWith(Parameterized.class)
 public class SelectRemoveDuplicatesTest extends BaseAndorTestCase {
 
+    Validator validator = new Validator();
+
     @Parameters(name = "{index}:table1={0}")
     public static List<String[]> prepare() {
         return Arrays.asList(ExecuteTableName.normaltblTable(dbType));
@@ -35,8 +37,8 @@ public class SelectRemoveDuplicatesTest extends BaseAndorTestCase {
 
     @Before
     public void prepareData() throws Exception {
-        Validator.con = Validator.getConnection();
-        Validator.andorCon = us.getConnection();
+        validator.con = validator.getConnection();
+        validator.andorCon = us.getConnection();
         prepareData.normaltblPrepare(0, MAX_DATA_SIZE);
     }
 

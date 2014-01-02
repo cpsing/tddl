@@ -16,7 +16,6 @@ import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
-import com.taobao.tddl.qatest.util.Validator;
 
 @RunWith(EclipseParameterized.class)
 public class UpdateTest extends BaseAndorTestCase {
@@ -39,7 +38,7 @@ public class UpdateTest extends BaseAndorTestCase {
 
     @After
     public void destory() throws Exception {
-        Validator.psConRcRsClose(rc, rs);
+        psConRcRsClose(rc, rs);
     }
 
     @Test

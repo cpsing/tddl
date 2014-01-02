@@ -19,7 +19,6 @@ import com.taobao.tddl.qatest.BaseAndorTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
-import com.taobao.tddl.qatest.util.Validator;
 
 /**
  * Comment for ReplaceTest
@@ -48,7 +47,7 @@ public class ReplaceTest extends BaseAndorTestCase {
 
     @After
     public void clearData() throws Exception {
-        Validator.psConRcRsClose(rc, rs);
+        psConRcRsClose(rc, rs);
     }
 
     @Test

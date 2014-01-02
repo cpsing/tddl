@@ -1,10 +1,5 @@
 package com.taobao.tddl.qatest.select;
 
-/**
- *  Copyright(c) 2010 taobao. All rights reserved.
- *  通用产品测试
- */
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

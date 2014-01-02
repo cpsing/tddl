@@ -26,8 +26,10 @@ import com.taobao.tddl.qatest.util.Validator;
 @RunWith(Parameterized.class)
 public class SelectWithNoData extends BaseAndorTestCase {
 
-    long pk = 1l;
-    int  id = 1;
+    Validator validator = new Validator();
+
+    long      pk        = 1l;
+    int       id        = 1;
 
     @Parameters(name = "{index}:table0={0}")
     public static List<String[]> prepare() {
@@ -40,15 +42,15 @@ public class SelectWithNoData extends BaseAndorTestCase {
 
     @Before
     public void prepareData() throws Exception {
-        Validator.con = Validator.getConnection();
-        Validator.andorCon = us.getConnection();
+        validator.con = validator.getConnection();
+        validator.andorCon = us.getConnection();
         prepareData.andorUpdateData("delete from  " + normaltblTableName, null);
         prepareData.mysqlUpdateData("delete from  " + normaltblTableName, null);
     }
 
     @After
     public void destory() throws Exception {
-        Validator.psConRcRsClose(rc, rs);
+        validator.psConRcRsClose(rc, rs);
     }
 
     @Test

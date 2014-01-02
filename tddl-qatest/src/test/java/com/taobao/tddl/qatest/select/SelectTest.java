@@ -32,6 +32,8 @@ import com.taobao.tddl.qatest.util.Validator;
 @RunWith(Parameterized.class)
 public class SelectTest extends BaseAndorTestCase {
 
+    Validator validator = new Validator();
+
     @Parameters(name = "{index}:table={0}")
     public static List<String[]> prepare() {
         return Arrays.asList(ExecuteTableName.studentTable(dbType));
@@ -43,8 +45,8 @@ public class SelectTest extends BaseAndorTestCase {
 
     @Before
     public void initData() throws Exception {
-        Validator.con = Validator.getConnection();
-        Validator.andorCon = us.getConnection();
+        validator.con = validator.getConnection();
+        validator.andorCon = us.getConnection();
         andorUpdateData("delete from  " + studentTableName, null);
         mysqlUpdateData("delete from  " + studentTableName, null);
     }

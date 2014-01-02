@@ -364,7 +364,6 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
 
         if (join.isSubQuery() || join.isTopQuery()) {
             buildSelect(join);
-
             sqlBuilder.append(" from ");
         }
 
@@ -372,9 +371,7 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
         IQueryTree right = join.getRightNode();
 
         MysqlPlanVisitorImpl visitor = this.getNewVisitor(left, left);
-
         sqlBuilder.append(visitor.getString());
-
         if (!join.getLeftOuter() && !join.getRightOuter()) {
             throw new RuntimeException("full outter join 不支持");
         } else if (join.getLeftOuter() && !join.getRightOuter()) {
@@ -383,13 +380,9 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
             sqlBuilder.append(" right");
         }
         sqlBuilder.append(" join ");
-
         visitor = this.getNewVisitor(right, right);
-
         sqlBuilder.append(visitor.getString());
-
         sqlBuilder.append(" on ");
-
         StringBuilder joinOnFilterStr = new StringBuilder();
         boolean first = true;
         for (int i = 0; i < join.getLeftJoinOnColumns().size(); i++) {
@@ -400,7 +393,6 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
             }
             ISelectable leftColumn = join.getLeftJoinOnColumns().get(i);
             ISelectable rightColumn = join.getRightJoinOnColumns().get(i);
-
             joinOnFilterStr.append(this.getNewVisitor(leftColumn).getString());
             joinOnFilterStr.append(" = ");
             joinOnFilterStr.append(this.getNewVisitor(rightColumn).getString());
@@ -417,7 +409,6 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
         }
 
         sqlBuilder.append(joinOnFilterStr.toString());
-
         if (join.isSubQuery() || join.isTopQuery()) {
             String whereFilterStr = "";
 
@@ -427,22 +418,17 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
             }
 
             if (!TStringUtil.isEmpty(whereFilterStr)) {
-
                 sqlBuilder.append(" where ");
-
                 sqlBuilder.append(whereFilterStr);
-
             }
             buildGroupBy(join);
             buildHaving(join);
             buildOrderBy(join);
-
             buildLimit(join);
         }
 
         if (join.isSubQuery() && !join.isTopQuery()) {
             sqlBuilder.append(" ) ");
-
             if (join.getAlias() != null) sqlBuilder.append(" ").append(join.getAlias()).append(" ");
         }
     }

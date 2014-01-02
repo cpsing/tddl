@@ -40,15 +40,15 @@ public class SelectWithLike extends BaseAndorTestCase {
 
     @Before
     public void prepareDate() throws Exception {
-        Validator.con = Validator.getConnection();
-        Validator.andorCon = us.getConnection();
+        validator.con = validator.getConnection();
+        validator.andorCon = us.getConnection();
         prepareData.normaltblPrepare(0, 20);
         prepareData.normaltblTwoPrepare();
     }
 
     @After
     public void destory() throws Exception {
-        Validator.psConRcRsClose(rc, rs);
+        validator.psConRcRsClose(rc, rs);
     }
 
     /**

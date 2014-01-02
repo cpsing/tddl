@@ -29,6 +29,8 @@ import com.taobao.tddl.qatest.util.Validator;
 @RunWith(Parameterized.class)
 public class SelectWithConditionTest extends BaseAndorTestCase {
 
+    Validator validator = new Validator();
+
     @Parameters(name = "{index}:table0={0},table1={1}")
     public static List<String[]> prepare() {
         return Arrays.asList(ExecuteTableName.normaltblStudentTable(dbType));
@@ -42,8 +44,8 @@ public class SelectWithConditionTest extends BaseAndorTestCase {
     @Before
     public void prepareDate() throws Exception {
 
-        Validator.con = Validator.getConnection();
-        Validator.andorCon = us.getConnection();
+        validator.con = validator.getConnection();
+        validator.andorCon = us.getConnection();
         // if(needPerparedData)
         {
             prepareData.normaltblPrepare(0, 20);
@@ -53,7 +55,7 @@ public class SelectWithConditionTest extends BaseAndorTestCase {
 
     @After
     public void clearDate() throws Exception {
-        Validator.psConRcRsClose(rc, rs);
+        validator.psConRcRsClose(rc, rs);
     }
 
     @Test

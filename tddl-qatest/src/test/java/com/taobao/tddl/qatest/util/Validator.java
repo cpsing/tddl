@@ -18,11 +18,11 @@ import com.taobao.tddl.matrix.jdbc.TDataSource;
 
 public class Validator {
 
-    public static TDataSource       us;
-    public static Connection        con;
-    public static Connection        andorCon;
-    public static PreparedStatement ps;
-    public static PreparedStatement andorPs;
+    public TDataSource       us;
+    public Connection        con;
+    public Connection        andorCon;
+    public PreparedStatement ps;
+    public PreparedStatement andorPs;
 
     /**
      * mysql查询数据
@@ -677,7 +677,7 @@ public class Validator {
      * @throws SQLException
      */
 
-    public static void psConRcRsClose(ResultSet rc, ResultSet rs) throws SQLException {
+    public void psConRcRsClose(ResultSet rc, ResultSet rs) throws SQLException {
         if (ps != null) {
             ps.close();
             ps = null;
@@ -740,7 +740,7 @@ public class Validator {
      * 
      * @return
      */
-    public static Connection getConnection() {
+    public Connection getConnection() {
         Connection conn = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
