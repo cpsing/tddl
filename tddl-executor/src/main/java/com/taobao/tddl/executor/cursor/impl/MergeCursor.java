@@ -201,9 +201,11 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
             ibf.setColumn(col);
             ibf.setValues(values);
             ibf.setOperation(OPERATION.IN);
-
-            if (keyFilterOrValueFilter) query.keyQuery(FilterUtils.and(query.getKeyFilter(), ibf));
-            else query.valueQuery(FilterUtils.and(query.getResultFilter(), ibf));
+            query.keyQuery(FilterUtils.and(FilterUtils.and(query.getKeyFilter(), ibf), query.getResultFilter()));
+            // if (keyFilterOrValueFilter)
+            // query.keyQuery(FilterUtils.and(query.getKeyFilter(), ibf));
+            // else query.valueQuery(FilterUtils.and(query.getResultFilter(),
+            // ibf));
 
             query.alias(iquery.getAlias());
             query.build();
