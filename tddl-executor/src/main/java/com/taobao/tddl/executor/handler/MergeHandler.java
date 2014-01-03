@@ -169,10 +169,12 @@ public class MergeHandler extends QueryHandlerCommon {
 
                 if (aggregate.isNeedDistinctArg()) {
                     IQueryTree sub = (IQueryTree) ((IMerge) executor).getSubNode().get(0);
-                    cursor = this.processOrderBy(cursor, sub.getOrderBys(), executionContext, (IQueryTree) executor,
-
-                    true);
-                    cursor = new DistinctCursor(cursor);
+                    cursor = this.processOrderBy(cursor,
+                        getOrderBy(sub.getColumns()),
+                        executionContext,
+                        (IQueryTree) executor,
+                        true);
+                    cursor = new DistinctCursor(cursor, getOrderBy(sub.getColumns()));
                     break;
                 }
             }

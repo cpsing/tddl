@@ -53,7 +53,7 @@ public class DistinctCursorTest {
         List<ISchematicCursor> cursors = new ArrayList();
         cursors.add(new SchematicCursor(mockCursor1, orderBys));
         cursors.add(new SchematicCursor(mockCursor2, orderBys));
-        DistinctCursor c = new DistinctCursor(new MergeSortedCursors(cursors, true));
+        DistinctCursor c = new DistinctCursor(new MergeSortedCursors(cursors, true), orderBys);
         Object[] expected = new Object[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13 };
         List actual = new ArrayList();
 
@@ -82,7 +82,7 @@ public class DistinctCursorTest {
         List<ISchematicCursor> cursors = new ArrayList();
         cursors.add(new SchematicCursor(mockCursor1, orderBys));
         cursors.add(new SchematicCursor(mockCursor2, orderBys));
-        DistinctCursor c = new DistinctCursor(new MergeSortedCursors(cursors, true));
+        DistinctCursor c = new DistinctCursor(new MergeSortedCursors(cursors, true), orderBys);
 
         Assert.assertEquals("[T1.ID, T1.NAME, T1.SCHOOL]", c.getReturnColumns().toString());
         Assert.assertEquals("[OrderBy [columnName=T1.ID, direction=true]]", c.getOrderBy().toString());
@@ -103,7 +103,7 @@ public class DistinctCursorTest {
         List<ISchematicCursor> cursors = new ArrayList();
         cursors.add(new SchematicCursor(mockCursor1, orderBys));
         cursors.add(new SchematicCursor(mockCursor2, orderBys));
-        DistinctCursor c = new DistinctCursor(new MergeSortedCursors(cursors, true));
+        DistinctCursor c = new DistinctCursor(new MergeSortedCursors(cursors, true), orderBys);
 
         c.next();
 
