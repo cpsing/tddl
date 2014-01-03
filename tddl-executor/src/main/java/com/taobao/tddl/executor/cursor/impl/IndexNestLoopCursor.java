@@ -12,7 +12,6 @@ import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
-import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 
 /**
  * @author jianxing <jianxing.qx@taobao.com> 重构用以支持mget接口实现。
@@ -31,7 +30,6 @@ public class IndexNestLoopCursor extends JoinSchematicCursor implements IIndexNe
     protected IRowSet           current;
     protected IteratorDirection iteratorDirection = null;
     protected boolean           right_prefix;
-    protected List<IOrderBy>    orderBys;
     protected ISchematicCursor  dup_cursor;
     protected CloneableRecord   right_key;
     protected RecordCodec       rightJoinOnColumnCodec;

@@ -22,37 +22,45 @@ public class Query extends QueryTree implements IQuery {
     protected String     indexName;
     protected IQueryTree subQuery;
 
+    @Override
     public IFilter getKeyFilter() {
         return keyFilter;
     }
 
+    @Override
     public IQuery setKeyFilter(IFilter keyFilter) {
         this.keyFilter = keyFilter;
         return this;
     }
 
+    @Override
     public LOCK_MODEL getLockModel() {
         return lockModel;
     }
 
+    @Override
     public IQuery setLockModel(LOCK_MODEL lockModel) {
         this.lockModel = lockModel;
         return this;
     }
 
+    @Override
     public IQuery setTableName(String tableName) {
         this.tableName = tableName;
         return this;
     }
 
+    @Override
     public String getTableName() {
         return tableName;
     }
 
+    @Override
     public String getIndexName() {
         return indexName;
     }
 
+    @Override
     public IQuery setIndexName(String indexName) {
         this.indexName = indexName;
         return this;
@@ -76,15 +84,18 @@ public class Query extends QueryTree implements IQuery {
 
     }
 
+    @Override
     public IQuery setSubQuery(IQueryTree subQuery) {
         this.subQuery = subQuery;
         return this;
     }
 
+    @Override
     public IQueryTree getSubQuery() {
         return subQuery;
     }
 
+    @Override
     public IQuery copy() {
         IQuery query = ASTNodeFactory.getInstance().createQuery();
         copySelfTo((QueryTree) query);
@@ -92,13 +103,15 @@ public class Query extends QueryTree implements IQuery {
         query.setSubQuery(this.getSubQuery());
         query.setTableName(this.getTableName());
 
-        return null;
+        return query;
     }
 
+    @Override
     public void accept(PlanVisitor visitor) {
         visitor.visit(this);
     }
 
+    @Override
     public String toStringWithInden(int inden) {
         String tabTittle = OptimizerToString.getTab(inden);
         String tabContent = OptimizerToString.getTab(inden + 1);

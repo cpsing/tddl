@@ -47,9 +47,7 @@ public class MergeHandler extends QueryHandlerCommon {
         IRepository repo = executionContext.getCurrentRepository();
         List<IDataNodeExecutor> subNodes = merge.getSubNode();
         List<ISchematicCursor> subCursors = new ArrayList<ISchematicCursor>();
-        if (QUERY_CONCURRENCY.CONCURRENT == merge.getQueryConcurrency()) {
-            executeSubNodesFuture(cursor, executionContext, subNodes, subCursors);
-        } else {
+        {
             if (!merge.isSharded()) {
                 /*
                  * 如果是个需要左驱动表的结果来进行查询的查询，直接返回mergeCursor.
@@ -83,8 +81,14 @@ public class MergeHandler extends QueryHandlerCommon {
                     subNodes.get(0),
                     tempOrderBy);
                 return cursor;
+            } else {
+                if (QUERY_CONCURRENCY.CONCURRENT == merge.getQueryConcurrency()) {
+                    executeSubNodesFuture(cursor, executionContext, subNodes, subCursors);
+                } else {
+                    executeSubNodes(cursor, executionContext, subNodes, subCursors);
+
+                }
             }
-            executeSubNodes(cursor, executionContext, subNodes, subCursors);
         }
         if (subNodes.get(0) instanceof IPut) {// 合并affect_rows
             int affect_rows = 0;
