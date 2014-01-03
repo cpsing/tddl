@@ -14,7 +14,6 @@ import com.taobao.tddl.executor.spi.IAtomExecutor;
 import com.taobao.tddl.executor.spi.IGroupExecutor;
 import com.taobao.tddl.executor.spi.IRepository;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
-import com.taobao.tddl.repo.bdb.executor.ExceptionSorter.ReturnVal;
 
 @SuppressWarnings("rawtypes")
 public class BDBGroupExecutor implements IGroupExecutor {
@@ -95,19 +94,23 @@ public class BDBGroupExecutor implements IGroupExecutor {
     public ISchematicCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext)
                                                                                                        throws TddlException {
 
-        IAtomExecutor atomExecutor = this.selectAtomExecutor(executeType, executionContext);
-        try {
-            rsHandler = commandExecutor.execByExecPlanNode(qc, executionContext);
-        } catch (TddlException e) {
-            ReturnVal<Integer> isRetryException = exceptionSorter.isRetryException(e.getMessage(), excludeKeys, index);
-            excludeKeys = isRetryException.getExcludeKeys();
-            if (!isRetryException.isRetryException()) {
-                throw e;
-            } else {
-                // 将excludeKey 加入map后，进入下一次循环
-                continue;
-            }
-        }
+        // IAtomExecutor atomExecutor = this.selectAtomExecutor(executeType,
+        // executionContext);
+        // try {
+        // rsHandler = commandExecutor.execByExecPlanNode(qc, executionContext);
+        // } catch (TddlException e) {
+        // ReturnVal<Integer> isRetryException =
+        // exceptionSorter.isRetryException(e.getMessage(), excludeKeys, index);
+        // excludeKeys = isRetryException.getExcludeKeys();
+        // if (!isRetryException.isRetryException()) {
+        // throw e;
+        // } else {
+        // // 将excludeKey 加入map后，进入下一次循环
+        // continue;
+        // }
+        // }
+
+        return null;
 
     }
 
