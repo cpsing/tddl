@@ -102,7 +102,7 @@ public class Query extends QueryTree implements IQuery {
         query.setLockModel(this.getLockModel());
         query.setSubQuery(this.getSubQuery());
         query.setTableName(this.getTableName());
-
+        query.setKeyFilter(this.getKeyFilter());
         return query;
     }
 

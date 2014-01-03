@@ -113,15 +113,20 @@ public class Validator {
         List<Object> mutilMysqlResult = new ArrayList<Object>();
         List<Object> mutilResult = new ArrayList<Object>();
         try {
+
             while (rs.next()) {
                 List<Object> mysqlResult = new ArrayList<Object>();
-                List<Object> result = new ArrayList<Object>();
-                ret.next();
                 for (int i = 0; i < columnParam.length; i++) {
                     mysqlResult.add(getObject(rs, columnParam, i));
-                    result.add(getObject(ret, columnParam, i));
                 }
                 mutilMysqlResult.add(mysqlResult);
+            }
+
+            while (ret.next()) {
+                List<Object> result = new ArrayList<Object>();
+                for (int i = 0; i < columnParam.length; i++) {
+                    result.add(getObject(ret, columnParam, i));
+                }
                 mutilResult.add(result);
             }
             if (mutilMysqlResult.size() != mutilResult.size()) {
@@ -314,10 +319,12 @@ public class Validator {
             this.number = number;
         }
 
+        @Override
         public String toString() {
             return this.number == null ? null : this.number.toString();
         }
 
+        @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
             if (obj == null) return false;
@@ -352,7 +359,7 @@ public class Validator {
         } else if (data instanceof Double) {
             data = new BigDecimal((Double) data);
         } else if (data instanceof BigDecimal) {
-            data = (BigDecimal) data;
+            data = data;
         } else if (data instanceof Date) {
             data = ((Date) data).getTime();
         } else if (data instanceof byte[]) {
