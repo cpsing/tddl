@@ -37,11 +37,17 @@ public class JoinSchematicCursor extends SchematicCursor {
     protected List<ISelectable>   rightJoinOnColumns;
 
     /**
-     * 见 com.taobao.ustore.optimizer.node.lazy.query.JoinNode
-     * leftOuterJoin:leftOuter=true && rightOuter=false
-     * rightOuterJoin:leftOuter=false && rightOuter=true
-     * innerJoin:leftOuter=true && rightOuter=true outerJoin:leftOuter=false &&
-     * rightOuter=false
+     * <pre>
+     * 见 com.taobao.tddl.optimizer.core.ast.query.JoinNode
+     * leftOuterJoin:
+     *      leftOuter=true && rightOuter=false
+     * rightOuterJoin:
+     *      leftOuter=false && rightOuter=true
+     * innerJoin:
+     *      leftOuter=false && rightOuter=false 
+     * outerJoin:
+     *      leftOuter=true && rightOuter=true
+     * </pre>
      */
     protected boolean             leftOutJoin    = false;
     protected boolean             rightOutJoin   = false;

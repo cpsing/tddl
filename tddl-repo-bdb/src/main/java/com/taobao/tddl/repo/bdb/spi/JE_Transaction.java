@@ -118,7 +118,5 @@ public class JE_Transaction implements ITransaction {
 
     @Override
     public void setAutoCommit(boolean autoCommit) {
-        // TODO Auto-generated method stub
-
     }
 }

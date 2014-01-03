@@ -1,6 +1,7 @@
 package com.taobao.tddl.executor.spi;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.taobao.tddl.common.exception.TddlException;
@@ -129,7 +130,9 @@ public class CursorFactoryDefaultImpl implements ICursorFactory {
             if ("True".equalsIgnoreCase(GeneralUtil.getExtraCmd(executionContext.getExtraCmds(),
                 ExtraCmd.ExecutionExtraCmd.ALLOW_TEMPORARY_TABLE))) {
 
-                IRepository bdbRepo = ExecutorContext.getContext().getRepositoryHolder().get(Group.GroupType.BDB_JE);
+                IRepository bdbRepo = ExecutorContext.getContext()
+                    .getRepositoryHolder()
+                    .getOrCreateRepository(Group.GroupType.BDB_JE.name(), Collections.EMPTY_MAP);
                 return new TempTableSortCursor(this,
                     bdbRepo,
                     cursor,

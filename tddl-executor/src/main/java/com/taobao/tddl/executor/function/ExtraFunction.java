@@ -95,7 +95,7 @@ public abstract class ExtraFunction implements IExtraFunction {
         for (Object funcArg : argsArr) {
             if (funcArg instanceof IFunction
                 && ((IFunction) funcArg).getExtraFunction().getFunctionType().equals(FunctionType.Aggregate)) {
-                Map<String, Object> resMap = (Map<String, Object>) ((IFunction) funcArg);
+                Map<String, Object> resMap = ((AggregateFunction) ((IFunction) funcArg).getExtraFunction()).getResult();
                 for (Object ob : resMap.values()) {
                     inputArg[index] = ob;
                     index++;
@@ -104,9 +104,7 @@ public abstract class ExtraFunction implements IExtraFunction {
                 if (IColumn.STAR.equals(((ISelectable) funcArg).getColumnName())) {
                     inputArg[index] = kvPair;
                 } else {
-
                     inputArg[index] = ExecUtils.getValueByIColumn(kvPair, ((ISelectable) funcArg));
-
                 }
                 index++;
             } else {
@@ -131,7 +129,6 @@ public abstract class ExtraFunction implements IExtraFunction {
                 Integer index = kvPair.getParentCursorMeta().getIndex(null, this.function.getColumnName());
                 if (index != null) {
                     Object v = kvPair.getObject(index);
-
                     ((ScalarFunction) this).setResult(v);
                 } else {
                     throw new RuntimeException(this.function.getFunctionName() + " 没有实现，结果集中也没有");
@@ -148,9 +145,7 @@ public abstract class ExtraFunction implements IExtraFunction {
                         throw e;
                     }
                 }
-
             }
-            return;
         } else {
             // 函数的input参数
             List<Object> reduceArgs = this.getReduceArgs(function);

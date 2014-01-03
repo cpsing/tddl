@@ -93,7 +93,7 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor impleme
 
         if (isLeftOutJoin() && !isRightOutJoin()) {
             leftOutJoin(leftJoinOnColumnCache, rightColumn, vfc, records);
-        } else if (isLeftOutJoin() && isRightOutJoin()) {
+        } else if (!isLeftOutJoin() && !isRightOutJoin()) {
             // inner join
             blockNestedLoopJoin(leftJoinOnColumnCache, rightColumn, vfc, records);
         } else {

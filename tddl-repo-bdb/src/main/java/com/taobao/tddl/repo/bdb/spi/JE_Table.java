@@ -168,9 +168,12 @@ public class JE_Table extends AbstractTable {
             valueEntry = emptyValueEntry;
         }
         try {
-            OperationStatus operationStatus = getDatabase(dbName).put(context.getTransaction() == null ? null : ((JE_Transaction) context.getTransaction()).txn,
-                keyEntry,
-                valueEntry);
+            ITransaction transaction = context.getTransaction();
+            com.sleepycat.je.Transaction txn = null;
+            if (transaction != null && transaction instanceof JE_Transaction) {
+                txn = ((JE_Transaction) transaction).txn;
+            }
+            OperationStatus operationStatus = getDatabase(dbName).put(txn, keyEntry, valueEntry);
             if (operationStatus.equals(OperationStatus.SUCCESS)) {
                 return;
             }
