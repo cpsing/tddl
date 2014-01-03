@@ -187,7 +187,13 @@ public abstract class QueryTreeNodeBuilder {
                 }
             }
 
-            isThis = c.isSameName(selected);
+            // 在当前select中查找，先比较column name，再比较alias name
+            if (selected.getColumnName().equals(c.getColumnName())) {
+                isThis = true;
+            } else if (selected.getAlias() != null && selected.getAlias().equals(c.getColumnName())) {
+                isThis = true;
+            }
+
             if (isThis) {
                 column = selected;
                 return column;

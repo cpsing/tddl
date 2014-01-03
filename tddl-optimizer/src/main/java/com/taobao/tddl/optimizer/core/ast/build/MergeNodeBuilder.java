@@ -54,7 +54,6 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
      * 2. substring(),to_date()等简单scalar函数(不包含条件1的函数)，推到子节点去，然后在父节点留一个字段，而不是函数
      * </pre>
      */
-    @Override
     public void buildFunction() {
         super.buildFunction();
 
@@ -106,6 +105,18 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
             }
 
             child.build();
+        }
+    }
+
+    public void buildFunction(IFunction f) {
+        for (Object arg : f.getArgs()) {
+            if (arg instanceof IFunction) {
+                this.buildSelectable((IFunction) arg);
+            } else if (arg instanceof ISelectable) {
+                if (((ISelectable) arg).isDistinct()) {// 只下推函数中的distinct字段
+                    this.buildSelectable((ISelectable) arg);
+                }
+            }
         }
     }
 

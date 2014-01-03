@@ -10,8 +10,6 @@ import java.util.concurrent.ThreadFactory;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.TStringUtil;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ExecutorContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -31,6 +29,9 @@ import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin;
 import com.taobao.tddl.optimizer.core.plan.query.IMerge;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author mengshi.sunmengshi 2013-12-5 上午11:06:01
@@ -119,7 +120,7 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
 
         if (isDistinct(IQueryTree)) {
             cursor = processOrderBy(cursor, getOrderBy(IQueryTree.getColumns()), executionContext, IQueryTree, false);
-            cursor = new DistinctCursor(cursor);
+            cursor = new DistinctCursor(cursor, getOrderBy(IQueryTree.getColumns()));
         }
 
         return cursor;

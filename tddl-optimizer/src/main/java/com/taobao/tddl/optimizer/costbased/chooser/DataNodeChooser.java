@@ -670,7 +670,7 @@ public class DataNodeChooser {
             for (ISelectable partitionColumn : partitionColumns) {
                 boolean isFound = false;
                 for (ISelectable joinColumn : joinColumns) {
-                    if (joinColumn.isSameName(partitionColumn)) {
+                    if (joinColumn.getColumnName().equals(partitionColumn.getColumnName())) {// partition无别名
                         isFound = true;
                         break;
                     }

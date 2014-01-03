@@ -96,39 +96,51 @@ public class OrderByPusher {
             if (containsDistinctColumns(merge)) {
                 for (ASTNode con : merge.getChildren()) {
                     QueryTreeNode child = (QueryTreeNode) con;
+
+                    // 去掉function函数，比如count(distinct id)
+                    List<IFunction> toRemove = new ArrayList();
+                    for (ISelectable s : child.getColumnsSelected()) {
+                        if (s instanceof IFunction) {
+                            toRemove.add((IFunction) s);
+                        }
+                    }
+                    child.getColumnsSelected().removeAll(toRemove);
+                    child.build();
+
                     // 重新构建order by / group by字段
                     if (!child.getGroupBys().isEmpty()) {
                         List<IOrderBy> implicitOrderBys = child.getImplicitOrderBys();
                         // 如果order by包含了所有的group by顺序
-                        if (containAllGroupBys(implicitOrderBys, child.getGroupBys())) {
+                        if (containAllOrderBys(implicitOrderBys, child.getGroupBys())) {
                             child.setOrderBys(implicitOrderBys);
                         } else {
+                            // order by不是一个group by的子集，优先使用group by
                             child.setOrderBys(child.getGroupBys());
                         }
                     }
 
                     // 将查询所有字段进行order by，保证每个child返回的数据顺序都是一致的
+                    List<IOrderBy> distinctOrderbys = new LinkedList<IOrderBy>();
                     for (ISelectable s : child.getColumnsSelected()) {
-                        boolean existed = false;
-                        for (IOrderBy orderExisted : child.getOrderBys()) {
-                            if (orderExisted.getColumn().equals(s)) {
-                                existed = true;
-                                break;
-                            }
-                        }
+                        IOrderBy order = ASTNodeFactory.getInstance().createOrderBy();
+                        order.setColumn(s).setDirection(true);
+                        distinctOrderbys.add(order);
+                    }
 
-                        if (!existed) {
-                            IOrderBy order = ASTNodeFactory.getInstance().createOrderBy();
-                            order.setColumn(s).setDirection(true);
-                            child.orderBy(s, true);
-                        }
+                    // 尝试调整下distinct的order by顺序，调整不了的话，按照distinct columns顺序
+                    List<IOrderBy> orderbys = getPushOrderBysCombileOrderbyColumns(distinctOrderbys,
+                        child.getOrderBys());
+                    if (orderbys.isEmpty()) {
+                        child.setOrderBys(distinctOrderbys);
+                    } else {
+                        child.setOrderBys(orderbys);
                     }
 
                     // 清空child的group by，由merge节点进行处理
                     child.setGroupBys(new ArrayList(0));
                 }
 
-                // 设置为distinct标记
+                // merge上的函数设置为distinct标记
                 for (ISelectable s : merge.getColumnsSelected()) {
                     if (s instanceof IFunction && isDistinct(s)) {
                         ((IFunction) s).setNeedDistinctArg(true);
@@ -232,9 +244,9 @@ public class OrderByPusher {
                     } else {
                         // 尝试一下只推group by的排序，减少一层排序
                         if (join.getGroupBys() != null && !join.getGroupBys().isEmpty()) {
-                            List<IOrderBy> leftImplicitOrders = getPushOrderBysCombileGroupAndJoinColumns(join.getGroupBys(),
+                            List<IOrderBy> leftImplicitOrders = getPushOrderBysCombileOrderbyColumns(join.getGroupBys(),
                                 leftJoinColumnOrderbys);
-                            List<IOrderBy> rightImplicitOrders = getPushOrderBysCombileGroupAndJoinColumns(join.getGroupBys(),
+                            List<IOrderBy> rightImplicitOrders = getPushOrderBysCombileOrderbyColumns(join.getGroupBys(),
                                 rightJoinColumnOrderbys);
 
                             // 重置下group by的顺序
@@ -308,7 +320,7 @@ public class OrderByPusher {
         return false;
     }
 
-    private static boolean containAllGroupBys(List<IOrderBy> orderBys, List<IOrderBy> groupBys) {
+    private static boolean containAllOrderBys(List<IOrderBy> orderBys, List<IOrderBy> groupBys) {
         for (IOrderBy group : groupBys) {
             boolean found = false;
             for (IOrderBy order : orderBys) {
@@ -450,23 +462,26 @@ public class OrderByPusher {
     }
 
     /**
-     * 尝试组合group by和join列的排序字段，以join列顺序为准，重排groupBys顺序
+     * <pre>
+     * 1. 尝试组合group by和join列的排序字段，以join列顺序为准，重排groupBys顺序 
+     * 2. 尝试组合order by列和distinct列的排序字段，以order列顺序为准，重排distinct顺序
+     * </pre>
      */
-    private static List<IOrderBy> getPushOrderBysCombileGroupAndJoinColumns(List<IOrderBy> groups,
-                                                                            List<IOrderBy> joinOrders) {
+    private static List<IOrderBy> getPushOrderBysCombileOrderbyColumns(List<IOrderBy> matchOrders,
+                                                                       List<IOrderBy> standardOrders) {
         List<IOrderBy> newOrderbys = new ArrayList<IOrderBy>();
-        for (IOrderBy joinOrder : joinOrders) {
-            if (findOrderByByColumn(groups, joinOrder.getColumn()) >= 0) {
-                newOrderbys.add(joinOrder);
+        for (IOrderBy standardOrder : standardOrders) {
+            if (findOrderByByColumn(matchOrders, standardOrder.getColumn()) >= 0) {
+                newOrderbys.add(standardOrder);
             } else {
                 return new ArrayList<IOrderBy>(); // 返回一般的顺序没用
             }
         }
 
-        for (IOrderBy group : groups) {
+        for (IOrderBy matchOrder : matchOrders) {
             // 找到join column中没有的进行添加
-            if (findOrderByByColumn(newOrderbys, group.getColumn()) < 0) {
-                newOrderbys.add(group);
+            if (findOrderByByColumn(newOrderbys, matchOrder.getColumn()) < 0) {
+                newOrderbys.add(matchOrder);
             }
         }
 
