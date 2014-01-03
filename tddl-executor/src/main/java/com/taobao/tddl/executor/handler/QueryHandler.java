@@ -34,43 +34,30 @@ public class QueryHandler extends QueryHandlerCommon {
         super();
     }
 
-    protected ISchematicCursor doQuery(ISchematicCursor cursor,
-
-    IDataNodeExecutor executor, ExecutionContext executionContext) throws TddlException {
+    protected ISchematicCursor doQuery(ISchematicCursor cursor, IDataNodeExecutor executor,
+                                       ExecutionContext executionContext) throws TddlException {
         List<IOrderBy> _orderBy = ((IQueryTree) executor).getOrderBys();
         IRepository repo = executionContext.getCurrentRepository();
         IDataNodeExecutor _subQuery = null;
         IQuery query = (IQuery) executor;
         _subQuery = query.getSubQuery();
-
         if (_subQuery != null) {
             // 如果有subQuery,则按照subquery构建
             cursor = ExecutorContext.getContext().getTopologyExecutor().execByExecPlanNode(_subQuery, executionContext);
         } else {
             ITable table = null;
-            String indexName = query.getIndexName();
             IndexMeta meta = null;
             buildTableAndMeta(query, executionContext);
             table = executionContext.getTable();
             meta = executionContext.getMeta();
-
-            if (cursor == null) {
-                if (meta != null) {
-                    cursor = table.getCursor(executionContext, meta, (IQuery) executor);
-                    // cursor = repo.getCursorFactory().aliasCursor(cursor,
-                    // table.getSchema().getTableName());
-                } else {
-                    throw new TddlException("index meta is null" + indexName);
-                }
-            }
+            cursor = table.getCursor(executionContext, meta, (IQuery) executor);
         }
+
         // 获得查询结果的元数据
         // 获得本次查询的keyFilter
         IFilter keyFilter = query.getKeyFilter();
         if (keyFilter != null) {
-
             if (keyFilter instanceof IBooleanFilter) {
-
                 // 外键约束好像没用
                 // if (meta.getRelationship() == Relationship.MANY_TO_MANY) {
                 // cursor = manageToReverseIndex(cursor, executor, repo,
@@ -79,14 +66,12 @@ public class QueryHandler extends QueryHandlerCommon {
                 // } else {}
                 // 非倒排索引,即普通索引,走的查询方式
                 cursor = manageToBooleanRangeCursor(executionContext, cursor, repo, keyFilter);
-
             } else if (keyFilter instanceof ILogicalFilter) {
                 ILogicalFilter lf = (ILogicalFilter) keyFilter;
                 cursor = repo.getCursorFactory().rangeCursor(executionContext, cursor, lf);
             }
 
             if (cursor instanceof RangeCursor) {//
-
                 if (_orderBy != null) {
                     if (_orderBy.size() == 1) {
                         IOrderBy o1 = _orderBy.get(0);

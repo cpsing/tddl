@@ -32,11 +32,11 @@ public class DeleteHandler extends PutHandlerCommon {
         int affect_rows = 0;
         IPut delete = put;
         ISchematicCursor conditionCursor = null;
-        conditionCursor = ExecutorContext.getContext()
-            .getTopologyExecutor()
-            .execByExecPlanNode(delete.getQueryTree(), executionContext);
         IRowSet rowSet = null;
         try {
+            conditionCursor = ExecutorContext.getContext()
+                .getTopologyExecutor()
+                .execByExecPlanNode(delete.getQueryTree(), executionContext);
             while ((rowSet = conditionCursor.next()) != null) {
                 affect_rows++;
                 CloneableRecord key = ExecUtils.convertToClonableRecord(rowSet);
@@ -46,10 +46,13 @@ public class DeleteHandler extends PutHandlerCommon {
         } catch (Exception e) {
             throw e;
         } finally {
-            List<TddlException> exs = new ArrayList();
-            exs = conditionCursor.close(exs);
-
-            if (!exs.isEmpty()) throw GeneralUtil.mergeException(exs);
+            if (conditionCursor != null) {
+                List<TddlException> exs = new ArrayList();
+                exs = conditionCursor.close(exs);
+                if (!exs.isEmpty()) {
+                    throw GeneralUtil.mergeException(exs);
+                }
+            }
         }
         return affect_rows;
     }

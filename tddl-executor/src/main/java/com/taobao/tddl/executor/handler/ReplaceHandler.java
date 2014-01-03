@@ -41,10 +41,8 @@ public class ReplaceHandler extends PutHandlerCommon {
             for (ColumnMeta cm : meta.getKeyColumns()) {
                 if (cm.getName().equals(ExecUtils.getColumn(columns.get(i)).getColumnName())) {
                     Object v = put.getUpdateValues().get(i);
-
                     if (v instanceof IFunction) {
                         IFunction func = ((IFunction) v);
-
                         ((ExtraFunction) func.getExtraFunction()).serverMap((IRowSet) null);
                         v = func.getExtraFunction().getResult();
                     }
@@ -55,9 +53,6 @@ public class ReplaceHandler extends PutHandlerCommon {
             for (ColumnMeta cm : meta.getValueColumns()) {
                 if (cm.getName().equals(ExecUtils.getColumn(columns.get(i)).getColumnName())) {
                     Object v = put.getUpdateValues().get(i);
-                    // if (v instanceof NullVal) {
-                    // v = null;
-                    // }
                     value.put(cm.getName(), v);
                     break;
                 }
@@ -71,7 +66,8 @@ public class ReplaceHandler extends PutHandlerCommon {
         }
         ITHLog iThLog = transaction.getHistoryLog();
         if (iThLog != null) {
-            CloneableRecord old = table.get(executionContext, key, meta, put.getTableName());
+            // CloneableRecord old = table.get(executionContext, key, meta,
+            // put.getTableName());
             prepare(transaction, table, null, key, value, PUT_TYPE.REPLACE);
         }
 

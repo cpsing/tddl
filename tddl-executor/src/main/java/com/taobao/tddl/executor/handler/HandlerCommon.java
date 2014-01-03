@@ -46,15 +46,14 @@ public abstract class HandlerCommon implements ICommandHandler {
         nestBuildTableAndSchema(groupDataNode, executionContext, indexName, query.getTableName(), true);
     }
 
+    /**
+     * 准备indexMeta和ITable信息
+     */
     protected void nestBuildTableAndSchema(String groupDataNode, ExecutionContext executionContext, String indexName,
                                            String actualTable, boolean logicalIndex) throws TddlException {
         if (indexName != null && !"".equals(indexName)) {
             String tableName = ExecUtils.getLogicTableName(indexName);
-            TableMeta ts = null;
-            ts = getTableMeta(tableName);
-            if (ts == null) {
-                throw new IllegalArgumentException("table :" + tableName + " is not found");
-            }
+            TableMeta ts = getTableMeta(tableName);
             executionContext.setMeta(ts.getIndexMeta(indexName));
             executionContext.setTable(executionContext.getCurrentRepository().getTable(ts, groupDataNode));
         }

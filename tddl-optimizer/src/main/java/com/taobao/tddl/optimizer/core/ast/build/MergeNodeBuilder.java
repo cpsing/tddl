@@ -108,18 +108,6 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
         }
     }
 
-    public void buildFunction(IFunction f) {
-        for (Object arg : f.getArgs()) {
-            if (arg instanceof IFunction) {
-                this.buildSelectable((IFunction) arg);
-            } else if (arg instanceof ISelectable) {
-                if (((ISelectable) arg).isDistinct()) {// 只下推函数中的distinct字段
-                    this.buildSelectable((ISelectable) arg);
-                }
-            }
-        }
-    }
-
     private List<IFunction> findAggregateFunctionsInScalar(IFunction s) {
         List<IFunction> res = new ArrayList();
         this.findAggregateFunctionsInScalar(s, res);

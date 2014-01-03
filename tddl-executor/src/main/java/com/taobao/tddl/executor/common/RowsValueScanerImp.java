@@ -9,6 +9,8 @@ import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
 /**
+ * 根据给定的字段遍历, ps. 期望的字段列表不一定是cursor meta中的返回顺序，需要做index映射
+ * 
  * @author mengshi.sunmengshi 2013-12-3 下午1:53:33
  * @since 5.1.0
  */
@@ -25,8 +27,9 @@ public class RowsValueScanerImp implements IRowsValueScaner {
         indexList = new ArrayList<Integer>(left_columns.size());
         for (ISelectable icol : left_columns) {
             Integer index = this.cursorMeta.getIndex(icol.getTableName(), icol.getColumnName());
-            if (index == null && icol.getAlias() != null) index = this.cursorMeta.getIndex(icol.getTableName(),
-                icol.getAlias());
+            if (index == null && icol.getAlias() != null) {
+                index = this.cursorMeta.getIndex(icol.getTableName(), icol.getAlias());
+            }
 
             indexList.add(index);
         }

@@ -42,9 +42,6 @@ public class InsertHandler extends PutHandlerCommon {
             for (ColumnMeta cm : meta.getKeyColumns()) {
                 if (cm.getName().equals(ExecUtils.getColumn(columns.get(i)).getColumnName())) {
                     Object v = insert.getUpdateValues().get(i);
-                    // if (v instanceof NullVal) {
-                    // v = null;
-                    // }
                     if (v instanceof IFunction) {
                         IFunction func = ((IFunction) v);
                         ((ExtraFunction) func.getExtraFunction()).serverMap((IRowSet) null);
@@ -59,7 +56,6 @@ public class InsertHandler extends PutHandlerCommon {
                     Object v = insert.getUpdateValues().get(i);
                     if (v instanceof IFunction) {
                         IFunction func = ((IFunction) v);
-
                         ((ExtraFunction) func.getExtraFunction()).serverMap((IRowSet) null);
                         v = func.getExtraFunction().getResult();
                     }

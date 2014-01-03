@@ -581,7 +581,7 @@ public class DataNodeChooser {
 
         PartitionJoinResult rightResult = isJoinOnPartitionOneSide(join.getRightKeys(), right);
         if (!rightResult.flag) {
-            return leftResult;
+            return rightResult;
         }
 
         PartitionJoinResult result = new PartitionJoinResult();

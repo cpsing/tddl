@@ -8,14 +8,15 @@ import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.common.model.Matrix;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.config.ConfigDataHandler;
 import com.taobao.tddl.config.ConfigDataListener;
 import com.taobao.tddl.config.impl.ConfigDataHandlerCity;
 import com.taobao.tddl.executor.spi.IGroupExecutor;
 import com.taobao.tddl.executor.spi.IRepository;
 import com.taobao.tddl.optimizer.config.table.parse.MatrixParser;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * group以及其对应的执行器
@@ -117,7 +118,6 @@ public class TopologyHandler extends AbstractLifecycle {
 
         @Override
         public void onDataRecieved(String dataId, String data) {
-            // TODO Auto-generated method stub
 
         }
 

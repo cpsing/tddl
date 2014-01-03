@@ -1,8 +1,5 @@
 package com.taobao.tddl.executor.handler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.KVPair;
@@ -21,20 +18,26 @@ import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IPut;
 
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
+
+/**
+ * CUD操作基类
+ * 
+ * @since 5.1.0
+ */
 public abstract class PutHandlerCommon extends HandlerCommon {
+
+    private static final Logger logger = LoggerFactory.getLogger(PutHandlerCommon.class);
 
     public PutHandlerCommon(){
         super();
     }
 
-    public Log logger = LogFactory.getLog(PutHandlerCommon.class);
-
-    @SuppressWarnings("rawtypes")
     public ISchematicCursor handle(IDataNodeExecutor executor, ExecutionContext executionContext) throws TddlException {
         long time = System.currentTimeMillis();
         IPut put = (IPut) executor;
 
-        // 用于测试终止任务 Thread.sleep(1000000000l);
         buildTableAndMeta(put, executionContext);
 
         int affect_rows = 0;
@@ -58,7 +61,6 @@ public abstract class PutHandlerCommon extends HandlerCommon {
         } catch (Exception e) {
             time = Monitor.monitorAndRenewTime(Monitor.KEY1, Monitor.ServerPut, Monitor.Key3Fail, time);
             if (autoCommit) {
-
                 rollback(executionContext, transaction);
             }
             throw new TddlException(e);

@@ -3,10 +3,7 @@ package com.taobao.tddl.executor.handler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.TStringUtil;
@@ -43,32 +40,21 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
         super();
     }
 
-    private static final int      thread              = Integer.parseInt(System.getProperty("com.ustore.concurrentThread",
-                                                          "8"));
-
-    private final ExecutorService concurrentExecutors = Executors.newFixedThreadPool(thread, new ThreadFactory() {
-
-                                                          @Override
-                                                          public Thread newThread(Runnable arg0) {
-                                                              return new Thread(arg0, "concurrent_query_executor");
-                                                          }
-                                                      });
-
     /**
      * 完全匹配
      */
-    public static int             MATCH               = 0;
+    public static int    MATCH        = 0;
 
     /**
      * 前缀匹配
      */
-    public static int             PREFIX_MATCH        = 1;
+    public static int    PREFIX_MATCH = 1;
 
     /**
      * 不匹配
      */
-    public static int             NOT_MATCH           = -1;
-    public Logger                 logger              = LoggerFactory.getLogger(QueryHandlerCommon.class);
+    public static int    NOT_MATCH    = -1;
+    public static Logger logger       = LoggerFactory.getLogger(QueryHandlerCommon.class);
 
     @Override
     public ISchematicCursor handle(IDataNodeExecutor executor, ExecutionContext executionContext) throws TddlException {
@@ -92,15 +78,14 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
     }
 
     /**
-     * 首先获取四个关键的属性 1. groupby 2. agg columns 算法 3. distinct? 4. order by 5.
-     * merge
-     * 
-     * @param context
-     * @param cursor
-     * @param executionContext
-     * @param IQueryTree
-     * @return
-     * @throws Exception
+     * <pre>
+     * 首先获取四个关键的属性 
+     * 1. groupby 
+     * 2. agg columns 算法 
+     * 3. distinct? 
+     * 4. order by 
+     * 5. merge
+     * </pre>
      */
     protected ISchematicCursor processGroupByAndOrderBy(ISchematicCursor cursor, ExecutionContext executionContext,
                                                         IQueryTree IQueryTree) throws TddlException {
@@ -128,17 +113,23 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
 
     boolean isDistinct(IQueryTree qc) {
         for (Object c : qc.getColumns()) {
-            if (c instanceof ISelectable && ((ISelectable<IColumn>) c).isDistinct()) return true;
+            if (c instanceof ISelectable && ((ISelectable<IColumn>) c).isDistinct()) {
+                return true;
+            }
         }
 
         return false;
     }
 
-    /*
-     * 处理 group by 和aggregate function. cursor =
-     * processGroupByAndAggregateFunction(context, cursor, IQueryTree,
-     * executionContext); // 接着处理排序 cursor = processOrderBy(cursor,
-     * IQueryTree.getOrderBy(), executionContext, IQueryTree); return cursor;
+    /**
+     * 处理 group by 和aggregate function.
+     * 
+     * <pre>
+     * cursor = processGroupByAndAggregateFunction(context, cursor, IQueryTree, executionContext);
+     * // 接着处理排序
+     * cursor = processOrderBy(cursor, IQueryTree.getOrderBy(), executionContext, IQueryTree);
+     * return cursor;
+     * </pre>
      */
     protected abstract ISchematicCursor doQuery(ISchematicCursor cursor, IDataNodeExecutor executor,
                                                 ExecutionContext executionContext) throws TddlException;
@@ -178,7 +169,9 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
                 } else {
                     List<IFunction> aggregateInThisScalar = new ArrayList();
                     findAggregateFunctionsInScalar(f, aggregateInThisScalar);
-                    if (!aggregateInThisScalar.isEmpty()) aggregates.add(f);
+                    if (!aggregateInThisScalar.isEmpty()) {
+                        aggregates.add(f);
+                    }
                 }
             }
         }
@@ -186,7 +179,6 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
     }
 
     private void findAggregateFunctionsInScalar(IFunction s, List<IFunction> res) {
-
         if (IFunction.FunctionType.Aggregate.equals(s.getFunctionType())) {
             res.add(s);
         }
@@ -200,18 +192,15 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
     }
 
     /**
-     * group by 和aggregate Function。 对单机来说，原则就是尽可能的使用索引完成count max min的功能。
+     * <pre>
+     * group by和aggregate Function。 
+     * 对单机来说，原则就是尽可能的使用索引完成count max min的功能。
      * 参考的关键条件有：
-     * <p>
-     * 1. 是否需要group by 2. 是什么aggregate. 3. 是否需要distinct 4. 是否是merge节点
-     * </p>
-     * 
-     * @param context
-     * @param cursor
-     * @param IQueryTree
-     * @param executionContext
-     * @return
-     * @throws Exception
+     * 1. 是否需要group by 
+     * 2. 是什么aggregate. 
+     * 3. 是否需要distinct 
+     * 4. 是否是merge节点
+     * </pre>
      */
     protected ISchematicCursor processGroupByAndAggregateFunction(ISchematicCursor cursor, IQueryTree IQueryTree,
                                                                   ExecutionContext executionContext)
@@ -219,21 +208,17 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
         // 是否带有group by 列。。
         List<IOrderBy> groupBycols = IQueryTree.getGroupBys();
         boolean closeResultCursor = executionContext.isCloseResultSet();
-
         final IRepository repo = executionContext.getCurrentRepository();
 
         List retColumns = getEmptyListIfRetColumnIsNull(IQueryTree);
         List<IFunction> _agg = getAggregates(retColumns);
         // 接着处理group by
         if (groupBycols != null && !groupBycols.isEmpty()) {
-
-            // // group by之前需要进行排序，按照group by列排序
+            // group by之前需要进行排序，按照group by列排序
             cursor = processOrderBy(cursor, (groupBycols), executionContext, IQueryTree, false);
-
         }
 
         cursor = executeAgg(cursor, IQueryTree, closeResultCursor, repo, _agg, groupBycols, executionContext);
-
         return cursor;
     }
 
@@ -292,7 +277,6 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
     protected ISchematicCursor processOrderBy(ISchematicCursor cursor, List<IOrderBy> ordersInRequest,
                                               ExecutionContext executionContext, IQueryTree IQueryTree,
                                               boolean needOrderMatch) throws TddlException {
-
         IRepository repo = executionContext.getCurrentRepository();
         boolean hasOrderBy = ordersInRequest != null && !ordersInRequest.isEmpty();
         if (!hasOrderBy) {
@@ -301,7 +285,6 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
         OrderByResult orderByResult = chooseOrderByMethod(cursor, ordersInRequest, executionContext, needOrderMatch);
         switch (orderByResult) {
             case temporaryTable: {
-
                 return repo.getCursorFactory().tempTableSortCursor(executionContext,
                     cursor,
                     ordersInRequest,
@@ -333,13 +316,12 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
     }
 
     protected static boolean isTwoOrderByMatched(IOrderBy o1, IOrderBy o2) {
-        boolean columnNotMatch = o1.getColumn() == null
-                                 || (!ExecUtils.getIColumn(o1.getColumn())
-                                     .getColumnName()
-                                     .equals(ExecUtils.getIColumn(o2.getColumn()).getColumnName()) && !(ExecUtils.getIColumn(o1.getColumn())
-                                     .getAlias() != null && ExecUtils.getIColumn(o1.getColumn())
-                                     .getAlias()
-                                     .equals(ExecUtils.getIColumn(o2.getColumn()).getColumnName())));
+        IColumn c1 = ExecUtils.getIColumn(o1.getColumn());
+        IColumn c2 = ExecUtils.getIColumn(o2.getColumn());
+        boolean columnNotMatch = c1 == null
+                                 || c2 == null
+                                 || (!c1.getColumnName().equals(c2.getColumnName()) && !(c1.getAlias() != null && c1.getAlias()
+                                     .equals(c2.getColumnName())));
 
         return !columnNotMatch;
     }
@@ -357,9 +339,10 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
     protected static OrderByResult chooseOrderByMethod(List<IOrderBy> ordersInCursor, List<IOrderBy> ordersInRequest,
                                                        ExecutionContext executionContext, boolean needOrderMatch) {
 
-        if (!needOrderMatch) return chooseOrderByMethodNotNeedOrderMatch(ordersInCursor,
-            ordersInRequest,
-            executionContext);
+        if (!needOrderMatch) {
+            return chooseOrderByMethodNotNeedOrderMatch(ordersInCursor, ordersInRequest, executionContext);
+        }
+
         if (ordersInRequest != null && ordersInRequest.size() <= ordersInCursor.size()) {
             // 察看order顺序
             int requestOrderSize = ordersInRequest.size();
@@ -377,7 +360,6 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
                 }
                 if (first) {
                     first = false;
-
                     firstOrderInCursor = orderInCursor.getDirection();
                 }
 
@@ -386,9 +368,13 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
                 if (columnNotMatch) {
                     return OrderByResult.temporaryTable;
                 }
-                /*
-                 * 1. cursor中的顺序全部相同，并且request中的顺序也全部相同，才可能使用reverse
-                 * 2.cursor中的顺序不同，但与request中的顺序相同，可以使用normal 3. 其他都是临时表
+
+                /**
+                 * <pre>
+                 * 1.cursor中的顺序全部相同，并且request中的顺序也全部相同，才可能使用reverse
+                 * 2.cursor中的顺序不同，但与request中的顺序相同，可以使用normal 
+                 * 3. 其他都是临时表
+                 * </pre>
                  */
                 if (firstOrderInCursor == orderInCursor.getDirection()) {
                     if (orderInCursor.getDirection() != orderInRequest.getDirection()) {
@@ -408,6 +394,7 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
                 }
 
             }
+
             if (ret != null) {
                 return ret;
             } else {
@@ -433,18 +420,22 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
             int requestOrderSize = ordersInRequest.size();
             OrderByResult ret = null;
             for (int i = 0; i < requestOrderSize; i++) {
-
                 IOrderBy orderInRequest = ordersInRequest.get(i);
                 boolean columnNotMatch = true;
                 for (int j = 0; j < ordersInCursor.size(); j++) {
                     IOrderBy orderInCursor = ordersInCursor.get(j);
                     columnNotMatch = columnNotMatch & !isTwoOrderByMatched(orderInCursor, orderInRequest);
-                    if (columnNotMatch == false) break;
+                    if (columnNotMatch == false) {
+                        // 出现false，代表有一个匹配成功
+                        break;
+                    }
                 }
 
                 if (columnNotMatch) {
                     return OrderByResult.temporaryTable;
-                } else ret = OrderByResult.normal;
+                } else {
+                    ret = OrderByResult.normal;
+                }
             }
             if (ret != null) {
                 return ret;
@@ -456,13 +447,18 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
     }
 
     /**
-     * 算order应该用什么方法来实现的方法。 具体可以看OrderByResult的解说 1.
-     * 如果全部列都匹配，并且asc也全部匹配，那么认为是normal. 2. 只要有一个列不匹配，那么就是临时表 3. 第三中情况略微复杂，做个详细说明
-     * 用户的request里面有可能会出现几种情况 1. 用户请求排序顺序与实际数据顺序完全一致，那么应该正常返回。 2.
-     * 用户请求顺序与实际数据顺序完全相反，那么应该返回反转cursor
-     * 3.用户请求顺序与实际数据顺序出现反转后反转，返回临时表。（比如用户请求:order by colA(asc),B(desc),C(asc)
-     * 真正的数据顺序 A(desc),B(asc),C(desc) 。
+     * <pre>
+     * 算order应该用什么方法来实现的方法。 具体可以看OrderByResult的解说 
+     * 1. 如果全部列都匹配，并且asc也全部匹配，那么认为是normal. 
+     * 2. 只要有一个列不匹配，那么就是临时表 
+     * 3. 第三中情况略微复杂，做个详细说明
+     *    用户的request里面有可能会出现几种情况 
+     *    1. 用户请求排序顺序与实际数据顺序完全一致，那么应该正常返回。 
+     *    2. 用户请求顺序与实际数据顺序完全相反，那么应该返回反转cursor
+     *    3. 用户请求顺序与实际数据顺序出现反转后反转，返回临时表。
+     * （比如用户请求:order by colA(asc),B(desc),C(asc) 真正的数据顺序 A(desc),B(asc),C(desc) 。
      * 
+     * <pre>
      * @param cursor
      * @param ordersInRequest
      * @param executionContext
@@ -495,12 +491,6 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
          * 正常
          */
         normal;
-        /**
-         * 如果column match 那么这个为true; 如 src : A,B,C tar : A ---> match tar : A,B
-         * ---> match tar : A,B,C ---> match tar : B ---> not match tar : C ---
-         * > not match
-         */
-
     }
 
     /**
@@ -574,10 +564,15 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
     }
 
     /**
+     * <pre>
      * 判断前缀索引 可判断o1是否包含o2.在组合索引里，要尽可能匹配更多的列。 在用于组合索引排序的时候 o1 是表的源组合索引。 o2
-     * 是where条件中需要的走索引的key filters的组合关系。 假如 ： 原来的组合索引(o1)是A ,B -> PK 如果o2 key
-     * filter是 A ,则返回0. 如果o2 key filter是A,B 则返回0 o2 KF 是C 返回-1
-     * 无关其他属性，返回0，也就意味着不需要排序。 -1 一般来说会导致使用临时表。 0不会
+     * 是where条件中需要的走索引的key filters的组合关系。 
+     * 假如 ： 
+     * 1. 原来的组合索引(o1)是A ,B -> PK 如果o2 key filter是 A ,则返回0
+     * 2. 如果o2 key filter是A,B 则返回0 ,  o2 Key Filter是C 返回-1, 无关其他属性，返回0，也就意味着不需要排序。 
+     * 
+     * -1 一般来说会导致使用临时表。 0不会
+     * </pre>
      * 
      * @param o2 条件，参数
      * @param o1 索引本身的顺序

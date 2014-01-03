@@ -37,7 +37,6 @@ public class UpdateHandler extends PutHandlerCommon {
         IPut update = put;
         ISchematicCursor conditionCursor = null;
         try {
-
             conditionCursor = ExecutorContext.getContext()
                 .getTopologyExecutor()
                 .execByExecPlanNode(update.getQueryTree(), executionContext);
@@ -62,7 +61,6 @@ public class UpdateHandler extends PutHandlerCommon {
                             Object v = update.getUpdateValues().get(i);
                             if (v instanceof IFunction) {
                                 IFunction func = ((IFunction) v);
-
                                 ((ExtraFunction) func.getExtraFunction()).serverMap((IRowSet) null);
                                 v = func.getExtraFunction().getResult();
                             }
@@ -77,9 +75,6 @@ public class UpdateHandler extends PutHandlerCommon {
                     for (int i = 0; i < update.getUpdateColumns().size(); i++) {
                         String cname = (ExecUtils.getColumn(update.getUpdateColumns().get(i))).getColumnName();
                         Object v = update.getUpdateValues().get(i);
-                        // if (v instanceof NullVal) {
-                        // v = null;
-                        // }
                         if (cm.getName().equals(cname)) {
                             key.put(cname, v);
                         }
@@ -88,21 +83,18 @@ public class UpdateHandler extends PutHandlerCommon {
                 prepare(transaction, table, kv, key, value, PUT_TYPE.UPDATE);
                 table.put(executionContext, key, value, meta, put.getTableName());
             }
-
         } catch (TddlException ex) {
+            throw ex;
+        } finally {
             if (conditionCursor != null) {
                 List<TddlException> exs = new ArrayList();
                 exs = conditionCursor.close(exs);
-                if (!exs.isEmpty()) throw GeneralUtil.mergeException(exs);
+                if (!exs.isEmpty()) {
+                    throw GeneralUtil.mergeException(exs);
+                }
             }
-            throw ex;
-        } finally {
-            List<TddlException> exs = new ArrayList();
-            exs = conditionCursor.close(exs);
-            if (!exs.isEmpty()) throw GeneralUtil.mergeException(exs);
         }
         return affect_rows;
-
     }
 
     private Object getValByColumnMeta(IRowSet kv, ColumnMeta cm) {

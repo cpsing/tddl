@@ -20,7 +20,6 @@ import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.spi.IRepository;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
-import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
@@ -47,47 +46,45 @@ public class MergeHandler extends QueryHandlerCommon {
         IRepository repo = executionContext.getCurrentRepository();
         List<IDataNodeExecutor> subNodes = merge.getSubNode();
         List<ISchematicCursor> subCursors = new ArrayList<ISchematicCursor>();
-        {
-            if (!merge.isSharded()) {
-                /*
-                 * 如果是个需要左驱动表的结果来进行查询的查询，直接返回mergeCursor.
-                 * 有些查询，是需要依赖左值结果进行查询的。这类查询需要先取一批左值出来，根据这些左值，走规则算右值的。
-                 * 这时候只有一个subNodes
-                 */
-                if (subNodes.size() != 1) {
-                    throw new IllegalArgumentException("subNodes is not 1? may be 执行计划生育上有了问题了，查一下" + executor);
-                }
-                ExecutionContext tempContext = new ExecutionContext();
-                tempContext.setCurrentRepository(executionContext.getCurrentRepository());
-                IQuery ide = (IQuery) subNodes.get(0);
-                buildTableAndMetaLogicalIndex(ide, tempContext);
-                IndexMeta indexMeta = tempContext.getMeta();
-                // ICursorMeta iCursorMetaTemp =
-                // GeneralUtil.convertToICursorMeta(indexMeta);
-                ICursorMeta iCursorMetaTemp = ExecUtils.convertToICursorMeta(ide);
+        if (!merge.isSharded()) {
+            /*
+             * 如果是个需要左驱动表的结果来进行查询的查询，直接返回mergeCursor.
+             * 有些查询，是需要依赖左值结果进行查询的。这类查询需要先取一批左值出来，根据这些左值，走规则算右值的。
+             * 这时候只有一个subNodes
+             */
+            if (subNodes.size() != 1) {
+                throw new IllegalArgumentException("subNodes is not 1? may be 执行计划生育上有了问题了，查一下" + executor);
+            }
+            ExecutionContext tempContext = new ExecutionContext();
+            tempContext.setCurrentRepository(executionContext.getCurrentRepository());
+            IQuery ide = (IQuery) subNodes.get(0);
+            buildTableAndMetaLogicalIndex(ide, tempContext);
+            // IndexMeta indexMeta = tempContext.getMeta();
+            // ICursorMeta iCursorMetaTemp =
+            // GeneralUtil.convertToICursorMeta(indexMeta);
+            ICursorMeta iCursorMetaTemp = ExecUtils.convertToICursorMeta(ide);
 
-                // ColumnMeta[] keyColumns = indexMeta.getKeyColumns();
-                ColumnMeta[] keyColumns = new ColumnMeta[] {};
+            // ColumnMeta[] keyColumns = indexMeta.getKeyColumns();
+            ColumnMeta[] keyColumns = new ColumnMeta[] {};
 
-                List<IOrderBy> tempOrderBy = new LinkedList<IOrderBy>();
-                for (ColumnMeta cm : keyColumns) {
-                    IOrderBy ob = ASTNodeFactory.getInstance().createOrderBy();
-                    ob.setColumn(ExecUtils.getIColumnsFromColumnMeta(cm, ide.getAlias()));
-                    tempOrderBy.add(ob);
-                }
-                cursor = repo.getCursorFactory().mergeCursor(executionContext,
-                    subCursors,
-                    iCursorMetaTemp,
-                    subNodes.get(0),
-                    tempOrderBy);
-                return cursor;
+            List<IOrderBy> tempOrderBy = new LinkedList<IOrderBy>();
+            for (ColumnMeta cm : keyColumns) {
+                IOrderBy ob = ASTNodeFactory.getInstance().createOrderBy();
+                ob.setColumn(ExecUtils.getIColumnsFromColumnMeta(cm, ide.getAlias()));
+                tempOrderBy.add(ob);
+            }
+            cursor = repo.getCursorFactory().mergeCursor(executionContext,
+                subCursors,
+                iCursorMetaTemp,
+                subNodes.get(0),
+                tempOrderBy);
+            return cursor;
+        } else {
+            if (QUERY_CONCURRENCY.CONCURRENT == merge.getQueryConcurrency()) {
+                executeSubNodesFuture(cursor, executionContext, subNodes, subCursors);
             } else {
-                if (QUERY_CONCURRENCY.CONCURRENT == merge.getQueryConcurrency()) {
-                    executeSubNodesFuture(cursor, executionContext, subNodes, subCursors);
-                } else {
-                    executeSubNodes(cursor, executionContext, subNodes, subCursors);
+                executeSubNodes(cursor, executionContext, subNodes, subCursors);
 
-                }
             }
         }
         if (subNodes.get(0) instanceof IPut) {// 合并affect_rows
@@ -108,8 +105,11 @@ public class MergeHandler extends QueryHandlerCommon {
 
             // union的话要去重
             // 这里假设都是排好序的
-            if (merge.isUnion()) cursor = this.buildMergeSortCursor(executionContext, repo, subCursors, false);
-            else cursor = repo.getCursorFactory().mergeCursor(executionContext, subCursors, executor);
+            if (merge.isUnion()) {
+                cursor = this.buildMergeSortCursor(executionContext, repo, subCursors, false);
+            } else {
+                cursor = repo.getCursorFactory().mergeCursor(executionContext, subCursors, executor);
+            }
         }
         return cursor;
     }
@@ -118,7 +118,6 @@ public class MergeHandler extends QueryHandlerCommon {
                                  List<IDataNodeExecutor> subNodes, List<ISchematicCursor> subCursors)
                                                                                                      throws TddlException {
         for (IDataNodeExecutor q : subNodes) {
-
             ISchematicCursor rc = ExecutorContext.getContext()
                 .getTopologyExecutor()
                 .execByExecPlanNode(q, executionContext);
@@ -134,7 +133,6 @@ public class MergeHandler extends QueryHandlerCommon {
         executionContext.getExtraCmds().put(ExtraCmd.ExecutionExtraCmd.EXECUTE_QUERY_WHEN_CREATED, "True");
         List<Future<ISchematicCursor>> futureCursors = new LinkedList<Future<ISchematicCursor>>();
         for (IDataNodeExecutor q : subNodes) {
-
             Future<ISchematicCursor> rcfuture = executeFuture(executionContext, q);
             futureCursors.add(rcfuture);
         }
@@ -257,9 +255,7 @@ public class MergeHandler extends QueryHandlerCommon {
                                                   List<ISchematicCursor> cursors, boolean duplicated)
                                                                                                      throws TddlException {
         ISchematicCursor cursor;
-
         cursor = repo.getCursorFactory().mergeSortedCursor(executionContext, cursors, duplicated);
-
         return cursor;
     }
 }

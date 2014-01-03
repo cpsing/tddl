@@ -276,15 +276,12 @@ public class ExecUtils {
 
     public static IColumn getIColumn(Object column) {
         if (column instanceof IFunction) {
-
             return ASTNodeFactory.getInstance()
                 .createColumn()
                 .setTableName(((IFunction) column).getTableName())
-
                 .setColumnName(((IFunction) column).getColumnName())
                 .setAlias(((IFunction) column).getAlias())
                 .setDataType(((IFunction) column).getDataType());
-
         } else if (!(column instanceof IColumn)) {
             throw new IllegalArgumentException("column :" + column + " is not a icolumn");
         }
@@ -600,7 +597,6 @@ public class ExecUtils {
                 Iterator<Object> leftIter = leftScaner.rowValueIterator(o1);
                 Iterator<Object> rightIter = rightScaner.rowValueIterator(o2);
                 for (IOrderBy orderBy : orderBys) {
-                    ISelectable ic = orderBy.getColumn();
                     Comparable c1 = (Comparable) leftIter.next();
                     Comparable c2 = (Comparable) rightIter.next();
 
