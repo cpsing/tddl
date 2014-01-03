@@ -10,12 +10,14 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
+import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
+import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
 import com.taobao.tddl.rule.TableRule;
 import com.taobao.tddl.rule.TddlRule;
@@ -222,14 +224,25 @@ public class OptimizerRule {
         } else if (ifilter instanceof IBooleanFilter) {
             Comparative comp = null;
             IBooleanFilter booleanFilter = (IBooleanFilter) ifilter;
-            // 判断非常量
-            if (!(booleanFilter.getColumn() instanceof IColumn || booleanFilter.getValue() instanceof IColumn)) {
-                return null;
-            }
 
             // 判断非空
             if (booleanFilter.getColumn() == null
                 || (booleanFilter.getValue() == null && booleanFilter.getValues() == null)) {
+                return null;
+            }
+
+            // 判断是否为 A > B , A > B + 1
+            if (booleanFilter.getColumn() instanceof ISelectable && booleanFilter.getValue() instanceof ISelectable) {
+                return null;
+            }
+
+            // 判断是否为 A > ALL(subquery)
+            if (booleanFilter.getColumn() instanceof QueryTreeNode || booleanFilter.getValue() instanceof QueryTreeNode) {
+                return null;
+            }
+
+            // 必须要有一个是字段
+            if (!(booleanFilter.getColumn() instanceof IColumn || booleanFilter.getValue() instanceof IColumn)) {
                 return null;
             }
 
