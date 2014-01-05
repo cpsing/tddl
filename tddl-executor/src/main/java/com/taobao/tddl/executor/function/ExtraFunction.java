@@ -125,7 +125,6 @@ public abstract class ExtraFunction implements IExtraFunction {
     public void serverReduce(IRowSet kvPair) throws TddlRuntimeException {
         if (this.getFunctionType().equals(FunctionType.Scalar)) {
             if (this.getClass().equals(Dummy.class)) {
-                // TODO
                 Integer index = kvPair.getParentCursorMeta().getIndex(null, this.function.getColumnName());
                 if (index != null) {
                     Object v = kvPair.getObject(index);

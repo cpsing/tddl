@@ -122,12 +122,12 @@ public interface ICursorFactory {
     /**
      * 临时表的排序用cursor ，将数据拿出写入临时表中，并进行排序。
      * 
+     * @param context
      * @param cursor
      * @param orderBys
      * @param sortedDuplicates
-     * @param extraContext TODO
+     * @param requestID
      * @return
-     * @throws FetchTddlException
      * @throws TddlException
      */
     ITempTableSortCursor tempTableSortCursor(ExecutionContext context, ISchematicCursor cursor,

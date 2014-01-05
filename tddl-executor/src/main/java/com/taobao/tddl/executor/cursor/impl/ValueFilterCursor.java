@@ -119,7 +119,6 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
 
                     } else {
                         // TODO shenxun : 这是否应该用cursorMeta?
-
                         column_value = ExecUtils.getValueByIColumn(iRowSet, (ISelectable) col);
                     }
                 } catch (Exception e) {

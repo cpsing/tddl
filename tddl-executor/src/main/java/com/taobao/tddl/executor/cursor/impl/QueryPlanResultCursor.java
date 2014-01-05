@@ -55,7 +55,6 @@ public class QueryPlanResultCursor extends ResultCursor {
 
     @Override
     public int getTotalCount() {
-        // TODO Auto-generated method stub
         return 1;
     }
 
@@ -63,7 +62,9 @@ public class QueryPlanResultCursor extends ResultCursor {
 
     @Override
     public IRowSet next() throws TddlException {
-        if (index > 0) return null;
+        if (index > 0) {
+            return null;
+        }
 
         return rows.get(index++);
     }
@@ -76,7 +77,9 @@ public class QueryPlanResultCursor extends ResultCursor {
 
     @Override
     public List<TddlException> close(List<TddlException> exceptions) {
-        if (exceptions == null) exceptions = new ArrayList();
+        if (exceptions == null) {
+            exceptions = new ArrayList();
+        }
         return exceptions;
     }
 

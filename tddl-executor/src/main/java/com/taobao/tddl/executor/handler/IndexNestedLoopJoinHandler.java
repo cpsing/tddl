@@ -56,18 +56,20 @@ public class IndexNestedLoopJoinHandler extends QueryHandlerCommon {
                 exs = cursor_right.close(exs);
             }
 
-            if (!exs.isEmpty()) throw GeneralUtil.mergeException(exs);
-            throw e;
+            if (!exs.isEmpty()) {
+                throw GeneralUtil.mergeException(exs);
+            } else {
+                throw e;
+            }
         }
 
-        int n = 0;
         cursor = repo.getCursorFactory().indexNestLoopCursor(executionContext,
             cursor_left,
             cursor_right,
             join.getLeftJoinOnColumns(),
             join.getRightJoinOnColumns(),
             join.getColumns(),
-            n == 1,
+            false,
             (IJoin) executor);
         return cursor;
     }

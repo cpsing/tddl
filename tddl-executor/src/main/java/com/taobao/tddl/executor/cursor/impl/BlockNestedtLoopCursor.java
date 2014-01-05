@@ -107,8 +107,11 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor impleme
                                                                                                                    throws TddlException {
         // 子查询的话不能用mget
         // 因为子查询的话，join的列可以是函数，函数应该放在having里，而不是放在valueFilter里
-        if (this.join.getRightNode().isSubQuery()) return this.getRecordFromRightByValueFilter(leftJoinOnColumnCache);
-        else return right_cursor.mgetWithDuplicate(leftJoinOnColumnCache, false, false);
+        if (this.join.getRightNode().isSubQuery()) {
+            return this.getRecordFromRightByValueFilter(leftJoinOnColumnCache);
+        } else {
+            return right_cursor.mgetWithDuplicate(leftJoinOnColumnCache, false, false);
+        }
     }
 
     private void leftOutJoin(List<CloneableRecord> leftJoinOnColumnCache, IColumn rightColumn, IValueFilterCursor vfc,
@@ -150,7 +153,6 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor impleme
             kv = ExecUtils.fromIRowSetToArrayRowSet(kv);
             Object rightValue = ExecUtils.getValueByIColumn(kv, rightColumn);
             for (CloneableRecord record : leftJoinOnColumnCache) {
-                Map<String, Object> recordMap = record.getMap();
                 Comparable comp = (Comparable) record.getMap().values().iterator().next();
                 if (rightValue.equals(comp)) {
                     buildDuplicate(records, kv, record);

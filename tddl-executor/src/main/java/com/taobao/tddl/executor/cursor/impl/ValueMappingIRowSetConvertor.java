@@ -33,9 +33,7 @@ public class ValueMappingIRowSetConvertor {
         }
 
         Iterator<ColMetaAndIndex> returnMetaIterator = returnCursorMeta.indexIterator();
-
         while (returnMetaIterator.hasNext()) {
-
             ColMetaAndIndex colMetaAndIndex = returnMetaIterator.next();
             Integer indexInCursor = firstIRowSet.getParentCursorMeta().getIndex(colMetaAndIndex.getTable(),
                 colMetaAndIndex.getName());
@@ -44,7 +42,6 @@ public class ValueMappingIRowSetConvertor {
                                                    + colMetaAndIndex.getTable() + "." + colMetaAndIndex.getName());
             }
             valueMappingMap = putIntoValueMappingIfNotEquals(valueMappingMap, colMetaAndIndex, indexInCursor);
-
         }
         return wrapValueMappingIRowSetIfValueMappingIsNotNull(firstIRowSet);
     }

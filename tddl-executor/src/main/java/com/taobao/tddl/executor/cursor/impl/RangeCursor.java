@@ -5,8 +5,6 @@ import java.util.List;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.executor.cursor.IRangeCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -19,6 +17,9 @@ import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * 现在具有对多个索引内前缀字段+非前缀字段
@@ -171,10 +172,8 @@ public class RangeCursor extends SchematicCursor implements IRangeCursor {
         // case5: data为空
 
         if (!cursor.skipTo(cr)) { // case2: to大于最大值，如17
-
             IRowSet last = cursor.last();
-            if (last == null) // case5: data为空
-            {
+            if (last == null) {// case5: data为空
                 return null;
             }
             if (match(last)) {
@@ -184,9 +183,7 @@ public class RangeCursor extends SchematicCursor implements IRangeCursor {
                 return null;
             }
         } else {
-
-            if (match(cursor.current())) // case1: to是data的某个值，如9
-            {
+            if (match(cursor.current())) { // case1: to是data的某个值，如9
                 // 此时current和to相等
                 return cursor.current();
             }// current>to或者current<from
@@ -195,8 +192,7 @@ public class RangeCursor extends SchematicCursor implements IRangeCursor {
             else {
 
                 IRowSet prevCurrent = cursor.prev();
-                if (prevCurrent == null) // case3: to小于最小值，如2
-                {
+                if (prevCurrent == null) { // case3: to小于最小值，如2
                     return null;
                 } else { // case4: to在某两个值之间，如11
                     if (match(prevCurrent)) {

@@ -8,8 +8,6 @@ import java.util.Map.Entry;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.codec.CodecFactory;
 import com.taobao.tddl.executor.codec.RecordCodec;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
@@ -35,6 +33,9 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author mengshi.sunmengshi 2013-12-19 下午12:18:29
@@ -75,10 +76,10 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
 
     @Override
     protected void init() throws TddlException {
-        if (this.inited) return;
-
+        if (this.inited) {
+            return;
+        }
         super.init();
-
     }
 
     @Override
@@ -88,9 +89,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
          * 因为subCursor和first Cursor的meta数据可能排列的顺序不一样。 比如，cursor1 ,顺序可能是pk ,
          * Name. 而cursor 2 ,顺序却是反过来的 ， Name , pk 这时候在这里需要统一Cursor内的meta信息才可以。
          */
-
         IRowSet iRowSet = innerNext();
-
         return iRowSet;
     }
 
@@ -125,7 +124,6 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
     @Override
     public List<TddlException> close(List<TddlException> exs) {
         exs.addAll(exceptionsWhenCloseSubCursor);
-        TddlException e = null;
         for (ISchematicCursor _cursor : cursors) {
             exs = _cursor.close(exs);
         }
@@ -162,7 +160,6 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
             throw new UnsupportedOperationException("not supported yet");
         } else {
             OptimizerContext optimizerContext = OptimizerContext.getContext();
-
             IBooleanFilter ibf = ASTNodeFactory.getInstance().createBooleanFilter();
             List<Comparable> values = new ArrayList<Comparable>();
             String colName = null;
@@ -175,12 +172,10 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
                 Entry<String, Object> entry = map.entrySet().iterator().next();
                 Comparable comp = (Comparable) entry.getValue();
                 colName = entry.getKey();
-
                 values.add(comp);
             }
 
             // 这里列的别名也丢了吧 似乎解决了
-
             IQuery iquery = (IQuery) currentExecotor;
 
             KVIndexNode query = new KVIndexNode(iquery.getIndexName());
@@ -222,10 +217,8 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
                 executionContext.getExtraCmds());
 
             ISchematicCursor cursor = null;
-
             Map<CloneableRecord, DuplicateKVPair> duplicateKeyMap = null;
             try {
-
                 ExecutionContext tempContext = new ExecutionContext();
                 tempContext.setCurrentRepository(executionContext.getCurrentRepository());
                 tempContext.setExecutorService(executionContext.getExecutorService());
@@ -233,12 +226,13 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
                 // 用于关闭，统一管理
                 this.returnColumns = cursor.getReturnColumns();
                 duplicateKeyMap = buildDuplicateKVPairMap(col, cursor);
-
             } finally {
                 if (cursor != null) {
                     List<TddlException> exs = new ArrayList();
                     exs = cursor.close(exs);
-                    if (!exs.isEmpty()) throw GeneralUtil.mergeException(exs);
+                    if (!exs.isEmpty()) {
+                        throw GeneralUtil.mergeException(exs);
+                    }
                 }
             }
             return duplicateKeyMap;
@@ -262,9 +256,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
         int count = 0;
 
         ISelectable icol = c.copy();
-
         icol.setTableName(null);
-
         List<ColumnMeta> colMetas = new ArrayList();
         colMetas.add(ExecUtils.getColumnMeta(icol));
         RecordCodec codec = CodecFactory.getInstance(CodecFactory.FIXED_LENGTH).getCodec(colMetas);
@@ -311,7 +303,6 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
 
     @Override
     public String toStringWithInden(int inden) {
-
         String tabTittle = GeneralUtil.getTab(inden);
         String tabContent = GeneralUtil.getTab(inden + 1);
         StringBuilder sb = new StringBuilder();
@@ -328,7 +319,10 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
 
     @Override
     public List<ColumnMeta> getReturnColumns() throws TddlException {
-        if (this.returnColumns != null) return this.returnColumns;
+        if (this.returnColumns != null) {
+            return this.returnColumns;
+        }
+
         if (this.cursors != null && !cursors.isEmpty()) {
             this.returnColumns = cursors.get(0).getReturnColumns();
         }

@@ -20,7 +20,6 @@ import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 public class ReverseOrderCursor extends SchematicCursor implements IReverseOrderCursor {
 
     public ReverseOrderCursor(ISchematicCursor cursor){
-
         super(cursor, null, cursor.getOrderBy());
         List<IOrderBy> orderByList = cursor.getOrderBy();
         reverseOrderBy(orderByList);
