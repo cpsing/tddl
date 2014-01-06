@@ -1,8 +1,3 @@
-/**
- *  Copyright(c) 2010 taobao. All rights reserved.
- *  通用产品测试
- */
-
 package com.taobao.tddl.qatest.join;
 
 import java.util.Arrays;

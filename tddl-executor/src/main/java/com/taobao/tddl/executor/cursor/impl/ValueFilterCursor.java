@@ -176,12 +176,12 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
             }
             if (v instanceof IFunction) {
                 try {
-                    if (((IFunction) v).getFunctionType().equals(FunctionType.Aggregate)) throw new RuntimeException("Invalid use of group function");
+                    if (((IFunction) v).getFunctionType().equals(FunctionType.Aggregate)) {
+                        throw new RuntimeException("Invalid use of group function");
+                    }
 
                     ((ExtraFunction) ((IFunction) v).getExtraFunction()).serverMap(iRowSet);
-
                     v = processFunction(iRowSet, v);
-
                 } catch (Exception e) {
                     throw new TddlException(e);
                 }
@@ -192,9 +192,9 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
             }
 
             if (op == OPERATION.IN) {
-
                 return processIn(column_value, bf.getValues());
             }
+
             int n = ((Comparable) v).compareTo(column_value);
 
             if (n == 0) {

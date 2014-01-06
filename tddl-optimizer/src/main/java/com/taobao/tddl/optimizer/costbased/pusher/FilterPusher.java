@@ -88,6 +88,7 @@ public class FilterPusher {
             List<IFilter> DNFNodeToCurrent = new LinkedList<IFilter>();
             if (DNFNodeToPush != null) {
                 for (IFilter node : DNFNodeToPush) {
+                    node = (IFilter) node.copy();
                     // 可能是多级节点，字段在select中，设置为select中的字段，这样才可以继续下推
                     if (!tryPushColumn(node, qn.getChild())) {
                         // 可能where条件是函数，暂时不下推
@@ -120,6 +121,7 @@ public class FilterPusher {
                 findJoinKeysAndRemoveIt(DNFNodeToPush, jn);
 
                 for (IFilter node : DNFNodeToPush) {
+                    node = (IFilter) node.copy();
                     if (tryPushColumn(node, jn.getLeftNode())) {
                         DNFNodetoPushToLeft.add(node);
                     } else if (tryPushColumn(node, jn.getRightNode())) {

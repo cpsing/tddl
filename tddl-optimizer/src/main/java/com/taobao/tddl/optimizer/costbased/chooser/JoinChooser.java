@@ -215,6 +215,8 @@ public class JoinChooser {
             // 如果右表是subquery，则也不能用indexNestedLoop
             if (((JoinNode) node).getRightNode().isSubQuery()) {
                 ((JoinNode) node).setJoinStrategy(JoinStrategy.NEST_LOOP_JOIN);
+                // 将未能下推的条件加到result filter中
+                ((JoinNode) node).setResultFilter(FilterUtils.and(node.getResultFilter(), node.getWhereFilter()));
                 return node;
             }
 
@@ -328,8 +330,13 @@ public class JoinChooser {
             } else { // 这种情况也属于case 2，先使用NestLoop...
                 ((JoinNode) node).setJoinStrategy(JoinStrategy.NEST_LOOP_JOIN);
             }
+
+            // 将未能下推的条件加到result filter中
+            ((JoinNode) node).setResultFilter(FilterUtils.and(node.getResultFilter(), node.getWhereFilter()));
             return node;
         } else {
+            // 将未能下推的条件加到result filter中
+            node.setResultFilter(FilterUtils.and(node.getResultFilter(), node.getWhereFilter()));
             return node;
         }
     }

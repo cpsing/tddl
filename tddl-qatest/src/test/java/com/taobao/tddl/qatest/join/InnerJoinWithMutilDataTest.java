@@ -1,8 +1,3 @@
-/**
- *  Copyright(c) 2010 taobao. All rights reserved.
- *  通用产品测试
- */
-
 package com.taobao.tddl.qatest.join;
 
 import java.util.Arrays;
@@ -193,9 +188,10 @@ public class InnerJoinWithMutilDataTest extends BaseAndorTestCase {
 
     @Test
     public void InnerJoinWithWhereOrderByLimitTest() throws Exception {
+        // join时不开启调整顺序，如果右表存在orderby，则会需要临时表
         String sql = "select " + host_info + ".host_id," + "" + host_info + ".host_name," + host_info
-                     + ".hostgroup_id," + hostgroup_info + ".hostgroup_name " + "from " + hostgroup_info
-                     + " inner join " + host_info + "  " + "on " + host_info + ".hostgroup_id=" + hostgroup_info
+                     + ".hostgroup_id," + hostgroup_info + ".hostgroup_name " + "from " + host_info + " inner join "
+                     + hostgroup_info + "  " + "on " + host_info + ".hostgroup_id=" + hostgroup_info
                      + ".hostgroup_id where " + host_info + ".hostgroup_id between 40 and 70 order by " + host_info
                      + ".host_id limit 10";
         selectOrderAssert(sql, columnParam, Collections.EMPTY_LIST);

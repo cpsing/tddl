@@ -286,6 +286,7 @@ public class OptimizerRule {
                         break;
                     case LT_EQ:
                         operationComp = Comparative.LessThanOrEqual;
+                        break;
                     default:
                         return null;
                 }

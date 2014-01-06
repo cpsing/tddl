@@ -196,10 +196,19 @@ public class Join extends QueryTree implements IJoin {
         appendField(sb, "leftColumns", this.getLeftJoinOnColumns(), tabContent);
         appendField(sb, "rightColumns", this.getRightJoinOnColumns(), tabContent);
 
-        if (this.leftOuter && this.rightOuter) appendField(sb, "type", "inner join", tabContent);
-        if (!this.leftOuter && this.rightOuter) appendField(sb, "type", "right outter join", tabContent);
-        if (this.leftOuter && !this.rightOuter) appendField(sb, "type", "left outter join", tabContent);
-        if (!this.leftOuter && !this.rightOuter) appendField(sb, "type", "outter join", tabContent);
+        if (this.leftOuter && this.rightOuter) {
+            appendField(sb, "type", "outter join", tabContent);
+        }
+
+        if (!this.leftOuter && this.rightOuter) {
+            appendField(sb, "type", "right outter join", tabContent);
+        }
+        if (this.leftOuter && !this.rightOuter) {
+            appendField(sb, "type", "left outter join", tabContent);
+        }
+        if (!this.leftOuter && !this.rightOuter) {
+            appendField(sb, "type", "inner join", tabContent);
+        }
 
         appendField(sb, "valueFilter", printFilterString(this.getValueFilter()), tabContent);
         appendField(sb, "otherJoinOnFilter", printFilterString(this.getOtherJoinOnFilter()), tabContent);

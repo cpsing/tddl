@@ -1,10 +1,13 @@
 package com.taobao.tddl.executor.cursor.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
@@ -26,7 +29,9 @@ import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.query.KVIndexNode;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
+import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
+import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
@@ -159,24 +164,37 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
         if (prefixMatch) {
             throw new UnsupportedOperationException("not supported yet");
         } else {
+            // 这里列的别名也丢了吧 似乎解决了
+            IQuery iquery = (IQuery) currentExecotor;
             OptimizerContext optimizerContext = OptimizerContext.getContext();
             IBooleanFilter ibf = ASTNodeFactory.getInstance().createBooleanFilter();
-            List<Comparable> values = new ArrayList<Comparable>();
+            ibf.setOperation(OPERATION.IN);
+            ibf.setValues(new ArrayList<Comparable>());
             String colName = null;
             for (CloneableRecord record : keys) {
                 Map<String, Object> recordMap = record.getMap();
-                if (recordMap.size() != 1) {
-                    throw new IllegalArgumentException("目前只支持单值查询吧。。简化一点");
-                }
-                Map<String, Object> map = record.getMap();
-                Entry<String, Object> entry = map.entrySet().iterator().next();
-                Comparable comp = (Comparable) entry.getValue();
-                colName = entry.getKey();
-                values.add(comp);
-            }
+                if (recordMap.size() == 1) {
+                    // 单字段in
+                    Entry<String, Object> entry = recordMap.entrySet().iterator().next();
+                    Comparable comp = (Comparable) entry.getValue();
+                    colName = entry.getKey();
+                    IColumn col = ASTNodeFactory.getInstance()
+                        .createColumn()
+                        .setColumnName(colName)
+                        .setDataType(DATA_TYPE.LONG_VAL);
 
-            // 这里列的别名也丢了吧 似乎解决了
-            IQuery iquery = (IQuery) currentExecotor;
+                    col.setTableName(iquery.getAlias());
+                    ibf.setColumn(col);
+                    ibf.getValues().add(comp);
+                } else {
+                    // 多字段in
+                    if (ibf.getColumn() == null) {
+                        ibf.setColumn(buildRowFunction(recordMap.keySet(), true));
+                    } else {
+                        ibf.getValues().add(buildRowFunction(recordMap.values(), false));
+                    }
+                }
+            }
 
             KVIndexNode query = new KVIndexNode(iquery.getIndexName());
             query.select(iquery.getColumns());
@@ -184,24 +202,16 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
             query.setLimitTo(iquery.getLimitTo());
             query.setOrderBys(iquery.getOrderBys());
             query.setGroupBys(iquery.getGroupBys());
-            query.valueQuery(iquery.getValueFilter());
-            query.setKeyFilter(iquery.getKeyFilter());
-
-            IColumn col = ASTNodeFactory.getInstance()
-                .createColumn()
-                .setColumnName(colName)
-                .setDataType(DATA_TYPE.LONG_VAL);
-
-            col.setTableName(iquery.getAlias());
-            ibf.setColumn(col);
-            ibf.setValues(values);
-            ibf.setOperation(OPERATION.IN);
-            query.keyQuery(FilterUtils.and(FilterUtils.and(query.getKeyFilter(), ibf), query.getResultFilter()));
+            // query.valueQuery(removeDupFilter(iquery.getValueFilter(), ibf));
+            // query.keyQuery(removeDupFilter(iquery.getKeyFilter(), ibf));
             // if (keyFilterOrValueFilter)
             // query.keyQuery(FilterUtils.and(query.getKeyFilter(), ibf));
             // else query.valueQuery(FilterUtils.and(query.getResultFilter(),
             // ibf));
 
+            // 直接构造为where条件，优化器进行重新选择
+            IFilter whereFilter = FilterUtils.and(iquery.getKeyFilter(), iquery.getValueFilter());
+            query.query(FilterUtils.and(removeDupFilter(whereFilter, ibf), ibf));
             query.alias(iquery.getAlias());
             query.build();
             // IDataNodeExecutor idne = dnc.shard(currentExecotor,
@@ -225,7 +235,13 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
                 cursor = ExecutorContext.getContext().getTopologyExecutor().execByExecPlanNode(idne, tempContext);
                 // 用于关闭，统一管理
                 this.returnColumns = cursor.getReturnColumns();
-                duplicateKeyMap = buildDuplicateKVPairMap(col, cursor);
+                List<IColumn> cols = new ArrayList<IColumn>();
+                if (ibf.getColumn() instanceof IColumn) {
+                    cols.add((IColumn) ibf.getColumn());
+                } else {
+                    cols.addAll(((IFunction) ibf.getColumn()).getArgs());
+                }
+                duplicateKeyMap = buildDuplicateKVPairMap(cols, cursor);
             } finally {
                 if (cursor != null) {
                     List<TddlException> exs = new ArrayList();
@@ -239,6 +255,52 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
         }
     }
 
+    private IFunction buildRowFunction(Collection values, boolean isColumn) {
+        IFunction func = ASTNodeFactory.getInstance().createFunction();
+        func.setFunctionName("ROW");
+        StringBuilder columnName = new StringBuilder();
+        columnName.append('(').append(StringUtils.join(values, ',')).append(')');
+        func.setColumnName(columnName.toString());
+        if (isColumn) {
+            List<IColumn> columns = new ArrayList<IColumn>(values.size());
+            for (Object value : values) {
+                IColumn col = ASTNodeFactory.getInstance()
+                    .createColumn()
+                    .setColumnName((String) value)
+                    .setDataType(DATA_TYPE.LONG_VAL);
+                columns.add(col);
+            }
+
+            func.setArgs(columns);
+        } else {
+            func.setArgs(new ArrayList(values));
+        }
+        return func;
+    }
+
+    /**
+     * 合并两个条件去除重复的key条件，比如构造了id in (xxx)的请求后，原先条件中有可能也存在id的条件，这时需要替换原先的id条件
+     * 
+     * @param srcFilter
+     * @param mergeFilter
+     */
+    private IFilter removeDupFilter(IFilter srcFilter, IBooleanFilter inFilter) {
+        List<List<IFilter>> filters = FilterUtils.toDNFNodesArray(srcFilter);
+        List<List<IFilter>> newFilters = new ArrayList<List<IFilter>>();
+        for (List<IFilter> sf : filters) {
+            List<IFilter> newSf = new ArrayList<IFilter>();
+            for (IFilter f : sf) {
+                if (!((IBooleanFilter) f).getColumn().equals(inFilter.getColumn())) {
+                    newSf.add(f);
+                }
+            }
+
+            newFilters.add(newSf);
+        }
+
+        return FilterUtils.DNFToOrLogicTree(newFilters);
+    }
+
     /**
      * 根据返回结果，创建重复值的kvpairMap
      * 
@@ -248,26 +310,29 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
      * @return
      * @throws TddlException
      */
-    private Map<CloneableRecord, DuplicateKVPair> buildDuplicateKVPairMap(IColumn c, ISchematicCursor cursor)
-                                                                                                             throws TddlException {
+    private Map<CloneableRecord, DuplicateKVPair> buildDuplicateKVPairMap(List<IColumn> cols, ISchematicCursor cursor)
+                                                                                                                      throws TddlException {
 
         Map<CloneableRecord, DuplicateKVPair> duplicateKeyMap = new HashMap<CloneableRecord, DuplicateKVPair>();
         IRowSet kvPair;
         int count = 0;
-
-        ISelectable icol = c.copy();
-        icol.setTableName(null);
-        List<ColumnMeta> colMetas = new ArrayList();
-        colMetas.add(ExecUtils.getColumnMeta(icol));
+        List<IColumn> icols = new ArrayList<IColumn>();
+        List<ColumnMeta> colMetas = new ArrayList<ColumnMeta>();
+        for (IColumn c : cols) {
+            ISelectable icol = c.copy();
+            icol.setTableName(null);
+            colMetas.add(ExecUtils.getColumnMeta(icol));
+            icols.add((IColumn) icol);
+        }
         RecordCodec codec = CodecFactory.getInstance(CodecFactory.FIXED_LENGTH).getCodec(colMetas);
-
-        IColumn col = ExecUtils.getIColumn(icol);
         while ((kvPair = cursor.next()) != null) {
             kvPair = ExecUtils.fromIRowSetToArrayRowSet(kvPair);
-            Object v = ExecUtils.getValueByIColumn(kvPair, icol);
-
             CloneableRecord key = codec.newEmptyRecord();
-            key.put(col.getColumnName(), v);
+            for (IColumn icol : icols) {
+                Object v = ExecUtils.getValueByIColumn(kvPair, icol);
+                key.put(icol.getColumnName(), v);
+            }
+
             DuplicateKVPair tempKVPair = duplicateKeyMap.get(key);
             if (tempKVPair == null) {// 加新列
                 tempKVPair = new DuplicateKVPair(kvPair);

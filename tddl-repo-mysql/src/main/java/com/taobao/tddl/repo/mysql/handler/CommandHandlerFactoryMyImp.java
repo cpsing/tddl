@@ -54,7 +54,9 @@ public class CommandHandlerFactoryMyImp implements ICommandHandlerFactory {
             return MERGE_HANDLER;
         } else if (executor instanceof IJoin) {
             boolean isCondensable = isCondensable(executor);
-            if (isCondensable) return CONDENSABLE_JOIN_HANDLER;
+            if (isCondensable) {
+                return CONDENSABLE_JOIN_HANDLER;
+            }
 
             IJoin join = (IJoin) executor;
             JoinStrategy joinStrategy = join.getJoinStrategy();
@@ -62,7 +64,12 @@ public class CommandHandlerFactoryMyImp implements ICommandHandlerFactory {
                 case INDEX_NEST_LOOP:
                     return INDEX_NEST_LOOP_JOIN_HANDLER;
                 case NEST_LOOP_JOIN:
-                    return NEST_LOOP_JOIN_HANDLER;
+                    if (join.getRightNode().isSubQuery()) {
+                        return NEST_LOOP_JOIN_HANDLER;
+                    } else {
+                        // mysql支持非主键的查询，所以即使是nest_loop，也可以选择index的模式
+                        return INDEX_NEST_LOOP_JOIN_HANDLER;
+                    }
                 case SORT_MERGE_JOIN:
                     return SORT_MERGE_JOIN_HANDLER;
                 default:
