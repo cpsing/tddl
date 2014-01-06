@@ -10,6 +10,7 @@ import org.apache.commons.lang.ObjectUtils;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
+import com.taobao.tddl.optimizer.core.ast.ASTNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode.FilterType;
 import com.taobao.tddl.optimizer.core.ast.query.JoinNode;
@@ -109,8 +110,9 @@ public class JoinChooser {
             return qtn;
         }
 
+        boolean needReChooserJoinOrder = needReChooseJoinOrder(qtn);
         JoinPermutationGenerator jpg = null;
-        if (isOptimizeJoinOrder(extraCmd)) {
+        if (needReChooserJoinOrder || isOptimizeJoinOrder(extraCmd)) {
             jpg = new JoinPermutationGenerator(qtn);
             qtn = jpg.getNext();
         }
@@ -131,6 +133,9 @@ public class JoinChooser {
                     minCostQueryTree = qtn;
                 }
                 qtn = jpg.getNext();
+            } else if (needReChooserJoinOrder) {
+                qtn = jpg.getNext();
+                needReChooserJoinOrder = false;
             } else {
                 // 不需要进行join选择，直接退出
                 minCostQueryTree = qtn;
@@ -141,6 +146,34 @@ public class JoinChooser {
 
         minCostQueryTree.build();
         return minCostQueryTree;
+    }
+
+    /**
+     * 判断是否需要调整join顺序
+     * 
+     * <pre>
+     * 比如mysql: select xx from a,b,c where a.id = c.id and b.name = c.name
+     * 这时的结构树为 (a join b) join c ， a join b上不存在join条件，需要调整join顺序为 (a join c) join b 或者 (b join c) join a
+     * </pre>
+     */
+    private static boolean needReChooseJoinOrder(QueryTreeNode qtn) {
+        if (qtn instanceof JoinNode) {
+            if (((JoinNode) qtn).getJoinFilter() == null || ((JoinNode) qtn).getJoinFilter().isEmpty()) {
+                return true;
+            }
+        }
+
+        for (ASTNode node : qtn.getChildren()) {
+            if (!(node instanceof QueryTreeNode)) {
+                return false;
+            }
+
+            if (needReChooseJoinOrder((QueryTreeNode) node)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

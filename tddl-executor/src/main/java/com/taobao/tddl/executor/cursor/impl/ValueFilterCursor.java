@@ -103,7 +103,6 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
 
     @SuppressWarnings("unchecked")
     boolean allow(IFilter f, IRowSet iRowSet) throws TddlException {
-
         if (f == null) {
             return true;
         }

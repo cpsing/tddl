@@ -19,13 +19,10 @@ public class TResultSetMetaData implements ResultSetMetaData {
     ResultCursor             rc;
 
     public TResultSetMetaData(List<ColumnMeta> columns){
-
         this.columnMetas = columns;
-
     }
 
     public boolean columnIsExist(String column) {
-
         for (ColumnMeta metaItem : columnMetas)
             if (column.equalsIgnoreCase(metaItem.getName()) || column.equalsIgnoreCase(metaItem.getAlias())) {
                 return true;
@@ -34,7 +31,6 @@ public class TResultSetMetaData implements ResultSetMetaData {
     }
 
     public DATA_TYPE getColumnDataType(String column) {
-
         for (ColumnMeta metaItem : columnMetas)
             if (column.equalsIgnoreCase(metaItem.getName()) || column.equalsIgnoreCase(metaItem.getAlias())) {
                 return metaItem.getDataType();
@@ -60,17 +56,14 @@ public class TResultSetMetaData implements ResultSetMetaData {
     }
 
     public <T> T unwrap(Class<T> iface) throws SQLException {
-
         return null;
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-
         return false;
     }
 
     public boolean isAutoIncrement(int column) throws SQLException {
-
         return false;
     }
 
@@ -85,54 +78,44 @@ public class TResultSetMetaData implements ResultSetMetaData {
     }
 
     public boolean isCurrency(int column) throws SQLException {
-
         return false;
     }
 
     public int isNullable(int column) throws SQLException {
-
         return 0;
     }
 
     public boolean isSigned(int column) throws SQLException {
-
         return false;
     }
 
     public int getColumnDisplaySize(int column) throws SQLException {
-
         return 20;
     }
 
     public String getSchemaName(int column) throws SQLException {
-
-        return "Andor";
+        return "Tddl";
     }
 
     public int getPrecision(int column) throws SQLException {
-
         return 0;
     }
 
     public int getScale(int column) throws SQLException {
-
         return 0;
     }
 
     public String getTableName(int column) throws SQLException {
-
         column--;
         ColumnMeta c = this.columnMetas.get(column);
         return c.getTableName();
     }
 
     public String getCatalogName(int column) throws SQLException {
-
-        return "Andor";
+        return "Tddl";
     }
 
     public int getColumnType(int column) throws SQLException {
-
         return 0;
     }
 
@@ -143,22 +126,18 @@ public class TResultSetMetaData implements ResultSetMetaData {
     }
 
     public boolean isReadOnly(int column) throws SQLException {
-
         return false;
     }
 
     public boolean isWritable(int column) throws SQLException {
-
         return true;
     }
 
     public boolean isDefinitelyWritable(int column) throws SQLException {
-
         return false;
     }
 
     public String getColumnClassName(int column) throws SQLException {
-
         return null;
     }
 

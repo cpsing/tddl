@@ -204,11 +204,10 @@ public class LeftJoinTest extends BaseAndorTestCase {
         List<Object> param = new ArrayList<Object>();
         param.add(0);
         param.add(100);
-        param.add(10);
+        param.add(20);
         param.add(1);
         param.add(20);
         String[] columnParam = { "sumId", "host_name", "aid", "bid" };
         selectContentSameAssert(sql, columnParam, param);
-
     }
 }

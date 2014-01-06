@@ -90,7 +90,7 @@ public class My_Cursor implements Cursor {
             ResultSetMetaData rsmd = this.myJdbcHandler.getResultSet().getMetaData();
             returnColumns = new ArrayList();
             for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                DATA_TYPE type = TableMetaParser.jdbcTypeToAndorType(rsmd.getColumnType(i));
+                DATA_TYPE type = TableMetaParser.jdbcTypeToDataType(rsmd.getColumnType(i));
                 if (type == null) throw new IllegalArgumentException("列：" + rsmd.getColumnName(i) + " 类型"
                                                                      + rsmd.getColumnType(i) + "无法识别,联系沈询");
 

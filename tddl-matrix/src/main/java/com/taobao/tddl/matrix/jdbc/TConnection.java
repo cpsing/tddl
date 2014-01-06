@@ -224,19 +224,31 @@ public class TConnection implements Connection {
 
     private Map<String, Comparable> buildExtraCommand(String sql) {
         Map<String, Comparable> extraCmd = new HashMap();
-        if (sql != null && sql.startsWith("/* ANDOR ")) {
+        String andorExtra = "/* ANDOR ";
+        String tddlExtra = "/* TDDL ";
+        if (sql != null) {
+            String commet = TStringUtil.substringAfter(sql, tddlExtra);
             // 去掉注释
-            String commet = TStringUtil.substringAfter(sql, "/* ANDOR ");
-            commet = TStringUtil.substringBefore(commet, "*/");
-            String[] params = commet.split(",");
-            for (String param : params) {
-                String[] keyAndVal = param.split("=");
-                if (keyAndVal.length != 2) {
-                    throw new IllegalArgumentException(param + " is wrong , only key = val supported");
+            if (TStringUtil.isNotEmpty(commet)) {
+                commet = TStringUtil.substringBefore(commet, "*/");
+            }
+
+            if (TStringUtil.isEmpty(commet) && sql.startsWith(andorExtra)) {
+                commet = TStringUtil.substringAfter(sql, andorExtra);
+                commet = TStringUtil.substringBefore(commet, "*/");
+            }
+
+            if (TStringUtil.isNotEmpty(commet)) {
+                String[] params = commet.split(",");
+                for (String param : params) {
+                    String[] keyAndVal = param.split("=");
+                    if (keyAndVal.length != 2) {
+                        throw new IllegalArgumentException(param + " is wrong , only key = val supported");
+                    }
+                    String key = keyAndVal[0];
+                    String val = keyAndVal[1];
+                    extraCmd.put(key, val);
                 }
-                String key = keyAndVal[0];
-                String val = keyAndVal[1];
-                extraCmd.put(key, val);
             }
         }
         extraCmd.putAll(this.ds.getConnectionProperties());

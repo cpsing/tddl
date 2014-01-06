@@ -83,7 +83,7 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
             ResultSetMetaData rsmd = rs.getMetaData();
             DatabaseMetaData dbmd = conn.getMetaData();
 
-            return this.resultSetMetaToSchema(rsmd, dbmd, logicalTableName, actualTableName);
+            return resultSetMetaToSchema(rsmd, dbmd, logicalTableName, actualTableName);
 
         } catch (Exception e) {
             if (e instanceof SQLException) {
@@ -92,8 +92,7 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
                         rs = stmt.executeQuery("select * from " + actualTableName + " where rownum<=2");
                         ResultSetMetaData rsmd = rs.getMetaData();
                         DatabaseMetaData dbmd = conn.getMetaData();
-
-                        return this.resultSetMetaToSchema(rsmd, dbmd, logicalTableName, actualTableName);
+                        return resultSetMetaToSchema(rsmd, dbmd, logicalTableName, actualTableName);
                     } catch (SQLException e1) {
                         e1.printStackTrace();
                     }
@@ -125,14 +124,15 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
 
         String xml = resultSetMetaToSchemaXml(rsmd, dbmd, logicalTableName, actualTableName);
 
-        if (xml == null) return null;
+        if (xml == null) {
+            return null;
+        }
         xml = xml.replaceFirst("<tables>", xmlHead);
-
         List<TableMeta> ts = null;
-
         ts = TableMetaParser.parse(xml);
-
-        if (ts != null && !ts.isEmpty()) return ts.get(0);
+        if (ts != null && !ts.isEmpty()) {
+            return ts.get(0);
+        }
 
         return null;
     }
@@ -164,7 +164,7 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
                 column.setAttribute("name", rsmd.getColumnName(i));
                 columns.appendChild(column);
 
-                String type = TableMetaParser.jdbcTypeToAndorTypeString(rsmd.getColumnType(i));
+                String type = TableMetaParser.jdbcTypeToDataTypeString(rsmd.getColumnType(i));
 
                 if (type == null) throw new IllegalArgumentException("列：" + rsmd.getColumnName(i) + " 类型"
                                                                      + rsmd.getColumnType(i) + "无法识别,联系沈询");

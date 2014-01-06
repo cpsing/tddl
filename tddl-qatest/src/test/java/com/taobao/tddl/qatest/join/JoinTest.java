@@ -139,7 +139,6 @@ public class JoinTest extends BaseAndorTestCase {
                      + "'";
         String[] columnParam = { "APPNAME", "HOSTIP", "STATIONID", "HOSTGROUPNAME", "applevel" };
         selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
-
     }
 
     @Test

@@ -65,7 +65,7 @@ public class ExecUtils {
         }
     }
 
-    public static DATA_TYPE getAndOrDataType(Object ob) {
+    public static DATA_TYPE getTddlDataType(Object ob) {
         if (ob instanceof Byte) {
             return DATA_TYPE.BYTES_VAL;
         } else if (ob instanceof Long) {

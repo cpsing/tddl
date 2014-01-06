@@ -281,11 +281,11 @@ public class TableMetaParser {
         return Relationship.NONE;
     }
 
-    public static DATA_TYPE jdbcTypeToAndorType(int jdbcType) {
-        return getDataType(jdbcTypeToAndorTypeString(jdbcType));
+    public static DATA_TYPE jdbcTypeToDataType(int jdbcType) {
+        return getDataType(jdbcTypeToDataTypeString(jdbcType));
     }
 
-    public static String jdbcTypeToAndorTypeString(int jdbcType) {
+    public static String jdbcTypeToDataTypeString(int jdbcType) {
         String type = null;
         switch (jdbcType) {
             case Types.BIGINT:

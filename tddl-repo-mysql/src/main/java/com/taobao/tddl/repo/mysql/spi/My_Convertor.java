@@ -10,7 +10,6 @@ public class My_Convertor {
 
     public static IRowSet convert(ResultSet rs, ICursorMeta meta) {
         IRowSet rowSet = new ResultSetRowSet(meta, rs);
-
         return rowSet;
     }
 }

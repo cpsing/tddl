@@ -50,7 +50,7 @@ public class DatasourceMySQLImplement implements IDataSourceGetter {
 
     @Override
     public DataSource getDataSource(String group) {
-        return this.getDatasourceByGroupNode(ExecutorContext.getContext().getTopologyHandler(), group);
+        return getDatasourceByGroupNode(ExecutorContext.getContext().getTopologyHandler(), group);
     }
 
 }

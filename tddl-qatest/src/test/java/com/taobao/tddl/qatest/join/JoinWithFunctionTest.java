@@ -166,8 +166,8 @@ public class JoinWithFunctionTest extends BaseAndorTestCase {
     public void JoinWithWhereOrderByLimitMinTest() throws Exception {
         String[] columnParam = { "min(" + host_info + ".host_id)" };
         String sql = "select min(" + host_info + ".host_id)," + "" + host_info + ".host_name," + host_info
-                     + ".hostgroup_id," + hostgroup_info + ".hostgroup_name " + "from " + hostgroup_info
-                     + " inner join " + host_info + "  " + "on " + host_info + ".hostgroup_id=" + hostgroup_info
+                     + ".hostgroup_id," + hostgroup_info + ".hostgroup_name " + "from " + host_info + " inner join "
+                     + hostgroup_info + "  " + "on " + host_info + ".hostgroup_id=" + hostgroup_info
                      + ".hostgroup_id where " + host_info + ".hostgroup_id order by " + host_info
                      + ".hostgroup_id limit 10";
         selectOrderAssert(sql, columnParam, Collections.EMPTY_LIST);
@@ -176,9 +176,9 @@ public class JoinWithFunctionTest extends BaseAndorTestCase {
     @Test
     public void InnerJoinWithGroupbyTest() throws Exception {
         String[] columnParam = { "min(" + host_info + ".host_id)" };
-        String sql = "select min(" + host_info + ".host_id)," + "" + host_info + ".host_name name from "
-                     + hostgroup_info + " inner join " + host_info + " on " + host_info + ".hostgroup_id="
-                     + hostgroup_info + ".hostgroup_id group by name";
+        String sql = "select min(" + host_info + ".host_id)," + "" + host_info + ".host_name name from " + host_info
+                     + " inner join " + hostgroup_info + " on " + host_info + ".hostgroup_id=" + hostgroup_info
+                     + ".hostgroup_id group by name";
         selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
     }
 

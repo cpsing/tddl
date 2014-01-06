@@ -335,7 +335,9 @@ public class FilterPusher {
                                 throw new IllegalArgumentException("join查询表右边不包含join column，请修改查询语句...");
                             }
                         } else {
-                            throw new IllegalArgumentException("join查询的join column都在左表上，请修改查询语句...");
+                            if (!(join.getLeftNode() instanceof JoinNode)) {
+                                throw new IllegalArgumentException("join查询的join column都在左表上，请修改查询语句...");
+                            }
                         }
                     } else if (join.getLeftNode().hasColumn(keys[1])) {
                         if (!join.getLeftNode().hasColumn(keys[0])) {
@@ -352,7 +354,9 @@ public class FilterPusher {
                                 throw new IllegalArgumentException("join查询表左边不包含join column，请修改查询语句...");
                             }
                         } else {
-                            throw new IllegalArgumentException("join查询的join column都在右表上，请修改查询语句...");
+                            if (!(join.getRightNode() instanceof JoinNode)) {
+                                throw new IllegalArgumentException("join查询的join column都在右表上，请修改查询语句...");
+                            }
                         }
                     }
                 }

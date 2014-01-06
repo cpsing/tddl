@@ -58,7 +58,6 @@ public class ResultSetRowSet extends AbstractRowSet implements IRowSet {
     public List<Object> getValues() {
         List<Object> res = new ArrayList<Object>();
         for (int i = 0; i < getParentCursorMeta().getColumns().size(); i++) {
-
             // Object obValue = rs.getObject(i);
             // if (obValue instanceof BigDecimal) {
             // obValue = ((BigDecimal) obValue).longValue();
@@ -70,7 +69,6 @@ public class ResultSetRowSet extends AbstractRowSet implements IRowSet {
             // obValue = rs.getTimestamp(i);
             // }
             res.add(this.getObject(i));
-
         }
         return res;
     }
