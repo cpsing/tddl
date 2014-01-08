@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
@@ -49,10 +50,12 @@ public class TConnection implements Connection {
     private boolean          isAutoCommit         = true;                      // jdbc规范，新连接为true
     private boolean          closed;
     private int              transactionIsolation = -1;
+    private ExecutorService  executorService;
 
     public TConnection(TDataSource ds){
         this.ds = ds;
         this.executor = ds.getExecutor();
+        this.executorService = ds.borrowExecutorService();
     }
 
     /**
@@ -66,7 +69,7 @@ public class TConnection implements Connection {
         ResultCursor resultCursor;
         ResultSet rs = null;
         extraCmd.putAll(buildExtraCommand(sql));
-        executionContext.setExecutorService(ds.borrowExecutorService());
+        executionContext.setExecutorService(executorService);
         executionContext.setParams(context);
         executionContext.setExtraCmds(extraCmd);
         try {
@@ -198,6 +201,10 @@ public class TConnection implements Connection {
             openedStatements.clear();
         }
 
+        if (executorService != null) {
+            this.ds.releaseExecutorService(executorService);
+        }
+
         if (this.executionContext != null) {
             if (this.executionContext.getTransaction() != null) {
                 try {
@@ -207,9 +214,6 @@ public class TConnection implements Connection {
                 }
             }
 
-            if (this.executionContext.getExecutorService() != null) {
-                this.ds.releaseExecutorService(this.executionContext.getExecutorService());
-            }
         }
 
         closed = true;
