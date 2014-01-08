@@ -70,7 +70,7 @@ public class MysqlRepoUtils {
                 my_transaction = (My_Transaction) txn;
             }
         } else {
-            my_transaction = new My_Transaction();
+            my_transaction = new My_Transaction(executionContext.isAutoCommit());
             executionContext.setTransaction(my_transaction);
         }
         jdbcHandler.setDs(ds);

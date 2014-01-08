@@ -12,13 +12,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.taobao.tddl.qatest.BaseAndorTestCase;
+import com.taobao.tddl.qatest.BaseTddlTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
 
 @RunWith(EclipseParameterized.class)
-public class DeleteTest extends BaseAndorTestCase {
+public class DeleteTest extends BaseTddlTestCase {
 
     @Parameters(name = "{index}:table={0}")
     public static List<String[]> prepareData() {

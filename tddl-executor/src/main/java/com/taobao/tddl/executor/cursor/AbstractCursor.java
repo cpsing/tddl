@@ -24,7 +24,6 @@ public abstract class AbstractCursor implements Cursor {
 
     protected void init() throws TddlException {
         inited = true;
-
     }
 
     protected void checkInited() throws TddlException {
@@ -74,13 +73,13 @@ public abstract class AbstractCursor implements Cursor {
     public IRowSet next() throws TddlException {
         GeneralUtil.checkInterrupted();
         throw new IllegalArgumentException("null object");
-        // if(cursor == null) return null;
-        // return cursor.next();
     }
 
     protected IRowSet parentCursorNext() throws TddlException {
         GeneralUtil.checkInterrupted();
-        if (cursor == null) return null;
+        if (cursor == null) {
+            return null;
+        }
         return cursor.next();
     }
 
@@ -105,7 +104,6 @@ public abstract class AbstractCursor implements Cursor {
     @Override
     public void beforeFirst() throws TddlException {
         throw new IllegalArgumentException("null object");
-        // cursor.beforeFirst();
     }
 
     protected void parentCursorBeforeFirst() throws TddlException {
@@ -150,7 +148,9 @@ public abstract class AbstractCursor implements Cursor {
             return ex;
         }
 
-        if (exceptions == null) exceptions = new ArrayList<TddlException>();
+        if (exceptions == null) {
+            exceptions = new ArrayList<TddlException>();
+        }
         return exceptions;
 
     }

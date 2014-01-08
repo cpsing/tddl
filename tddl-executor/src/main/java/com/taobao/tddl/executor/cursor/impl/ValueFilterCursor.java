@@ -351,6 +351,7 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
         return null;
     }
 
+    @SuppressWarnings("unused")
     private Map<String, Object> getRecordMap(CloneableRecord key, CloneableRecord value) {
         int size = 0;
         if (value != null) {

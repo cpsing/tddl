@@ -11,7 +11,7 @@ import com.taobao.tddl.optimizer.exceptions.FunctionException;
  * 
  * @author Whisper
  */
-public class Dummy implements IExtraFunction {
+public class Dummy2 implements IExtraFunction {
 
     public DATA_TYPE getReturnType() {
         return DATA_TYPE.LONG_VAL;
@@ -25,22 +25,18 @@ public class Dummy implements IExtraFunction {
     }
 
     public FunctionType getFunctionType() {
-
-        return null;
+        return FunctionType.Scalar;
     }
 
     public DATA_TYPE getMapReturnType() {
-
-        return null;
+        return DATA_TYPE.LONG_VAL;
     }
 
     public Object getResult() {
-
         return null;
     }
 
     public void clear() {
-
     }
 
 }

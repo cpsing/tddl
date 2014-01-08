@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.taobao.tddl.qatest.BaseAndorTestCase;
+import com.taobao.tddl.qatest.BaseTddlTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
@@ -20,7 +20,7 @@ import com.taobao.tddl.qatest.util.ExecuteTableName;
  * Author By: zhuoxue.yll Created Date: 2012-10-19 上午10:54:19
  */
 @RunWith(EclipseParameterized.class)
-public class SelectRemoveDuplicatesTest extends BaseAndorTestCase {
+public class SelectRemoveDuplicatesTest extends BaseTddlTestCase {
 
     @Parameters(name = "{index}:table1={0}")
     public static List<String[]> prepare() {

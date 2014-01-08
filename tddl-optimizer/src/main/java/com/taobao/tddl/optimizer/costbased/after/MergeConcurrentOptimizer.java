@@ -62,7 +62,7 @@ public class MergeConcurrentOptimizer implements QueryPlanOptimizer {
     }
 
     private static boolean isMergeConcurrent(Map<String, Comparable> extraCmd, IMerge query) {
-        String value = ObjectUtils.toString(GeneralUtil.getExtraCmd(extraCmd,
+        String value = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd,
             ExtraCmd.OptimizerExtraCmd.MergeConcurrent));
         if (StringUtils.isEmpty(value)) {
             if ((query.getLimitFrom() != null || query.getLimitTo() != null)) {

@@ -5,9 +5,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
@@ -16,62 +18,66 @@ import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.common.utils.thread.NamedThreadFactory;
 import com.taobao.tddl.executor.MatrixExecutor;
 import com.taobao.tddl.matrix.config.ConfigHolder;
+import com.taobao.tddl.matrix.config.TDefaultConfig;
 
 /**
+ * matrix的jdbc datasource实现
+ * 
  * @author mengshi.sunmengshi 2013-11-22 下午3:26:14
  * @since 5.1.0
  */
 public class TDataSource extends AbstractLifecycle implements DataSource {
 
-    private String                  ruleFilePath         = null;
-    private String                  machineTopologyFile  = null;
-    private String                  schemaFile           = null;
-    private MatrixExecutor          executor             = null;
-    private String                  appName              = null;
-    private Map<String, Comparable> connectionProperties = new HashMap(2);
-
-    private ConfigHolder            configHolder;
-
+    private String                               ruleFilePath          = null;
+    private String                               machineTopologyFile   = null;
+    private String                               schemaFile            = null;
+    private String                               appName               = null;
+    private MatrixExecutor                       executor              = null;
+    private Map<String, Comparable>              connectionProperties  = new HashMap(2);
+    private ConfigHolder                         configHolder;
     /**
      * 用于并行查询的线程池
      */
-    private ExecutorService         executorService      = null;
+    private ExecutorService                      globalExecutorService = null;
+    private LinkedBlockingQueue<ExecutorService> executorServiceQueue  = null;
 
     @Override
-    public PrintWriter getLogWriter() throws SQLException {
-        throw new UnsupportedOperationException("getLogWriter");
-    }
+    public void doInit() throws TddlException {
+        this.executor = new MatrixExecutor();
+        executor.init();
 
-    @Override
-    public int getLoginTimeout() throws SQLException {
-        throw new UnsupportedOperationException("getLoginTimeout");
-    }
+        ConfigHolder configHolder = new ConfigHolder();
+        configHolder.setAppName(appName);
+        configHolder.setTopologyFilePath(this.machineTopologyFile);
+        configHolder.setSchemaFilePath(this.schemaFile);
+        configHolder.setRuleFilePath(this.ruleFilePath);
+        configHolder.init();
+        this.configHolder = configHolder;
 
-    @Override
-    public void setLogWriter(PrintWriter arg0) throws SQLException {
-        throw new UnsupportedOperationException("setLogWriter");
+        /**
+         * 如果不为每个连接都初始化，则为整个ds初始化一个线程池
+         */
+        boolean everyConnectionPool = GeneralUtil.getExtraCmdBoolean(this.getConnectionProperties(),
+            ExtraCmd.ConnectionExtraCmd.INIT_CONCURRENT_POOL_EVERY_CONNECTION,
+            true);
+        if (everyConnectionPool) {
+            executorServiceQueue = new LinkedBlockingQueue<ExecutorService>();
+        } else {
+            // 全局共享线程池
+            int poolSize;
+            Object poolSizeObj = GeneralUtil.getExtraCmdString(this.getConnectionProperties(),
+                ExtraCmd.ConnectionExtraCmd.CONCURRENT_THREAD_SIZE);
 
-    }
+            if (poolSizeObj == null) {
+                throw new TddlRuntimeException("如果线程池为整个datasource共用，请使用CONCURRENT_THREAD_SIZE指定线程池大小");
+            }
 
-    @Override
-    public void setLoginTimeout(int arg0) throws SQLException {
-        throw new UnsupportedOperationException("setLoginTimeout");
-
-    }
-
-    @Override
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return this.getClass().isAssignableFrom(iface);
-    }
-
-    @Override
-    public <T> T unwrap(Class<T> iface) throws SQLException {
-        try {
-            return (T) this;
-        } catch (Exception e) {
-            throw new SQLException(e);
+            poolSize = Integer.valueOf(poolSizeObj.toString());
+            // 默认queue队列为poolSize的两倍，超过queue大小后使用当前线程
+            globalExecutorService = createThreadPool(poolSize);
         }
     }
 
@@ -85,58 +91,73 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
         }
     }
 
+    public ExecutorService borrowExecutorService() {
+        if (globalExecutorService != null) {
+            return globalExecutorService;
+        } else {
+            ExecutorService executor = executorServiceQueue.poll();
+            if (executor == null) {
+                Object poolSizeObj = GeneralUtil.getExtraCmdString(this.getConnectionProperties(),
+                    ExtraCmd.ConnectionExtraCmd.CONCURRENT_THREAD_SIZE);
+                int poolSize = 0;
+                if (poolSizeObj != null) {
+                    poolSize = Integer.valueOf(poolSizeObj.toString());
+                } else {
+                    poolSize = TDefaultConfig.CONCURRENT_THREAD_SIZE;
+                }
+                executor = createThreadPool(poolSize);
+            }
+
+            if (executor.isShutdown()) {
+                return borrowExecutorService();
+            } else {
+                return executor;
+            }
+        }
+    }
+
+    public void releaseExecutorService(ExecutorService executor) {
+        if (executor != null && executor != globalExecutorService) {
+            executorServiceQueue.offer(executor);// 放回队列中
+        }
+    }
+
+    private ThreadPoolExecutor createThreadPool(int poolSize) {
+        return new ThreadPoolExecutor(poolSize,
+            poolSize,
+            2000L,
+            TimeUnit.MILLISECONDS,
+            new ArrayBlockingQueue(poolSize * 2),
+            new NamedThreadFactory("tddl_concurrent_query_executor"),
+            new ThreadPoolExecutor.CallerRunsPolicy());
+    }
+
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
         return this.getConnection();
     }
 
     @Override
-    public void doInit() throws TddlException {
-
-        this.executor = new MatrixExecutor();
-
-        ConfigHolder configHolder = new ConfigHolder();
-        configHolder.setAppName(appName);
-        configHolder.setTopologyFilePath(this.machineTopologyFile);
-        configHolder.setSchemaFilePath(this.schemaFile);
-        configHolder.setRuleFilePath(this.ruleFilePath);
-
-        configHolder.init();
-
-        this.configHolder = configHolder;
-
-        /**
-         * 如果不为每个连接都初始化，则为整个ds初始化一个线程池
-         */
-        if ("False".equalsIgnoreCase(GeneralUtil.getExtraCmd(this.getConnectionProperties(),
-            ExtraCmd.ConnectionExtraCmd.INIT_CONCURRENT_POOL_EVERY_CONNECTION))) {
-            int poolSize;
-            Object poolSizeObj = GeneralUtil.getExtraCmd(this.getConnectionProperties(),
-                ExtraCmd.ConnectionExtraCmd.CONCURRENT_THREAD_SIZE);
-
-            if (poolSizeObj == null) throw new TddlRuntimeException("如果线程池为整个datasource共用，请使用CONCURRENT_THREAD_SIZE指定线程池大小");
-
-            poolSize = Integer.valueOf(poolSizeObj.toString());
-
-            executorService = Executors.newFixedThreadPool(poolSize, new ThreadFactory() {
-
-                @Override
-                public Thread newThread(Runnable arg0) {
-                    return new Thread(arg0, "concurrent_query_executor");
-                }
-            });
+    public void doDestory() throws TddlException {
+        if (globalExecutorService != null) {
+            globalExecutorService.shutdownNow();
         }
 
-    }
+        if (executorServiceQueue != null) {
+            for (ExecutorService executor : executorServiceQueue) {
+                executor.shutdownNow();
+            }
 
-    public ConfigHolder getConfigHolder() {
-        return this.configHolder;
-    }
+            executorServiceQueue.clear();
+        }
 
-    @Override
-    public void doDestory() {
-        // TODO Auto-generated method stub
+        if (configHolder != null) {
+            configHolder.destory();
+        }
 
+        if (executor.isInited()) {
+            executor.destory();
+        }
     }
 
     public String getRuleFile() {
@@ -180,12 +201,44 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
 
     }
 
-    public ExecutorService getExecutorService() {
-        return executorService;
+    public ConfigHolder getConfigHolder() {
+        return this.configHolder;
     }
 
-    public void setExecutorService(ExecutorService executorService) {
-        this.executorService = executorService;
+    @Override
+    public PrintWriter getLogWriter() throws SQLException {
+        throw new UnsupportedOperationException("getLogWriter");
+    }
+
+    @Override
+    public int getLoginTimeout() throws SQLException {
+        throw new UnsupportedOperationException("getLoginTimeout");
+    }
+
+    @Override
+    public void setLogWriter(PrintWriter arg0) throws SQLException {
+        throw new UnsupportedOperationException("setLogWriter");
+
+    }
+
+    @Override
+    public void setLoginTimeout(int arg0) throws SQLException {
+        throw new UnsupportedOperationException("setLoginTimeout");
+
+    }
+
+    @Override
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        return this.getClass().isAssignableFrom(iface);
+    }
+
+    @Override
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        try {
+            return (T) this;
+        } catch (Exception e) {
+            throw new SQLException(e);
+        }
     }
 
 }

@@ -16,7 +16,7 @@ public interface ITransaction {
 
     void rollback() throws TddlException;
 
-    boolean isAutoCommit() throws TddlException;
+    boolean isAutoCommit();
 
     public ITHLog getHistoryLog();
 

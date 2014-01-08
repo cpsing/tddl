@@ -24,12 +24,11 @@ import java.util.Map;
 
 public class ResultSetRemeberIfClosed implements ResultSet {
 
-    ResultSet rs;
-    boolean   isClosed = false;
+    private ResultSet rs;
+    private boolean   isClosed = false;
 
     public ResultSetRemeberIfClosed(ResultSet rs){
         this.rs = rs;
-
     }
 
     public boolean absolute(int row) throws SQLException {

@@ -161,7 +161,7 @@ public class FilterSpliter {
     }
 
     private static boolean isOptimizeIndexMerge(Map<String, Comparable> extraCmd) {
-        String value = ObjectUtils.toString(GeneralUtil.getExtraCmd(extraCmd,
+        String value = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd,
             ExtraCmd.OptimizerExtraCmd.ChooseIndexMerge));
         return BooleanUtils.toBoolean(value);
     }

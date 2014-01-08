@@ -26,9 +26,9 @@ import com.taobao.tddl.qatest.util.NormalTblRow;
 public class ibatisTypeTest {
 
     protected static SqlMapClient andorSqlMapClient          = null;
-    protected static SqlMapClient andorTDHSSqlMapClient      = null;
+    // protected static SqlMapClient andorTDHSSqlMapClient = null;
     protected static SqlMapClient mysqlSqlMapClient          = null;
-    protected static final String MATRIX_IBATIS_CONTEXT_PATH = "classpath:ibatis/spring_context.xml";
+    protected static final String MATRIX_IBATIS_CONTEXT_PATH = "classpath:spring/spring_context.xml";
     private NormalTblRow          row                        = null;
     private NormalTblRow          rowTdhs                    = null;
     private NormalTblRow          rowMysql                   = null;
@@ -37,7 +37,8 @@ public class ibatisTypeTest {
     public static void setUp() {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(MATRIX_IBATIS_CONTEXT_PATH);
         andorSqlMapClient = (SqlMapClient) context.getBean("ibatis_ds");
-        andorTDHSSqlMapClient = (SqlMapClient) context.getBean("ibatis_tdhs_ds");
+        // andorTDHSSqlMapClient = (SqlMapClient)
+        // context.getBean("ibatis_tdhs_ds");
         mysqlSqlMapClient = (SqlMapClient) context.getBean("ibatis_mysql");
     }
 
@@ -52,9 +53,10 @@ public class ibatisTypeTest {
         rowMysql = (NormalTblRow) listMysql.get(0);
         rowEquals(row, rowMysql);
         // andor的tdhs
-        List listTdhs = andorTDHSSqlMapClient.queryForList("select_tdhs_test", map);
-        rowTdhs = (NormalTblRow) list.get(0);
-        rowEquals(rowTdhs, rowMysql);
+        // List listTdhs =
+        // andorTDHSSqlMapClient.queryForList("select_tdhs_test", map);
+        // rowTdhs = (NormalTblRow) list.get(0);
+        // rowEquals(rowTdhs, rowMysql);
     }
 
     @Test
@@ -62,15 +64,16 @@ public class ibatisTypeTest {
         Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("pk", 11);
         // andor的mysql
-        List list = andorSqlMapClient.queryForList("select_test_null", map);
-        NormalTblNullRow row = (NormalTblNullRow) list.get(0);
         List listMysql = mysqlSqlMapClient.queryForList("select_test_null", map);
         NormalTblNullRow rowMysql = (NormalTblNullRow) listMysql.get(0);
+        List list = andorSqlMapClient.queryForList("select_test_null", map);
+        NormalTblNullRow row = (NormalTblNullRow) list.get(0);
         rowNullEquals(row, rowMysql);
         // andor的tdhs
-        List listTdhs = andorTDHSSqlMapClient.queryForList("select_tdhs_null", map);
-        NormalTblNullRow rowTdhs = (NormalTblNullRow) list.get(0);
-        rowNullEquals(rowTdhs, rowMysql);
+        // List listTdhs =
+        // andorTDHSSqlMapClient.queryForList("select_tdhs_null", map);
+        // NormalTblNullRow rowTdhs = (NormalTblNullRow) list.get(0);
+        // rowNullEquals(rowTdhs, rowMysql);
     }
 
     @Test
@@ -107,11 +110,11 @@ public class ibatisTypeTest {
 
         andorSqlMapClient.delete("delete_test", map);
         mysqlSqlMapClient.delete("delete_test", map);
-        andorTDHSSqlMapClient.delete("delete_tdhs_test", map);
+        // andorTDHSSqlMapClient.delete("delete_tdhs_test", map);
 
         andorSqlMapClient.insert("insert_test", map);
         mysqlSqlMapClient.insert("insert_test", map);
-        andorTDHSSqlMapClient.insert("insert_tdhs_test", map);
+        // andorTDHSSqlMapClient.insert("insert_tdhs_test", map);
 
         List list = andorSqlMapClient.queryForList("select_test", map);
         row = (NormalTblRow) list.get(0);
@@ -119,13 +122,14 @@ public class ibatisTypeTest {
         rowMysql = (NormalTblRow) listMysql.get(0);
         rowEquals(row, rowMysql);
         // andor的tdhs
-        List listTdhs = andorTDHSSqlMapClient.queryForList("select_tdhs_test", map);
-        rowTdhs = (NormalTblRow) list.get(0);
-        rowEquals(rowTdhs, rowMysql);
+        // List listTdhs =
+        // andorTDHSSqlMapClient.queryForList("select_tdhs_test", map);
+        // rowTdhs = (NormalTblRow) list.get(0);
+        // rowEquals(rowTdhs, rowMysql);
 
         andorSqlMapClient.delete("delete_test", map);
         mysqlSqlMapClient.delete("delete_test", map);
-        andorTDHSSqlMapClient.insert("delete_tdhs_test", map);
+        // andorTDHSSqlMapClient.insert("delete_tdhs_test", map);
 
     }
 
@@ -194,6 +198,5 @@ public class ibatisTypeTest {
         Assert.assertEquals(rowMysql.getTinyintr(), row.getTinyintr());
         Assert.assertEquals(rowMysql.getYearr(), row.getYearr());
         Assert.assertEquals(rowMysql.getDatetimeDate(), row.getDatetimeDate());
-
     }
 }

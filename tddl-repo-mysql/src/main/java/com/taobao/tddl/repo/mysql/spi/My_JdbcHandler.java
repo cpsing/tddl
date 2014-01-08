@@ -7,11 +7,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
-import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.jdbc.ParameterMethod;
@@ -57,6 +55,8 @@ public class My_JdbcHandler implements GeneralQueryHandler {
     protected String            groupName        = null;
     protected DataSource        ds               = null;
     protected ExecutionContext  executionContext = null;
+    protected boolean           initPrev         = false;
+    protected IDataNodeExecutor plan;
 
     public enum ExecutionType {
         PUT, GET
@@ -87,59 +87,48 @@ public class My_JdbcHandler implements GeneralQueryHandler {
             }
         }
 
-        executionType = ExecutionType.GET;
-        connection = myTransaction.getConnection(groupName, ds);
-
-        if (logger.isDebugEnabled()) {
-            logger.warn("sqlAndParam:\n" + sqlAndParam);
-        }
-
-        ps = connection.prepareStatement(sqlAndParam.sql);
-        if (isStreaming) {
-            // 当prev的时候 不能设置
-            setStreamingForStatement(ps);
-        }
-        Map<Integer, ParameterContext> map = sqlAndParam.param;
-        ParameterMethod.setParameters(ps, map);
         try {
+            executionType = ExecutionType.GET;
+            connection = myTransaction.getConnection(groupName, ds);
+
+            if (logger.isDebugEnabled()) {
+                logger.warn("sqlAndParam:\n" + sqlAndParam);
+            }
+
+            ps = connection.prepareStatement(sqlAndParam.sql);
+            if (isStreaming) {
+                // 当prev的时候 不能设置
+                setStreamingForStatement(ps);
+            }
+            Map<Integer, ParameterContext> map = sqlAndParam.param;
+            ParameterMethod.setParameters(ps, map);
             ResultSet rs = new ResultSetRemeberIfClosed(ps.executeQuery());
             if (isControlSql) {
                 rs = new ResultSetAutoCloseConnection(rs, connection, ps);
             }
             this.resultSet = rs;
-        } catch (SQLException e) {
-            if (e.getMessage()
-                .contains("only select, insert, update, delete,replace,truncate,create,drop,load,merge sql is supported")) {
-                ps = connection.prepareStatement("select 1");
-                this.resultSet = new ResultSetRemeberIfClosed(new ResultSetAutoCloseConnection(ps.executeQuery(),
-                    connection,
-                    ps));
-
-            } else {
-                throw new RuntimeException("sql generated is :\n" + sqlAndParam.toString(), e);
+        } catch (Throwable e) {
+            if (myTransaction.isAutoCommit()) {
+                // 关闭自提交的链接
+                close();
             }
-        }
-    }
 
-    protected void setStreamingForStatement(Statement stat) throws SQLException {
-        stat.setFetchSize(Integer.MIN_VALUE);
-        if (logger.isDebugEnabled()) {
-            logger.warn("fetchSize:\n" + stat.getFetchSize());
+            throw new TddlRuntimeException("sql generated is :\n" + sqlAndParam.toString(), e);
+            // if (e.getMessage()
+            // .contains("only select, insert, update, delete,replace,truncate,create,drop,load,merge sql is supported"))
+            // {
+            // // 返回一个空结果
+            // ps = connection.prepareStatement("select 1");
+            // this.resultSet = new ResultSetRemeberIfClosed(new
+            // ResultSetAutoCloseConnection(ps.executeQuery(),
+            // connection,
+            // ps));
+            // } else {
+            //
+            // throw new TddlRuntimeException("sql generated is :\n" +
+            // sqlAndParam.toString(), e);
+            // }
         }
-    }
-
-    protected void setContext(ICursorMeta meta, boolean isStreaming) {
-        if (cursorMeta == null) {
-            cursorMeta = meta;
-        }
-
-        if (isStreaming != this.isStreaming) {
-            this.isStreaming = isStreaming;
-        }
-    }
-
-    public boolean isAutoCommit() throws SQLException {
-        return myTransaction.autoCommit;
     }
 
     public void executeUpdate(ExecutionContext executionContext, IPut put, ITable table, IndexMeta meta)
@@ -164,19 +153,12 @@ public class My_JdbcHandler implements GeneralQueryHandler {
             executionType = ExecutionType.PUT;
             this.resultSet = urw;
         } catch (Throwable e) {
-            try {
-                if (myTransaction.isAutoCommit()) {
-                    close();
-                }
-            } catch (TddlException e1) {
-                throw new SQLException(e);
+            if (myTransaction.isAutoCommit()) {
+                close();
             }
+
             throw new SQLException(e);
         }
-    }
-
-    public DataSource getDs() {
-        return ds;
     }
 
     public ISchematicCursor getResultCursor() {
@@ -194,7 +176,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
                 return null;
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new TddlRuntimeException(e);
         }
     }
 
@@ -204,6 +186,31 @@ public class My_JdbcHandler implements GeneralQueryHandler {
 
     public void setDs(Object ds) {
         this.ds = (DataSource) ds;
+    }
+
+    protected void setStreamingForStatement(Statement stat) throws SQLException {
+        stat.setFetchSize(Integer.MIN_VALUE);
+        if (logger.isDebugEnabled()) {
+            logger.warn("fetchSize:\n" + stat.getFetchSize());
+        }
+    }
+
+    protected void setContext(ICursorMeta meta, boolean isStreaming) {
+        if (cursorMeta == null) {
+            cursorMeta = meta;
+        }
+
+        if (isStreaming != this.isStreaming) {
+            this.isStreaming = isStreaming;
+        }
+    }
+
+    public boolean isAutoCommit() throws SQLException {
+        return myTransaction.isAutoCommit();
+    }
+
+    public DataSource getDs() {
+        return ds;
     }
 
     public void close() throws SQLException {
@@ -241,13 +248,9 @@ public class My_JdbcHandler implements GeneralQueryHandler {
                     ps = null;
                 }
             } finally {
-                try {
-                    // 针对自动提交的事务,链接不会进行重用，各自关闭
-                    if (connection != null && myTransaction.isAutoCommit()) {
-                        connection.close();
-                    }
-                } catch (TddlException e) {
-                    throw new SQLException(e);
+                // 针对自动提交的事务,链接不会进行重用，各自关闭
+                if (connection != null && myTransaction.isAutoCommit()) {
+                    connection.close();
                 }
             }
         }
@@ -268,10 +271,11 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         }
 
         checkInitedInRsNext();
-
         prev_kv = current;
         try {
-            if (resultSet.isClosed()) return null;
+            if (resultSet.isClosed()) {
+                return null;
+            }
         } catch (Exception ex) {
             return null;
         }
@@ -332,21 +336,16 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         current = null;
     }
 
-    boolean                   initPrev = false;
-    private IDataNodeExecutor plan;
-
     public IRowSet prev() throws SQLException {
         if (ds == null) {
-
             throw new TddlRuntimeException("数据源为空");
         }
         if (!initPrev) {
             initPrev = true;
             return convertRowSet(resultSet.last());
-
         }
-        checkInitedInRsNext();
 
+        checkInitedInRsNext();
         return convertRowSet(resultSet.previous());
 
     }
@@ -366,23 +365,14 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         return true;
     }
 
-    public IRowSet next(long timeout, TimeUnit unit) throws SQLException {
-        // TODO shenxun : 如果真的需要可能需要用外部线程interrupted掉网络io等待。
-        return next();
-    }
-
-    @Override
     public void cancel(boolean interruptedIfRunning) {
-
     }
 
     public void setMyTransaction(My_Transaction myTransaction) {
         this.myTransaction = myTransaction;
     }
 
-    @Override
     public boolean isCanceled() {
-
         return false;
     }
 
@@ -416,7 +406,6 @@ public class My_JdbcHandler implements GeneralQueryHandler {
 
     public void setPlan(IDataNodeExecutor plan) {
         this.plan = plan;
-
     }
 
     public IDataNodeExecutor getPlan() {

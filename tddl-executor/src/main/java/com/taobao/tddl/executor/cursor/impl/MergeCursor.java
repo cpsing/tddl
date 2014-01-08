@@ -66,7 +66,6 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
         this.cursors = cursors;
         List<IOrderBy> orderBys = this.cursors.get(0).getOrderBy();
         setOrderBy(orderBys);
-
     }
 
     public MergeCursor(List<ISchematicCursor> cursors, ICursorMeta iCursorMeta, IDataNodeExecutor currentExecotor,
@@ -211,7 +210,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
 
             // 直接构造为where条件，优化器进行重新选择
             IFilter whereFilter = FilterUtils.and(iquery.getKeyFilter(), iquery.getValueFilter());
-            query.query(FilterUtils.and(removeDupFilter(whereFilter, ibf), ibf));
+            query.query(FilterUtils.and(whereFilter, ibf));
             query.alias(iquery.getAlias());
             query.build();
             // IDataNodeExecutor idne = dnc.shard(currentExecotor,
@@ -222,6 +221,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
 
             executionContext.getExtraCmds().put("initThread", currentThread);
 
+            // TODO 以后要考虑做cache
             idne = optimizerContext.getOptimizer().optimizeAndAssignment(query,
                 executionContext.getParams(),
                 executionContext.getExtraCmds());
@@ -284,6 +284,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
      * @param srcFilter
      * @param mergeFilter
      */
+    @SuppressWarnings("unused")
     private IFilter removeDupFilter(IFilter srcFilter, IBooleanFilter inFilter) {
         List<List<IFilter>> filters = FilterUtils.toDNFNodesArray(srcFilter);
         List<List<IFilter>> newFilters = new ArrayList<List<IFilter>>();

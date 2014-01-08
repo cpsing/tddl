@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.taobao.tddl.qatest.BaseAndorTestCase;
+import com.taobao.tddl.qatest.BaseTddlTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
@@ -20,7 +20,7 @@ import com.taobao.tddl.qatest.util.ExecuteTableName;
  * Author By: zhuoxue.yll Created Date: 2012-9-17 上午11:14:23
  */
 @RunWith(EclipseParameterized.class)
-public class SelectCacheTest extends BaseAndorTestCase {
+public class SelectCacheTest extends BaseTddlTestCase {
 
     String[] columnParam = { "PK", "NAME", "ID", "gmt_create", "GMT_TIMESTAMP", "GMT_DATETIME", "floatCol" };
 

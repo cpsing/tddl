@@ -21,16 +21,22 @@ import com.taobao.tddl.rule.TddlRule;
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
+/**
+ * 依赖的组件
+ * 
+ * @since 5.1.0
+ */
 public class ConfigHolder extends AbstractLifecycle {
 
     final static Logger      logger = LoggerFactory.getLogger(ConfigHolder.class);
-    private OptimizerRule    optimizerRule;
     private String           appName;
     private String           ruleFilePath;
     private String           schemaFilePath;
     private String           topologyFilePath;
     private String           unitName;
+    private OptimizerRule    optimizerRule;
     private TopologyHandler  topologyHandler;
+    private TopologyExecutor topologyExecutor;
     private SchemaManager    schemaManager;
     private IndexManager     indexManger;
     private Optimizer        optimizer;
@@ -40,7 +46,6 @@ public class ConfigHolder extends AbstractLifecycle {
 
     @Override
     public void doInit() throws TddlException {
-
         ExecutorContext executorContext = new ExecutorContext();
         this.executorContext = executorContext;
         ExecutorContext.setContext(executorContext);
@@ -55,7 +60,7 @@ public class ConfigHolder extends AbstractLifecycle {
         optimizerInit();
 
         executorContext.setTopologyHandler(topologyHandler);
-        executorContext.setTopologyExecutor(new TopologyExecutor());
+        executorContext.setTopologyExecutor(topologyExecutor);
 
         oc.setIndexManager(this.indexManger);
         oc.setMatrix(topologyHandler.getMatrix());
@@ -67,12 +72,20 @@ public class ConfigHolder extends AbstractLifecycle {
 
     @Override
     protected void doDestory() throws TddlException {
-        // TODO
+        schemaManager.destory();
+        optimizerRule.destory();
+        optimizer.destory();
+        statManager.destory();
+        topologyHandler.destory();
+        topologyExecutor.destory();
     }
 
     public void topologyInit() throws TddlException {
         topologyHandler = new TopologyHandler(appName, unitName, topologyFilePath);
         topologyHandler.init();
+
+        topologyExecutor = new TopologyExecutor();
+        topologyExecutor.init();
     }
 
     public void ruleInit() throws TddlException {
@@ -82,26 +95,23 @@ public class ConfigHolder extends AbstractLifecycle {
         rule.init();
 
         optimizerRule = new OptimizerRule(rule);
+        optimizerRule.init();
     }
 
     public void schemaInit() throws TddlException {
         RuleSchemaManager ruleSchemaManager = new RuleSchemaManager(optimizerRule, topologyHandler.getMatrix());
         StaticSchemaManager staticSchemaManager = new StaticSchemaManager(schemaFilePath, appName, unitName);
-
         ruleSchemaManager.setLocal(staticSchemaManager);
 
         this.schemaManager = ruleSchemaManager;
-
         schemaManager.init();
 
         IndexManager indexManager = new RuleIndexManager(ruleSchemaManager);
         indexManager.init();
-
         this.indexManger = indexManager;
     }
 
     public void optimizerInit() throws TddlException {
-
         CostBasedOptimizer optimizer = new CostBasedOptimizer();
         optimizer.init();
 
@@ -113,7 +123,6 @@ public class ConfigHolder extends AbstractLifecycle {
         statManager.init();
 
         this.statManager = statManager;
-
     }
 
     public String getAppName() {

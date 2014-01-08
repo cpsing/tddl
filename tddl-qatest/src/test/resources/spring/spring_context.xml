@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="gb2312"?>
+<!DOCTYPE beans PUBLIC "-//ibatis/DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="placeHolderConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:spring/config.properties" />
+	</bean>
+
+	<!--mysql数据源1 -->
+	<bean id="normal_0" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="${mysql.normal0.url}" />
+		<property name="username" value="${mysql.normal0.username}" />
+		<property name="password" value="${mysql.normal0.password}" />
+	</bean>
+    <!-- andor数据源 -->
+	<bean id="andords" class="com.taobao.tddl.matrix.jdbc.TDataSource" init-method="init">
+		<property name="appName" value="andor_mysql_qatest" />
+		<property name="ruleFile"  value="V0#classpath:client/mysql_rule.xml" />
+		<property name="topologyFile" value="src/test/resources/client/server_topology.xml" />
+		<property name="schemaFile" value="src/test/resources/client/mysql_schema.xml" />
+	</bean> 
+	<!-- 
+	<bean id="andorTDHSds" class="com.taobao.tddl.matrix.jdbc.TDataSource" init-method="init">
+		<property name="ruleFilePath"  value="V0#classpath:client/tdhs_rule.xml" />
+		<property name="machineTopologyFile" value="src/test/resources/client/server_topology.xml" />
+		<property name="schemaFile" value="src/test/resources/client/tdhs_schema.xml" />
+	</bean>
+	<bean id="ibatis_tdhs_ds" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="ibatis/sqlmap_config.xml" />
+		<property name="dataSource" ref="andorTDHSds" />
+	</bean>
+	 -->
+	<bean id="ibatis_ds" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="ibatis/sqlmap_config.xml" />
+		<property name="dataSource" ref="andords" />
+	</bean>  
+	<bean id="ibatis_mysql" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="ibatis/sqlmap_config.xml" />
+		<property name="dataSource" ref="normal_0" />
+	</bean>
+</beans>

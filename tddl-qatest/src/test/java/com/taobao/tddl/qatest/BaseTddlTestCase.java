@@ -21,7 +21,7 @@ import com.taobao.tddl.qatest.util.PrepareData;
  * <p/>
  * Author By: zhuoxue.yll Created Date: 2012-2-16 下午2:05:24
  */
-public class BaseAndorTestCase extends PrepareData {
+public class BaseTddlTestCase extends PrepareData {
 
     protected static final ExecutorService pool                    = Executors.newCachedThreadPool();
     private static String                  ruleFile                = "V0#classpath:client/";
@@ -113,11 +113,7 @@ public class BaseAndorTestCase extends PrepareData {
     }
 
     public static JdbcTemplate JdbcTemplateClient(String dbType) throws Exception {
-        us = new TDataSource();
-        us.setRuleFile(ruleFile + dbType + "_" + rule);
-        us.setTopologyFile(machineTapologyFile);
-        us.setSchemaFile(schemaFile + dbType + "_" + schema);
-        us.init();
+        IEnvInit();
         return new JdbcTemplate(us);
     }
 

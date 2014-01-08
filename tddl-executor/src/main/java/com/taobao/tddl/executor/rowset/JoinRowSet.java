@@ -70,9 +70,9 @@ public class JoinRowSet extends AbstractRowSet implements IRowSet {
     @Override
     public List<Object> getValues() {
         ArrayList<Object> values = new ArrayList<Object>();
-
         if (leftRowSet == null && rightRowSet == null) {
-            for (ColumnMeta cm : this.getParentCursorMeta().getColumns()) {
+            int size = this.getParentCursorMeta().getColumns().size();
+            for (int i = 0; i < size; i++) {
                 values.add(null);
             }
         } else if (rightRowSet == null) {

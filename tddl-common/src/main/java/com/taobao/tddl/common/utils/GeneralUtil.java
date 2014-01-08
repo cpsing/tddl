@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.taobao.tddl.common.exception.TddlException;
@@ -111,7 +112,7 @@ public class GeneralUtil {
         return tab.toString();
     }
 
-    public static String getExtraCmd(Map<String, Comparable> extraCmd, String key) {
+    public static String getExtraCmdString(Map<String, Comparable> extraCmd, String key) {
         if (extraCmd == null) {
             return null;
         }
@@ -124,6 +125,15 @@ public class GeneralUtil {
             return obj.toString().trim();
         } else {
             return null;
+        }
+    }
+
+    public static boolean getExtraCmdBoolean(Map<String, Comparable> extraCmd, String key, boolean defaultValue) {
+        String value = getExtraCmdString(extraCmd, key);
+        if (value == null) {
+            return defaultValue;
+        } else {
+            return BooleanUtils.toBoolean(value);
         }
     }
 

@@ -4,6 +4,7 @@ import java.util.concurrent.Future;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.Group;
+import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ExecutorContext;
 import com.taobao.tddl.executor.common.TransactionConfig;
@@ -14,6 +15,7 @@ import com.taobao.tddl.executor.spi.ICommandHandlerFactory;
 import com.taobao.tddl.executor.spi.IGroupExecutor;
 import com.taobao.tddl.executor.spi.IRepository;
 import com.taobao.tddl.executor.spi.ITransaction;
+import com.taobao.tddl.group.jdbc.TGroupDataSource;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 
 /**
@@ -23,8 +25,7 @@ import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
  * @author mengshi.sunmengshi 2013-12-6 下午2:39:18
  * @since 5.1.0
  */
-@SuppressWarnings("rawtypes")
-public class TddlGroupExecutor implements IGroupExecutor {
+public class TddlGroupExecutor extends AbstractLifecycle implements IGroupExecutor {
 
     public static final String TRANSACTION_GROUP_KEY = "GROUP_KEY";
     private IRepository        repo;
@@ -33,8 +34,25 @@ public class TddlGroupExecutor implements IGroupExecutor {
      * 可能是个datasource ，也可能是个rpc客户端。放在一起的原因是
      */
     private Object             remotingExecutableObject;
-
     private Group              group;
+
+    public TddlGroupExecutor(IRepository repo){
+        this.repo = repo;
+    }
+
+    protected void doInit() throws TddlException {
+        super.doInit();
+    }
+
+    protected void doDestory() throws TddlException {
+        if (remotingExecutableObject instanceof TGroupDataSource) {
+            try {
+                ((TGroupDataSource) remotingExecutableObject).destroyDataSource();
+            } catch (Exception e) {
+                throw new TddlException(e);
+            }
+        }
+    }
 
     @Override
     public ISchematicCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext)
@@ -65,20 +83,6 @@ public class TddlGroupExecutor implements IGroupExecutor {
         return commandHandler.handle(executor, executionContext);
     }
 
-    @Override
-    public Group getGroupInfo() {
-        // TODO Auto-generated method stub
-        return this.group;
-    }
-
-    public Object getRemotingExecutableObject() {
-        return remotingExecutableObject;
-    }
-
-    public IRepository getRepository() {
-        return this.repo;
-    }
-
     public void getTransaction(ExecutionContext executionContext, IDataNodeExecutor targetExecutor)
                                                                                                    throws TddlException {
         if (executionContext.getTransaction() != null) {
@@ -98,41 +102,25 @@ public class TddlGroupExecutor implements IGroupExecutor {
 
     }
 
-    public void setGroup(Group group) {
-        this.group = group;
-    }
-
-    public void setRemotingExecutableObject(Object remotingExecutableObject) {
-        this.remotingExecutableObject = remotingExecutableObject;
-    }
-
-    public void setRepository(IRepository repo) {
-        this.repo = repo;
-    }
-
-    @Override
-    public String toString() {
-        return "GroupExecutor [groupName=" + group.getName() + ", type=" + group.getType()
-               + ", remotingExecutableObject=" + remotingExecutableObject + "]";
-    }
-
     @Override
     public ResultCursor commit(ExecutionContext executionContext) throws TddlException {
         ResultCursor rc = new ResultCursor(null, executionContext);
-        if (executionContext.getTransactionGroup() == null) return rc;
+        if (executionContext.getTransactionGroup() == null) {
+            return rc;
+        }
 
         executionContext.getTransaction().commit();
-
         return rc;
     }
 
     @Override
     public ResultCursor rollback(ExecutionContext executionContext) throws TddlException {
         ResultCursor rc = new ResultCursor(null, executionContext);
-        if (executionContext.getTransactionGroup() == null) return rc;
+        if (executionContext.getTransactionGroup() == null) {
+            return rc;
+        }
 
         executionContext.getTransaction().rollback();
-
         return rc;
     }
 
@@ -144,5 +132,28 @@ public class TddlGroupExecutor implements IGroupExecutor {
     @Override
     public Future<ResultCursor> rollbackFuture(ExecutionContext executionContext) throws TddlException {
         return ExecutorContext.getContext().getTopologyExecutor().rollbackFuture(executionContext);
+    }
+
+    @Override
+    public Group getGroupInfo() {
+        return this.group;
+    }
+
+    public Object getRemotingExecutableObject() {
+        return remotingExecutableObject;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
+    public void setRemotingExecutableObject(Object remotingExecutableObject) {
+        this.remotingExecutableObject = remotingExecutableObject;
+    }
+
+    @Override
+    public String toString() {
+        return "GroupExecutor [groupName=" + group.getName() + ", type=" + group.getType()
+               + ", remotingExecutableObject=" + remotingExecutableObject + "]";
     }
 }

@@ -426,7 +426,7 @@ public class JoinChooser {
     }
 
     private static boolean isOptimizeJoinOrder(Map<String, Comparable> extraCmd) {
-        String value = ObjectUtils.toString(GeneralUtil.getExtraCmd(extraCmd, ExtraCmd.OptimizerExtraCmd.ChooseJoin));
+        String value = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd, ExtraCmd.OptimizerExtraCmd.ChooseJoin));
         return BooleanUtils.toBoolean(value);
     }
 

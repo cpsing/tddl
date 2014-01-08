@@ -13,7 +13,7 @@ public class Now extends ScalarFunction {
     }
 
     public DATA_TYPE getReturnType() {
-        return DATA_TYPE.TIMESTAMP;
+        return DATA_TYPE.TIMESTAMP_VAL;
     }
 
 }

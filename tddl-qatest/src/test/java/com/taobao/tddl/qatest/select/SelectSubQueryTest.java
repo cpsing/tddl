@@ -9,14 +9,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.taobao.tddl.qatest.BaseAndorTestCase;
+import com.taobao.tddl.qatest.BaseTddlTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
 
 @Ignore
 @RunWith(EclipseParameterized.class)
-public class SelectSubQueryTest extends BaseAndorTestCase {
+public class SelectSubQueryTest extends BaseTddlTestCase {
 
     String modlueName = "module12";
     long   pk         = 12l;

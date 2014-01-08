@@ -24,21 +24,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
-import com.taobao.tddl.common.model.ExtraCmd;
-import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.executor.MatrixExecutor;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ExecutorContext;
 import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.cursor.impl.ResultSetCursor;
-import com.taobao.tddl.matrix.config.TDefaultConfig;
 import com.taobao.tddl.matrix.jdbc.utils.ExceptionUtils;
 import com.taobao.tddl.optimizer.OptimizerContext;
 
@@ -48,14 +42,46 @@ import com.taobao.tddl.optimizer.OptimizerContext;
  */
 public class TConnection implements Connection {
 
-    private MatrixExecutor   executor         = null;
+    private MatrixExecutor   executor             = null;
     private TDataSource      ds;
-    private ExecutionContext executionContext = new ExecutionContext();
-    private Set<TStatement>  openedStatements = new HashSet<TStatement>(2);
+    private ExecutionContext executionContext     = new ExecutionContext();
+    private Set<TStatement>  openedStatements     = new HashSet<TStatement>(2);
+    private boolean          isAutoCommit         = true;                      // jdbc规范，新连接为true
+    private boolean          closed;
+    private int              transactionIsolation = -1;
 
     public TConnection(TDataSource ds){
         this.ds = ds;
         this.executor = ds.getExecutor();
+    }
+
+    /**
+     * 执行sql语句的逻辑
+     */
+    public ResultSet executeSQL(String sql, Map<Integer, ParameterContext> context, TStatement stmt,
+                                Map<String, Comparable> extraCmd, ExecutionContext executionContext)
+                                                                                                    throws SQLException {
+        ExecutorContext.setContext(this.ds.getConfigHolder().getExecutorContext());
+        OptimizerContext.setContext(this.ds.getConfigHolder().getOptimizerContext());
+        ResultCursor resultCursor;
+        ResultSet rs = null;
+        extraCmd.putAll(buildExtraCommand(sql));
+        executionContext.setExecutorService(ds.borrowExecutorService());
+        executionContext.setParams(context);
+        executionContext.setExtraCmds(extraCmd);
+        try {
+            resultCursor = executor.execute(sql, executionContext);
+        } catch (TddlException e) {
+            throw new SQLException(e);
+        }
+
+        if (resultCursor instanceof ResultSetCursor) {
+            rs = ((ResultSetCursor) resultCursor).getResultSet();
+        } else {
+            rs = new TResultSet(resultCursor);
+        }
+
+        return rs;
     }
 
     public PreparedStatement prepareStatement(String sql) throws SQLException {
@@ -95,7 +121,6 @@ public class TConnection implements Connection {
      * JDBC事务相关的autoCommit设置、commit/rollback、TransactionIsolation等
      * ======================================================================
      */
-    private boolean isAutoCommit = true; // jdbc规范，新连接为true
 
     public void setAutoCommit(boolean autoCommit) throws SQLException {
         checkClosed();
@@ -124,7 +149,6 @@ public class TConnection implements Connection {
             throw new SQLException(e);
         }
 
-        clearTransactionResource();
     }
 
     public void rollback() throws SQLException {
@@ -138,47 +162,12 @@ public class TConnection implements Connection {
         } catch (TddlException e) {
             throw new SQLException(e);
         }
-
-        clearTransactionResource();
     }
 
-    private void initTransactionResource() {
-    }
-
-    private void clearTransactionResource() {
-
-    }
-
-    // FIXME DatabaseMetaData 未实现
     public DatabaseMetaData getMetaData() throws SQLException {
         checkClosed();
         return new TDatabaseMetaData();
     }
-
-    public Savepoint setSavepoint() throws SQLException {
-        throw new UnsupportedOperationException("setSavepoint");
-    }
-
-    public Savepoint setSavepoint(String name) throws SQLException {
-        throw new UnsupportedOperationException("setSavepoint");
-    }
-
-    public void rollback(Savepoint savepoint) throws SQLException {
-        throw new UnsupportedOperationException("rollback");
-
-    }
-
-    public void releaseSavepoint(Savepoint savepoint) throws SQLException {
-        throw new UnsupportedOperationException("releaseSavepoint");
-
-    }
-
-    /*
-     * ========================================================================
-     * 关闭逻辑
-     * ======================================================================
-     */
-    private boolean closed;
 
     private void checkClosed() throws SQLException {
         if (closed) {
@@ -190,7 +179,6 @@ public class TConnection implements Connection {
         return closed;
     }
 
-    @SuppressWarnings("unchecked")
     public void close() throws SQLException {
         if (closed) {
             return;
@@ -210,14 +198,20 @@ public class TConnection implements Connection {
             openedStatements.clear();
         }
 
-        if (this.executionContext != null && this.executionContext.getTransaction() != null) {
-            try {
-                this.executionContext.getTransaction().setAutoCommit(true);
-                this.executionContext.getTransaction().close();
-            } catch (TddlException e) {
-                exceptions.add(new SQLException(e));
+        if (this.executionContext != null) {
+            if (this.executionContext.getTransaction() != null) {
+                try {
+                    this.executionContext.getTransaction().close();
+                } catch (TddlException e) {
+                    exceptions.add(new SQLException(e));
+                }
+            }
+
+            if (this.executionContext.getExecutorService() != null) {
+                this.ds.releaseExecutorService(this.executionContext.getExecutorService());
             }
         }
+
         closed = true;
         ExceptionUtils.throwSQLException(exceptions, "close tconnection", Collections.EMPTY_LIST);
     }
@@ -256,67 +250,21 @@ public class TConnection implements Connection {
     }
 
     /**
-     * 执行sql语句的逻辑
-     * 
-     * @param sql
-     * @param context
-     * @return
-     * @throws SQLException
-     */
-    public ResultSet executeSQL(String sql, Map<Integer, ParameterContext> context, TStatement stmt,
-                                Map<String, Comparable> extraCmd, ExecutionContext executionContext)
-                                                                                                    throws SQLException {
-        ExecutorContext.setContext(this.ds.getConfigHolder().getExecutorContext());
-        OptimizerContext.setContext(this.ds.getConfigHolder().getOptimizerContext());
-        ResultCursor resultCursor;
-        ResultSet rs = null;
-        extraCmd.putAll(buildExtraCommand(sql));
-        if (this.ds.getExecutorService() != null) {
-            executionContext.setExecutorService(ds.getExecutorService());
-        } else {
-            Object poolSizeObj = GeneralUtil.getExtraCmd(this.ds.getConnectionProperties(),
-                ExtraCmd.ConnectionExtraCmd.CONCURRENT_THREAD_SIZE);
-            int poolSize = 0;
-            if (poolSizeObj != null) {
-
-                poolSize = Integer.valueOf(poolSizeObj.toString());
-            } else {
-                poolSize = TDefaultConfig.CONCURRENT_THREAD_SIZE;
-            }
-
-            ExecutorService executorService = Executors.newFixedThreadPool(poolSize, new ThreadFactory() {
-
-                @Override
-                public Thread newThread(Runnable arg0) {
-                    return new Thread(arg0, "concurrent_query_executor");
-                }
-            });
-
-            executionContext.setExecutorService(executorService);
-        }
-        executionContext.setParams(context);
-        executionContext.setExtraCmds(extraCmd);
-
-        try {
-            resultCursor = executor.execute(sql, executionContext);
-        } catch (TddlException e) {
-            throw new SQLException(e);
-        }
-
-        if (resultCursor instanceof ResultSetCursor) {
-            rs = ((ResultSetCursor) resultCursor).getResultSet();
-        } else {
-            rs = new TResultSet(resultCursor);
-        }
-
-        return rs;
-    }
-
-    /**
      * 未实现方法
      */
+    public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
+        TStatement stmt = (TStatement) createStatement();
+        stmt.setResultSetType(resultSetType);
+        stmt.setResultSetConcurrency(resultSetConcurrency);
+        return stmt;
+    }
+
     public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability)
                                                                                                            throws SQLException {
+        throw new UnsupportedOperationException();
+    }
+
+    public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
         throw new UnsupportedOperationException();
     }
 
@@ -325,193 +273,58 @@ public class TConnection implements Connection {
         throw new UnsupportedOperationException();
     }
 
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency,
-                                         int resultSetHoldability) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-        // return null;
-    }
-
-    /**
-     * andor 暂时不支持GeneratedKeys
-     */
-    public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
-
-        throw new UnsupportedOperationException();
-        // return null;
-    }
-
     public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
         throw new UnsupportedOperationException();
-        // TODO Auto-generated method stub
-        // return null;
     }
 
     public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
-        // return null;
     }
 
-    public Clob createClob() throws SQLException {
-        // TODO Auto-generated method stub
+    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency)
+                                                                                                      throws SQLException {
         throw new UnsupportedOperationException();
-        // return null;
     }
 
-    public Blob createBlob() throws SQLException {
-        // TODO Auto-generated method stub
+    public CallableStatement prepareCall(String sql) throws SQLException {
         throw new UnsupportedOperationException();
-        // return null;
     }
 
-    public NClob createNClob() throws SQLException {
-        // TODO Auto-generated method stub
+    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
         throw new UnsupportedOperationException();
-        // return null;
     }
 
-    public SQLXML createSQLXML() throws SQLException {
-        // TODO Auto-generated method stub
+    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency,
+                                         int resultSetHoldability) throws SQLException {
         throw new UnsupportedOperationException();
-        // return null;
+    }
+
+    public void setTransactionIsolation(int level) throws SQLException {
+        this.transactionIsolation = level;
+    }
+
+    public int getTransactionIsolation() throws SQLException {
+        checkClosed();
+        return transactionIsolation;
     }
 
     /**
      * 暂时实现为isClosed
      */
     public boolean isValid(int timeout) throws SQLException {
-        // TODO 暂时实现为isClosed
-
         return this.isClosed();
     }
 
-    public void setClientInfo(String name, String value) throws SQLClientInfoException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-
-    }
-
-    public void setClientInfo(Properties properties) throws SQLClientInfoException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-
-    }
-
-    public String getClientInfo(String name) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-        // return null;
-
-    }
-
-    public Properties getClientInfo() throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-        // return null;
-    }
-
-    public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-        // return null;
-    }
-
-    public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-        // return null;
-    }
-
-    public void setReadOnly(boolean readOnly) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean isReadOnly() throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-        // return false;
-    }
-
-    public void setCatalog(String catalog) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-    }
-
-    public String getCatalog() throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-        // return null;
-    }
-
-    public void setTransactionIsolation(int level) throws SQLException {
-        // TODO Auto-generated method stub
-
-    }
-
-    public int getTransactionIsolation() throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public SQLWarning getWarnings() throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void clearWarnings() throws SQLException {
-        // TODO Auto-generated method stub
-
-    }
-
-    public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-        // return null;
-    }
-
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency)
-                                                                                                      throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-        // return null;
-    }
-
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Map<String, Class<?>> getTypeMap() throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
-        // TODO Auto-generated method stub
-
-    }
-
     public void setHoldability(int holdability) throws SQLException {
-        // TODO Auto-generated method stub
-
+        /*
+         * 如果你看到这里，那么恭喜，哈哈 mysql默认在5.x的jdbc driver里面也没有实现holdability 。
+         * 所以默认都是.CLOSE_CURSORS_AT_COMMIT 为了简化起见，我们也就只实现close这种
+         */
+        throw new UnsupportedOperationException("setHoldability");
     }
 
     public int getHoldability() throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public CallableStatement prepareCall(String sql) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public String nativeSQL(String sql) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-        // return null;
+        return ResultSet.CLOSE_CURSORS_AT_COMMIT;
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
@@ -532,6 +345,106 @@ public class TConnection implements Connection {
 
     public ExecutionContext getExecutionContext() {
         return this.executionContext;
+    }
+
+    public SQLWarning getWarnings() throws SQLException {
+        return null;
+    }
+
+    public void clearWarnings() throws SQLException {
+        // do nothing
+    }
+
+    public void setReadOnly(boolean readOnly) throws SQLException {
+        // do nothing
+    }
+
+    /**
+     * 保持可读可写
+     */
+    public boolean isReadOnly() throws SQLException {
+        return false;
+    }
+
+    /*---------------------后面是未实现的方法------------------------------*/
+
+    public Savepoint setSavepoint() throws SQLException {
+        throw new UnsupportedOperationException("setSavepoint");
+    }
+
+    public Savepoint setSavepoint(String name) throws SQLException {
+        throw new UnsupportedOperationException("setSavepoint");
+    }
+
+    public void rollback(Savepoint savepoint) throws SQLException {
+        throw new UnsupportedOperationException("rollback");
+
+    }
+
+    public void releaseSavepoint(Savepoint savepoint) throws SQLException {
+        throw new UnsupportedOperationException("releaseSavepoint");
+    }
+
+    public Clob createClob() throws SQLException {
+        throw new SQLException("not support exception");
+    }
+
+    public Blob createBlob() throws SQLException {
+        throw new SQLException("not support exception");
+    }
+
+    public NClob createNClob() throws SQLException {
+        throw new SQLException("not support exception");
+    }
+
+    public SQLXML createSQLXML() throws SQLException {
+        throw new SQLException("not support exception");
+    }
+
+    public void setClientInfo(String name, String value) throws SQLClientInfoException {
+        throw new RuntimeException("not support exception");
+    }
+
+    public void setClientInfo(Properties properties) throws SQLClientInfoException {
+        throw new RuntimeException("not support exception");
+    }
+
+    public String getClientInfo(String name) throws SQLException {
+        throw new SQLException("not support exception");
+    }
+
+    public Properties getClientInfo() throws SQLException {
+        throw new SQLException("not support exception");
+    }
+
+    public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
+        throw new SQLException("not support exception");
+    }
+
+    public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
+        throw new SQLException("not support exception");
+    }
+
+    public Map<String, Class<?>> getTypeMap() throws SQLException {
+        throw new UnsupportedOperationException("getTypeMap");
+    }
+
+    public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
+        throw new UnsupportedOperationException("setTypeMap");
+    }
+
+    public String nativeSQL(String sql) throws SQLException {
+        throw new UnsupportedOperationException("nativeSQL");
+    }
+
+    @Override
+    public void setCatalog(String catalog) throws SQLException {
+        throw new UnsupportedOperationException("setCatalog");
+    }
+
+    @Override
+    public String getCatalog() throws SQLException {
+        throw new UnsupportedOperationException("getCatalog");
     }
 
 }

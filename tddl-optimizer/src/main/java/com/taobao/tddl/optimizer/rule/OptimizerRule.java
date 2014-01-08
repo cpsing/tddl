@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
+import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
@@ -36,13 +38,25 @@ import com.taobao.tddl.rule.model.sqljep.ComparativeOR;
  * 
  * @since 5.1.0
  */
-public class OptimizerRule {
+public class OptimizerRule extends AbstractLifecycle {
 
     private final static int DEFAULT_OPERATION_COMP = -1000;
     private TddlRule         tddlRule;
 
     public OptimizerRule(TddlRule tddlRule){
         this.tddlRule = tddlRule;
+    }
+
+    protected void doInit() throws TddlException {
+        if (!tddlRule.isInited()) {
+            tddlRule.init();
+        }
+    }
+
+    protected void doDestory() throws TddlException {
+        if (tddlRule.isInited()) {
+            tddlRule.destory();
+        }
     }
 
     /**

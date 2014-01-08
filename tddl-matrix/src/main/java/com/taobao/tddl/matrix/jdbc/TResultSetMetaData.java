@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.taobao.tddl.common.utils.TStringUtil;
-import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 
@@ -16,17 +15,17 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 public class TResultSetMetaData implements ResultSetMetaData {
 
     private List<ColumnMeta> columnMetas;
-    ResultCursor             rc;
 
     public TResultSetMetaData(List<ColumnMeta> columns){
         this.columnMetas = columns;
     }
 
     public boolean columnIsExist(String column) {
-        for (ColumnMeta metaItem : columnMetas)
+        for (ColumnMeta metaItem : columnMetas) {
             if (column.equalsIgnoreCase(metaItem.getName()) || column.equalsIgnoreCase(metaItem.getAlias())) {
                 return true;
             }
+        }
         return false;
     }
 
@@ -56,11 +55,15 @@ public class TResultSetMetaData implements ResultSetMetaData {
     }
 
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        return null;
+        try {
+            return (T) this;
+        } catch (Exception e) {
+            throw new SQLException(e);
+        }
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return false;
+        return this.getClass().isAssignableFrom(iface);
     }
 
     public boolean isAutoIncrement(int column) throws SQLException {
@@ -68,12 +71,10 @@ public class TResultSetMetaData implements ResultSetMetaData {
     }
 
     public boolean isCaseSensitive(int column) throws SQLException {
-
         return false;
     }
 
     public boolean isSearchable(int column) throws SQLException {
-
         return false;
     }
 

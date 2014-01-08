@@ -18,6 +18,4 @@ public interface IGroupExecutor extends IExecutor {
      */
     public Object getRemotingExecutableObject();
 
-    public IRepository getRepository();
-
 }

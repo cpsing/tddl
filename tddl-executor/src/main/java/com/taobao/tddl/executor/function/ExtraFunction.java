@@ -93,11 +93,18 @@ public abstract class ExtraFunction implements IExtraFunction {
         Object[] inputArg = new Object[argsArr.size()];
         int index = 0;
         for (Object funcArg : argsArr) {
-            if (funcArg instanceof IFunction
-                && ((IFunction) funcArg).getExtraFunction().getFunctionType().equals(FunctionType.Aggregate)) {
-                Map<String, Object> resMap = ((AggregateFunction) ((IFunction) funcArg).getExtraFunction()).getResult();
-                for (Object ob : resMap.values()) {
-                    inputArg[index] = ob;
+            if (funcArg instanceof IFunction) {
+                if (((IFunction) funcArg).getExtraFunction().getFunctionType().equals(FunctionType.Aggregate)) {
+                    // aggregate function
+                    Map<String, Object> resMap = ((AggregateFunction) ((IFunction) funcArg).getExtraFunction()).getResult();
+                    for (Object ob : resMap.values()) {
+                        inputArg[index] = ob;
+                        index++;
+                    }
+                } else {
+                    // scalar function
+                    ((ScalarFunction) ((IFunction) funcArg).getExtraFunction()).serverMap(kvPair);
+                    inputArg[index] = ((ScalarFunction) ((IFunction) funcArg).getExtraFunction()).getResult();
                     index++;
                 }
             } else if (funcArg instanceof ISelectable) {// 如果是IColumn，那么应该从输入的参数中获取对应column

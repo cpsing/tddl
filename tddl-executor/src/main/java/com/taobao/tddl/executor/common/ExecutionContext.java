@@ -79,6 +79,9 @@ public class ExecutionContext {
 
     public void setTransaction(ITransaction transaction) {
         this.transaction = transaction;
+        if (transaction != null) {
+            this.transaction.setAutoCommit(isAutoCommit());
+        }
     }
 
     public IndexMeta getMeta() {

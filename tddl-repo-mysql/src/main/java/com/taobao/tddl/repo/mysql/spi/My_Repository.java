@@ -1,12 +1,16 @@
 package com.taobao.tddl.repo.mysql.spi;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import javax.sql.DataSource;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.Group;
+import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.ExceptionErrorCodeUtils;
 import com.taobao.tddl.executor.common.TransactionConfig;
 import com.taobao.tddl.executor.repo.RepositoryConfig;
@@ -22,63 +26,69 @@ import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.repo.mysql.executor.TddlGroupExecutor;
 import com.taobao.tddl.repo.mysql.handler.CommandHandlerFactoryMyImp;
 
-public class My_Repository implements IRepository {
+public class My_Repository extends AbstractLifecycle implements IRepository {
 
-    Map<String, ITable>              tables   = new ConcurrentHashMap<String, ITable>();
-    RepositoryConfig                 config;
-    private CursorFactoryMyImpl      cfm;
-    protected ICommandHandlerFactory cef      = null;
-    protected IDataSourceGetter      dsGetter = new DatasourceMySQLImplement();
+    protected Cache<String, ITable>        tables    = CacheBuilder.newBuilder().build();
+    protected Cache<Group, IGroupExecutor> executors = CacheBuilder.newBuilder().build();
+    protected RepositoryConfig             config;
+    protected CursorFactoryMyImpl          cfm;
+    protected ICommandHandlerFactory       cef       = null;
+    protected IDataSourceGetter            dsGetter  = new DatasourceMySQLImplement();
 
     @Override
-    public ITable getTable(TableMeta meta, String groupNode) throws TddlException {
+    public void doInit() {
+        this.config = new RepositoryConfig();
+        this.config.setProperty(RepositoryConfig.DEFAULT_TXN_ISOLATION, "READ_COMMITTED");
+        this.config.setProperty(RepositoryConfig.IS_TRANSACTIONAL, "true");
+        cfm = new CursorFactoryMyImpl();
+        cef = new CommandHandlerFactoryMyImp();
 
-        ITable table = tables.get(groupNode);
-        if (table == null) {
-            synchronized (this) {
-                table = tables.get(groupNode);
-                if (table == null) {
-                    try {
-                        table = initTable(meta, groupNode);
-                    } catch (Exception ex) {
-                        throw new TddlException(ExceptionErrorCodeUtils.Read_only, ex);
-                    }
-                    if (!meta.isTmp()) {
-                        tables.put(groupNode, table);
-                    }
-                }
+    }
 
+    @Override
+    protected void doDestory() throws TddlException {
+        tables.cleanUp();
+
+        for (IGroupExecutor executor : executors.asMap().values()) {
+            executor.destory();
+        }
+    }
+
+    @Override
+    public ITable getTable(final TableMeta meta, final String groupNode) throws TddlException {
+        if (meta.isTmp()) {
+            return getTempTable(meta);
+        } else {
+            try {
+                return tables.get(groupNode, new Callable<ITable>() {
+
+                    public ITable call() throws Exception {
+                        try {
+                            DataSource ds = dsGetter.getDataSource(groupNode);
+                            My_Table table = new My_Table(ds, meta, groupNode);
+                            table.setSelect(false);
+                            return table;
+                        } catch (Exception ex) {
+                            throw new TddlException(ExceptionErrorCodeUtils.Read_only, ex);
+                        }
+                    }
+                });
+            } catch (ExecutionException e) {
+                throw new TddlException(e);
             }
         }
-        if (table != null) {
-            ((My_Table) table).setSelect(false);
-        } else {
-            throw new IllegalArgumentException("can't find table by group name :" + groupNode + " . meta" + meta);
-        }
-        return table;
-    }
-
-    public ITable initTable(TableMeta meta, String groupNode) throws Exception {
-        DataSource ds = dsGetter.getDataSource(groupNode);
-        ITable table = new My_Table(ds, meta, groupNode);
-        return table;
     }
 
     @Override
-    public void close() {
-
+    public ITable getTempTable(TableMeta meta) throws TddlException {
+        throw new UnsupportedOperationException("temp table is not supported by mysql repo");
     }
 
     @Override
     public ITransaction beginTransaction(TransactionConfig tc) throws TddlException {
-        My_Transaction my = new My_Transaction();
+        My_Transaction my = new My_Transaction(true);
         my.beginTransaction();
         return my;
-    }
-
-    @Override
-    public Map<String, ITable> getTables() {
-        return null;
     }
 
     public RepositoryConfig getRepoConfig() {
@@ -100,40 +110,31 @@ public class My_Repository implements IRepository {
         return cef;
     }
 
-    @Override
-    public void init() {
-        this.config = new RepositoryConfig();
-        this.config.setProperty(RepositoryConfig.DEFAULT_TXN_ISOLATION, "READ_COMMITTED");
-        this.config.setProperty(RepositoryConfig.IS_TRANSACTIONAL, "true");
-        cfm = new CursorFactoryMyImpl();
-
-        cef = new CommandHandlerFactoryMyImp();
-
-    }
-
     public boolean isEnhanceExecutionModel(String groupKey) {
         return false;
     }
 
-    public void renameTable(TableMeta schema, String newName) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public IGroupExecutor getGroupExecutor(final Group group) {
+        try {
+            final IRepository repo = (this);
+            return executors.get(group, new Callable<IGroupExecutor>() {
+
+                @Override
+                public IGroupExecutor call() throws Exception {
+                    TGroupDataSource groupDS = new TGroupDataSource(group.getName(), group.getAppName());
+                    groupDS.setGroup(group);
+                    groupDS.init();
+
+                    TddlGroupExecutor executor = new TddlGroupExecutor(repo);
+                    executor.setGroup(group);
+                    executor.setRemotingExecutableObject(groupDS);
+                    return executor;
+                }
+            });
+        } catch (ExecutionException e) {
+            throw new TddlRuntimeException(e);
+        }
+
     }
 
-    @Override
-    public IGroupExecutor buildGroupExecutor(Group group) {
-        TGroupDataSource groupDS = new TGroupDataSource(group.getName(), group.getAppName());
-        groupDS.setGroup(group);
-        groupDS.init();
-
-        TddlGroupExecutor executor = new TddlGroupExecutor();
-        executor.setGroup(group);
-        executor.setRemotingExecutableObject(groupDS);
-        executor.setRepository(this);
-        return executor;
-    }
-
-    @Override
-    public ITable getTempTable(TableMeta meta) throws TddlException {
-        throw new UnsupportedOperationException("temp table is not supported by mysql repo");
-    }
 }

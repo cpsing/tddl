@@ -9,13 +9,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.taobao.tddl.qatest.BaseAndorTestCase;
+import com.taobao.tddl.qatest.BaseTddlTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
 
 @RunWith(EclipseParameterized.class)
-public class JoinTest extends BaseAndorTestCase {
+public class JoinTest extends BaseTddlTestCase {
 
     // common fields
     private final long   module_id          = Math.abs(rand.nextLong());

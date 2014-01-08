@@ -107,7 +107,7 @@ public class JE_Transaction implements ITransaction {
     }
 
     @Override
-    public boolean isAutoCommit() throws TddlException {
+    public boolean isAutoCommit() {
         throw new IllegalArgumentException();
     }
 

@@ -3,13 +3,14 @@ package com.taobao.tddl.executor.local;
 import java.util.concurrent.Future;
 
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.executor.CommunicateExecutor;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 
-public class LocalCommunicateExecutor implements CommunicateExecutor {
+public class LocalCommunicateExecutor extends AbstractLifecycle implements CommunicateExecutor {
 
     @Override
     public ISchematicCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext)

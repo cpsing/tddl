@@ -15,7 +15,6 @@ public class SortMergeJoinHandler extends QueryHandlerCommon {
         super();
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     protected ISchematicCursor doQuery(ISchematicCursor cursor, IDataNodeExecutor executor,
                                        ExecutionContext executionContext) throws TddlException {
@@ -69,7 +68,6 @@ public class SortMergeJoinHandler extends QueryHandlerCommon {
             join.getLeftJoinOnColumns(),
             join.getRightJoinOnColumns());
         return cursor;
-
     }
 
 }

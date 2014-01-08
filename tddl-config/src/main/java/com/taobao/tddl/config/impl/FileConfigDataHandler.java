@@ -11,10 +11,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.config.ConfigDataHandler;
 import com.taobao.tddl.config.ConfigDataListener;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 public class FileConfigDataHandler extends AbstractLifecycle implements ConfigDataHandler {
 
@@ -82,10 +83,10 @@ public class FileConfigDataHandler extends AbstractLifecycle implements ConfigDa
                     try {
                         Thread.sleep(20000);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        // ignore
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error(e);
                 }
             }
 
@@ -176,7 +177,6 @@ public class FileConfigDataHandler extends AbstractLifecycle implements ConfigDa
         for (ConfigDataListener l : configDataListenerList) {
             this.addListener(l, executor);
         }
-
     }
 
 }

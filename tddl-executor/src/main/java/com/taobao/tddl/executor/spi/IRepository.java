@@ -1,9 +1,9 @@
 package com.taobao.tddl.executor.spi;
 
-import java.util.Map;
-
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.Group;
+import com.taobao.tddl.common.model.lifecycle.Lifecycle;
+import com.taobao.tddl.executor.IExecutor;
 import com.taobao.tddl.executor.common.TransactionConfig;
 import com.taobao.tddl.executor.repo.RepositoryConfig;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
@@ -14,7 +14,12 @@ import com.taobao.tddl.optimizer.config.table.TableMeta;
  * @author mengshi.sunmengshi 2013-11-27 下午3:59:13
  * @since 5.1.0
  */
-public interface IRepository {
+public interface IRepository extends Lifecycle {
+
+    /**
+     * 获取对应的表结构
+     */
+    ITable getTempTable(TableMeta meta) throws TddlException;
 
     /**
      * 获取一个表对象 ，在任何sql操作中都会根据table schema找到对应的数据库实例对象的。 表对象包含核心数据和对应的二级索引。
@@ -26,11 +31,6 @@ public interface IRepository {
     ITable getTable(TableMeta meta, String groupNode) throws TddlException;
 
     /**
-     * 关闭存储引擎所使用的对象。
-     */
-    void close() throws TddlException;
-
-    /**
      * 针对这个存储引擎，开始一个事务。
      * 
      * @param conf
@@ -38,20 +38,6 @@ public interface IRepository {
      * @throws Exception
      */
     ITransaction beginTransaction(TransactionConfig conf) throws TddlException;
-
-    /**
-     * 获取所有的表对象
-     * 
-     * @return
-     */
-    Map<String, ITable> getTables();
-
-    /**
-     * 初始化时调用的方法。
-     * 
-     * @param conf
-     */
-    void init();
 
     /**
      * 获取当前存储引擎的一些配置信息。
@@ -82,13 +68,18 @@ public interface IRepository {
      */
     ICursorFactory getCursorFactory();
 
-    // void cleanTempTable();
-
+    /**
+     * 获取对应的 handler构造器
+     * 
+     * @return
+     */
     ICommandHandlerFactory getCommandExecutorFactory();
 
-    // DataSource getDataSource(String groupNode);
-
-    IGroupExecutor buildGroupExecutor(Group group);
-
-    ITable getTempTable(TableMeta meta) throws TddlException;
+    /**
+     * 获取对应的group {@link IExecutor}
+     * 
+     * @param group
+     * @return
+     */
+    IGroupExecutor getGroupExecutor(Group group);
 }

@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.taobao.tddl.qatest.BaseAndorTestCase;
+import com.taobao.tddl.qatest.BaseTddlTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
@@ -22,7 +22,7 @@ import com.taobao.tddl.qatest.util.ExecuteTableName;
  * Author By: zhuoxue.yll Created Date: 2012-3-13 上午09:42:46
  */
 @RunWith(EclipseParameterized.class)
-public class LeftJoinTest extends BaseAndorTestCase {
+public class LeftJoinTest extends BaseTddlTestCase {
 
     String[] columnParam = { "host_id", "host_name", "hostgroup_id", "hostgroup_name" };
 

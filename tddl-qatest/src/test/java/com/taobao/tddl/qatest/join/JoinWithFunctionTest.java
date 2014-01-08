@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.taobao.tddl.qatest.BaseAndorTestCase;
+import com.taobao.tddl.qatest.BaseTddlTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
@@ -20,7 +20,7 @@ import com.taobao.tddl.qatest.util.ExecuteTableName;
  * Author By: zhuoxue.yll Created Date: 2012-3-13 上午09:42:46
  */
 @RunWith(EclipseParameterized.class)
-public class JoinWithFunctionTest extends BaseAndorTestCase {
+public class JoinWithFunctionTest extends BaseTddlTestCase {
 
     @Parameters(name = "{index}:table0={0},table1={1},table2={2},table3={3},table4={4}")
     public static List<String[]> prepareDate() {
