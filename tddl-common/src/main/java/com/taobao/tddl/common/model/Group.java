@@ -22,7 +22,7 @@ public class Group {
     private String appName;
 
     public enum GroupType {
-        BDB_JE, MYSQL_JDBC, MYSQL_ASYNC_JDBC, JAVA_SKIPLIST, HBASE_CLIENT, TDHS_CLIENT, ORACLE_JDBC;
+        BDB_JE, MYSQL_JDBC, MYSQL_ASYNC_JDBC, JAVA_SKIPLIST, HBASE_CLIENT, TDHS_CLIENT, ORACLE_JDBC, OCEANBASE_JDBC;
 
         public boolean isMysql() {
             return this == MYSQL_JDBC;
@@ -80,6 +80,7 @@ public class Group {
         this.properties = properties;
     }
 
+    @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this, TddlToStringStyle.DEFAULT_STYLE);
     }

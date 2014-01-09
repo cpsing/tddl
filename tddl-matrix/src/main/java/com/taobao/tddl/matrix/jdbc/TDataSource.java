@@ -125,7 +125,7 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
     private ThreadPoolExecutor createThreadPool(int poolSize) {
         return new ThreadPoolExecutor(poolSize,
             poolSize,
-            2000L,
+            0L,
             TimeUnit.MILLISECONDS,
             new ArrayBlockingQueue(poolSize * 2),
             new NamedThreadFactory("tddl_concurrent_query_executor"),

@@ -12,7 +12,7 @@ import com.taobao.tddl.executor.spi.IGroupExecutor;
 
 public class DatasourceMySQLImplement implements IDataSourceGetter {
 
-    public static DataSource getDatasourceByGroupNode(TopologyHandler topology, String groupNode) {
+    public DataSource getDatasourceByGroupNode(TopologyHandler topology, String groupNode) {
 
         Map<String, IGroupExecutor> executorMap = topology.getExecutorMap();
         if ("undecided".equals(groupNode)) {
@@ -42,7 +42,7 @@ public class DatasourceMySQLImplement implements IDataSourceGetter {
         return ds;
     }
 
-    private static boolean isNotValidateNode(Group.GroupType type) {
+    protected boolean isNotValidateNode(Group.GroupType type) {
 
         return !Group.GroupType.MYSQL_JDBC.equals(type) && !Group.GroupType.TDHS_CLIENT.equals(type)
                && !Group.GroupType.ORACLE_JDBC.equals(type);

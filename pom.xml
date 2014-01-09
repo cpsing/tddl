@@ -75,6 +75,7 @@
 		<module>tddl-atom</module>
 		<module>tddl-group</module>
 		<module>tddl-repo-mysql</module>
+		<module>tddl-repo-oceanbase</module>
 		<module>tddl-optimizer</module>
 		<module>tddl-executor</module>
 		<module>tddl-matrix</module>
