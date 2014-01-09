@@ -13,13 +13,12 @@ import javax.sql.DataSource;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.ExceptionErrorCodeUtils;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.AtomicNumberCreator;
 import com.taobao.tddl.executor.spi.ITHLog;
 import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.group.jdbc.TGroupConnection;
-
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author mengshi.sunmengshi 2013-12-6 上午11:31:29
@@ -28,8 +27,8 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
 public class My_Transaction implements ITransaction {
 
     protected final static Logger           logger                = LoggerFactory.getLogger(My_Transaction.class);
-    private AtomicNumberCreator             idGen                 = AtomicNumberCreator.getNewInstance();
-    private Integer                         id                    = idGen.getIntegerNextNumber();
+    private final AtomicNumberCreator       idGen                 = AtomicNumberCreator.getNewInstance();
+    private final Integer                   id                    = idGen.getIntegerNextNumber();
 
     /**
      * 处于事务中的连接管理
@@ -115,7 +114,7 @@ public class My_Transaction implements ITransaction {
             }
         } else {// 没有事务建立，新建事务
             transactionalNodeName = groupName;
-            Connection handler = getConnection(groupName, ds);
+            Connection handler = getConnection(groupName, ds, true);
             return handler;
         }
     }
@@ -143,6 +142,7 @@ public class My_Transaction implements ITransaction {
         return myConn;
     }
 
+    @Override
     public void commit() throws TddlException {
         try {
             if (connMap != null && !connMap.isEmpty()) {
@@ -159,6 +159,7 @@ public class My_Transaction implements ITransaction {
         transactionalNodeName = null;
     }
 
+    @Override
     public void rollback() throws TddlException {
         try {
             if (connMap != null && !connMap.isEmpty()) {
@@ -174,14 +175,17 @@ public class My_Transaction implements ITransaction {
         transactionalNodeName = null;
     }
 
+    @Override
     public long getId() {
         return id;
     }
 
+    @Override
     public ITHLog getHistoryLog() {
         return null;
     }
 
+    @Override
     public void close() throws TddlException {
         if (autoCommit) {
             // 如果是auto commit模式，因为不存在重用，链接关闭自管理
@@ -262,10 +266,12 @@ public class My_Transaction implements ITransaction {
         throw new RuntimeException("impossible,connection is not TGroupConnection:" + con.getClass());
     }
 
+    @Override
     public boolean isAutoCommit() throws TddlException {
         return autoCommit;
     }
 
+    @Override
     public void setAutoCommit(boolean autoCommit) {
         this.autoCommit = autoCommit;
 
