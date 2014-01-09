@@ -54,7 +54,8 @@ public class BaseAtomGroupTestCase extends BaseTestCase {
     protected static final String        GROUP_NORMAL_1_PATH                  = "group/tddl_group_1.properties";
     protected static final String        GROUP_NORMAL_2_PATH                  = "group/tddl_group_2.properties";
     protected static final String        GROUP_NORMAL_COMPLEX_PATH            = "group/tddl_group_complex.properties";
-    protected static final String        MATRIX_DBGROUPS_PATH                 = "matrix/groups/tddl_dbgroups.properties";
+
+    protected static final String        MATRIX_DBGROUPS_PATH                 = "matrix/tddl_dbgroups.properties";
     protected static final String        MATRIX_SQLEXECUTOR_PATH              = "matrix/rules/tddl_sqlexecutor.properties";
     protected static final String        MATRIX_RULE_PROPS_PATH               = "matrix/rules/tddl_rule.properties";
     protected static final String        MATRIX_RULE_XML_PATH                 = "classpath:matrix/rules/tddl_rule.xml";
