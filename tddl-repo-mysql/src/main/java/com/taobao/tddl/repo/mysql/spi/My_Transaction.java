@@ -97,7 +97,6 @@ public class My_Transaction implements ITransaction {
         // return my_JdbcHandler;
         // }
         // }
-
         /*
          * 状态是强一致或ALLOW_READ 策略一致
          */

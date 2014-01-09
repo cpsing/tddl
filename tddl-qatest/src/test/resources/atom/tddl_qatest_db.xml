@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"
+	default-autowire="byName">
+
+	<bean id="placeHolderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:atom/tddl_config.properties" />
+	</bean>
+	
+	<!-- master -->
+	<bean id="qatest_normal_0" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="${mysql.normal0.url}" />
+		<property name="username" value="${mysql.normal0.username}" />
+		<property name="password" value="${mysql.normal0.password}" />
+		<property name="initialSize" value="10" />
+		<property name="maxActive" value="30" />
+		<property name="minIdle" value="15" />
+		<property name="maxIdle" value="25" />
+	</bean>
+
+	<bean id="qatest_normal_1" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="${mysql.normal1.url}" />
+		<property name="username" value="${mysql.normal1.username}" />
+		<property name="password" value="${mysql.normal1.password}" />
+		<property name="initialSize" value="10" />
+		<property name="maxActive" value="30" />
+		<property name="minIdle" value="15" />
+		<property name="maxIdle" value="25" />
+	</bean>
+
+	<bean id="qatest_normal_2" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="${mysql.normal2.url}" />
+		<property name="username" value="${mysql.normal2.username}" />
+		<property name="password" value="${mysql.normal2.password}" />
+		<property name="initialSize" value="10" />
+		<property name="maxActive" value="30" />
+		<property name="minIdle" value="15" />
+		<property name="maxIdle" value="25" />
+	</bean>
+
+	<!-- slave -->
+	<bean id="qatest_normal_0_bac" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="${mysql.normal0.bac.url}" />
+		<property name="username" value="${mysql.normal0.bac.username}" />
+		<property name="password" value="${mysql.normal0.bac.password}" />
+		<property name="initialSize" value="10" />
+		<property name="maxActive" value="30" />
+		<property name="minIdle" value="15" />
+		<property name="maxIdle" value="25" />
+	</bean>
+
+	<bean id="qatest_normal_1_bac" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="${mysql.normal1.bac.url}" />
+		<property name="username" value="${mysql.normal1.bac.username}" />
+		<property name="password" value="${mysql.normal1.bac.password}" />
+		<property name="initialSize" value="10" />
+		<property name="maxActive" value="30" />
+		<property name="minIdle" value="15" />
+		<property name="maxIdle" value="25" />
+	</bean>
+
+	<bean id="qatest_normal_2_bac" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="${mysql.normal2.bac.url}" />
+		<property name="username" value="${mysql.normal2.bac.username}" />
+		<property name="password" value="${mysql.normal2.bac.password}" />
+		<property name="initialSize" value="10" />
+		<property name="maxActive" value="30" />
+		<property name="minIdle" value="15" />
+		<property name="maxIdle" value="25" />
+	</bean>
+
+	<bean id="fixDataSource" class="com.taobao.tddl.qatest.util.FixDataSourceImpl">
+		<property name="dbCount" value="2" />
+		<property name="tableCount" value="2" />
+		<property name="tableLength" value="4" />
+
+		<property name="masterDsList">
+			<list>
+				<ref bean="qatest_normal_0" />
+				<ref bean="qatest_normal_1" />
+				<ref bean="qatest_normal_2" />
+			</list>
+		</property>
+
+		<property name="slaveDsList">
+			<list>
+				<ref bean="qatest_normal_0_bac" />
+				<ref bean="qatest_normal_1_bac" />
+				<ref bean="qatest_normal_2_bac" />
+			</list>
+		</property>
+	</bean>
+</beans>
