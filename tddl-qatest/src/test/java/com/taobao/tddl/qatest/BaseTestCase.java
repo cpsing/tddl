@@ -12,8 +12,12 @@ import java.util.Random;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.log4j.Logger;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 
+import com.taobao.diamond.mockserver.MockServer;
+import com.taobao.tddl.atom.TAtomDataSource;
 import com.taobao.tddl.matrix.jdbc.TDataSource;
 import com.taobao.tddl.qatest.util.DateUtil;
 import com.taobao.tddl.qatest.util.Validator;
@@ -58,6 +62,18 @@ public class BaseTestCase extends Validator {
     protected String                  timeString    = DateUtil.formatDate(new Date(), DateUtil.DATE_FULLHYPHEN);
     protected static final Logger     logger        = Logger.getLogger(BaseTestCase.class);
     protected static final Properties properties    = new Properties();
+
+    @BeforeClass
+    public static void diamondSetUp() {
+        MockServer.setUpMockServer();
+        TAtomDataSource.cleanAllDataSource();
+    }
+
+    @AfterClass
+    public static void diamondTearDown() {
+        MockServer.tearDownMockServer();
+        TAtomDataSource.cleanAllDataSource();
+    }
 
     // 获取配置
     static {

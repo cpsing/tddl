@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="gb2312"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans> 
+	<bean id="tGroupDataSource" class="com.taobao.tddl.group.jdbc.TGroupDataSource" init-method="init">
+	    <property name="appName" value="tddl_sample"></property>
+	    <property name="dbGroupKey" value="tddl_group_0"></property>
+	</bean>
+	
+	<bean id="tddlJT" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource"><ref bean="tGroupDataSource"/></property>
+    </bean>
+</beans>

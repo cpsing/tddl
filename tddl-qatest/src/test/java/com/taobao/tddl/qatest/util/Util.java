@@ -53,7 +53,7 @@ public class Util {
             br = new BufferedReader(isr);
             StringBuffer buf = new StringBuffer();
 
-            for (int j = 1; (temp = br.readLine()) != null; j++) {
+            while ((temp = br.readLine()) != null) {
                 buf = buf.append(temp);
                 buf = buf.append(System.getProperty("line.separator"));
             }

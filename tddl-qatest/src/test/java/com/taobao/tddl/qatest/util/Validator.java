@@ -359,7 +359,7 @@ public class Validator {
         } else if (data instanceof Double) {
             data = new BigDecimal((Double) data);
         } else if (data instanceof BigDecimal) {
-            data = data;
+            // data = data;
         } else if (data instanceof Date) {
             data = ((Date) data).getTime();
         } else if (data instanceof byte[]) {
