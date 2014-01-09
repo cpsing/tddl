@@ -13,12 +13,13 @@ import javax.sql.DataSource;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.ExceptionErrorCodeUtils;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.AtomicNumberCreator;
 import com.taobao.tddl.executor.spi.ITHLog;
 import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.group.jdbc.TGroupConnection;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author mengshi.sunmengshi 2013-12-6 上午11:31:29
@@ -113,7 +114,7 @@ public class My_Transaction implements ITransaction {
             }
         } else {// 没有事务建立，新建事务
             transactionalNodeName = groupName;
-            Connection handler = getConnection(groupName, ds, true);
+            Connection handler = getConnection(groupName, ds);
             return handler;
         }
     }
@@ -266,7 +267,7 @@ public class My_Transaction implements ITransaction {
     }
 
     @Override
-    public boolean isAutoCommit() throws TddlException {
+    public boolean isAutoCommit() {
         return autoCommit;
     }
 
