@@ -28,8 +28,8 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
 public class My_Transaction implements ITransaction {
 
     protected final static Logger           logger                = LoggerFactory.getLogger(My_Transaction.class);
-    private final AtomicNumberCreator       idGen                 = AtomicNumberCreator.getNewInstance();
-    private final Integer                   id                    = idGen.getIntegerNextNumber();
+    private AtomicNumberCreator             idGen                 = AtomicNumberCreator.getNewInstance();
+    private Integer                         id                    = idGen.getIntegerNextNumber();
 
     /**
      * 处于事务中的连接管理
@@ -39,9 +39,9 @@ public class My_Transaction implements ITransaction {
     /**
      * 当前进行事务的节点
      */
-    String                                  transactionalNodeName = null;
-    boolean                                 autoCommit            = true;
-    Stragety                                stragety              = Stragety.STRONG;
+    protected String                        transactionalNodeName = null;
+    protected boolean                       autoCommit            = true;
+    protected Stragety                      stragety              = Stragety.STRONG;
 
     public enum Stragety {
 
@@ -51,6 +51,10 @@ public class My_Transaction implements ITransaction {
         STRONG,
         /** 随意跨机 */
         NONE
+    }
+
+    public My_Transaction(boolean autoCommit){
+        this.autoCommit = autoCommit;
     }
 
     public void beginTransaction() {
@@ -98,12 +102,13 @@ public class My_Transaction implements ITransaction {
         // return my_JdbcHandler;
         // }
         // }
+
         /*
          * 状态是强一致或ALLOW_READ 策略一致
          */
         if (transactionalNodeName != null) {// 已经有事务链接了
             if (transactionalNodeName.equalsIgnoreCase(groupName)) {
-                List<Connection> conn = getConnections(transactionalNodeName, ds, false);
+                List<Connection> conn = getConnections(transactionalNodeName, ds);
                 if (conn.size() != 1 && conn.get(0).getAutoCommit()) {
                     // 拿出来的应该是已经存在的链接，这个链接也必然是事务链接
                     throw new RuntimeException("connection is not transactional? should not be here");
@@ -119,8 +124,7 @@ public class My_Transaction implements ITransaction {
         }
     }
 
-    private List<Connection> getConnections(String groupName, DataSource ds, boolean beginTransaction)
-                                                                                                      throws SQLException {
+    private List<Connection> getConnections(String groupName, DataSource ds) throws SQLException {
         List<Connection> conns = connMap.get(groupName);
         if (conns == null || conns.isEmpty()) {
             conns = new ArrayList();
@@ -129,7 +133,7 @@ public class My_Transaction implements ITransaction {
             connMap.put(groupName, conns);
         }
 
-        if (beginTransaction) {
+        if (!autoCommit) {
             for (Connection conn : conns) {
                 conn.setAutoCommit(false);
             }
@@ -142,7 +146,6 @@ public class My_Transaction implements ITransaction {
         return myConn;
     }
 
-    @Override
     public void commit() throws TddlException {
         try {
             if (connMap != null && !connMap.isEmpty()) {
@@ -159,7 +162,6 @@ public class My_Transaction implements ITransaction {
         transactionalNodeName = null;
     }
 
-    @Override
     public void rollback() throws TddlException {
         try {
             if (connMap != null && !connMap.isEmpty()) {
@@ -175,17 +177,14 @@ public class My_Transaction implements ITransaction {
         transactionalNodeName = null;
     }
 
-    @Override
     public long getId() {
         return id;
     }
 
-    @Override
     public ITHLog getHistoryLog() {
         return null;
     }
 
-    @Override
     public void close() throws TddlException {
         if (autoCommit) {
             // 如果是auto commit模式，因为不存在重用，链接关闭自管理
@@ -212,7 +211,7 @@ public class My_Transaction implements ITransaction {
     }
 
     public static void closeStreaming(My_Transaction trans, String groupName, DataSource ds) throws SQLException {
-        List<Connection> conns = trans.getConnections(groupName, ds, false);
+        List<Connection> conns = trans.getConnections(groupName, ds);
         for (Connection con : conns) {
             // 后面的代码主要是为了从各种包装类里面取出真正的链接里面的query id。。。蛋略微痛。。
             // 弄掉TDDL包装
@@ -266,15 +265,12 @@ public class My_Transaction implements ITransaction {
         throw new RuntimeException("impossible,connection is not TGroupConnection:" + con.getClass());
     }
 
-    @Override
     public boolean isAutoCommit() {
         return autoCommit;
     }
 
-    @Override
     public void setAutoCommit(boolean autoCommit) {
         this.autoCommit = autoCommit;
-
     }
 
     public Map<String, List<Connection>> getConnMap() {
