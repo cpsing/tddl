@@ -74,7 +74,7 @@ public class QueryMyHandler extends QueryHandler implements ICommandHandler {
             if (order.getColumn().getAlias() != null) order.getColumn().setColumnName(order.getColumn().getAlias());
         }
 
-        if ("True".equalsIgnoreCase(GeneralUtil.getExtraCmd(executionContext.getExtraCmds(),
+        if ("True".equalsIgnoreCase(GeneralUtil.getExtraCmdString(executionContext.getExtraCmds(),
             ExtraCmd.ExecutionExtraCmd.EXECUTE_QUERY_WHEN_CREATED))) {
             my_cursor.init();
         }

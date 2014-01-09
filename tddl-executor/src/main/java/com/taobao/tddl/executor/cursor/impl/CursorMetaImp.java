@@ -149,9 +149,7 @@ public class CursorMetaImp implements ICursorMeta {
 
     List<ColumnMeta>                                                 columns;
 
-    private Map<String/* 列名字哦。注意，不是表名，因为列名更长取，量也更大 */, ColumnHolder> indexMap      = null;
-
-    private Map<String/* 列的别名，如果存在的话 */, ColumnHolder>               aliasIndexMap = null;
+    private Map<String/* 列名字哦。注意，不是表名，因为列名更长取，量也更大 */, ColumnHolder> indexMap = null;
 
     private Integer                                                  indexRange;
 

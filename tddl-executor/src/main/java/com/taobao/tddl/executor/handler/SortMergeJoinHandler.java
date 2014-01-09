@@ -15,7 +15,6 @@ public class SortMergeJoinHandler extends QueryHandlerCommon {
         super();
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     protected ISchematicCursor doQuery(ISchematicCursor cursor, IDataNodeExecutor executor,
                                        ExecutionContext executionContext) throws TddlException {
@@ -53,9 +52,7 @@ public class SortMergeJoinHandler extends QueryHandlerCommon {
             .execByExecPlanNode(leftQuery, executionContext);
         right_match = matchIndex(getOrderBy(join.getRightJoinOnColumns()), rightQuery.getOrderBys());
         if (right_match == NOT_MATCH) {
-
             // 这里是，排序不匹配，所以使用leftJoinOnColumns进行临时表构建。
-
             cursor_right = repo.getCursorFactory().tempTableSortCursor(executionContext,
                 cursor_right,
                 getOrderBy(join.getRightJoinOnColumns()),
@@ -71,7 +68,6 @@ public class SortMergeJoinHandler extends QueryHandlerCommon {
             join.getLeftJoinOnColumns(),
             join.getRightJoinOnColumns());
         return cursor;
-
     }
 
 }

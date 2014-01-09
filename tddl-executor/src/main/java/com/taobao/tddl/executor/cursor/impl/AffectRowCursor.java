@@ -31,11 +31,8 @@ public class AffectRowCursor extends SchematicCursor implements IAffectRowCursor
             return cursormeta;
         }
         schemaInited = true;
-
         ColumnMessage colMeta = new ColumnMessage(ResultCursor.AFFECT_ROW, DATA_TYPE.INT_VAL);
-
         CursorMetaImp cursurMetaImp = CursorMetaImp.buildNew("", Arrays.asList(colMeta), 1);
-
         this.cursormeta = cursurMetaImp;
         return cursurMetaImp;
     }

@@ -103,7 +103,6 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
 
     @SuppressWarnings("unchecked")
     boolean allow(IFilter f, IRowSet iRowSet) throws TddlException {
-
         if (f == null) {
             return true;
         }
@@ -119,7 +118,6 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
 
                     } else {
                         // TODO shenxun : 这是否应该用cursorMeta?
-
                         column_value = ExecUtils.getValueByIColumn(iRowSet, (ISelectable) col);
                     }
                 } catch (Exception e) {
@@ -177,12 +175,12 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
             }
             if (v instanceof IFunction) {
                 try {
-                    if (((IFunction) v).getFunctionType().equals(FunctionType.Aggregate)) throw new RuntimeException("Invalid use of group function");
+                    if (((IFunction) v).getFunctionType().equals(FunctionType.Aggregate)) {
+                        throw new RuntimeException("Invalid use of group function");
+                    }
 
                     ((ExtraFunction) ((IFunction) v).getExtraFunction()).serverMap(iRowSet);
-
                     v = processFunction(iRowSet, v);
-
                 } catch (Exception e) {
                     throw new TddlException(e);
                 }
@@ -193,9 +191,9 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
             }
 
             if (op == OPERATION.IN) {
-
                 return processIn(column_value, bf.getValues());
             }
+
             int n = ((Comparable) v).compareTo(column_value);
 
             if (n == 0) {
@@ -353,6 +351,7 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
         return null;
     }
 
+    @SuppressWarnings("unused")
     private Map<String, Object> getRecordMap(CloneableRecord key, CloneableRecord value) {
         int size = 0;
         if (value != null) {

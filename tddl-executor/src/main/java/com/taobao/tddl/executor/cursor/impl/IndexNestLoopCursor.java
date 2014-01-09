@@ -66,8 +66,11 @@ public class IndexNestLoopCursor extends JoinSchematicCursor implements IIndexNe
     }
 
     protected IRowSet getOneLeftCursor(boolean forward) throws TddlException {
-        if (forward) left = ExecUtils.fromIRowSetToArrayRowSet(left_cursor.next());
-        else left = ExecUtils.fromIRowSetToArrayRowSet(left_cursor.prev());
+        if (forward) {
+            left = ExecUtils.fromIRowSetToArrayRowSet(left_cursor.next());
+        } else {
+            left = ExecUtils.fromIRowSetToArrayRowSet(left_cursor.prev());
+        }
         return left;
     }
 
@@ -167,9 +170,7 @@ public class IndexNestLoopCursor extends JoinSchematicCursor implements IIndexNe
     protected void putLeftCursorValueIntoReturnVal() {
         right_key = rightJoinOnColumnCodec.newEmptyRecord();
         for (int k = 0; k < leftJoinOnColumns.size(); k++) {
-
             Object v = ExecUtils.getValueByIColumn(left, leftJoinOnColumns.get(k));
-
             right_key.put(ExecUtils.getColumn(rightJoinOnColumns.get(k)).getColumnName(), v);
         }
     }
@@ -181,22 +182,16 @@ public class IndexNestLoopCursor extends JoinSchematicCursor implements IIndexNe
 
     @Override
     public String toStringWithInden(int inden) {
-
         String tabTittle = GeneralUtil.getTab(inden);
         String tabContent = GeneralUtil.getTab(inden + 1);
         StringBuilder sb = new StringBuilder();
-
         GeneralUtil.printlnToStringBuilder(sb, tabTittle + "IndexNestedLoopCursor ");
-
         GeneralUtil.printAFieldToStringBuilder(sb, "leftColumns", this.leftJoinOnColumns, tabContent);
-
         GeneralUtil.printAFieldToStringBuilder(sb, "rightColumns", this.rightJoinOnColumns, tabContent);
-
         GeneralUtil.printlnToStringBuilder(sb, tabContent + "left:");
         sb.append(this.left_cursor.toStringWithInden(inden + 1));
         GeneralUtil.printlnToStringBuilder(sb, tabContent + "right:");
         sb.append(this.right_cursor.toStringWithInden(inden + 1));
-
         return sb.toString();
     }
 

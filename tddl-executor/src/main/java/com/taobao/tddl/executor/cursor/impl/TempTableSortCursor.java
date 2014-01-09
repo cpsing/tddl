@@ -9,8 +9,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.common.utils.TStringUtil;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.codec.CodecFactory;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.KVPair;
@@ -33,6 +31,9 @@ import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * 用于临时表排序，需要依赖bdb
@@ -219,16 +220,18 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
 
         List<TddlException> exs = new ArrayList();
         exs = cursor.close(exs);
-        if (!exs.isEmpty()) throw GeneralUtil.mergeException(exs);
+        if (!exs.isEmpty()) {
+            throw GeneralUtil.mergeException(exs);
+        }
         if (protection) {
-
             exs = this.close(exs);
-            if (!exs.isEmpty()) throw GeneralUtil.mergeException(exs);
+            if (!exs.isEmpty()) {
+                throw GeneralUtil.mergeException(exs);
+            }
             throw new IllegalStateException("temp table size protection , check your sql or enlarge the limination size . ");
         }
 
         this.cursor = ret;
-
         returnMeta = CursorMetaImp.buildNew(retColumns);
         return ret;
     }
@@ -251,8 +254,12 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
                     cm.getAlias(),
                     cm.isNullable());
 
-                if (!values.contains(cm2)) values.add(cm2);
-                if (!metaValues.contains(cm)) metaValues.add(cm);
+                if (!values.contains(cm2)) {
+                    values.add(cm2);
+                }
+                if (!metaValues.contains(cm)) {
+                    metaValues.add(cm);
+                }
             }
         }
 

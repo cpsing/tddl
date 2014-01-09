@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.taobao.tddl.qatest.BaseAndorTestCase;
+import com.taobao.tddl.qatest.BaseTddlTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
@@ -18,7 +18,7 @@ import com.taobao.tddl.qatest.util.ExecuteTableName;
  * 主要针对合并约束条件的测试 Author By: zhuoxue.yll Created Date: 2012-9-14 下午02:35:55
  */
 @RunWith(EclipseParameterized.class)
-public class SelectComplexConditionTest extends BaseAndorTestCase {
+public class SelectComplexConditionTest extends BaseTddlTestCase {
 
     String[] columnParam = { "PK", "NAME", "ID" };
 

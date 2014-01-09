@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.taobao.tddl.qatest.BaseAndorTestCase;
+import com.taobao.tddl.qatest.BaseTddlTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
@@ -28,7 +28,7 @@ import com.taobao.tddl.qatest.util.ExecuteTableName;
  * Author By: zhuoxue.yll Created Date: 2012-7-2 上午11:10:59
  */
 @RunWith(EclipseParameterized.class)
-public class SelectAmountLimit extends BaseAndorTestCase {
+public class SelectAmountLimit extends BaseTddlTestCase {
 
     private final int AMOUNT_DATA = 100;
     private final int thread_size = 5;

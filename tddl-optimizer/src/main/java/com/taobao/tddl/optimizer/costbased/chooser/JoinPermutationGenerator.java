@@ -136,7 +136,6 @@ public final class JoinPermutationGenerator {
             }
 
             QueryTreeNode newTree = getQueryTreeFromQueryNodes(nodes);
-
             if (newTree != null) {
                 newTree.setOrderBys(orderBys);
                 newTree.setResultFilter(this.valueFilter);

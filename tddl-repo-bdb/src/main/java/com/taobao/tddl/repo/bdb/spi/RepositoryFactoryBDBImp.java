@@ -17,7 +17,7 @@ public class RepositoryFactoryBDBImp implements IRepositoryFactory {
 
     @Override
     public IRepository buildRepository(Map properties) {
-        String repoConfigFile = GeneralUtil.getExtraCmd(properties, BDBConfig.BDB_REPO_CONFIG_FILE_PATH);
+        String repoConfigFile = GeneralUtil.getExtraCmdString(properties, BDBConfig.BDB_REPO_CONFIG_FILE_PATH);
         BDBConfig config = null;
 
         if (repoConfigFile == null) {

@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.qatest.BaseAndorTestCase;
+import com.taobao.tddl.qatest.BaseTddlTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
@@ -24,7 +24,7 @@ import com.taobao.tddl.qatest.util.ExecuteTableName;
  * Author By: yaolingling.pt Created Date: 2012-2-21 上午11:30:18
  */
 @RunWith(EclipseParameterized.class)
-public class SelectWithConditionTest extends BaseAndorTestCase {
+public class SelectWithConditionTest extends BaseTddlTestCase {
 
     @Parameters(name = "{index}:table0={0},table1={1}")
     public static List<String[]> prepare() {

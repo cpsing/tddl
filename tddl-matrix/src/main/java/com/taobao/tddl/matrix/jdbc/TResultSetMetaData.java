@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.taobao.tddl.common.utils.TStringUtil;
-import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 
@@ -16,25 +15,21 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 public class TResultSetMetaData implements ResultSetMetaData {
 
     private List<ColumnMeta> columnMetas;
-    ResultCursor             rc;
 
     public TResultSetMetaData(List<ColumnMeta> columns){
-
         this.columnMetas = columns;
-
     }
 
     public boolean columnIsExist(String column) {
-
-        for (ColumnMeta metaItem : columnMetas)
+        for (ColumnMeta metaItem : columnMetas) {
             if (column.equalsIgnoreCase(metaItem.getName()) || column.equalsIgnoreCase(metaItem.getAlias())) {
                 return true;
             }
+        }
         return false;
     }
 
     public DATA_TYPE getColumnDataType(String column) {
-
         for (ColumnMeta metaItem : columnMetas)
             if (column.equalsIgnoreCase(metaItem.getName()) || column.equalsIgnoreCase(metaItem.getAlias())) {
                 return metaItem.getDataType();
@@ -60,79 +55,68 @@ public class TResultSetMetaData implements ResultSetMetaData {
     }
 
     public <T> T unwrap(Class<T> iface) throws SQLException {
-
-        return null;
+        try {
+            return (T) this;
+        } catch (Exception e) {
+            throw new SQLException(e);
+        }
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-
-        return false;
+        return this.getClass().isAssignableFrom(iface);
     }
 
     public boolean isAutoIncrement(int column) throws SQLException {
-
         return false;
     }
 
     public boolean isCaseSensitive(int column) throws SQLException {
-
         return false;
     }
 
     public boolean isSearchable(int column) throws SQLException {
-
         return false;
     }
 
     public boolean isCurrency(int column) throws SQLException {
-
         return false;
     }
 
     public int isNullable(int column) throws SQLException {
-
         return 0;
     }
 
     public boolean isSigned(int column) throws SQLException {
-
         return false;
     }
 
     public int getColumnDisplaySize(int column) throws SQLException {
-
         return 20;
     }
 
     public String getSchemaName(int column) throws SQLException {
-
-        return "Andor";
+        return "Tddl";
     }
 
     public int getPrecision(int column) throws SQLException {
-
         return 0;
     }
 
     public int getScale(int column) throws SQLException {
-
         return 0;
     }
 
     public String getTableName(int column) throws SQLException {
-
         column--;
         ColumnMeta c = this.columnMetas.get(column);
         return c.getTableName();
     }
 
     public String getCatalogName(int column) throws SQLException {
-
-        return "Andor";
+        return "Tddl";
     }
 
     public int getColumnType(int column) throws SQLException {
-
         return 0;
     }
 
@@ -143,22 +127,18 @@ public class TResultSetMetaData implements ResultSetMetaData {
     }
 
     public boolean isReadOnly(int column) throws SQLException {
-
         return false;
     }
 
     public boolean isWritable(int column) throws SQLException {
-
         return true;
     }
 
     public boolean isDefinitelyWritable(int column) throws SQLException {
-
         return false;
     }
 
     public String getColumnClassName(int column) throws SQLException {
-
         return null;
     }
 

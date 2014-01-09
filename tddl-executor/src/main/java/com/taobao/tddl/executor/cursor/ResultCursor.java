@@ -13,7 +13,6 @@ import com.taobao.tddl.executor.rowset.IRowSet;
  * @author mengshi.sunmengshi 2013-11-29 下午1:38:39
  * @since 5.1.0
  */
-@SuppressWarnings("rawtypes")
 public class ResultCursor extends SchematicCursor {
 
     public static EmptyResultCursor EMPTY_RESULT_CURSOR = new EmptyResultCursor(null, null);
@@ -133,19 +132,17 @@ public class ResultCursor extends SchematicCursor {
 
     // private static final String INDEX_NAME = "INDEX_NAME";
 
-    public static final String AFFECT_ROW = "AFFECT_ROW";
-
-    protected boolean          closed     = false;
-    Long                       txn_id;
-    Integer                    result_id;
-    String                     exception;
-    List<IRowSet>              results;
-    Iterator<IRowSet>          iter;
-    int                        size       = 10;
-    int                        totalCount;
-    List<Object>               originalSelectColumns;
-
-    private ExecutionContext   executionContext;
+    public static final String  AFFECT_ROW = "AFFECT_ROW";
+    protected boolean           closed     = false;
+    protected Long              txn_id;
+    protected Integer           result_id;
+    protected String            exception;
+    protected List<IRowSet>     results;
+    protected Iterator<IRowSet> iter;
+    protected int               size       = 10;
+    protected int               totalCount;
+    protected List<Object>      originalSelectColumns;
+    private ExecutionContext    executionContext;
 
     public List<Object> getOriginalSelectColumns() {
         return originalSelectColumns;
@@ -288,7 +285,6 @@ public class ResultCursor extends SchematicCursor {
     public void beforeFirst() throws TddlException {
         throwExceptionIfClosed();
         GeneralUtil.checkInterrupted();
-
         if (result_id == null) {
             if (this.results == null) return;
 
@@ -300,7 +296,6 @@ public class ResultCursor extends SchematicCursor {
                 iter = results.iterator();
             }
             super.beforeFirst();
-
         }
     }
 
@@ -326,5 +321,4 @@ public class ResultCursor extends SchematicCursor {
     public String toString() {
         return toStringWithInden(0);
     }
-
 }

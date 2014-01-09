@@ -127,7 +127,7 @@ public class CursorFactoryDefaultImpl implements ICursorFactory {
                                                     List<IOrderBy> orderBys, boolean sortedDuplicates, long requestID)
                                                                                                                       throws TddlException {
         try {
-            if ("True".equalsIgnoreCase(GeneralUtil.getExtraCmd(executionContext.getExtraCmds(),
+            if ("True".equalsIgnoreCase(GeneralUtil.getExtraCmdString(executionContext.getExtraCmds(),
                 ExtraCmd.ExecutionExtraCmd.ALLOW_TEMPORARY_TABLE))) {
 
                 IRepository bdbRepo = ExecutorContext.getContext()

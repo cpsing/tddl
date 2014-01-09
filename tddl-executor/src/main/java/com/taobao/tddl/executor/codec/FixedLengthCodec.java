@@ -76,7 +76,7 @@ public class FixedLengthCodec implements RecordCodec<byte[]> {
                 length += 4;
             } else if (t == DATA_TYPE.BYTES_VAL) {
                 length += KeyEncoder.calculateEncodedLength((byte[]) v);
-            } else if (t == DATA_TYPE.DATE_VAL || t == DATA_TYPE.TIMESTAMP) {
+            } else if (t == DATA_TYPE.DATE_VAL || t == DATA_TYPE.TIMESTAMP_VAL) {
                 if (v == null) {
                     length += 1;
                 } else {
@@ -116,7 +116,7 @@ public class FixedLengthCodec implements RecordCodec<byte[]> {
             return 4;
         } else if (t == DATA_TYPE.BYTES_VAL) {
             return KeyEncoder.encode((byte[]) v, dst, offset);
-        } else if (t == DATA_TYPE.DATE_VAL || t == DATA_TYPE.TIMESTAMP) {
+        } else if (t == DATA_TYPE.DATE_VAL || t == DATA_TYPE.TIMESTAMP_VAL) {
             if (v != null && !(v instanceof Long)) {
                 if (v instanceof Date) {
                     v = ((Date) v).getTime();
@@ -168,7 +168,7 @@ public class FixedLengthCodec implements RecordCodec<byte[]> {
                     byte[][] val = new byte[1][];
                     offset += KeyDecoder.decode(bytes, offset, val);
                     v = val[0];
-                } else if (t == DATA_TYPE.DATE_VAL || t == DATA_TYPE.TIMESTAMP) {
+                } else if (t == DATA_TYPE.DATE_VAL || t == DATA_TYPE.TIMESTAMP_VAL) {
 
                     v = DataDecoder.decodeLongObj(bytes, offset);
 

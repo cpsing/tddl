@@ -9,17 +9,19 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * <p/>
  * Author By: zhuoxue.yll Created Date: 2013-4-11 下午1:57:19
  */
-public class BaseTemplateTestCase extends BaseAndorTestCase {
+public class BaseTemplateTestCase extends BaseTddlTestCase {
 
     protected static JdbcTemplate andorJT                    = null;
-    protected static final String MATRIX_IBATIS_CONTEXT_PATH = "classpath:ibatis/spring_context.xml";
+    protected static final String MATRIX_IBATIS_CONTEXT_PATH = "classpath:spring/spring_context.xml";
     protected String              sql                        = null;
 
     @BeforeClass
-    public static void IEnvInit() throws Exception {
+    public static void IEnvInitTemplate() throws Exception {
         normaltblTableName = "mysql_normaltbl_oneGroup_oneAtom";
         if (us == null) {
             andorJT = JdbcTemplateClient("mysql");
+        } else {
+            andorJT = new JdbcTemplate(us);
         }
     }
 

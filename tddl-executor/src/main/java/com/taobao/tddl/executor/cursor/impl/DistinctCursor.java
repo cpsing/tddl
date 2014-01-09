@@ -25,35 +25,28 @@ public class DistinctCursor extends MergeSortedCursors {
 
     @Override
     public String toStringWithInden(int inden) {
-
         String tabTittle = GeneralUtil.getTab(inden);
         String tabContent = GeneralUtil.getTab(inden + 1);
         StringBuilder sb = new StringBuilder();
-
         GeneralUtil.printlnToStringBuilder(sb, tabTittle + "DistinctCursor ");
         GeneralUtil.printAFieldToStringBuilder(sb, "orderBy", this.orderBys, tabContent);
         sb.append(tabContent).append("cursor:").append("\n");
         sb.append(cursor.toStringWithInden(inden + 1));
         return sb.toString();
-
     }
 
     @Override
     public IRowSet next() throws TddlException {
         IRowSet next = null;
         while ((next = (cursor.next())) != null) {
-
             if (current == null) {
                 break;
             }
-
             super.initComparator(orderBys, next.getParentCursorMeta());
-
             int n = kvPairComparator.compare(next, current);
             if (n != 0) {
                 break;
             }
-
             next = null;
         }
         this.current = ExecUtils.fromIRowSetToArrayRowSet(next);

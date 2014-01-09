@@ -88,6 +88,7 @@ public class FilterPusher {
             List<IFilter> DNFNodeToCurrent = new LinkedList<IFilter>();
             if (DNFNodeToPush != null) {
                 for (IFilter node : DNFNodeToPush) {
+                    node = (IFilter) node.copy();
                     // 可能是多级节点，字段在select中，设置为select中的字段，这样才可以继续下推
                     if (!tryPushColumn(node, qn.getChild())) {
                         // 可能where条件是函数，暂时不下推
@@ -120,6 +121,7 @@ public class FilterPusher {
                 findJoinKeysAndRemoveIt(DNFNodeToPush, jn);
 
                 for (IFilter node : DNFNodeToPush) {
+                    node = (IFilter) node.copy();
                     if (tryPushColumn(node, jn.getLeftNode())) {
                         DNFNodetoPushToLeft.add(node);
                     } else if (tryPushColumn(node, jn.getRightNode())) {
@@ -333,7 +335,9 @@ public class FilterPusher {
                                 throw new IllegalArgumentException("join查询表右边不包含join column，请修改查询语句...");
                             }
                         } else {
-                            throw new IllegalArgumentException("join查询的join column都在左表上，请修改查询语句...");
+                            if (!(join.getLeftNode() instanceof JoinNode)) {
+                                throw new IllegalArgumentException("join查询的join column都在左表上，请修改查询语句...");
+                            }
                         }
                     } else if (join.getLeftNode().hasColumn(keys[1])) {
                         if (!join.getLeftNode().hasColumn(keys[0])) {
@@ -350,7 +354,9 @@ public class FilterPusher {
                                 throw new IllegalArgumentException("join查询表左边不包含join column，请修改查询语句...");
                             }
                         } else {
-                            throw new IllegalArgumentException("join查询的join column都在右表上，请修改查询语句...");
+                            if (!(join.getRightNode() instanceof JoinNode)) {
+                                throw new IllegalArgumentException("join查询的join column都在右表上，请修改查询语句...");
+                            }
                         }
                     }
                 }

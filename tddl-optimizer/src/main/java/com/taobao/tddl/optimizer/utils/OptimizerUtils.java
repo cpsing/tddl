@@ -63,7 +63,7 @@ public class OptimizerUtils {
                 value = Byte.valueOf(strValue);
             } else if (type.equals(DATA_TYPE.CHAR_VAL)) {
                 value = strValue;
-            } else if (type.equals(DATA_TYPE.DATE_VAL) || type.equals(DATA_TYPE.TIMESTAMP)) {
+            } else if (type.equals(DATA_TYPE.DATE_VAL) || type.equals(DATA_TYPE.TIMESTAMP_VAL)) {
                 if (value != null && value instanceof Long) {
                     value = new Date((Long) value);
                 }

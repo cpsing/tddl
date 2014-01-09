@@ -246,11 +246,15 @@ public class TableMetaParser {
         } else if ("DATE".equalsIgnoreCase(type)) {
             return DATA_TYPE.DATE_VAL;
         } else if ("TIMESTAMP".equalsIgnoreCase(type)) {
-            return DATA_TYPE.TIMESTAMP;
+            return DATA_TYPE.TIMESTAMP_VAL;
         } else if ("DATETIME".equalsIgnoreCase(type)) {
-            return DATA_TYPE.TIMESTAMP;
+            return DATA_TYPE.TIMESTAMP_VAL;
+        } else if ("TIME".equalsIgnoreCase(type)) {
+            return DATA_TYPE.TIME_VAL;
         } else if ("BLOB".equalsIgnoreCase(type)) {
-            return DATA_TYPE.BLOB;
+            return DATA_TYPE.BLOB_VAL;
+        } else if ("BIT".equalsIgnoreCase(type)) {
+            return DATA_TYPE.BIT_VAL;
         }
 
         return null;
@@ -281,11 +285,11 @@ public class TableMetaParser {
         return Relationship.NONE;
     }
 
-    public static DATA_TYPE jdbcTypeToAndorType(int jdbcType) {
-        return getDataType(jdbcTypeToAndorTypeString(jdbcType));
+    public static DATA_TYPE jdbcTypeToDataType(int jdbcType) {
+        return getDataType(jdbcTypeToDataTypeString(jdbcType));
     }
 
-    public static String jdbcTypeToAndorTypeString(int jdbcType) {
+    public static String jdbcTypeToDataTypeString(int jdbcType) {
         String type = null;
         switch (jdbcType) {
             case Types.BIGINT:
@@ -303,6 +307,9 @@ public class TableMetaParser {
                 break;
             case Types.TIMESTAMP:
                 type = "TIMESTAMP";
+                break;
+            case Types.TIME:
+                type = "TIME";
                 break;
             case Types.FLOAT:
             case Types.REAL:
@@ -326,6 +333,9 @@ public class TableMetaParser {
                 break;
             case Types.BLOB:
                 type = "BLOB";
+                break;
+            case Types.BIT:
+                type = "BIT";
                 break;
             default:
                 type = null;

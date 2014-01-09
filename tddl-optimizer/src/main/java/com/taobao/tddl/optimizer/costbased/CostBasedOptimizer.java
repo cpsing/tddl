@@ -157,7 +157,7 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
                                                                                                           throws QueryException,
                                                                                                           SqlParserException {
         SqlAnalysisResult result = sqlParseManager.parse(sql, parameterSettings, cached);
-        return optimizeAndAssignment(result.getAstNode(), parameterSettings, extraCmd, sql, false);
+        return optimizeAndAssignment(result.getAstNode(), parameterSettings, extraCmd, sql, cached);
     }
 
     private IDataNodeExecutor optimizeAndAssignment(final ASTNode node,

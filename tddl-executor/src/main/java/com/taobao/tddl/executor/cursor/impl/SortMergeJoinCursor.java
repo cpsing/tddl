@@ -103,17 +103,13 @@ public class SortMergeJoinCursor extends JoinSchematicCursor implements IMergeSo
         while (!leftSubSet.isEmpty() && !rightSubSet.isEmpty()) {
             int compare = compare(left_key, right_key, leftJoinOnColumns, rightJoinOnColumns);
             if (compare == 0) {
-
                 this.needAdvanceLeft = true;
                 this.needAdvanceRight = true;
                 List<IRowSet> results = acrossProduct(leftSubSet, rightSubSet);
                 resultsIter = results.iterator();
-
                 this.current = resultsIter.next();
                 return this.current;
-
             } else {
-
                 // outter join情况下，没有消耗就不需要前移
                 if (this.isLeftOutJoin() || this.isRightOutJoin()) {
                     needAdvanceLeft = false;
@@ -121,7 +117,6 @@ public class SortMergeJoinCursor extends JoinSchematicCursor implements IMergeSo
                 }
 
                 if (compare < 0) {
-
                     if (this.isLeftOutJoin()) {
                         this.needAdvanceLeft = true;
                         List<IRowSet> results = acrossProduct(leftSubSet,
@@ -130,10 +125,8 @@ public class SortMergeJoinCursor extends JoinSchematicCursor implements IMergeSo
                         this.current = resultsIter.next();
                         return this.current;
                     }
-
                     left_key = advance(leftSubSet, left_cursor, leftJoinOnColumns);
                 } else {
-
                     if (this.isRightOutJoin()) {
                         this.needAdvanceRight = true;
                         List<IRowSet> results = acrossProduct(getNullSubSet(left_cursor.getReturnColumns()),
@@ -148,7 +141,6 @@ public class SortMergeJoinCursor extends JoinSchematicCursor implements IMergeSo
         }
 
         if (!(leftSubSet.isEmpty() && rightSubSet.isEmpty())) {
-
             // outter join情况下，要将两个cursor都取完
             if (leftSubSet.isEmpty() && this.isRightOutJoin()) {
                 this.needAdvanceRight = true;
@@ -205,7 +197,6 @@ public class SortMergeJoinCursor extends JoinSchematicCursor implements IMergeSo
     }
 
     private int compare(IRowSet row1, IRowSet row2, List columns1, List columns2) {
-
         Comparator kvPairComparator = ExecUtils.getComp(columns1,
             columns2,
             row1.getParentCursorMeta(),

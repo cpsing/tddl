@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.common.model.Matrix;
@@ -26,18 +27,17 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  */
 public class TopologyHandler extends AbstractLifecycle {
 
-    final static Logger                                      logger            = LoggerFactory.getLogger(TopologyHandler.class);
+    public final static Logger                               logger            = LoggerFactory.getLogger(TopologyHandler.class);
+    public final static MessageFormat                        topologyNullError = new MessageFormat("get topology info error, appName is:{0}, unitName is:{1}, filePath is: {2}, dataId is: {3}");
+    public final static MessageFormat                        TOPOLOGY          = new MessageFormat("com.taobao.and_orV0.{0}_MACHINE_TAPOLOGY");
     private final Map<String/* group key */, IGroupExecutor> executorMap       = new HashMap<String, IGroupExecutor>();
     private String                                           appName;
     private String                                           unitName;
     private String                                           topologyFilePath;
     private ConfigDataHandler                                cdh               = null;
     private Matrix                                           matrix;
-    public final static MessageFormat                        topologyNullError = new MessageFormat("get topology info error, appName is:{0}, unitName is:{1}, filePath is: {2}, dataId is: {3}");
-    public final static MessageFormat                        TOPOLOGY          = new MessageFormat("com.taobao.and_orV0.{0}_MACHINE_TAPOLOGY");
 
     public TopologyHandler(String appName, String unitName, String topologyFilePath){
-        super();
         this.appName = appName;
         this.unitName = unitName;
         this.topologyFilePath = topologyFilePath;
@@ -49,7 +49,6 @@ public class TopologyHandler extends AbstractLifecycle {
 
     @Override
     protected void doInit() {
-
         if (topologyFilePath != null) {
             cdh = ConfigDataHandlerCity.getFileFactory(appName).getConfigDataHandler(topologyFilePath,
                 new TopologyListener(this));
@@ -57,17 +56,16 @@ public class TopologyHandler extends AbstractLifecycle {
             cdh = ConfigDataHandlerCity.getFactory(appName, unitName)
                 .getConfigDataHandler(TOPOLOGY.format(new Object[] { appName }), new TopologyListener(this));
         }
-        String data = cdh.getData(ConfigDataHandler.GET_DATA_TIMEOUT, ConfigDataHandler.FIRST_SERVER_STRATEGY);
 
+        String data = cdh.getData(ConfigDataHandler.GET_DATA_TIMEOUT, ConfigDataHandler.FIRST_SERVER_STRATEGY);
         if (data == null) {
-            String dataid = TOPOLOGY.format(new Object[] { appName });
+            String dataId = TOPOLOGY.format(new Object[] { appName });
             throw new TddlRuntimeException(topologyNullError.format(new String[] { appName, unitName, topologyFilePath,
-                    dataid }));
+                    dataId }));
         }
 
         try {
             Matrix matrix = MatrixParser.parse(data);
-
             this.matrix = matrix;
         } catch (Exception ex) {
             logger.error("matrix topology init error,file is: " + this.getTopologyFilePath() + ", appname is: "
@@ -75,16 +73,25 @@ public class TopologyHandler extends AbstractLifecycle {
                 ex);
             throw new TddlRuntimeException(ex);
         }
+
         for (Group group : matrix.getGroups()) {
             group.setAppName(this.appName);
             IRepository repo = ExecutorContext.getContext()
                 .getRepositoryHolder()
                 .getOrCreateRepository(group.getType().toString(), matrix.getProperties());
 
-            IGroupExecutor groupExecutor = repo.buildGroupExecutor(group);
-
+            IGroupExecutor groupExecutor = repo.getGroupExecutor(group);
             executorMap.put(group.getName(), groupExecutor);
         }
+    }
+
+    protected void doDestory() throws TddlException {
+        Map<String, IRepository> repos = ExecutorContext.getContext().getRepositoryHolder().getRepository();
+        for (IRepository repo : repos.values()) {
+            repo.destory();
+        }
+
+        cdh.destory();
     }
 
     public IGroupExecutor putOne(String groupKey, IGroupExecutor groupExecutor) {
@@ -110,6 +117,7 @@ public class TopologyHandler extends AbstractLifecycle {
 
     public class TopologyListener implements ConfigDataListener {
 
+        @SuppressWarnings("unused")
         private final TopologyHandler topologyHandler;
 
         public TopologyListener(TopologyHandler topologyHandler){
@@ -118,7 +126,7 @@ public class TopologyHandler extends AbstractLifecycle {
 
         @Override
         public void onDataRecieved(String dataId, String data) {
-
+            // do nothing
         }
 
     }

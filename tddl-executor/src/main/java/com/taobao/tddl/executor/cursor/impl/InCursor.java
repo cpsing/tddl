@@ -114,7 +114,6 @@ public class InCursor extends SchematicCursor implements IInCursor {
 
     @Override
     public IRowSet next() throws TddlException {
-
         if (valuesToFind == null) {
             throw new IllegalArgumentException("value is null ");
         }
@@ -122,7 +121,6 @@ public class InCursor extends SchematicCursor implements IInCursor {
             // 还未初始化
             List<CloneableRecord> list = new ArrayList<CloneableRecord>(valuesToFind.size());
             for (Comparable valOne : valuesToFind) {
-
                 list.add(getCloneableRecordOfKey(c.getColumnName(), valOne, keyCodec));
             }
             pairToReturn = cursor.mgetWithDuplicateList(list, false, true);

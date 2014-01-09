@@ -139,14 +139,15 @@ public class JoinSchematicCursor extends SchematicCursor {
 
         rightCursorOffset = leftColumns.size();
         this.joinCursorMeta = cursorMetaImpJoin;
-
     }
 
     private void addIndexToNewIndexes(ICursorMeta cursorMeta, List<ColumnMeta> columns, List<Integer> indexes,
                                       int offset) {
         for (ColumnMeta cm : columns) {
             Integer index = cursorMeta.getIndex(cm.getTableName(), cm.getName());
-            if (index == null) index = cursorMeta.getIndex(cm.getTableName(), cm.getAlias());
+            if (index == null) {
+                index = cursorMeta.getIndex(cm.getTableName(), cm.getAlias());
+            }
             indexes.add(offset + index);
         }
     }

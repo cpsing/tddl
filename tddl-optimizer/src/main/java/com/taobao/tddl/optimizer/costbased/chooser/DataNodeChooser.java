@@ -544,7 +544,7 @@ public class DataNodeChooser {
     }
 
     private static boolean chooseJoinMergeJoinByRule(Map<String, Comparable> extraCmd) {
-        String choose = ObjectUtils.toString(GeneralUtil.getExtraCmd(extraCmd,
+        String choose = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd,
             ExtraCmd.OptimizerExtraCmd.JoinMergeJoinJudgeByRule));
         if (StringUtils.isEmpty(choose)) {
             // 默认返回true
@@ -555,7 +555,7 @@ public class DataNodeChooser {
     }
 
     private static boolean chooseJoinMergeJoinForce(Map<String, Comparable> extraCmd) {
-        String choose = ObjectUtils.toString(GeneralUtil.getExtraCmd(extraCmd, ExtraCmd.OptimizerExtraCmd.JoinMergeJoin));
+        String choose = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd, ExtraCmd.OptimizerExtraCmd.JoinMergeJoin));
         return BooleanUtils.toBoolean(choose);
     }
 

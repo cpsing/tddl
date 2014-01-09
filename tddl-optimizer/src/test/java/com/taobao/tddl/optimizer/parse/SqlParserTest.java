@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
@@ -153,6 +154,24 @@ public class SqlParserTest extends BaseOptimizerTest {
         QueryTreeNode qnExpected = table1.alias("A")
             .join(table2.alias("B"))
             .setRightOuterJoin()
+            .addJoinKeys("A.ID", "B.ID")
+            .query("A.NAME=1");
+        qnExpected.build();
+        assertEquals(qn, qnExpected);
+    }
+
+    @Ignore("mysql parser语法上暂时不支持，需要修改")
+    @Test
+    public void testQuery_outter连接() throws SqlParserException, QueryException {
+        String sql = "SELECT * FROM TABLE1 A OUTER JOIN TABLE2 B ON A.ID=B.ID WHERE A.NAME=1";
+        QueryTreeNode qn = query(sql);
+        qn.build();
+
+        TableNode table1 = new TableNode("TABLE1");
+        TableNode table2 = new TableNode("TABLE2");
+        QueryTreeNode qnExpected = table1.alias("A")
+            .join(table2.alias("B"))
+            .setOuterJoin()
             .addJoinKeys("A.ID", "B.ID")
             .query("A.NAME=1");
         qnExpected.build();

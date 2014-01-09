@@ -3,6 +3,7 @@ package com.taobao.tddl.executor.rpc;
 import java.util.concurrent.Future;
 
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.executor.CommunicateExecutor;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -15,7 +16,7 @@ import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
  * @author mengshi.sunmengshi 2013-12-6 下午2:21:36
  * @since 5.1.0
  */
-public class RpcCommunicateExecutor implements CommunicateExecutor {
+public class RpcCommunicateExecutor extends AbstractLifecycle implements CommunicateExecutor {
 
     @Override
     public ISchematicCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext)

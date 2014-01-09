@@ -93,16 +93,18 @@ public class IndexNestedLoopMgetImpCursor extends IndexNestLoopCursor implements
                 leftJoinOnColumnCacheIterator = null;
             }
         }
-
     }
 
     /**
+     * <pre>
      * 这个方法的核心作用，就是把已经取出的左面一组数，和右面的一组数，按照join on
-     * column的条件，从两边各找到一个对应的Row.然后把这两个row join到一起。 右列与左列排序相同，但右列可能出现几种情况： 1.
-     * 右列可能缺少左列中的某个值，同时， 2.右列也可能拥有多个与左列某个值相同的值（重复）
+     * column的条件，从两边各找到一个对应的Row.然后把这两个row join到一起。 右列与左列排序相同，但右列可能出现几种情况： 
+     * 1. 右列可能缺少左列中的某个值
+     * 2. 右列也可能拥有多个与左列某个值相同的值（重复）
      * 若左列当前值为空，从左面拿一个值出来，再从右面拿一个值出来，做比较。否则使用左列当前值
      * 因为可能出现左列某值在右列为空的情况，为了简化场景（主要简化：左要知道右是否有左，需要遍历全结果集），所以以右作为驱动表。
      * 右的值，一定会在左中有对应的值。 找到他，组合成joinRecord.放到current里面。然后返回true即可。
+     * </pre>
      * 
      * @param leftIterator 左值的一个遍历队列便利器
      * @param leftJoinOnColumnCacheIterator2 左值中，用来做join on column的数据的队列便利器
@@ -114,9 +116,7 @@ public class IndexNestedLoopMgetImpCursor extends IndexNestLoopCursor implements
     protected IRowSet match(Iterator<IRowSet> leftIterator, Iterator<CloneableRecord> leftJoinOnColumnCacheIterator2,
                             Map<CloneableRecord/* 相同的key */, DuplicateKVPair/* 见DuplicateKVPair注释 */> rightPairs2) {
         IRowSet right = null;
-
         if (rightDuplicateCache == null) {
-
             while (leftIterator.hasNext()) {
                 left = leftIterator.next();
                 if (!leftJoinOnColumnCacheIterator2.hasNext()) {
@@ -158,7 +158,6 @@ public class IndexNestedLoopMgetImpCursor extends IndexNestLoopCursor implements
 
                         current = new ArrayRowSet(this.joinCursorMeta, row);
                     } catch (Exception e) {
-                        e.printStackTrace();
                         throw new RuntimeException(e);
                     }
 

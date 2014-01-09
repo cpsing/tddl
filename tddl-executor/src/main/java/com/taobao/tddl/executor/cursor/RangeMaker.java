@@ -175,7 +175,7 @@ public class RangeMaker {
             case DATE_VAL:
                 c = new Date(((Date) c).getTime() - 1l);
                 break;
-            case TIMESTAMP:
+            case TIMESTAMP_VAL:
                 c = new Date(((Date) c).getTime() - 1l);
                 break;
             case STRING_VAL:
@@ -229,7 +229,7 @@ public class RangeMaker {
             case DATE_VAL:
                 c = new Date(((Date) c).getTime() + 1l);
                 break;
-            case TIMESTAMP:
+            case TIMESTAMP_VAL:
                 c = new Date(((Date) c).getTime() + 1l);
                 break;
             case STRING_VAL:
@@ -310,7 +310,7 @@ public class RangeMaker {
                     return new Date(Long.MAX_VALUE);
                 case STRING_VAL:
                     return Character.MAX_VALUE + "";
-                case TIMESTAMP:
+                case TIMESTAMP_VAL:
                     return new Date(Long.MAX_VALUE);
                 case BOOLEAN_VAL:
                     return new Boolean(true);

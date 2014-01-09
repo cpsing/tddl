@@ -7,16 +7,16 @@ import java.util.concurrent.Future;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.Group;
+import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.spi.IAtomExecutor;
 import com.taobao.tddl.executor.spi.IGroupExecutor;
-import com.taobao.tddl.executor.spi.IRepository;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 
 @SuppressWarnings("rawtypes")
-public class BDBGroupExecutor implements IGroupExecutor {
+public class BDBGroupExecutor extends AbstractLifecycle implements IGroupExecutor {
 
     private final ArrayList<IAtomExecutor> executorList;
 
@@ -42,7 +42,6 @@ public class BDBGroupExecutor implements IGroupExecutor {
     private static int findIndexToExecute(ResourceSelector selector, Map<Integer, String> excludeKeys)
                                                                                                       throws TddlException {
         int index = 0;
-
         Integer specIndex = null;
 
         if (specIndex != null) {
@@ -176,12 +175,6 @@ public class BDBGroupExecutor implements IGroupExecutor {
 
     @Override
     public Object getRemotingExecutableObject() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public IRepository getRepository() {
         // TODO Auto-generated method stub
         return null;
     }

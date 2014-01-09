@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.taobao.tddl.qatest.BaseAndorTestCase;
+import com.taobao.tddl.qatest.BaseTddlTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
@@ -22,7 +22,7 @@ import com.taobao.tddl.qatest.util.ExecuteTableName;
  * Author By: zhuoxue.yll Created Date: 2012-3-13 上午09:42:46
  */
 @RunWith(EclipseParameterized.class)
-public class LeftJoinTest extends BaseAndorTestCase {
+public class LeftJoinTest extends BaseTddlTestCase {
 
     String[] columnParam = { "host_id", "host_name", "hostgroup_id", "hostgroup_name" };
 
@@ -204,11 +204,10 @@ public class LeftJoinTest extends BaseAndorTestCase {
         List<Object> param = new ArrayList<Object>();
         param.add(0);
         param.add(100);
-        param.add(10);
+        param.add(20);
         param.add(1);
         param.add(20);
         String[] columnParam = { "sumId", "host_name", "aid", "bid" };
         selectContentSameAssert(sql, columnParam, param);
-
     }
 }

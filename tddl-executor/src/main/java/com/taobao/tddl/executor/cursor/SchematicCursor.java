@@ -31,8 +31,8 @@ public class SchematicCursor extends AbstractCursor implements ISchematicCursor 
             orderBys = Collections.emptyList();
         }
     }
-    
-    public SchematicCursor(Cursor cursor,List<IOrderBy> orderBys){
+
+    public SchematicCursor(Cursor cursor, List<IOrderBy> orderBys){
         super(cursor);
         this.orderBys = orderBys;
     }
@@ -120,9 +120,11 @@ public class SchematicCursor extends AbstractCursor implements ISchematicCursor 
 
     @Override
     public String toStringWithInden(int inden) {
-
-        if (cursor != null) return cursor.toStringWithInden(inden);
-        return GeneralUtil.getTab(inden) + "SchematicCursor";
+        if (cursor != null) {
+            return cursor.toStringWithInden(inden);
+        } else {
+            return GeneralUtil.getTab(inden) + "SchematicCursor";
+        }
 
     }
 

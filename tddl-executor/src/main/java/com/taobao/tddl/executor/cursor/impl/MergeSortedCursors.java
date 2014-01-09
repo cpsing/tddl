@@ -47,7 +47,6 @@ public class MergeSortedCursors extends SortCursor {
         this.cursors = cursors;
         this.allowDuplicated = duplicated;
         values = new ArrayList(cursors.size());
-
     }
 
     @Override
@@ -55,8 +54,9 @@ public class MergeSortedCursors extends SortCursor {
         inited = false;
         values.clear();
         values = new ArrayList(cursors.size());
-        for (Cursor cursor : cursors)
+        for (Cursor cursor : cursors) {
             cursor.beforeFirst();
+        }
     }
 
     boolean allowDuplicated = false;
@@ -65,14 +65,14 @@ public class MergeSortedCursors extends SortCursor {
 
     @Override
     public void init() throws TddlException {
-        if (inited) return;
+        if (inited) {
+            return;
+        }
         inited = true;
 
         for (int i = 0; i < cursors.size(); i++) {
             IRowSet row = cursors.get(i).next();
-
             row = convertToIRowSet(row, i == 0);
-
             values.add(row);
         }
     }
@@ -116,11 +116,11 @@ public class MergeSortedCursors extends SortCursor {
                     IRowSet rowToRemoveDuplicate = null;
                     while (true) {
                         rowToRemoveDuplicate = this.cursors.get(i).next();
-
-                        if (rowToRemoveDuplicate == null) break;
+                        if (rowToRemoveDuplicate == null) {
+                            break;
+                        }
 
                         rowToRemoveDuplicate = convertToIRowSet(rowToRemoveDuplicate, i == 0);
-
                         if (kvPairComparator.compare(rowToRemoveDuplicate, currentMaxOrMin) != 0) {
                             break;
                         }
@@ -137,11 +137,11 @@ public class MergeSortedCursors extends SortCursor {
             // 选中的cursor消费一行记录，往前移动，如果有需要，还要去重
             while (true) {
                 rowToRemoveDuplicate = this.cursors.get(indexOfCurrentMaxOrMin).next();
-
-                if (rowToRemoveDuplicate == null) break;
+                if (rowToRemoveDuplicate == null) {
+                    break;
+                }
 
                 rowToRemoveDuplicate = convertToIRowSet(rowToRemoveDuplicate, indexOfCurrentMaxOrMin == 0);
-
                 if (this.allowDuplicated) {
                     break;
                 }
@@ -151,17 +151,16 @@ public class MergeSortedCursors extends SortCursor {
                 }
             }
             this.values.set(indexOfCurrentMaxOrMin, rowToRemoveDuplicate);
-
         }
 
         setCurrent(currentMaxOrMin);
         return currentMaxOrMin;
-
     }
 
     private IRowSet convertToIRowSet(IRowSet rowSet, boolean left) {
-
-        if (rowSet == null) return null;
+        if (rowSet == null) {
+            return null;
+        }
         if (valueMappingIRowSetConvertor == null) {// 认为是初始化
             valueMappingIRowSetConvertor = new ValueMappingIRowSetConvertor();
             valueMappingIRowSetConvertor.wrapValueMappingIRowSetIfNeed(rowSet);
@@ -177,7 +176,6 @@ public class MergeSortedCursors extends SortCursor {
             // or template is right but current is left
             return valueMappingIRowSetConvertor.wrapValueMappingIRowSetIfNeed(rowSet);
         }
-
     }
 
     private void setCurrent(IRowSet current) {
@@ -221,7 +219,6 @@ public class MergeSortedCursors extends SortCursor {
 
     @Override
     public String toStringWithInden(int inden) {
-
         String tabTittle = GeneralUtil.getTab(inden);
         String tabContent = GeneralUtil.getTab(inden + 1);
         StringBuilder sb = new StringBuilder();
@@ -234,18 +231,17 @@ public class MergeSortedCursors extends SortCursor {
         }
 
         return sb.toString();
-
     }
 
     @Override
     public List<TddlException> close(List<TddlException> exs) {
-
         for (Cursor c : this.cursors) {
-            if (c != null) exs = c.close(exs);
+            if (c != null) {
+                exs = c.close(exs);
+            }
         }
 
         return exs;
-
     }
 
     @Override

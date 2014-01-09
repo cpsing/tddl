@@ -3,6 +3,7 @@ package com.taobao.tddl.executor;
 import java.util.concurrent.Future;
 
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.model.lifecycle.Lifecycle;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.ResultCursor;
@@ -15,7 +16,7 @@ import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
  * @since 5.1.0
  */
 @SuppressWarnings("rawtypes")
-public interface IExecutor {
+public interface IExecutor extends Lifecycle {
 
     /**
      * 执行一个命令
@@ -29,9 +30,9 @@ public interface IExecutor {
     public ISchematicCursor execByExecPlanNode(IDataNodeExecutor qc, ExecutionContext executionContext)
                                                                                                        throws TddlException;
 
-    ResultCursor commit(ExecutionContext executionContext) throws TddlException;
+    public ResultCursor commit(ExecutionContext executionContext) throws TddlException;
 
-    ResultCursor rollback(ExecutionContext executionContext) throws TddlException;
+    public ResultCursor rollback(ExecutionContext executionContext) throws TddlException;
 
     /**
      * 执行一个命令

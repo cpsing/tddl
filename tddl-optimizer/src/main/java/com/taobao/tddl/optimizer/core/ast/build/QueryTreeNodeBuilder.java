@@ -300,6 +300,7 @@ public abstract class QueryTreeNodeBuilder {
         }
 
         if (c instanceof IColumn) {
+            c.setDataType(res.getDataType());
             // 如果是子表的结构，比如Join/Merge的子节点，字段的名字直接使用别名
             if (other.getAlias() != null) {
                 c.setTableName(other.getAlias());

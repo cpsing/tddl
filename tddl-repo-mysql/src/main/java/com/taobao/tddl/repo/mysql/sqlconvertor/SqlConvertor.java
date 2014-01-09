@@ -76,7 +76,6 @@ public class SqlConvertor {
         if (oneQuery instanceof IQueryTree) ((IQueryTree) oneQuery).setTopQuery(true);
         MysqlPlanVisitorImpl visitor = new MysqlPlanVisitorImpl(oneQuery, null, null, true);
         oneQuery.accept(visitor);
-        SqlAndParam sqlAndParam = new SqlAndParam();
         Sql sql = new Sql();
         sql.setSql(visitor.getString());
         sql.setParam(visitor.getParamMap());

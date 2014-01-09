@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.taobao.tddl.qatest.BaseAndorTestCase;
+import com.taobao.tddl.qatest.BaseTddlTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
@@ -18,7 +18,7 @@ import com.taobao.tddl.qatest.util.ExecuteTableName;
  * @author zhuoxue.yll 2013.01.23
  */
 @RunWith(EclipseParameterized.class)
-public class SelectWithNullTest extends BaseAndorTestCase {
+public class SelectWithNullTest extends BaseTddlTestCase {
 
     String[] columnParam = { "PK", "NAME", "ID" };
 

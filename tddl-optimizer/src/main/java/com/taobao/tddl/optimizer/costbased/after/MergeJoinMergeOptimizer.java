@@ -215,7 +215,7 @@ public class MergeJoinMergeOptimizer implements QueryPlanOptimizer {
     }
 
     private static boolean isMergeExpand(Map<String, Comparable> extraCmd) {
-        String value = ObjectUtils.toString(GeneralUtil.getExtraCmd(extraCmd, ExtraCmd.OptimizerExtraCmd.MergeExpand));
+        String value = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd, ExtraCmd.OptimizerExtraCmd.MergeExpand));
         return BooleanUtils.toBoolean(value);
     }
 }

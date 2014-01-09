@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.taobao.tddl.qatest.BaseAndorTestCase;
+import com.taobao.tddl.qatest.BaseTddlTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
@@ -21,7 +21,7 @@ import com.taobao.tddl.qatest.util.ExecuteTableName;
  */
 @Ignore("目前不支持")
 @RunWith(EclipseParameterized.class)
-public class FullJoinTest extends BaseAndorTestCase {
+public class FullJoinTest extends BaseTddlTestCase {
 
     @Parameters(name = "{index}:table0={0},table1={1}")
     public static List<String[]> prepare() {

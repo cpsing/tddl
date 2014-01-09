@@ -21,7 +21,6 @@ import com.sleepycat.je.rep.QuorumPolicy;
 import com.sleepycat.je.rep.ReplicatedEnvironment;
 import com.sleepycat.je.rep.ReplicationConfig;
 import com.sleepycat.je.rep.UnknownMasterException;
-import com.taobao.tddl.executor.spi.ITable;
 
 /**
  * @author jianxing <jianxing.qx@taobao.com>
@@ -40,8 +39,7 @@ public class JE_HA_Repository extends JE_Repository {
     // }
 
     @Override
-    public void init() {
-
+    public void doInit() {
         File repo_dir = new File(config.getRepoDir());
         repo_dir.delete();// 删除空目录
 
@@ -179,17 +177,9 @@ public class JE_HA_Repository extends JE_Repository {
 
     }
 
-    public static void main(String[] args) {
-        System.out.println(SyncPolicy.valueOf("SYNC"));
-    }
-
     @Override
     public boolean isWriteAble() {
         return ((ReplicatedEnvironment) env).getState().isMaster();
-    }
-
-    public Map<String, ITable> getTables() {
-        return super.getTables();
     }
 
     public int cleanLog() {

@@ -63,7 +63,6 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
             }
             if (!TStringUtil.isBlank(col.getAlias())) {
                 if (TStringUtil.isBlank(tableAlias)) {
-
                     cm = ExecUtils.getColumnMeta(col, col.getAlias());
                 } else {
                     cm = ExecUtils.getColumnMeta(col, tableAlias, col.getAlias());
@@ -76,7 +75,9 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
                 }
             }
             Integer index = cursormeta.getIndex(col.getTableName(), col.getColumnName());
-            if (index == null) index = cursormeta.getIndex(col.getTableName(), col.getAlias());
+            if (index == null) {
+                index = cursormeta.getIndex(col.getTableName(), col.getAlias());
+            }
 
             if (index != null) {
                 indexes.add(index);
@@ -99,7 +100,6 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
                 }
                 setOrderBy(obNew);
             }
-
         } else {
             newMeta = CursorMetaImp.buildNew(colMessages, indexes, cursormeta.getIndexRange());
         }
@@ -149,26 +149,21 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
     public Map<CloneableRecord, DuplicateKVPair> mgetWithDuplicate(List<CloneableRecord> keys, boolean prefixMatch,
                                                                    boolean keyFilterOrValueFilter) throws TddlException {
         Map<CloneableRecord, DuplicateKVPair> res = super.mgetWithDuplicate(keys, prefixMatch, keyFilterOrValueFilter);
-
         for (DuplicateKVPair dkv : res.values()) {
             while (dkv != null) {
                 dkv.currentKey = replaceAliasAndSelect(dkv.currentKey);
                 dkv = dkv.next;
             }
         }
-
         return res;
     }
 
     @Override
     public String toStringWithInden(int inden) {
-
         String tabTittle = GeneralUtil.getTab(inden);
         String tabContent = GeneralUtil.getTab(inden + 1);
         StringBuilder sb = new StringBuilder();
-
         GeneralUtil.printlnToStringBuilder(sb, tabTittle + "ColumnAliasCursor ");
-
         GeneralUtil.printAFieldToStringBuilder(sb, "tableAlias", this.tableAlias, tabContent);
         GeneralUtil.printAFieldToStringBuilder(sb, "colMessages", this.colMessages, tabContent);
         GeneralUtil.printAFieldToStringBuilder(sb, "retColumns", this.retColumns, tabContent);
@@ -178,21 +173,21 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
         }
 
         return sb.toString();
-
     }
 
     @Override
     public List<ColumnMeta> getReturnColumns() throws TddlException {
-        if (this.returnColumnMetas != null) return this.returnColumnMetas;
-
+        if (this.returnColumnMetas != null) {
+            return this.returnColumnMetas;
+        }
         returnColumnMetas = new ArrayList();
-
         for (ISelectable cm : this.retColumns) {
             String tableName = tableAlias;
-            if (tableName == null) tableName = cm.getTableName();
+            if (tableName == null) {
+                tableName = cm.getTableName();
+            }
             returnColumnMetas.add(new ColumnMeta(tableName, cm.getColumnName(), cm.getDataType(), cm.getAlias(), true));
         }
-
         return returnColumnMetas;
     }
 }

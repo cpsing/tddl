@@ -65,7 +65,7 @@ public class ExecUtils {
         }
     }
 
-    public static DATA_TYPE getAndOrDataType(Object ob) {
+    public static DATA_TYPE getTddlDataType(Object ob) {
         if (ob instanceof Byte) {
             return DATA_TYPE.BYTES_VAL;
         } else if (ob instanceof Long) {
@@ -350,7 +350,6 @@ public class ExecUtils {
             List<Object> values = rsrs.getValues();
             IRowSet rs = new ArrayRowSet(irs.getParentCursorMeta(), values.toArray());
             rsrs.setParentRowSet(rs);
-
         } else if (irs instanceof RowSetWrapper) {
             IRowSetWrapperToArrayRowSet((RowSetWrapper) irs);
         }
@@ -577,7 +576,6 @@ public class ExecUtils {
         return new Comparator<IRowSet>() {
 
             public IRowsValueScaner  leftScaner;
-
             public IRowsValueScaner  rightScaner;
             public List<ISelectable> cols;
             {

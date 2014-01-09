@@ -18,9 +18,8 @@ import com.sleepycat.je.rep.ReplicaWriteException;
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.Group;
+import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.ExceptionErrorCodeUtils;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.TransactionConfig;
 import com.taobao.tddl.executor.spi.ICommandHandlerFactory;
 import com.taobao.tddl.executor.spi.ICursorFactory;
@@ -31,21 +30,20 @@ import com.taobao.tddl.executor.spi.ITable;
 import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 
-//import com.taobao.ustore.thl.ITHLog2Applier;
-
 /**
  * @author jianxing <jianxing.qx@taobao.com>
  */
-public class JE_Repository implements IRepository {
+public class JE_Repository extends AbstractLifecycle implements IRepository {
 
-    private final static Logger logger = LoggerFactory.getLogger(JE_Repository.class);
-    BDBConfig                   config;
-    Environment                 env;
-    Map<String, ITable>         tables = new ConcurrentHashMap<String, ITable>();
-    ICursorFactory              cursorFactoryBDBImp;
-    Environment                 env_tmp;
-    Durability                  durability;
-    Random                      r      = new Random();
+    protected final AtomicReference<ITHLog> historyLog = new AtomicReference<ITHLog>();
+    protected ICommandHandlerFactory        cef        = null;
+    protected BDBConfig                     config;
+    protected Environment                   env;
+    protected Map<String, ITable>           tables     = new ConcurrentHashMap<String, ITable>();
+    protected ICursorFactory                cursorFactoryBDBImp;
+    protected Environment                   env_tmp;
+    protected Durability                    durability;
+    protected Random                        r          = new Random();
 
     public JE_Repository(){
     }
@@ -89,11 +87,6 @@ public class JE_Repository implements IRepository {
     }
 
     @Override
-    public Map<String, ITable> getTables() {
-        return tables;
-    }
-
-    @Override
     public boolean isWriteAble() {
         return true;
     }
@@ -102,10 +95,6 @@ public class JE_Repository implements IRepository {
     public ICursorFactory getCursorFactory() {
         return cursorFactoryBDBImp;
     }
-
-    protected final AtomicReference<ITHLog> historyLog = new AtomicReference<ITHLog>();
-
-    protected ICommandHandlerFactory        cef        = null;
 
     @Override
     public void init() {
@@ -180,7 +169,6 @@ public class JE_Repository implements IRepository {
     }
 
     public ITable initTable(TableMeta table_schema) throws TddlException {
-
         return new JE_Table(table_schema, this);
     }
 
@@ -209,7 +197,7 @@ public class JE_Repository implements IRepository {
     }
 
     @Override
-    public void close() throws TddlException {
+    public void doDestory() throws TddlException {
         for (Entry<String, ITable> t : tables.entrySet()) {
             t.getValue().close();
         }
@@ -275,7 +263,7 @@ public class JE_Repository implements IRepository {
     }
 
     @Override
-    public IGroupExecutor buildGroupExecutor(Group group) {
+    public IGroupExecutor getGroupExecutor(Group group) {
         throw new NotSupportException();
     }
 

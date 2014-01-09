@@ -136,7 +136,7 @@ public class FilterPreProcessor {
             for (IFilter one : andDNFfilter) {
                 if (one.getOperation() == OPERATION.CONSTANT) {
                     boolean flag = false;
-                    if (((IBooleanFilter) one).getColumn() instanceof IFunction) {// 可能是个not函数
+                    if (((IBooleanFilter) one).getColumn() instanceof ISelectable) {// 可能是个not函数
                         newAndDNFfilter.add(one);// 不能丢弃
                     } else {
                         String value = ((IBooleanFilter) one).getColumn().toString();

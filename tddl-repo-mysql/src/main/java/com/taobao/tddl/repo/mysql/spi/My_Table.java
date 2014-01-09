@@ -30,11 +30,11 @@ public class My_Table implements ITable {
     protected DataSource        ds;
     protected TableMeta         schema;
     protected String            groupNodeName;
-    private IDataSourceGetter   dsGetter = new DatasourceMySQLImplement();
+    protected IDataSourceGetter dsGetter = new DatasourceMySQLImplement();
     // 在插入或者更新的时候判断是否存在，如果存在则用insert否则update
-    CloneableRecord             tmpKey   = null;
+    protected CloneableRecord   tmpKey   = null;
     // 判断是否已经做过了查询
-    boolean                     isSelect = false;
+    protected boolean           isSelect = false;
 
     public My_Table(DataSource ds, TableMeta schema, String groupNodeName){
         this.ds = ds;
@@ -64,7 +64,6 @@ public class My_Table implements ITable {
                                                                                                               throws TddlException {
 
         My_JdbcHandler jdbcHandler = MysqlRepoUtils.getJdbcHandler(this.dsGetter, executor, executionContext);
-
         ICursorMeta meta = ExecUtils.convertToICursorMeta(indexName);
         My_Cursor my_cursor = new My_Cursor(jdbcHandler, meta, executor, executor.isStreaming());
         return new SchematicMyCursor(my_cursor, meta, MysqlRepoUtils.buildOrderBy(executor, indexName));
@@ -112,11 +111,16 @@ public class My_Table implements ITable {
             throw new TddlException("error: 底层数据库异常", e);
         } finally {
             try {
-                if (con != null) {
-                    con.close();
-                }
                 if (ps != null) {
                     ps.close();
+                }
+            } catch (SQLException e) {
+                log.warn("数据库关闭异常", e);
+            }
+
+            try {
+                if (con != null) {
+                    con.close();
                 }
             } catch (SQLException e) {
                 log.warn("数据库关闭异常", e);
@@ -159,11 +163,16 @@ public class My_Table implements ITable {
             log.error("error: 底层数据库异常", e);
         } finally {
             try {
-                if (con != null) {
-                    con.close();
-                }
                 if (ps != null) {
                     ps.close();
+                }
+            } catch (SQLException e) {
+                log.warn("数据库关闭异常", e);
+            }
+
+            try {
+                if (con != null) {
+                    con.close();
                 }
             } catch (SQLException e) {
                 log.warn("数据库关闭异常", e);

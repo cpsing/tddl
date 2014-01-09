@@ -111,7 +111,6 @@ public class NamedRecord extends CloneableRecord {
 
     @Override
     public Object get(String name, String key) {
-        key = (key);
         return get(key);
     }
 
