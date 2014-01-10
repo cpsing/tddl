@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
-import com.taobao.tddl.qatest.BaseTestCase;
+import com.taobao.tddl.qatest.BaseAtomGroupTestCase;
 
-public class PrepareData extends BaseTestCase {
+public class PrepareData extends BaseAtomGroupTestCase {
 
     /**
      * normaltbl表数据的准备 start为插入起始数据，end为插入结束数据

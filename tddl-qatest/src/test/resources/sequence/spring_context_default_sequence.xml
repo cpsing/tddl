@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="gb2312"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="placeHolderConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:atom/tddl_config.properties" />
+	</bean>
+	<!--数据源 -->
+	<bean id="normal_0" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="${mysql.normal0.url}" />
+		<property name="username" value="${mysql.normal0.username}" />
+		<property name="password" value="${mysql.normal0.password}" />
+	</bean>
+	
+	<bean id="sequence" class="com.taobao.tddl.sequence.impl.DefaultSequence">
+		<property name="sequenceDao" ref="sequenceDao" />
+		<property name="name" value="ni" />
+	</bean>
+
+	<bean id="sequenceDao" class="com.taobao.tddl.sequence.impl.DefaultSequenceDao">
+		<property name="dataSource">
+			<ref bean="normal_0" />
+		</property>
+		<property name="gmtModifiedColumnName" value="gmt_modified" />
+		<property name="nameColumnName" value="name" />
+		<property name="tableName" value="sequence" />
+		<property name="valueColumnName" value="value" />
+	</bean>
+</beans>

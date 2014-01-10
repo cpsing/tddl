@@ -1,11 +1,13 @@
 package com.taobao.tddl.qatest;
 
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -15,6 +17,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.taobao.diamond.mockserver.MockServer;
 import com.taobao.tddl.common.model.ExtraCmd;
+import com.taobao.tddl.config.ConfigServerHelper;
+import com.taobao.tddl.group.jdbc.TGroupDataSource;
 import com.taobao.tddl.matrix.jdbc.TDataSource;
 import com.taobao.tddl.qatest.util.LoadPropsUtil;
 import com.taobao.tddl.qatest.util.PrepareData;
@@ -33,7 +37,6 @@ public class BaseMatrixTestCase extends PrepareData {
     private static String                  schemaFile              = "matrix/";
     private static String                  schema                  = "schema.xml";
     // dbType为mysql运行mysql测试，bdb值为bdb运行bdb测试，如果为空则运行bdb和mysql测试
-
     protected static String                dbType                  = null;
 
     protected static boolean               needPerparedData        = true;
@@ -49,6 +52,7 @@ public class BaseMatrixTestCase extends PrepareData {
     @BeforeClass
     public static void IEnvInit() throws Exception {
         MockServer.tearDownMockServer();
+        // setMatrixMockInfo(MATRIX_DBGROUPS_PATH, TDDL_DBGROUPS);
 
         if (us == null) {
             if (dbType.equals("bdb") || dbType == "") {
@@ -121,4 +125,51 @@ public class BaseMatrixTestCase extends PrepareData {
         return new JdbcTemplate(us);
     }
 
+    protected static void setMatrixMockInfo(String groupsPath, String key) throws Exception {
+        setMatrixMockInfo(groupsPath, key, false);
+    }
+
+    protected static void setMatrixMockInfo(String groupsPath, String key, boolean isOracle) throws Exception {
+        // -----------------获取groups信息
+        String groupsStr = LoadPropsUtil.loadProps2OneLine(groupsPath, key);
+        if (groupsStr == null || StringUtils.isBlank(groupsStr)) {
+            throw new Exception("指定path = " + groupsPath + ",key = " + key + "的groups信息为null或者为空字符。");
+        }
+
+        // -----------------oracle or mysql
+        String groupPath = GROUP_PATH;
+        String atomPath = ATOM_PATH;
+        if (isOracle) {
+            groupPath = GROUP_ORA_PATH;
+            atomPath = ATOM_ORA_PATH;
+        }
+
+        // -----------------获取group信息
+        dataMap = new HashMap<String, String>();
+        String[] groupArr = groupsStr.split(",");
+
+        for (String group : groupArr) {
+            group = group.trim();
+            String groupStr = "";
+            groupStr = LoadPropsUtil.loadProps2OneLine(groupPath + group + PROPERTIES_FILE, group);
+            if (groupsStr != null && StringUtils.isNotBlank(groupsStr)) {
+                // 获取atom信息
+                String[] atomArr = groupStr.split(",");
+                for (String atom : atomArr) {
+                    atom = atom.trim();
+                    atom = atom.substring(0, atom.indexOf(":"));
+                    initAtomConfig(atomPath + atom, APPNAME, atom);
+                }
+                // 获取groupkey
+                dataMap.put(TGroupDataSource.getFullDbGroupKey(group), groupStr);
+            }
+        }
+
+        // -----------------dbgroups
+        dataMap.put(new MessageFormat(ConfigServerHelper.DATA_ID_DB_GROUP_KEYS).format(new Object[] { APPNAME }),
+            groupsStr);
+
+        // 建立MockServer
+        MockServer.setConfigInfos(dataMap);
+    }
 }

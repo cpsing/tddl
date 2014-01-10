@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="gb2312"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="placeHolderConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:atom/tddl_config.properties" />
+	</bean>
+
+	<bean id="sequence" class="com.taobao.tddl.sequence.impl.GroupSequence"
+		init-method="init">
+		<property name="sequenceDao" ref="sequenceDao" />
+		<property name="name" value="ni" />
+	</bean>
+	<bean id="sequence_one_db" class="com.taobao.tddl.sequence.impl.GroupSequence"
+		init-method="init">
+		<property name="sequenceDao" ref="sequenceDao_one_db" />
+		<property name="name" value="ni" />
+	</bean>
+
+	<bean id="sequenceDao" class="com.taobao.tddl.sequence.impl.GroupSequenceDao"
+		init-method="init">
+		<!--appName ,必填 -->
+		<property name="appName" value="tddl_qatest" />
+		<!--数据源的个数 -->
+		<property name="dscount" value="2" />
+		<!--dbGroupKeys必填 -->
+		<property name="dbGroupKeys">
+			<list>
+				<value>tddl_group_0</value>
+				<value>tddl_group_1</value>
+			</list>
+		</property>
+		<!--内步长 -->
+		<property name="innerStep" value="100" />
+		<!--是否开启自适应，默认是false -->
+		<property name="adjust" value="true" />
+		<property name="retryTimes" value="4" />
+
+		<property name="gmtModifiedColumnName" value="gmt_modified" />
+		<property name="nameColumnName" value="name" />
+		<property name="tableName" value="sequence" />
+		<property name="valueColumnName" value="value" />
+	</bean>
+
+	<!--一个数据库 -->
+	<bean id="sequenceDao_one_db" class="com.taobao.tddl.sequence.impl.GroupSequenceDao"
+		init-method="init">
+		<!--appName ,必填 -->
+		<property name="appName" value="tddl_qatest" />
+		<!--数据源的个数 -->
+		<property name="dscount" value="1" />
+		<!--dbGroupKeys必填 -->
+		<property name="dbGroupKeys">
+			<list>
+				<value>tddl_group_0</value>
+			</list>
+		</property>
+		<!--内步长 -->
+		<property name="innerStep" value="100" />
+		<!--是否开启自适应，默认是false -->
+		<property name="adjust" value="true" />
+		<property name="retryTimes" value="7" />
+		<property name="gmtModifiedColumnName" value="gmt_modified" />
+		<property name="nameColumnName" value="name" />
+		<property name="tableName" value="sequence" />
+		<property name="valueColumnName" value="value" />
+	</bean>
+</beans>
