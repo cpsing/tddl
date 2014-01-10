@@ -93,6 +93,18 @@ public class Avg extends AggregateFunction {
 
     }
 
+    public String getDbFunction() {
+        return bulidAvgSql(function);
+    }
+
+    private String bulidAvgSql(IFunction func) {
+        String colName = func.getColumnName();
+        StringBuilder sb = new StringBuilder();
+        sb.append(colName.replace("AVG", "SUM"));
+        sb.append(",").append(colName.replace("AVG", "COUNT"));
+        return sb.toString();
+    }
+
     public Map<String, Object> getResult() {
         return result;
     }
@@ -109,19 +121,6 @@ public class Avg extends AggregateFunction {
 
     public DATA_TYPE getMapReturnType() {
         return DATA_TYPE.STRING_VAL;
-    }
-
-    public String getDbFunction() {
-        // return "COUNT("+args[0]+"),"+"SUM("+args[0]+")";
-        return bulidAvgSql(function);
-    }
-
-    private String bulidAvgSql(IFunction func) {
-        String colName = func.getColumnName();
-        StringBuilder sb = new StringBuilder();
-        sb.append(colName.replace("AVG", "SUM"));
-        sb.append(",").append(colName.replace("AVG", "COUNT"));
-        return sb.toString();
     }
 
 }

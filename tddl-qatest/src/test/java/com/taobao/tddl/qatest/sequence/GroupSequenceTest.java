@@ -20,6 +20,7 @@ import org.springframework.dao.DataAccessException;
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.Statement;
 import com.taobao.diamond.mockserver.MockServer;
+import com.taobao.tddl.qatest.BaseAtomGroupTestCase;
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.sequence.exception.SequenceException;
 import com.taobao.tddl.sequence.impl.GroupSequence;
@@ -38,7 +39,7 @@ public class GroupSequenceTest extends BaseMatrixTestCase {
     @BeforeClass
     public static void setUp() throws Exception {
         MockServer.setUpMockServer();
-        setMatrixMockInfo(MATRIX_DBGROUPS_PATH, TDDL_DBGROUPS);
+        setMatrixMockInfo(BaseAtomGroupTestCase.MATRIX_DBGROUPS_PATH, BaseAtomGroupTestCase.TDDL_DBGROUPS);
     }
 
     @Before
