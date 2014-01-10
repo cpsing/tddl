@@ -460,7 +460,7 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
             sqlBuilder.append(" from ");
         }
         sqlBuilder.append(query.getTableName());
-        if (!query.isSubQuery() && query.getAlias() != null) {
+        if (!query.isSubQuery() && query.getAlias() != null && !query.getAlias().equalsIgnoreCase(query.getTableName())) {
             sqlBuilder.append(" ").append(query.getAlias());
         }
 

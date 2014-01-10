@@ -31,7 +31,10 @@ public class ConfigHolderTest {
 
         ExecutionContext context = new ExecutionContext();
         context.setExecutorService(Executors.newCachedThreadPool());
-        ResultCursor rc = me.execute("select * from bmw_users", context);
+        // ResultCursor rc = me.execute("select * from bmw_users limit 10",
+        // context);
+        ResultCursor rc = me.execute("select count(distinct gmt_create) as k  from mobile_pigeon_msg_log  order by gmt_create limit 10",
+            context);
 
         IRowSet row = null;
         while ((row = rc.next()) != null) {

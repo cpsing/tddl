@@ -10,10 +10,13 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.taobao.tddl.common.TddlConstants;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.monitor.Monitor;
 import com.taobao.tddl.optimizer.Optimizer;
 import com.taobao.tddl.optimizer.OptimizerContext;
@@ -46,9 +49,6 @@ import com.taobao.tddl.optimizer.exceptions.SqlParserException;
 import com.taobao.tddl.optimizer.parse.SqlAnalysisResult;
 import com.taobao.tddl.optimizer.parse.SqlParseManager;
 import com.taobao.tddl.optimizer.parse.cobar.CobarSqlParseManager;
-
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * <pre>
@@ -100,13 +100,14 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  */
 public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
 
-    private static final Logger           logger          = LoggerFactory.getLogger(CostBasedOptimizer.class);
-    private int                           cacheSize       = 1000;
-    private int                           expireTime      = 30000;
-    private SqlParseManager               sqlParseManager;
-    private Cache<String, OptimizeResult> optimizedResults;
-    private List<QueryPlanOptimizer>      afterOptimizers = new ArrayList<QueryPlanOptimizer>();
+    private static final Logger            logger          = LoggerFactory.getLogger(CostBasedOptimizer.class);
+    private int                            cacheSize       = 1000;
+    private long                           expireTime      = TddlConstants.DEFAULT_OPTIMIZER_EXPIRE_TIME;
+    private SqlParseManager                sqlParseManager;
+    private Cache<String, OptimizeResult>  optimizedResults;
+    private final List<QueryPlanOptimizer> afterOptimizers = new ArrayList<QueryPlanOptimizer>();
 
+    @Override
     protected void doInit() throws TddlException {
         // after处理
         afterOptimizers.add(new FuckAvgOptimizer());
@@ -130,10 +131,11 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
 
         optimizedResults = CacheBuilder.newBuilder()
             .maximumSize(1000)
-            .expireAfterWrite(30000, TimeUnit.MILLISECONDS)
+            .expireAfterWrite(expireTime, TimeUnit.MILLISECONDS)
             .build();
     }
 
+    @Override
     protected void doDestory() throws TddlException {
         optimizedResults.invalidateAll();
         sqlParseManager.destory();
@@ -145,12 +147,14 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
         public QueryException ex        = null;
     }
 
+    @Override
     public IDataNodeExecutor optimizeAndAssignment(final ASTNode node,
                                                    final Map<Integer, ParameterContext> parameterSettings,
                                                    final Map<String, Comparable> extraCmd) throws QueryException {
         return optimizeAndAssignment(node, parameterSettings, extraCmd, null, false);
     }
 
+    @Override
     public IDataNodeExecutor optimizeAndAssignment(final String sql,
                                                    final Map<Integer, ParameterContext> parameterSettings,
                                                    final Map<String, Comparable> extraCmd, boolean cached)
@@ -180,6 +184,7 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
             try {
                 or = optimizedResults.get(sql, new Callable<OptimizeResult>() {
 
+                    @Override
                     public OptimizeResult call() throws Exception {
                         OptimizeResult or = new OptimizeResult();
                         try {
@@ -369,7 +374,7 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
         this.cacheSize = cacheSize;
     }
 
-    public void setExpireTime(int expireTime) {
+    public void setExpireTime(long expireTime) {
         this.expireTime = expireTime;
     }
 

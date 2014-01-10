@@ -13,8 +13,8 @@ import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.jdbc.ParameterMethod;
 import com.taobao.tddl.common.model.Matrix;
 import com.taobao.tddl.optimizer.config.MockRepoIndexManager;
-import com.taobao.tddl.optimizer.config.table.StaticSchemaManager;
 import com.taobao.tddl.optimizer.config.table.RepoSchemaManager;
+import com.taobao.tddl.optimizer.config.table.StaticSchemaManager;
 import com.taobao.tddl.optimizer.config.table.parse.MatrixParser;
 import com.taobao.tddl.optimizer.costbased.CostBasedOptimizer;
 import com.taobao.tddl.optimizer.costbased.esitimater.stat.LocalStatManager;
@@ -61,7 +61,6 @@ public class BaseOptimizerTest {
 
         schemaManager = new RepoSchemaManager();
         schemaManager.setLocal(localSchemaManager);
-        schemaManager.setUseCache(true);
         schemaManager.setGroup(matrix.getGroup("andor_group_0"));
         schemaManager.init();
 

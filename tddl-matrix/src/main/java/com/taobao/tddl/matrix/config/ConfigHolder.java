@@ -1,7 +1,14 @@
 package com.taobao.tddl.matrix.config;
 
+import java.util.Map;
+
+import com.taobao.tddl.common.TddlConstants;
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
+import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.TopologyExecutor;
 import com.taobao.tddl.executor.common.ExecutorContext;
 import com.taobao.tddl.executor.common.TopologyHandler;
@@ -18,9 +25,6 @@ import com.taobao.tddl.optimizer.rule.RuleIndexManager;
 import com.taobao.tddl.optimizer.rule.RuleSchemaManager;
 import com.taobao.tddl.rule.TddlRule;
 
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
-
 /**
  * 依赖的组件
  * 
@@ -28,21 +32,22 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  */
 public class ConfigHolder extends AbstractLifecycle {
 
-    final static Logger      logger = LoggerFactory.getLogger(ConfigHolder.class);
-    private String           appName;
-    private String           ruleFilePath;
-    private String           schemaFilePath;
-    private String           topologyFilePath;
-    private String           unitName;
-    private OptimizerRule    optimizerRule;
-    private TopologyHandler  topologyHandler;
-    private TopologyExecutor topologyExecutor;
-    private SchemaManager    schemaManager;
-    private IndexManager     indexManger;
-    private Optimizer        optimizer;
-    private OptimizerContext optimizerContext;
-    private ExecutorContext  executorContext;
-    private StatManager      statManager;
+    final static Logger             logger = LoggerFactory.getLogger(ConfigHolder.class);
+    private String                  appName;
+    private String                  ruleFilePath;
+    private String                  schemaFilePath;
+    private String                  topologyFilePath;
+    private String                  unitName;
+    private OptimizerRule           optimizerRule;
+    private TopologyHandler         topologyHandler;
+    private TopologyExecutor        topologyExecutor;
+    private SchemaManager           schemaManager;
+    private IndexManager            indexManger;
+    private Optimizer               optimizer;
+    private OptimizerContext        optimizerContext;
+    private ExecutorContext         executorContext;
+    private StatManager             statManager;
+    private Map<String, Comparable> connectionProperties;
 
     @Override
     public void doInit() throws TddlException {
@@ -99,7 +104,12 @@ public class ConfigHolder extends AbstractLifecycle {
     }
 
     public void schemaInit() throws TddlException {
-        RuleSchemaManager ruleSchemaManager = new RuleSchemaManager(optimizerRule, topologyHandler.getMatrix());
+
+        RuleSchemaManager ruleSchemaManager = new RuleSchemaManager(optimizerRule,
+            topologyHandler.getMatrix(),
+            GeneralUtil.getExtraCmdLong(this.connectionProperties,
+                ExtraCmd.ConnectionExtraCmd.TABLE_META_CACHE_EXPIRE_TIME,
+                TddlConstants.DEFAULT_TABLE_META_EXPIRE_TIME));
         StaticSchemaManager staticSchemaManager = new StaticSchemaManager(schemaFilePath, appName, unitName);
         ruleSchemaManager.setLocal(staticSchemaManager);
 
@@ -113,6 +123,9 @@ public class ConfigHolder extends AbstractLifecycle {
 
     public void optimizerInit() throws TddlException {
         CostBasedOptimizer optimizer = new CostBasedOptimizer();
+        optimizer.setExpireTime(GeneralUtil.getExtraCmdLong(this.connectionProperties,
+            ExtraCmd.ConnectionExtraCmd.OPTIMIZER_CACHE_EXPIRE_TIME,
+            TddlConstants.DEFAULT_OPTIMIZER_EXPIRE_TIME));
         optimizer.init();
 
         this.optimizer = optimizer;
@@ -171,6 +184,14 @@ public class ConfigHolder extends AbstractLifecycle {
 
     public OptimizerContext getOptimizerContext() {
         return this.optimizerContext;
+    }
+
+    public Map<String, Comparable> getConnectionProperties() {
+        return connectionProperties;
+    }
+
+    public void setConnectionProperties(Map<String, Comparable> connectionProperties) {
+        this.connectionProperties = connectionProperties;
     }
 
 }

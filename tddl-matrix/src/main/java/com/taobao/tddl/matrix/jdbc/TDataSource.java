@@ -54,6 +54,7 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
         configHolder.setTopologyFilePath(this.machineTopologyFile);
         configHolder.setSchemaFilePath(this.schemaFile);
         configHolder.setRuleFilePath(this.ruleFilePath);
+        configHolder.setConnectionProperties(this.connectionProperties);
         configHolder.init();
         this.configHolder = configHolder;
 

@@ -4,7 +4,7 @@
 	<bean id="vtabroot" class="com.taobao.tddl.interact.rule.VirtualTableRoot"
 		init-method="init">
 		<property name="dbType" value="MYSQL" />
-		<property name="defaultDbIndex" value="andor_show_group0" />
+		<property name="defaultDbIndex" value="ob_group" />
 		<property name="tableRules">
 			<map>
 				<entry key="auction_auctions._auction_id" value-ref="auction_auctions._auction_id" />
@@ -15,6 +15,7 @@
 				<entry key="testtable._id" value-ref="testtable._id" />
 				<entry key="testtable2._id" value-ref="testtable2._id" />
 				<entry key="bmw_users" value-ref="bmw_users._id" />
+				<entry key="xsl" value-ref="xsl._id" />
 			</map>
 		</property>
 	</bean>
@@ -72,5 +73,12 @@
 		<property name="dbNamePattern" value="andor_show_group0" />
 		<property name="tbNamePattern"
 			value="sqls" />
+	</bean>
+	
+		<bean id="xsl._id" class="com.taobao.tddl.interact.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="ob_group" />
+		<property name="tbNamePattern"
+			value="xsl" />
 	</bean>
 </beans>

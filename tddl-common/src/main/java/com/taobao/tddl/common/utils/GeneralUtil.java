@@ -137,6 +137,15 @@ public class GeneralUtil {
         }
     }
 
+    public static long getExtraCmdLong(Map<String, Comparable> extraCmd, String key, long defaultValue) {
+        String value = getExtraCmdString(extraCmd, key);
+        if (value == null) {
+            return defaultValue;
+        } else {
+            return Long.valueOf(value);
+        }
+    }
+
     public static void checkInterrupted() throws TddlException {
         if (Thread.interrupted()) {
             throw new TddlException(new InterruptedException());

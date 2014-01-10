@@ -25,15 +25,15 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.utils.extension.Activate;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.spi.IDataSourceGetter;
 import com.taobao.tddl.optimizer.config.table.RepoSchemaManager;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.config.table.parse.TableMetaParser;
 import com.taobao.tddl.repo.mysql.spi.DatasourceMySQLImplement;
-
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author mengshi.sunmengshi 2013-12-5 下午6:18:14
@@ -42,11 +42,14 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
 @Activate(name = "MYSQL_JDBC", order = 2)
 public class MysqlTableMetaManager extends RepoSchemaManager {
 
-    private final static Logger logger   = LoggerFactory.getLogger(MysqlTableMetaManager.class);
-    private IDataSourceGetter   dsGetter = new DatasourceMySQLImplement();
+    private final static Logger     logger        = LoggerFactory.getLogger(MysqlTableMetaManager.class);
+    private final IDataSourceGetter mysqlDsGetter = new DatasourceMySQLImplement();
 
     public MysqlTableMetaManager(){
-        this.setUseCache(false);
+    }
+
+    protected IDataSourceGetter getDatasourceGetter() {
+        return this.mysqlDsGetter;
     }
 
     /**
@@ -63,8 +66,11 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
     }
 
     private TableMeta fetchSchema(String logicalTableName, String actualTableName) {
+        if (actualTableName == null) {
+            throw new TddlRuntimeException("table " + logicalTableName + " cannot fetched without a actual tableName");
+        }
 
-        DataSource ds = dsGetter.getDataSource(this.getGroup().getName());
+        DataSource ds = getDatasourceGetter().getDataSource(this.getGroup().getName());
 
         if (ds == null) {
             logger.error("schema of " + logicalTableName + " cannot be fetched, datasource is null, group name is "
@@ -172,13 +178,20 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
                 column.setAttribute("type", type);
             }
 
-            ResultSet pkrs = dbmd.getPrimaryKeys(null, null, actualTableName);
+            try {
+                ResultSet pkrs = dbmd.getPrimaryKeys(null, null, actualTableName);
 
-            if (pkrs.next()) {
-                Element primaryKey = doc.createElement("primaryKey");
-                primaryKey.appendChild(doc.createTextNode(pkrs.getString("COLUMN_NAME")));
-                table.appendChild(primaryKey);
-            } else {
+                if (pkrs.next()) {
+                    Element primaryKey = doc.createElement("primaryKey");
+                    primaryKey.appendChild(doc.createTextNode(pkrs.getString("COLUMN_NAME")));
+                    table.appendChild(primaryKey);
+                } else {
+                    Element primaryKey = doc.createElement("primaryKey");
+                    primaryKey.appendChild(doc.createTextNode(rsmd.getColumnName(1)));
+                    table.appendChild(primaryKey);
+                }
+            } catch (Exception ex) {
+                logger.warn("fetch pk error, choose the first column as pk, tablename is: " + logicalTableName, ex);
                 Element primaryKey = doc.createElement("primaryKey");
                 primaryKey.appendChild(doc.createTextNode(rsmd.getColumnName(1)));
                 table.appendChild(primaryKey);

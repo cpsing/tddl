@@ -88,7 +88,7 @@ public class Ob_Repository extends AbstractLifecycle implements IRepository {
 
     @Override
     public ITransaction beginTransaction(TransactionConfig tc) throws TddlException {
-        Ob_Transaction my = new Ob_Transaction();
+        Ob_Transaction my = new Ob_Transaction(true);
         my.beginTransaction();
         return my;
     }
@@ -136,7 +136,7 @@ public class Ob_Repository extends AbstractLifecycle implements IRepository {
 
                     TddlGroupExecutor executor = new TddlGroupExecutor(repo);
                     executor.setGroup(group);
-                    executor.setRemotingExecutableObject(configUrl);
+                    executor.setRemotingExecutableObject(obDS);
                     return executor;
                 }
             });

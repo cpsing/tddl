@@ -10,6 +10,11 @@ import com.taobao.tddl.repo.mysql.spi.My_Transaction;
  */
 public class Ob_Transaction extends My_Transaction {
 
+    public Ob_Transaction(boolean autoCommit){
+        super(autoCommit);
+        // TODO Auto-generated constructor stub
+    }
+
     protected final static Logger logger = LoggerFactory.getLogger(Ob_Transaction.class);
 
 }

@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.taobao.tddl.common.TddlConstants;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.optimizer.exceptions.SqlParserException;
@@ -18,9 +19,10 @@ import com.taobao.tddl.optimizer.parse.SqlParseManager;
 public class CobarSqlParseManager extends AbstractLifecycle implements SqlParseManager {
 
     private int                                          cacheSize  = 1000;
-    private int                                          expireTime = 30000;
+    private long                                         expireTime = TddlConstants.DEFAULT_OPTIMIZER_EXPIRE_TIME;
     private static Cache<String, CobarSqlAnalysisResult> cache      = null;
 
+    @Override
     protected void doInit() {
         cache = CacheBuilder.newBuilder()
             .maximumSize(cacheSize)
@@ -28,10 +30,12 @@ public class CobarSqlParseManager extends AbstractLifecycle implements SqlParseM
             .build();
     }
 
+    @Override
     protected void doDestory() {
         cache.invalidateAll();
     }
 
+    @Override
     public SqlAnalysisResult parse(final String sql, final Map<Integer, ParameterContext> parameterSettings,
                                    boolean cached) throws SqlParserException {
         CobarSqlAnalysisResult result = null;
@@ -39,6 +43,7 @@ public class CobarSqlParseManager extends AbstractLifecycle implements SqlParseM
             if (cached) {
                 result = cache.get(sql, new Callable<CobarSqlAnalysisResult>() {
 
+                    @Override
                     public CobarSqlAnalysisResult call() throws Exception {
                         CobarSqlAnalysisResult bean = new CobarSqlAnalysisResult();
                         bean.parse(sql, parameterSettings);
@@ -66,7 +71,7 @@ public class CobarSqlParseManager extends AbstractLifecycle implements SqlParseM
         this.cacheSize = cacheSize;
     }
 
-    public void setExpireTime(int expireTime) {
+    public void setExpireTime(long expireTime) {
         this.expireTime = expireTime;
     }
 

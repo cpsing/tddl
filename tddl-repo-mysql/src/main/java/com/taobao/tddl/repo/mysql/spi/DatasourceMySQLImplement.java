@@ -45,7 +45,7 @@ public class DatasourceMySQLImplement implements IDataSourceGetter {
     protected boolean isNotValidateNode(Group.GroupType type) {
 
         return !Group.GroupType.MYSQL_JDBC.equals(type) && !Group.GroupType.TDHS_CLIENT.equals(type)
-               && !Group.GroupType.ORACLE_JDBC.equals(type);
+               && !Group.GroupType.ORACLE_JDBC.equals(type) && !Group.GroupType.OCEANBASE_JDBC.equals(type);
     }
 
     @Override

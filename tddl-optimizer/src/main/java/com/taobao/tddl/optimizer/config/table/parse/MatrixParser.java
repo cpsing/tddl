@@ -160,6 +160,8 @@ public class MatrixParser {
             return GroupType.ORACLE_JDBC;
         } else if ("BDB_JE".equalsIgnoreCase(type)) {
             return GroupType.BDB_JE;
+        } else if ("OCEANBASE_JDBC".equalsIgnoreCase(type)) {
+            return GroupType.OCEANBASE_JDBC;
         }
 
         throw new NotSupportException();

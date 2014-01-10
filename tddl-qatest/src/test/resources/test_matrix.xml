@@ -52,4 +52,12 @@
 
 	<group name="andor_show_group1" type="MYSQL_JDBC">
 	</group>
+	
+		<group name="ob_group" type="OCEANBASE_JDBC">
+		<properties>
+						<property name="CONFIGURL">
+					<value>http://obconsole.test.alibaba-inc.com/ob-config/config.co?dataId=wireless_message</value>
+				</property>
+			</properties>
+	</group>
 </matrix>

@@ -1,1 +1,1 @@
-com.taobao.tddl.repo.mysql.spi.RepositoryFactoryMyImp
+com.taobao.tddl.repo.oceanbase.spi.ObRepositoryFactory

@@ -8,7 +8,7 @@ import com.taobao.tddl.common.utils.extension.Activate;
 import com.taobao.tddl.executor.spi.IRepository;
 import com.taobao.tddl.executor.spi.IRepositoryFactory;
 
-@Activate(name = "MYSQL_JDBC")
+@Activate(name = "OCEANBASE_JDBC")
 public class ObRepositoryFactory implements IRepositoryFactory {
 
     @Override

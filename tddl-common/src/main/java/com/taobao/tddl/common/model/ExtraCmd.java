@@ -93,7 +93,17 @@ public class ExtraCmd {
         public static final String OPTIMIZE_JOIN_ORDER                    = "OPTIMIZE_JOIN_ORDER";
         public static final String INIT_TEMP_TABLE                        = "USE_TEMP_TABLE";
         public static final String INIT_TDDL_DATASOURCE                   = "INIT_TDDL_DATASOURCE";
-        public static final String CLEAN_SCHEMA_MINUTE                    = "CLEAN_SCHEMA_MINUTE";
+
+        /**
+         * 表的meta超时时间，单位毫秒
+         */
+        public static final String TABLE_META_CACHE_EXPIRE_TIME           = "TABLE_META_CACHE_EXPIRE_TIME";
+
+        /**
+         * 优化器和parser结果超时时间，单位毫秒
+         */
+        public static final String OPTIMIZER_CACHE_EXPIRE_TIME            = "OPTIMIZER_CACHE_EXPIRE_TIME";
+
         public static final String CONFIG_UPDATE_INVALID_MINUTE           = "CONFIG_UPDATE_INVALID_MINUTE";
         public static final String USE_TDHS_FOR_DEFAULT                   = "USE_TDHS_FOR_DEFAULT";
         public static final String USE_BOTH_LOCALSCHEMA_AND_DYNAMICSCHEMA = "USE_BOTH_LOCALSCHEMA_AND_DYNAMICSCHEMA";
