@@ -72,7 +72,7 @@ public class SelectAliasTest extends BaseMatrixTestCase {
     }
 
     @Test
-    public void aliasFileTest() throws Exception {
+    public void aliasFiledTest() throws Exception {
         String sql = "select name xingming ,id pid ,pk ppk from  " + normaltblTableName + "  where pk=?";
         List<Object> param = new ArrayList<Object>();
         param.add(pk);
@@ -110,7 +110,6 @@ public class SelectAliasTest extends BaseMatrixTestCase {
         assertAlias(sql, columnParam, "nor", param);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void aliasTableWithJoinTest() throws Exception {
         String sql = "select n.name,s.name studentName,n.pk,s.id from  " + normaltblTableName + "  n , "
@@ -123,7 +122,6 @@ public class SelectAliasTest extends BaseMatrixTestCase {
         selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void aliasWithFieldJoinTest() throws Exception {
         String sql = "select  " + normaltblTableName + ".name name1, " + studentTableName + ".name, "

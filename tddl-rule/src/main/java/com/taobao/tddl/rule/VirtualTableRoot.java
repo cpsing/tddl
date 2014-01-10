@@ -49,7 +49,7 @@ public class VirtualTableRoot extends AbstractLifecycle implements Lifecycle {
     public TableRule getVirtualTable(String virtualTableName) {
         RuleUtils.notNull(virtualTableName, "virtual table name is null");
         TableRule tablRule = virtualTableMap.get(virtualTableName.toLowerCase());
-        if (lazyInit && !tablRule.isInited()) {
+        if (tablRule != null && lazyInit && !tablRule.isInited()) {
             try {
                 initTableRule(virtualTableName.toLowerCase(), tablRule);
             } catch (TddlException e) {

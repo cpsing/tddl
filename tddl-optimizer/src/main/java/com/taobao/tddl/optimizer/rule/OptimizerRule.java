@@ -168,8 +168,7 @@ public class OptimizerRule extends AbstractLifecycle {
 
     private TableRule getTableRule(String logicTable) {
         VirtualTableRoot root = tddlRule.getCurrentRule();
-        logicTable = logicTable.toLowerCase();
-        TableRule table = root.getTableRules().get(logicTable);
+        TableRule table = root.getVirtualTable(logicTable);
         return table;
     }
 
