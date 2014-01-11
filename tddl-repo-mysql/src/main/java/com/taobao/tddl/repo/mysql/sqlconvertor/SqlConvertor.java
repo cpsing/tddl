@@ -73,7 +73,9 @@ public class SqlConvertor {
             subQuerys.put(nodeName, sqls);
         }
 
-        if (oneQuery instanceof IQueryTree) ((IQueryTree) oneQuery).setTopQuery(true);
+        if (oneQuery instanceof IQueryTree) {
+            ((IQueryTree) oneQuery).setTopQuery(true);
+        }
         MysqlPlanVisitorImpl visitor = new MysqlPlanVisitorImpl(oneQuery, null, null, true);
         oneQuery.accept(visitor);
         Sql sql = new Sql();

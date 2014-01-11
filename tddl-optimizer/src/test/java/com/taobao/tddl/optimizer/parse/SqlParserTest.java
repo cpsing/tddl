@@ -49,7 +49,7 @@ public class SqlParserTest extends BaseOptimizerTest {
         QueryTreeNode qn = query(sql);
         qn.build();
 
-        QueryTreeNode qnExpected = new TableNode("TABLE1").query("ID=1");
+        QueryTreeNode qnExpected = new TableNode("TABLE1").query("ID=1 or ID=2");
         qnExpected.build();
         assertEquals(qn, qnExpected);
     }
@@ -1028,7 +1028,7 @@ public class SqlParserTest extends BaseOptimizerTest {
         QueryTreeNode qn = query(sql);
         qn.build();
 
-        System.out.println(qn);
+        // System.out.println(qn);
         Assert.assertTrue(((JoinNode) qn).getLeftNode() instanceof JoinNode);
     }
 
@@ -1049,7 +1049,7 @@ public class SqlParserTest extends BaseOptimizerTest {
     public void testQuery_join_子查询_多级组合() throws SqlParserException, QueryException {
         String joinSql = "SELECT TABLE1.ID,TABLE1.NAME FROM TABLE1 JOIN TABLE2 ON TABLE1.ID=TABLE1.ID WHERE TABLE1.NAME=1";
         String subsql = "SELECT * FROM (" + joinSql + " ) S WHERE S.NAME = 1";
-        String sql = "SELECT * FROM (" + subsql + ") B , (" + subsql + ") C WHERE NAME = 6 AND B.ID = C.ID";
+        String sql = "SELECT * FROM (" + subsql + ") B , (" + subsql + ") C WHERE B.NAME = 6 AND B.ID = C.ID";
         QueryTreeNode qn = query(sql);
         qn.build();
 
