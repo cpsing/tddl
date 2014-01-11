@@ -129,7 +129,11 @@ public class MatrixExecutor extends AbstractLifecycle implements IExecutor {
         } catch (EmptyResultFilterException e) {
             return ResultCursor.EMPTY_RESULT_CURSOR;
         } catch (Exception e) {
-            throw new TddlException(e);
+            if (ExceptionUtils.getCause(e) instanceof EmptyResultFilterException) {
+                return ResultCursor.EMPTY_RESULT_CURSOR;
+            } else {
+                throw new TddlException(e);
+            }
         }
     }
 
@@ -185,7 +189,6 @@ public class MatrixExecutor extends AbstractLifecycle implements IExecutor {
     private void generateResultIdAndPutIntoResultSetMap(ResultCursor cursor) {
         int id = idGen.getIntegerNextNumber();
         cursor.setResultID(id);
-
     }
 
 }

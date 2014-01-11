@@ -55,7 +55,6 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
     }
 
     public int executeUpdate() throws SQLException {
-
         checkClosed();
         ensureResultSetIsEmpty();
         this.currentResultSet = this.conn.executeSQL(sql, parameterSettings, this, extraCmd, this.executionContext);
@@ -112,7 +111,6 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
     }
 
     public void setString(int parameterIndex, String x) throws SQLException {
-
         parameterSettings.put(parameterIndex - 1, new ParameterContext(ParameterMethod.setString, new Object[] {
                 parameterIndex - 1, x }));
     }
@@ -142,8 +140,8 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
     }
 
     public void setDate(int parameterIndex, Date x, Calendar cal) throws SQLException {
-        throw new SQLException("not support this methord!");
-
+        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setDate2, new Object[] {
+                parameterIndex, x, cal }));
     }
 
     public void clearParameters() throws SQLException {
@@ -179,22 +177,21 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
     public void setTimestamp(int parameterIndex, Timestamp x) throws SQLException {
         parameterSettings.put(parameterIndex - 1, new ParameterContext(ParameterMethod.setTimestamp1, new Object[] {
                 parameterIndex - 1, x }));
-
     }
 
     public void setAsciiStream(int parameterIndex, InputStream x, int length) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setAsciiStream, new Object[] {
+                parameterIndex, x, length }));
     }
 
     public void setUnicodeStream(int parameterIndex, InputStream x, int length) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setUnicodeStream, new Object[] {
+                parameterIndex, x, length }));
     }
 
     public void setBinaryStream(int parameterIndex, InputStream x, int length) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setBinaryStream, new Object[] {
+                parameterIndex, x, length }));
     }
 
     public void setObject(int parameterIndex, Object x, int targetSqlType) throws SQLException {
@@ -238,20 +235,17 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
     }
 
     public void addBatch() throws SQLException {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
-
     }
 
     public void setCharacterStream(int parameterIndex, Reader reader, int length) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-
+        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setCharacterStream, new Object[] {
+                parameterIndex, reader, length }));
     }
 
     public void setRef(int parameterIndex, Ref x) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setRef, new Object[] {
+                parameterIndex, x }));
     }
 
     public void setBlob(int parameterIndex, Blob x) throws SQLException {
@@ -262,21 +256,11 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
     public void setClob(int parameterIndex, Clob x) throws SQLException {
         parameterSettings.put(parameterIndex - 1, new ParameterContext(ParameterMethod.setClob, new Object[] {
                 parameterIndex - 1, x }));
-
     }
 
     public void setArray(int parameterIndex, Array x) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * 不支持
-     */
-    public ResultSetMetaData getMetaData() throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-        // return null;
+        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setArray, new Object[] {
+                parameterIndex, x }));
     }
 
     public void setTime(int parameterIndex, Time x, Calendar cal) throws SQLException {
@@ -302,120 +286,124 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
     }
 
     public void setURL(int parameterIndex, URL x) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-
+        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setURL, new Object[] {
+                parameterIndex, x }));
     }
 
-    /**
-     * 用map实现的parameterSettings，未实现ParameterMetaData
-     */
-    public ParameterMetaData getParameterMetaData() throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-        // return null;
+    @Override
+    public void setObject(int parameterIndex, Object x, int targetSqlType, int scaleOrLength) throws SQLException {
+        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setObject3, new Object[] {
+                parameterIndex, x, targetSqlType, scaleOrLength }));
     }
 
-    public void setRowId(int parameterIndex, RowId x) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        return this.getClass().isAssignableFrom(iface);
     }
+
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        try {
+            return (T) this;
+        } catch (Exception e) {
+            throw new SQLException(e);
+        }
+    }
+
+    // ----------------- 不支持的方法 ------------------
 
     /**
      * 不支持
      */
-    public void setNString(int parameterIndex, String value) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+    public ResultSetMetaData getMetaData() throws SQLException {
+        throw new UnsupportedOperationException("getMetaData");
+    }
 
+    public boolean isClosed() throws SQLException {
+        throw new SQLException("not support exception");
+    }
+
+    public void setPoolable(boolean poolable) throws SQLException {
+        throw new SQLException("not support exception");
+    }
+
+    public boolean isPoolable() throws SQLException {
+        throw new SQLException("not support exception");
+    }
+
+    public void setRowId(int parameterIndex, RowId x) throws SQLException {
+        throw new SQLException("not support exception");
+    }
+
+    public void setNString(int parameterIndex, String value) throws SQLException {
+        throw new SQLException("not support exception");
     }
 
     public void setNCharacterStream(int parameterIndex, Reader value, long length) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-
+        throw new SQLException("not support exception");
     }
 
     public void setNClob(int parameterIndex, NClob value) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        throw new SQLException("not support exception");
     }
 
     public void setClob(int parameterIndex, Reader reader, long length) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        throw new SQLException("not support exception");
     }
 
     public void setBlob(int parameterIndex, InputStream inputStream, long length) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        throw new SQLException("not support exception");
     }
 
     public void setNClob(int parameterIndex, Reader reader, long length) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        throw new SQLException("not support exception");
     }
 
     public void setSQLXML(int parameterIndex, SQLXML xmlObject) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-    }
-
-    public void setObject(int parameterIndex, Object x, int targetSqlType, int scaleOrLength) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        throw new SQLException("not support exception");
     }
 
     public void setAsciiStream(int parameterIndex, InputStream x, long length) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        throw new SQLException("not support exception");
     }
 
     public void setBinaryStream(int parameterIndex, InputStream x, long length) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
-
+        throw new SQLException("not support exception");
     }
 
     public void setCharacterStream(int parameterIndex, Reader reader, long length) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        throw new SQLException("not support exception");
     }
 
     public void setAsciiStream(int parameterIndex, InputStream x) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        throw new SQLException("not support exception");
     }
 
     public void setBinaryStream(int parameterIndex, InputStream x) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        throw new SQLException("not support exception");
     }
 
     public void setCharacterStream(int parameterIndex, Reader reader) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        throw new SQLException("not support exception");
     }
 
     public void setNCharacterStream(int parameterIndex, Reader value) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        throw new SQLException("not support exception");
     }
 
     public void setClob(int parameterIndex, Reader reader) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        throw new SQLException("not support exception");
     }
 
     public void setBlob(int parameterIndex, InputStream inputStream) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        throw new SQLException("not support exception");
     }
 
     public void setNClob(int parameterIndex, Reader reader) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        throw new SQLException("not support exception");
+    }
+
+    @Override
+    public ParameterMetaData getParameterMetaData() throws SQLException {
+        throw new UnsupportedOperationException("getParameterMetaData");
     }
 
 }
