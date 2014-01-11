@@ -210,7 +210,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
 
             // 直接构造为where条件，优化器进行重新选择
             IFilter whereFilter = FilterUtils.and(iquery.getKeyFilter(), iquery.getValueFilter());
-            query.query(FilterUtils.and(whereFilter, ibf));
+            query.query(FilterUtils.and(removeDupFilter(whereFilter, ibf), ibf));
             query.alias(iquery.getAlias());
             query.build();
             // IDataNodeExecutor idne = dnc.shard(currentExecotor,

@@ -3,6 +3,8 @@ package com.taobao.tddl.executor;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
@@ -52,7 +54,11 @@ public class MatrixExecutor extends AbstractLifecycle implements IExecutor {
         } catch (EmptyResultFilterException e) {
             return ResultCursor.EMPTY_RESULT_CURSOR;
         } catch (Exception e) {
-            throw new TddlException(e);
+            if (ExceptionUtils.getCause(e) instanceof EmptyResultFilterException) {
+                return ResultCursor.EMPTY_RESULT_CURSOR;
+            } else {
+                throw new TddlException(e);
+            }
         }
     }
 

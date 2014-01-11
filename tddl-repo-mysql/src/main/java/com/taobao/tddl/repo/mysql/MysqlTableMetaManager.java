@@ -27,13 +27,14 @@ import org.w3c.dom.Element;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.utils.extension.Activate;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.spi.IDataSourceGetter;
 import com.taobao.tddl.optimizer.config.table.RepoSchemaManager;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.config.table.parse.TableMetaParser;
 import com.taobao.tddl.repo.mysql.spi.DatasourceMySQLImplement;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author mengshi.sunmengshi 2013-12-5 下午6:18:14
@@ -100,7 +101,7 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
                         DatabaseMetaData dbmd = conn.getMetaData();
                         return resultSetMetaToSchema(rsmd, dbmd, logicalTableName, actualTableName);
                     } catch (SQLException e1) {
-                        e1.printStackTrace();
+                        logger.warn(e);
                     }
 
                 }
@@ -108,7 +109,6 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
             logger.error("schema of " + logicalTableName + " cannot be fetched", e);
             return null;
         } finally {
-
             try {
                 if (rs != null) {
                     rs.close();
@@ -117,7 +117,6 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
                 if (conn != null) conn.close();
             } catch (SQLException e) {
                 logger.warn(e);
-                e.printStackTrace();
             }
         }
 

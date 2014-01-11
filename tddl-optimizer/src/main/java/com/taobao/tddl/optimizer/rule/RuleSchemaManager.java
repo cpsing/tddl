@@ -115,6 +115,10 @@ public class RuleSchemaManager extends AbstractLifecycle implements SchemaManage
             }
         }
 
+        if (ts == null) {
+            throw new TddlRuntimeException(tableName + " is not found");
+        }
+
         return ts;
     }
 

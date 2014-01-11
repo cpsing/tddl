@@ -136,7 +136,9 @@ public class JoinAndTest extends BaseMatrixTestCase {
                   + hostgroup_info + ".hostgroup_name " + "from " + hostgroup_info + " " + joinType[i] + " join "
                   + host_info + "  " + "on " + host_info + ".hostgroup_id=" + hostgroup_info + ".hostgroup_id where "
                   + hostgroup_info + ".hostgroup_id>20 and " + hostgroup_info + ".hostgroup_id<80";
-            if (!host_info.contains("oneGroup_oneAtom")) sql = hint + sql;
+            if (!host_info.contains("oneGroup_oneAtom")) {
+                sql = hint + sql;
+            }
             selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
         }
     }

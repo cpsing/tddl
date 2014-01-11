@@ -75,7 +75,7 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
         }
 
         if (meta == null) {// 本地没有
-            return delegate.getTable0(logicalTableName, actualTableName);
+            meta = delegate.getTable0(logicalTableName, actualTableName);
         }
 
         return meta;
