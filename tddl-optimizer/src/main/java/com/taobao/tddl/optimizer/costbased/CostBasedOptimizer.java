@@ -191,6 +191,8 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
         } else {
             sql = SimpleHintParser.removeHint(sql, parameterSettings);
             // 基于hint直接构造执行计划
+            // 目前sql构造依赖于cobar parser的visitor模式，如果cobar
+            // parser存在语法解析不过的情况，即使设置hint也无法绕过
             if (routeCondition instanceof DirectlyRouteCondition) {
                 DirectlyRouteCondition drc = (DirectlyRouteCondition) routeCondition;
                 Map<String, String> sqls = buildDirectSqls(result, drc.getVirtualTableName(), drc.getTables());
@@ -201,12 +203,11 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
                 List<TargetDB> targetDBs = OptimizerContext.getContext()
                     .getRule()
                     .shard(rrc.getVirtualTableName(), rrc.getCompMapChoicer(), isWrite);
-
+                // 考虑表名可能有重复
                 Set<String> tables = new HashSet<String>();
                 for (TargetDB target : targetDBs) {
                     tables.addAll(target.getTableNames());
                 }
-
                 Map<String, String> sqls = buildDirectSqls(result, rrc.getVirtualTableName(), tables);
                 return buildRulePlain(result.getSqlType(), targetDBs, sqls, parameterSettings);
             } else {
