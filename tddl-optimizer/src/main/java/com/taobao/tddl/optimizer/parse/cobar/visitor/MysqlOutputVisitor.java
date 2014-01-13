@@ -33,12 +33,15 @@ public class MysqlOutputVisitor extends MySQLOutputASTVisitor {
     // 路由结果是否为单库单表,是则limit参数不做改变
     private boolean                                              singleNode;
 
-    public MysqlOutputVisitor(StringBuilder appendable){
-        super(appendable);
+    public MysqlOutputVisitor(StringBuilder appendable, boolean singleNode, Map<String, String> logicTable2RealTable){
+        this(appendable, null, singleNode, logicTable2RealTable);
     }
 
-    public MysqlOutputVisitor(StringBuilder appendable, Object[] args){
+    public MysqlOutputVisitor(StringBuilder appendable, Object[] args, boolean singleNode,
+                              Map<String, String> logicTable2RealTable){
         super(appendable, args);
+        this.singleNode = singleNode;
+        this.logicTable2RealTable = logicTable2RealTable;
     }
 
     private String convertToRealTable(String tableName) {
@@ -46,7 +49,7 @@ public class MysqlOutputVisitor extends MySQLOutputASTVisitor {
             return null;
         }
 
-        if (logicTable2RealTable == null) {
+        if (logicTable2RealTable == null || logicTable2RealTable.isEmpty()) {
             return tableName;
         }
 
@@ -264,5 +267,13 @@ public class MysqlOutputVisitor extends MySQLOutputASTVisitor {
         } else {
             select.accept(this);
         }
+    }
+
+    public void setLogicTable2RealTable(Map<String, String> logicTable2RealTable) {
+        this.logicTable2RealTable = logicTable2RealTable;
+    }
+
+    public void setSingleNode(boolean singleNode) {
+        this.singleNode = singleNode;
     }
 }

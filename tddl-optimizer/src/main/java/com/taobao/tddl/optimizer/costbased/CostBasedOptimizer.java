@@ -1,23 +1,30 @@
 package com.taobao.tddl.optimizer.costbased;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import com.alibaba.cobar.parser.ast.stmt.SQLStatement;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.taobao.tddl.common.TddlConstants;
+import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ExtraCmd;
+import com.taobao.tddl.common.model.SqlType;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.monitor.Monitor;
 import com.taobao.tddl.optimizer.Optimizer;
 import com.taobao.tddl.optimizer.OptimizerContext;
+import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.ast.ASTNode;
 import com.taobao.tddl.optimizer.core.ast.DMLNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
@@ -30,6 +37,7 @@ import com.taobao.tddl.optimizer.core.ast.query.MergeNode;
 import com.taobao.tddl.optimizer.core.ast.query.QueryNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
+import com.taobao.tddl.optimizer.core.plan.query.IMerge;
 import com.taobao.tddl.optimizer.costbased.after.ChooseTreadOptimizer;
 import com.taobao.tddl.optimizer.costbased.after.FillRequestIDAndSubRequestID;
 import com.taobao.tddl.optimizer.costbased.after.FuckAvgOptimizer;
@@ -46,10 +54,15 @@ import com.taobao.tddl.optimizer.exceptions.QueryException;
 import com.taobao.tddl.optimizer.exceptions.SqlParserException;
 import com.taobao.tddl.optimizer.parse.SqlAnalysisResult;
 import com.taobao.tddl.optimizer.parse.SqlParseManager;
+import com.taobao.tddl.optimizer.parse.cobar.CobarSqlAnalysisResult;
 import com.taobao.tddl.optimizer.parse.cobar.CobarSqlParseManager;
+import com.taobao.tddl.optimizer.parse.cobar.visitor.MysqlOutputVisitor;
+import com.taobao.tddl.optimizer.parse.hint.DirectlyRouteCondition;
 import com.taobao.tddl.optimizer.parse.hint.ExtraCmdRouteCondition;
 import com.taobao.tddl.optimizer.parse.hint.RouteCondition;
+import com.taobao.tddl.optimizer.parse.hint.RuleRouteCondition;
 import com.taobao.tddl.optimizer.parse.hint.SimpleHintParser;
+import com.taobao.tddl.rule.model.TargetDB;
 
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
@@ -86,7 +99,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  *      对Join顺序调整的依据是通过计算开销，开销主要包括两种: 
  *          1. 磁盘IO与网络传输 详细计算方式请参见CostEstimater实现类的相关注释
  *          2. 对Join顺序的遍历使用的是最左树 在此步中，还会对同一列的约束条件进行合并等操作
- *      选取策略见chooseStrategyAndIndexAndSplitQuery的注释 
+ *      选取策略见JoinChooser的注释 
  * 
  * s6.将s1中生成的临时列删除
  * 
@@ -161,8 +174,10 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
     public IDataNodeExecutor optimizeAndAssignment(String sql, Map<Integer, ParameterContext> parameterSettings,
                                                    Map<String, Object> extraCmd, boolean cached) throws QueryException,
                                                                                                 SqlParserException {
+        // 处理sql hint
         RouteCondition routeCondition = SimpleHintParser.convertHint2RouteCondition(sql, parameterSettings);
         if (routeCondition != null && !routeCondition.getExtraCmds().isEmpty()) {
+            // 合并sql中的extra cmd参数
             if (extraCmd == null) {
                 extraCmd = new HashMap<String, Object>();
             }
@@ -170,13 +185,33 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
             extraCmd.putAll(routeCondition.getExtraCmds());
         }
 
-        if (routeCondition != null && !(routeCondition instanceof ExtraCmdRouteCondition)) {
-            String runSql = SimpleHintParser.removeHint(sql, parameterSettings);
-            // TODO 基于hint直接构造执行计划
-            return null;
+        SqlAnalysisResult result = sqlParseManager.parse(sql, cached);
+        if (routeCondition == null || routeCondition instanceof ExtraCmdRouteCondition) {
+            return optimizeAndAssignment(result.getAstNode(parameterSettings), parameterSettings, extraCmd, sql, cached);
         } else {
-            SqlAnalysisResult result = sqlParseManager.parse(sql, parameterSettings, cached);
-            return optimizeAndAssignment(result.getAstNode(), parameterSettings, extraCmd, sql, cached);
+            sql = SimpleHintParser.removeHint(sql, parameterSettings);
+            // 基于hint直接构造执行计划
+            if (routeCondition instanceof DirectlyRouteCondition) {
+                DirectlyRouteCondition drc = (DirectlyRouteCondition) routeCondition;
+                Map<String, String> sqls = buildDirectSqls(result, drc.getVirtualTableName(), drc.getTables());
+                return buildDirectPlan(result.getSqlType(), drc.getDbId(), sqls, parameterSettings);
+            } else if (routeCondition instanceof RuleRouteCondition) {
+                RuleRouteCondition rrc = (RuleRouteCondition) routeCondition;
+                boolean isWrite = (result.getSqlType() != SqlType.SELECT && result.getSqlType() != SqlType.SELECT_FOR_UPDATE);
+                List<TargetDB> targetDBs = OptimizerContext.getContext()
+                    .getRule()
+                    .shard(rrc.getVirtualTableName(), rrc.getCompMapChoicer(), isWrite);
+
+                Set<String> tables = new HashSet<String>();
+                for (TargetDB target : targetDBs) {
+                    tables.addAll(target.getTableNames());
+                }
+
+                Map<String, String> sqls = buildDirectSqls(result, rrc.getVirtualTableName(), tables);
+                return buildRulePlain(result.getSqlType(), targetDBs, sqls, parameterSettings);
+            } else {
+                throw new NotSupportException("RouteCondition : " + routeCondition.toString());
+            }
         }
     }
 
@@ -349,6 +384,99 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
     }
 
     // ============= helper method =============
+
+    /**
+     * 通过visitor替换表名生成sql
+     */
+    private Map<String, /* table name */String/* sql */> buildDirectSqls(SqlAnalysisResult sqlAnalysisResult,
+                                                                         String vtab, Collection<String> tables) {
+        Map<String, String> sqls = new HashMap<String, String>();
+        // 指定分库分表，直接下推sql
+        // 目前先考虑只有一张表的表名需要替换
+        SQLStatement statement = ((CobarSqlAnalysisResult) sqlAnalysisResult).getStatement();
+        boolean singleNode = (tables.size() > 1);
+        Map<String, String> logicTable2RealTable = new HashMap<String, String>();
+        for (String realTable : tables) {
+            logicTable2RealTable.put(vtab, realTable);
+            MysqlOutputVisitor sqlVisitor = new MysqlOutputVisitor(new StringBuilder(),
+                singleNode,
+                logicTable2RealTable);
+            statement.accept(sqlVisitor);
+            sqls.put(realTable, sqlVisitor.getSql());
+        }
+        return sqls;
+    }
+
+    /**
+     * 根据规则生成对应的执行计划
+     */
+    private IDataNodeExecutor buildRulePlain(SqlType sqlType, List<TargetDB> targetDBs, Map<String, String> sqls,
+                                             Map<Integer, ParameterContext> parameterSettings) {
+        List<IDataNodeExecutor> subs = new ArrayList<IDataNodeExecutor>();
+        for (TargetDB target : targetDBs) {
+            for (String table : target.getTableNames()) {
+                subs.add(buildOneDirectPlan(sqlType, target.getDbIndex(), sqls.get(table), parameterSettings));
+            }
+        }
+
+        if (subs.size() > 1) {
+            IMerge merge = ASTNodeFactory.getInstance().createMerge();
+            for (IDataNodeExecutor sub : subs) {
+                merge.addSubNode(sub);
+            }
+            return merge;
+        } else {
+            return subs.get(0);
+        }
+    }
+
+    /**
+     * 根据指定的库和表生成执行计划
+     */
+    private IDataNodeExecutor buildDirectPlan(SqlType sqlType, String dbId, Map<String, String> tables,
+                                              Map<Integer, ParameterContext> parameterSettings) {
+        if (tables.size() > 1) {
+            IMerge merge = ASTNodeFactory.getInstance().createMerge();
+            for (String sql : tables.values()) {
+                merge.addSubNode(buildOneDirectPlan(sqlType, dbId, sql, parameterSettings));
+            }
+            return merge;
+        } else {
+            return buildOneDirectPlan(sqlType, dbId, tables.values().iterator().next(), parameterSettings);
+        }
+    }
+
+    private IDataNodeExecutor buildOneDirectPlan(SqlType sqlType, String dbId, String sql,
+                                                 Map<Integer, ParameterContext> parameterSettings) {
+        IDataNodeExecutor executor = null;
+        switch (sqlType) {
+            case SELECT:
+                executor = ASTNodeFactory.getInstance().createQuery();
+                break;
+            case UPDATE:
+                executor = ASTNodeFactory.getInstance().createUpdate();
+                break;
+            case DELETE:
+                executor = ASTNodeFactory.getInstance().createDelete();
+                break;
+            case INSERT:
+                executor = ASTNodeFactory.getInstance().createInsert();
+                break;
+            case REPLACE:
+                executor = ASTNodeFactory.getInstance().createReplace();
+                break;
+            default:
+                break;
+        }
+
+        if (executor != null) {
+            executor.setSql(sql);
+            executor.setParameterSettings(parameterSettings);
+            executor.executeOn(dbId);
+        }
+
+        return executor;
+    }
 
     private ASTNode createMergeForJoin(ASTNode dne, Map<String, Object> extraCmd) {
         if (dne instanceof MergeNode) {

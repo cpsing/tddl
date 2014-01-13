@@ -2,9 +2,10 @@
 package com.taobao.tddl.group.utils;
 
 import com.taobao.tddl.common.utils.TStringUtil;
+import com.taobao.tddl.group.config.GroupIndex;
+
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
-import com.taobao.tddl.group.config.GroupIndex;
 
 /**
  * @description
@@ -58,7 +59,7 @@ public class GroupHintParser {
     }
 
     private static String extractTDDLGroupHintString(String sql) {
-        return TStringUtil.getBetween(sql.toLowerCase(), "/*+tddl_group({", "})*/");
+        return TStringUtil.getBetween(sql.toUpperCase(), "/*+TDDL_GROUP({", "})*/");
     }
 
     public static String removeTddlGroupHint(String sql) {
@@ -67,13 +68,12 @@ public class GroupHintParser {
             return sql;
         }
 
-        sql = TStringUtil.removeBetweenWithSplitor(sql.toLowerCase(), "/*+tddl_group({", "})*/");
+        sql = TStringUtil.removeBetweenWithSplitor(sql.toUpperCase(), "/*+TDDL_GROUP({", "})*/");
         return sql;
     }
 
     public static void main(String[] args) {
         String sql = "/*+TDDL_GROUP({groupIndex:12})*/select * from tab";
-
         System.out.println(convertHint2Index(sql));
         System.out.println(removeTddlGroupHint(sql));
     }

@@ -125,6 +125,10 @@ public interface IDataNodeExecutor<RT extends IDataNodeExecutor> extends CanVisi
 
     public RT setSql(String sql);
 
+    public Map<Integer, ParameterContext> getParameterSettings();
+
+    public RT setParameterSettings(Map<Integer, ParameterContext> parameterSettings);
+
     // ------------------复制----------------
 
     public RT copy();

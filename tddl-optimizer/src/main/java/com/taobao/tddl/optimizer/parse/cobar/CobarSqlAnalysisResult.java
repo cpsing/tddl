@@ -43,15 +43,15 @@ import com.taobao.tddl.optimizer.parse.cobar.visitor.MySqlUpdateVisitor;
  */
 public class CobarSqlAnalysisResult implements SqlAnalysisResult {
 
-    private SqlType                        sqlType;
-    private SQLASTVisitor                  visitor;
-    private QueryTreeNode                  dalQueryTreeNode;
-    private Map<Integer, ParameterContext> parameterSettings;
+    private SqlType       sqlType;
+    private SQLASTVisitor visitor;
+    private QueryTreeNode dalQueryTreeNode;
+    private SQLStatement  statement;
+    private boolean       hasVisited;
 
-    public void parse(String sql, Map<Integer, ParameterContext> parameterSettings) throws SQLSyntaxErrorException {
+    public void parse(String sql) throws SQLSyntaxErrorException {
         if (sql != null) {
-            this.parameterSettings = parameterSettings;
-            SQLStatement statement = SQLParserDelegate.parse(sql);
+            this.statement = SQLParserDelegate.parse(sql);
             if (statement instanceof DMLSelectStatement) {
                 if (isSysSelectStatement((DMLSelectStatement) statement, sql)) {
                     sqlType = SqlType.SHOW_WITHOUT_TABLE;
@@ -98,6 +98,13 @@ public class CobarSqlAnalysisResult implements SqlAnalysisResult {
         }
     }
 
+    public void visited() {
+        if (hasVisited == false && statement != null && visitor != null) {
+            statement.accept(visitor);
+            hasVisited = true;
+        }
+    }
+
     private boolean isSysSelectStatement(DMLSelectStatement statement, String sql) {
         TableReferences tables = statement.getTables();
         if (tables == null) {
@@ -128,7 +135,8 @@ public class CobarSqlAnalysisResult implements SqlAnalysisResult {
         return sqlType;
     }
 
-    public QueryTreeNode getQueryTreeNode() {
+    public QueryTreeNode getQueryTreeNode(Map<Integer, ParameterContext> parameterSettings) {
+        visited();
         if (dalQueryTreeNode == null) {
             return ((MySqlSelectVisitor) visitor).getTableNode();
         } else {
@@ -136,36 +144,44 @@ public class CobarSqlAnalysisResult implements SqlAnalysisResult {
         }
     }
 
-    public UpdateNode getUpdateNode() {
+    public UpdateNode getUpdateNode(Map<Integer, ParameterContext> parameterSettings) {
+        visited();
         return (UpdateNode) ((MySqlUpdateVisitor) visitor).getUpdateNode().setParameterSettings(parameterSettings);
     }
 
-    public InsertNode getInsertNode() {
+    public InsertNode getInsertNode(Map<Integer, ParameterContext> parameterSettings) {
+        visited();
         return (InsertNode) ((MySqlInsertVisitor) visitor).getInsertNode().setParameterSettings(parameterSettings);
     }
 
-    public PutNode getReplaceNode() {
+    public PutNode getReplaceNode(Map<Integer, ParameterContext> parameterSettings) {
+        visited();
         return (PutNode) ((MySqlReplaceIntoVisitor) visitor).getReplaceNode().setParameterSettings(parameterSettings);
     }
 
-    public DeleteNode getDeleteNode() {
+    public DeleteNode getDeleteNode(Map<Integer, ParameterContext> parameterSettings) {
+        visited();
         return (DeleteNode) ((MySqlDeleteVisitor) visitor).getDeleteNode().setParameterSettings(parameterSettings);
     }
 
-    public ASTNode getAstNode() {
+    public ASTNode getAstNode(Map<Integer, ParameterContext> parameterSettings) {
         if (sqlType == SqlType.SELECT || sqlType == SqlType.SHOW_WITH_TABLE) {
-            return getQueryTreeNode();
+            return getQueryTreeNode(parameterSettings);
         } else if (sqlType == SqlType.UPDATE) {
-            return getUpdateNode();
+            return getUpdateNode(parameterSettings);
         } else if (sqlType == SqlType.INSERT) {
-            return getInsertNode();
+            return getInsertNode(parameterSettings);
         } else if (sqlType == SqlType.REPLACE) {
-            return getReplaceNode();
+            return getReplaceNode(parameterSettings);
         } else if (sqlType == SqlType.DELETE) {
-            return getDeleteNode();
+            return getDeleteNode(parameterSettings);
         }
 
         throw new NotSupportException(sqlType.toString());
+    }
+
+    public SQLStatement getStatement() {
+        return statement;
     }
 
 }
