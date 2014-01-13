@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.taobao.tddl.atom.common.TAtomConstants;
 import com.taobao.tddl.config.impl.holder.AbstractConfigDataHolder;
 
@@ -34,11 +36,21 @@ public class AtomConfigHolder extends AbstractConfigDataHolder {
 
         List<String> passWdKeys = new ArrayList<String>();
         for (String atomKey : atomKeys) {
+            String globalValue = globalResults.get(fullGlobalKeys.get(atomKey));
+            if (StringUtils.isEmpty(globalValue)) {
+                throw new IllegalArgumentException("Global Config Is Null, AppName >> " + appName + " ## UnitName >> "
+                                                   + unitName + " ## AtomKey >> " + atomKey);
+            }
             Properties globalProperties = TAtomConfParser.parserConfStr2Properties(globalResults.get(fullGlobalKeys.get(atomKey)));
             String dbName = globalProperties.getProperty(TAtomConfParser.GLOBA_DB_NAME_KEY);
             String dbType = globalProperties.getProperty(TAtomConfParser.GLOBA_DB_TYPE_KEY);
 
-            Properties dbKeyProperties = TAtomConfParser.parserConfStr2Properties(appKeyResults.get(fullAppKeys.get(atomKey)));
+            String appValue = appKeyResults.get(fullAppKeys.get(atomKey));
+            if (StringUtils.isEmpty(appValue)) {
+                throw new IllegalArgumentException("App Config Is Null, AppName >> " + appName + " ## UnitName >> "
+                                                   + unitName + " ## AtomKey >> " + atomKey);
+            }
+            Properties dbKeyProperties = TAtomConfParser.parserConfStr2Properties(appValue);
             String userName = dbKeyProperties.getProperty(TAtomConfParser.APP_USER_NAME_KEY);
 
             passWdKeys.add(getPassWdKey(dbName, dbType, userName));

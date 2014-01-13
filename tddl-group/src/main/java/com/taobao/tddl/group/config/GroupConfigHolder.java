@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.taobao.tddl.config.ConfigServerHelper;
 import com.taobao.tddl.config.impl.holder.AbstractConfigDataHolder;
 import com.taobao.tddl.group.jdbc.TGroupDataSource;
@@ -46,8 +48,12 @@ public class GroupConfigHolder extends AbstractConfigDataHolder {
         initExtraConfigs();
 
         List<String> atomKeys = new ArrayList<String>();
-        for (String value : queryResults.values()) {
-            String[] dsWeightArray = value.split(",");
+        for (Map.Entry<String, String> entry : queryResults.entrySet()) {
+            if (StringUtils.isEmpty(entry.getValue())) {
+                throw new IllegalArgumentException("Group Config Is Null, AppName >> " + appName + " ## UnitName >> "
+                                                   + unitName + " ## GroupKey >> " + entry.getKey());
+            }
+            String[] dsWeightArray = entry.getValue().split(",");
             for (String inValue : dsWeightArray) {
                 atomKeys.add(inValue.split(":")[0]);
             }
