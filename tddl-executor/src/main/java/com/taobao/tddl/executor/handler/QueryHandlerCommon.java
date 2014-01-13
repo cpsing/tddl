@@ -7,6 +7,8 @@ import java.util.concurrent.Future;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.TStringUtil;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ExecutorContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -26,9 +28,6 @@ import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin;
 import com.taobao.tddl.optimizer.core.plan.query.IMerge;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
-
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author mengshi.sunmengshi 2013-12-5 上午11:06:01
@@ -63,16 +62,17 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
 
         ISchematicCursor cursor = doQuery(null, executor, executionContext);
 
-        IQueryTree IQueryTree = (IQueryTree) executor;
+        if (executor.getSql() == null) {
+            IQueryTree IQueryTree = (IQueryTree) executor;
 
-        cursor = processValueFilter(cursor, executionContext, IQueryTree);
+            cursor = processValueFilter(cursor, executionContext, IQueryTree);
 
-        cursor = processGroupByAndOrderBy(cursor, executionContext, IQueryTree);
+            cursor = processGroupByAndOrderBy(cursor, executionContext, IQueryTree);
 
-        cursor = processLimitFromTo(cursor, executionContext, IQueryTree);
+            cursor = processLimitFromTo(cursor, executionContext, IQueryTree);
 
-        cursor = processColumnAndAlias(cursor, executionContext, IQueryTree);
-
+            cursor = processColumnAndAlias(cursor, executionContext, IQueryTree);
+        }
         time = Monitor.monitorAndRenewTime(Monitor.KEY1, Monitor.ServerQuery, Monitor.Key3Success, time);
         return cursor;
     }

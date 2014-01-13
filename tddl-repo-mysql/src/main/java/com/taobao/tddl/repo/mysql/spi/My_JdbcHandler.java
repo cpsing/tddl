@@ -13,6 +13,8 @@ import javax.sql.DataSource;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.jdbc.ParameterMethod;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -30,9 +32,6 @@ import com.taobao.tddl.repo.mysql.common.ResultSetAutoCloseConnection;
 import com.taobao.tddl.repo.mysql.common.ResultSetRemeberIfClosed;
 import com.taobao.tddl.repo.mysql.sqlconvertor.MysqlPlanVisitorImpl;
 import com.taobao.tddl.repo.mysql.sqlconvertor.SqlAndParam;
-
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * jdbc 方法执行相关的数据封装. 每个需要执行的cursor都可以持有这个对象进行数据库操作。 ps .. fuxk java
@@ -66,6 +65,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         this.executionContext = executionContext;
     }
 
+    @Override
     public void executeQuery(ICursorMeta meta, boolean isStreaming) throws SQLException {
         setContext(meta, isStreaming);
         SqlAndParam sqlAndParam = null;
@@ -80,7 +80,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
             cursorMeta.setIsSureLogicalIndexEqualActualIndex(true);
             if (plan instanceof IQueryTree) {
                 ((IQueryTree) plan).setTopQuery(true);
-                MysqlPlanVisitorImpl visitor = new MysqlPlanVisitorImpl((IQueryTree) plan, null, null, true);
+                MysqlPlanVisitorImpl visitor = new MysqlPlanVisitorImpl(plan, null, null, true);
                 plan.accept(visitor);
                 sqlAndParam.sql = visitor.getString();
                 sqlAndParam.param = visitor.getParamMap();
@@ -113,24 +113,21 @@ public class My_JdbcHandler implements GeneralQueryHandler {
                 close();
             }
 
-            throw new TddlRuntimeException("sql generated is :\n" + sqlAndParam.toString(), e);
-            // if (e.getMessage()
-            // .contains("only select, insert, update, delete,replace,truncate,create,drop,load,merge sql is supported"))
-            // {
-            // // 返回一个空结果
-            // ps = connection.prepareStatement("select 1");
-            // this.resultSet = new ResultSetRemeberIfClosed(new
-            // ResultSetAutoCloseConnection(ps.executeQuery(),
-            // connection,
-            // ps));
-            // } else {
-            //
-            // throw new TddlRuntimeException("sql generated is :\n" +
-            // sqlAndParam.toString(), e);
-            // }
+            if (e.getMessage()
+                .contains("only select, insert, update, delete,replace,truncate,create,drop,load,merge sql is supported")) {
+                // 返回一个空结果
+                ps = connection.prepareStatement("select 1");
+                this.resultSet = new ResultSetRemeberIfClosed(new ResultSetAutoCloseConnection(ps.executeQuery(),
+                    connection,
+                    ps));
+            } else {
+
+                throw new TddlRuntimeException("sql generated is :\n" + sqlAndParam.toString(), e);
+            }
         }
     }
 
+    @Override
     public void executeUpdate(ExecutionContext executionContext, IPut put, ITable table, IndexMeta meta)
                                                                                                         throws SQLException {
         MysqlPlanVisitorImpl visitor = new MysqlPlanVisitorImpl(put, null, null, true);
@@ -161,6 +158,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         }
     }
 
+    @Override
     public ISchematicCursor getResultCursor() {
         try {
             if (executionType == ExecutionType.PUT) {
@@ -184,6 +182,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         return ps;
     }
 
+    @Override
     public void setDs(Object ds) {
         this.ds = (DataSource) ds;
     }
@@ -205,6 +204,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         }
     }
 
+    @Override
     public boolean isAutoCommit() throws SQLException {
         return myTransaction.isAutoCommit();
     }
@@ -213,6 +213,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         return ds;
     }
 
+    @Override
     public void close() throws SQLException {
         try {
             /*
@@ -300,6 +301,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         return ps;
     }
 
+    @Override
     public IRowSet first() throws SQLException {
         resultSet.beforeFirst();
         resultSet.next();
@@ -308,6 +310,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
 
     }
 
+    @Override
     public IRowSet last() throws SQLException {
         resultSet.afterLast();
         resultSet.previous();
@@ -316,6 +319,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
 
     }
 
+    @Override
     public IRowSet getCurrent() {
         return current;
     }
@@ -326,16 +330,19 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         }
     }
 
+    @Override
     public boolean isInited() {
         return executionType != null;
     }
 
+    @Override
     public void beforeFirst() throws SQLException {
         this.close();
         this.executeQuery(cursorMeta, isStreaming);
         current = null;
     }
 
+    @Override
     public IRowSet prev() throws SQLException {
         if (ds == null) {
             throw new TddlRuntimeException("数据源为空");
@@ -361,10 +368,12 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         return current;
     }
 
+    @Override
     public boolean isDone() {
         return true;
     }
 
+    @Override
     public void cancel(boolean interruptedIfRunning) {
     }
 
@@ -372,6 +381,7 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         this.myTransaction = myTransaction;
     }
 
+    @Override
     public boolean isCanceled() {
         return false;
     }

@@ -53,10 +53,10 @@ public class QueryMyHandler extends QueryHandler implements ICommandHandler {
 
         My_Cursor my_cursor = new My_Cursor(jdbcHandler, meta, executor, executor.isStreaming());
 
-        if (executor.getSql() != null) {
-            // TODO shenxun : 排序信息似乎丢了啊。。
-            return my_cursor.getResultSet();
-        }
+        // if (executor.getSql() != null) {
+        // // TODO shenxun : 排序信息似乎丢了啊。。
+        // return my_cursor.getResultSet();
+        // }
 
         List<IOrderBy> orderBy = null;
         if (executor instanceof IJoin) {

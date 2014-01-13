@@ -15,6 +15,7 @@ import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
+import com.taobao.tddl.executor.cursor.impl.CursorMetaImp;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.record.FixedLengthRecord;
 import com.taobao.tddl.executor.record.NamedRecord;
@@ -100,6 +101,11 @@ public class My_Cursor implements Cursor {
 
                 ColumnMeta cm = new ColumnMeta(null, name, type, null, true);
                 returnColumns.add(cm);
+            }
+
+            if (this.meta == null) {
+                meta = CursorMetaImp.buildNew(returnColumns);
+                myJdbcHandler.setContext(meta, isStreaming);
             }
             inited = true;
         } catch (SQLException e) {

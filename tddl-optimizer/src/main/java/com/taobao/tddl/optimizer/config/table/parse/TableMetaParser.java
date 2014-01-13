@@ -293,10 +293,11 @@ public class TableMetaParser {
         String type = null;
         switch (jdbcType) {
             case Types.BIGINT:
+            case Types.DECIMAL:
                 type = "LONG";
                 break;
             case Types.INTEGER:
-            case Types.DECIMAL:
+
             case Types.TINYINT:
             case Types.SMALLINT:
             case Types.NUMERIC:
