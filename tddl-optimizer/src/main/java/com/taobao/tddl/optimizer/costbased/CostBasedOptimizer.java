@@ -170,7 +170,7 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
             extraCmd.putAll(routeCondition.getExtraCmds());
         }
 
-        if (!(routeCondition instanceof ExtraCmdRouteCondition)) {
+        if (routeCondition != null && !(routeCondition instanceof ExtraCmdRouteCondition)) {
             String runSql = SimpleHintParser.removeHint(sql, parameterSettings);
             // TODO 基于hint直接构造执行计划
             return null;
