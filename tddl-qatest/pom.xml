@@ -12,14 +12,18 @@
 	<packaging>jar</packaging>
 	<name>${project.artifactId} module for tddl ${project.version}</name>
 	<dependencies>
-
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>tddl-matrix</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>tddl-sequence</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -33,14 +37,8 @@
 		</dependency>
 
 		<!-- test libs -->
-		<!--
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>tddl-client</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		-->
+		<!-- <dependency> <groupId>${project.groupId}</groupId> <artifactId>tddl-client</artifactId> 
+			<version>${project.version}</version> <scope>test</scope> </dependency> -->
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>tddl-repo-mysql</artifactId>
@@ -53,7 +51,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-				<dependency>
+		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>tddl-repo-oceanbase</artifactId>
 			<version>${project.version}</version>

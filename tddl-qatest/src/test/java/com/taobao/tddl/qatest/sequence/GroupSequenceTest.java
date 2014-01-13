@@ -1,7 +1,9 @@
 package com.taobao.tddl.qatest.sequence;
 
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -17,8 +19,6 @@ import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DataAccessException;
 
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.Statement;
 import com.taobao.diamond.mockserver.MockServer;
 import com.taobao.tddl.qatest.BaseAtomGroupTestCase;
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
