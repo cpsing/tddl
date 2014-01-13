@@ -21,5 +21,5 @@ import com.taobao.tddl.optimizer.exceptions.QueryException;
 public interface QueryPlanOptimizer {
 
     IDataNodeExecutor optimize(IDataNodeExecutor dne, Map<Integer, ParameterContext> parameterSettings,
-                               Map<String, Comparable> extraCmd) throws QueryException;
+                               Map<String, Object> extraCmd) throws QueryException;
 }

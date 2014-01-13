@@ -15,8 +15,6 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.monitor.Monitor;
 import com.taobao.tddl.optimizer.Optimizer;
 import com.taobao.tddl.optimizer.OptimizerContext;
@@ -49,6 +47,12 @@ import com.taobao.tddl.optimizer.exceptions.SqlParserException;
 import com.taobao.tddl.optimizer.parse.SqlAnalysisResult;
 import com.taobao.tddl.optimizer.parse.SqlParseManager;
 import com.taobao.tddl.optimizer.parse.cobar.CobarSqlParseManager;
+import com.taobao.tddl.optimizer.parse.hint.ExtraCmdRouteCondition;
+import com.taobao.tddl.optimizer.parse.hint.RouteCondition;
+import com.taobao.tddl.optimizer.parse.hint.SimpleHintParser;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * <pre>
@@ -148,26 +152,38 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
     }
 
     @Override
-    public IDataNodeExecutor optimizeAndAssignment(final ASTNode node,
-                                                   final Map<Integer, ParameterContext> parameterSettings,
-                                                   final Map<String, Comparable> extraCmd) throws QueryException {
+    public IDataNodeExecutor optimizeAndAssignment(ASTNode node, Map<Integer, ParameterContext> parameterSettings,
+                                                   Map<String, Object> extraCmd) throws QueryException {
         return optimizeAndAssignment(node, parameterSettings, extraCmd, null, false);
     }
 
     @Override
-    public IDataNodeExecutor optimizeAndAssignment(final String sql,
-                                                   final Map<Integer, ParameterContext> parameterSettings,
-                                                   final Map<String, Comparable> extraCmd, boolean cached)
-                                                                                                          throws QueryException,
-                                                                                                          SqlParserException {
-        SqlAnalysisResult result = sqlParseManager.parse(sql, parameterSettings, cached);
-        return optimizeAndAssignment(result.getAstNode(), parameterSettings, extraCmd, sql, cached);
+    public IDataNodeExecutor optimizeAndAssignment(String sql, Map<Integer, ParameterContext> parameterSettings,
+                                                   Map<String, Object> extraCmd, boolean cached) throws QueryException,
+                                                                                                SqlParserException {
+        RouteCondition routeCondition = SimpleHintParser.convertHint2RouteCondition(sql, parameterSettings);
+        if (routeCondition != null && !routeCondition.getExtraCmds().isEmpty()) {
+            if (extraCmd == null) {
+                extraCmd = new HashMap<String, Object>();
+            }
+
+            extraCmd.putAll(routeCondition.getExtraCmds());
+        }
+
+        if (!(routeCondition instanceof ExtraCmdRouteCondition)) {
+            String runSql = SimpleHintParser.removeHint(sql, parameterSettings);
+            // TODO 基于hint直接构造执行计划
+            return null;
+        } else {
+            SqlAnalysisResult result = sqlParseManager.parse(sql, parameterSettings, cached);
+            return optimizeAndAssignment(result.getAstNode(), parameterSettings, extraCmd, sql, cached);
+        }
     }
 
     private IDataNodeExecutor optimizeAndAssignment(final ASTNode node,
                                                     final Map<Integer, ParameterContext> parameterSettings,
-                                                    final Map<String, Comparable> extraCmd, String sql, boolean cached)
-                                                                                                                       throws QueryException {
+                                                    final Map<String, Object> extraCmd, String sql, boolean cached)
+                                                                                                                   throws QueryException {
         if (node.getSql() != null) { // 如果指定了sql，则绕过优化器直接返回
             if (logger.isDebugEnabled()) {
                 logger.warn("node.getSql() != null:\n" + node.getSql());
@@ -254,8 +270,8 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
         return qc;
     }
 
-    public ASTNode optimize(ASTNode node, Map<Integer, ParameterContext> parameterSettings,
-                            Map<String, Comparable> extraCmd) throws QueryException {
+    public ASTNode optimize(ASTNode node, Map<Integer, ParameterContext> parameterSettings, Map<String, Object> extraCmd)
+                                                                                                                         throws QueryException {
         // 先调用一次build，完成select字段信息的推导
         node.build();
         ASTNode optimized = null;
@@ -282,7 +298,7 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
         return optimized;
     }
 
-    private QueryTreeNode optimizeQuery(QueryTreeNode qn, Map<String, Comparable> extraCmd) throws QueryException {
+    private QueryTreeNode optimizeQuery(QueryTreeNode qn, Map<String, Object> extraCmd) throws QueryException {
 
         // / 预先处理子查询
         qn = SubQueryPreProcessor.optimize(qn);
@@ -303,7 +319,7 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
         return qn;
     }
 
-    private ASTNode optimizeUpdate(UpdateNode update, Map<String, Comparable> extraCmd) throws QueryException {
+    private ASTNode optimizeUpdate(UpdateNode update, Map<String, Object> extraCmd) throws QueryException {
         update.build();
         if (extraCmd == null) {
             extraCmd = new HashMap();
@@ -317,24 +333,24 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
 
     }
 
-    private ASTNode optimizeInsert(InsertNode insert, Map<String, Comparable> extraCmd) throws QueryException {
+    private ASTNode optimizeInsert(InsertNode insert, Map<String, Object> extraCmd) throws QueryException {
         insert.setNode((TableNode) insert.getNode().convertToJoinIfNeed());
         return insert;
     }
 
-    private ASTNode optimizeDelete(DeleteNode delete, Map<String, Comparable> extraCmd) throws QueryException {
+    private ASTNode optimizeDelete(DeleteNode delete, Map<String, Object> extraCmd) throws QueryException {
         QueryTreeNode queryCommon = this.optimizeQuery(delete.getNode(), extraCmd);
         delete.setNode((TableNode) queryCommon);
         return delete;
     }
 
-    private ASTNode optimizePut(PutNode put, Map<String, Comparable> extraCmd) throws QueryException {
+    private ASTNode optimizePut(PutNode put, Map<String, Object> extraCmd) throws QueryException {
         return put;
     }
 
     // ============= helper method =============
 
-    private ASTNode createMergeForJoin(ASTNode dne, Map<String, Comparable> extraCmd) {
+    private ASTNode createMergeForJoin(ASTNode dne, Map<String, Object> extraCmd) {
         if (dne instanceof MergeNode) {
             for (ASTNode sub : ((MergeNode) dne).getChildren()) {
                 this.createMergeForJoin(sub, extraCmd);

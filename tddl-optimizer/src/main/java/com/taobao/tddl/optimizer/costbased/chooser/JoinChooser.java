@@ -68,7 +68,7 @@ public class JoinChooser {
      * @param extraCmd
      * @return
      */
-    public static QueryTreeNode optimize(QueryTreeNode qtn, Map<String, Comparable> extraCmd) {
+    public static QueryTreeNode optimize(QueryTreeNode qtn, Map<String, Object> extraCmd) {
         optimizeSubQuery(qtn, extraCmd);// 先遍历完成对QueryNode的子优化，因为这个优化不会在optimizeJoin处理
         qtn = optimizeJoin(qtn, extraCmd);
         qtn.build();
@@ -81,7 +81,7 @@ public class JoinChooser {
      * 所以需要先对子查询进行优化，再对外层查询进行优化，回溯完成
      * </pre>
      */
-    private static void optimizeSubQuery(QueryTreeNode qtn, Map<String, Comparable> extraCmd) throws QueryException {
+    private static void optimizeSubQuery(QueryTreeNode qtn, Map<String, Object> extraCmd) throws QueryException {
         if (qtn instanceof QueryNode) {
             QueryNode qn = (QueryNode) qtn;
             if (qn.getChild() != null) {
@@ -103,7 +103,7 @@ public class JoinChooser {
     /**
      * 优化一棵查询树,以QueryNode为叶子终止,子节点单独进行优化
      */
-    private static QueryTreeNode optimizeJoin(QueryTreeNode qtn, Map<String, Comparable> extraCmd) {
+    private static QueryTreeNode optimizeJoin(QueryTreeNode qtn, Map<String, Object> extraCmd) {
         // 暂时跳过可能存在的聚合函数
         if (!(qtn instanceof TableNode || qtn instanceof JoinNode)) {
             qtn.getChildren().set(0, optimize((QueryTreeNode) qtn.getChildren().get(0), extraCmd));
@@ -180,7 +180,7 @@ public class JoinChooser {
      * 遍历每个节点 分解Query 为Query选择索引与Join策略 只遍历一棵子查询树
      */
     private static QueryTreeNode chooseStrategyAndIndexAndSplitQuery(QueryTreeNode node,
-                                                                     Map<String, Comparable> extraCmd)
+                                                                     Map<String, Object> extraCmd)
                                                                                                       throws QueryException {
         if (node instanceof JoinNode) {
             for (int i = 0; i < node.getChildren().size(); i++) {
@@ -425,7 +425,7 @@ public class JoinChooser {
         }
     }
 
-    private static boolean isOptimizeJoinOrder(Map<String, Comparable> extraCmd) {
+    private static boolean isOptimizeJoinOrder(Map<String, Object> extraCmd) {
         String value = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd, ExtraCmd.OptimizerExtraCmd.ChooseJoin));
         return BooleanUtils.toBoolean(value);
     }

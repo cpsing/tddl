@@ -112,7 +112,7 @@ public class GeneralUtil {
         return tab.toString();
     }
 
-    public static String getExtraCmdString(Map<String, Comparable> extraCmd, String key) {
+    public static String getExtraCmdString(Map<String, Object> extraCmd, String key) {
         if (extraCmd == null) {
             return null;
         }
@@ -128,7 +128,7 @@ public class GeneralUtil {
         }
     }
 
-    public static boolean getExtraCmdBoolean(Map<String, Comparable> extraCmd, String key, boolean defaultValue) {
+    public static boolean getExtraCmdBoolean(Map<String, Object> extraCmd, String key, boolean defaultValue) {
         String value = getExtraCmdString(extraCmd, key);
         if (value == null) {
             return defaultValue;
@@ -137,7 +137,7 @@ public class GeneralUtil {
         }
     }
 
-    public static long getExtraCmdLong(Map<String, Comparable> extraCmd, String key, long defaultValue) {
+    public static long getExtraCmdLong(Map<String, Object> extraCmd, String key, long defaultValue) {
         String value = getExtraCmdString(extraCmd, key);
         if (value == null) {
             return defaultValue;

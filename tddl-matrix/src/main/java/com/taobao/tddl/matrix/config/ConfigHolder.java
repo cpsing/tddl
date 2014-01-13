@@ -7,8 +7,6 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.TopologyExecutor;
 import com.taobao.tddl.executor.common.ExecutorContext;
 import com.taobao.tddl.executor.common.TopologyHandler;
@@ -25,6 +23,9 @@ import com.taobao.tddl.optimizer.rule.RuleIndexManager;
 import com.taobao.tddl.optimizer.rule.RuleSchemaManager;
 import com.taobao.tddl.rule.TddlRule;
 
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
+
 /**
  * 依赖的组件
  * 
@@ -32,22 +33,22 @@ import com.taobao.tddl.rule.TddlRule;
  */
 public class ConfigHolder extends AbstractLifecycle {
 
-    final static Logger             logger = LoggerFactory.getLogger(ConfigHolder.class);
-    private String                  appName;
-    private String                  ruleFilePath;
-    private String                  schemaFilePath;
-    private String                  topologyFilePath;
-    private String                  unitName;
-    private OptimizerRule           optimizerRule;
-    private TopologyHandler         topologyHandler;
-    private TopologyExecutor        topologyExecutor;
-    private SchemaManager           schemaManager;
-    private IndexManager            indexManger;
-    private Optimizer               optimizer;
-    private OptimizerContext        optimizerContext;
-    private ExecutorContext         executorContext;
-    private StatManager             statManager;
-    private Map<String, Comparable> connectionProperties;
+    final static Logger         logger = LoggerFactory.getLogger(ConfigHolder.class);
+    private String              appName;
+    private String              ruleFilePath;
+    private String              schemaFilePath;
+    private String              topologyFilePath;
+    private String              unitName;
+    private OptimizerRule       optimizerRule;
+    private TopologyHandler     topologyHandler;
+    private TopologyExecutor    topologyExecutor;
+    private SchemaManager       schemaManager;
+    private IndexManager        indexManger;
+    private Optimizer           optimizer;
+    private OptimizerContext    optimizerContext;
+    private ExecutorContext     executorContext;
+    private StatManager         statManager;
+    private Map<String, Object> connectionProperties;
 
     @Override
     public void doInit() throws TddlException {
@@ -186,11 +187,11 @@ public class ConfigHolder extends AbstractLifecycle {
         return this.optimizerContext;
     }
 
-    public Map<String, Comparable> getConnectionProperties() {
+    public Map<String, Object> getConnectionProperties() {
         return connectionProperties;
     }
 
-    public void setConnectionProperties(Map<String, Comparable> connectionProperties) {
+    public void setConnectionProperties(Map<String, Object> connectionProperties) {
         this.connectionProperties = connectionProperties;
     }
 

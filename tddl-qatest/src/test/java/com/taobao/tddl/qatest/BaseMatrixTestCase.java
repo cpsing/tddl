@@ -98,7 +98,7 @@ public class BaseMatrixTestCase extends PrepareData {
             us.setSchemaFile(schemaFile + dbTypeStack + "_" + schema);
         }
 
-        Map<String, Comparable> cp = new HashMap<String, Comparable>();
+        Map<String, Object> cp = new HashMap<String, Object>();
         if ("tdhs".equalsIgnoreCase(dbTypeStack)) {
             cp.put(ExtraCmd.ConnectionExtraCmd.USE_TDHS_FOR_DEFAULT, "true");
         }

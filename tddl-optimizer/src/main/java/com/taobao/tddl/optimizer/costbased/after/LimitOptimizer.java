@@ -25,7 +25,7 @@ public class LimitOptimizer implements QueryPlanOptimizer {
      */
     @Override
     public IDataNodeExecutor optimize(IDataNodeExecutor dne, Map<Integer, ParameterContext> parameterSettings,
-                                      Map<String, Comparable> extraCmd) {
+                                      Map<String, Object> extraCmd) {
 
         if (dne instanceof IQueryTree) {
             this.findMergeAndOptimizerLimit(dne);

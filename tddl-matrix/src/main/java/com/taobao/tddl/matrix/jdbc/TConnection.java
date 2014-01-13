@@ -62,8 +62,7 @@ public class TConnection implements Connection {
      * 执行sql语句的逻辑
      */
     public ResultSet executeSQL(String sql, Map<Integer, ParameterContext> context, TStatement stmt,
-                                Map<String, Comparable> extraCmd, ExecutionContext executionContext)
-                                                                                                    throws SQLException {
+                                Map<String, Object> extraCmd, ExecutionContext executionContext) throws SQLException {
         ExecutorContext.setContext(this.ds.getConfigHolder().getExecutorContext());
         OptimizerContext.setContext(this.ds.getConfigHolder().getOptimizerContext());
         ResultCursor resultCursor;
@@ -220,8 +219,8 @@ public class TConnection implements Connection {
         ExceptionUtils.throwSQLException(exceptions, "close tconnection", Collections.EMPTY_LIST);
     }
 
-    private Map<String, Comparable> buildExtraCommand(String sql) {
-        Map<String, Comparable> extraCmd = new HashMap();
+    private Map<String, Object> buildExtraCommand(String sql) {
+        Map<String, Object> extraCmd = new HashMap();
         String andorExtra = "/* ANDOR ";
         String tddlExtra = "/* TDDL ";
         if (sql != null) {

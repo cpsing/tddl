@@ -44,7 +44,7 @@ public class ExecutionContext {
      */
     private ITable                 table;
 
-    Map<String, Comparable>        extraCmds        = new HashMap();
+    Map<String, Object>            extraCmds        = new HashMap();
 
     Map<Integer, ParameterContext> params           = null;
     String                         isolation        = null;
@@ -100,11 +100,11 @@ public class ExecutionContext {
         this.table = table;
     }
 
-    public Map<String, Comparable> getExtraCmds() {
+    public Map<String, Object> getExtraCmds() {
         return extraCmds;
     }
 
-    public void setExtraCmds(Map<String, Comparable> extraCmds) {
+    public void setExtraCmds(Map<String, Object> extraCmds) {
         this.extraCmds = extraCmds;
     }
 

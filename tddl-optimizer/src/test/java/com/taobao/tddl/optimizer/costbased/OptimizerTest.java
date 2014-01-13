@@ -26,7 +26,7 @@ import com.taobao.tddl.optimizer.utils.OptimizerUtils;
  */
 public class OptimizerTest extends BaseOptimizerTest {
 
-    private static Map<String, Comparable> extraCmd = new HashMap<String, Comparable>();
+    private static Map<String, Object> extraCmd = new HashMap<String, Object>();
 
     @BeforeClass
     public static void setUp() {

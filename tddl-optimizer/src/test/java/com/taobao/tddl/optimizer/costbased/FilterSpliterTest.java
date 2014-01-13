@@ -88,7 +88,7 @@ public class FilterSpliterTest extends BaseOptimizerTest {
     private void build(TableNode table) {
         table.build();
 
-        Map<String, Comparable> extraCmd = new HashMap<String, Comparable>();
+        Map<String, Object> extraCmd = new HashMap<String, Object>();
         extraCmd.put(ExtraCmd.OptimizerExtraCmd.ChooseIndex, true);
         IndexMeta index = IndexChooser.findBestIndex(table.getTableMeta(),
             new ArrayList<ISelectable>(),

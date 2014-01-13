@@ -267,7 +267,7 @@ public class JoinChooserTest extends BaseOptimizerTest {
     }
 
     private QueryTreeNode optimize(QueryTreeNode qtn, boolean chooseIndex, boolean chooseJoin, boolean chooseIndexMerge) {
-        Map<String, Comparable> extraCmd = new HashMap<String, Comparable>();
+        Map<String, Object> extraCmd = new HashMap<String, Object>();
         extraCmd.put(ExtraCmd.OptimizerExtraCmd.ChooseIndex, chooseIndex);
         extraCmd.put(ExtraCmd.OptimizerExtraCmd.ChooseJoin, chooseJoin);
         extraCmd.put(ExtraCmd.OptimizerExtraCmd.ChooseIndexMerge, chooseIndexMerge);
@@ -277,7 +277,7 @@ public class JoinChooserTest extends BaseOptimizerTest {
     private void build(TableNode table) {
         table.build();
 
-        Map<String, Comparable> extraCmd = new HashMap<String, Comparable>();
+        Map<String, Object> extraCmd = new HashMap<String, Object>();
         extraCmd.put(ExtraCmd.OptimizerExtraCmd.ChooseIndex, true);
         IndexMeta index = IndexChooser.findBestIndex(table.getTableMeta(),
             new ArrayList<ISelectable>(),

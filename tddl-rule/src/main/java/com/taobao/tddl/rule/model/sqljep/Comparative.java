@@ -83,21 +83,32 @@ public class Comparative implements Comparable, Cloneable {
         }
     }
 
-    public static int getComparisonByIdent(String ident) {
-        if ("=".equals(ident)) {
-            return Equivalent;
-        } else if (">".equals(ident)) {
-            return GreaterThan;
-        } else if (">=".equals(ident)) {
-            return GreaterThanOrEqual;
-        } else if ("<=".equals(ident)) {
-            return LessThanOrEqual;
-        } else if ("<".equals(ident)) {
-            return LessThan;
-        } else if ("!=".equals(ident)) {
-            return NotEquivalent;
-        } else if ("<>".equals(ident)) {
-            return NotEquivalent;
+    /**
+     * contains顺序按字符从多到少排列，否则逻辑不对，这里 先这样处理。
+     * 
+     * @param completeStr
+     * @return
+     */
+    public static int getComparisonByCompleteString(String completeStr) {
+        if (completeStr != null) {
+            String ident = completeStr.toLowerCase();
+            if (ident.contains(">=")) {
+                return GreaterThanOrEqual;
+            } else if (ident.contains("<=")) {
+                return LessThanOrEqual;
+            } else if (ident.contains("!=")) {
+                return NotEquivalent;
+            } else if (ident.contains("<>")) {
+                return NotEquivalent;
+            } else if (ident.contains("=")) {
+                return Equivalent;
+            } else if (ident.contains(">")) {
+                return GreaterThan;
+            } else if (ident.contains("<")) {
+                return LessThan;
+            } else {
+                return -1;
+            }
         } else {
             return -1;
         }

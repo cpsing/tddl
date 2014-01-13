@@ -30,7 +30,7 @@ public class FuckAvgOptimizer implements QueryPlanOptimizer {
      */
     @Override
     public IDataNodeExecutor optimize(IDataNodeExecutor dne, Map<Integer, ParameterContext> parameterSettings,
-                                      Map<String, Comparable> extraCmd) {
+                                      Map<String, Object> extraCmd) {
         if (dne instanceof IMerge && ((IMerge) dne).getSubNode().size() > 1) {
             boolean hasAvg = false;
             for (IDataNodeExecutor sub : ((IMerge) dne).getSubNode()) {
