@@ -202,7 +202,7 @@ public class SimpleHintParser {
      * @return
      */
     public static String extractHint(String sql, Map<Integer, ParameterContext> parameterSettings) {
-        String tddlHint = TStringUtil.getBetween(sql, "/*+TDDL(", ")*/");
+        String tddlHint = TStringUtil.getBetween(sql.toUpperCase(), "/*+TDDL(", ")*/");
         if (null == tddlHint || "".endsWith(tddlHint)) {
             return null;
         }
@@ -234,9 +234,13 @@ public class SimpleHintParser {
         return sb.toString();
     }
 
+    public static String extractTDDLGroupHintString(String sql) {
+        return TStringUtil.getBetween(sql.toUpperCase(), "/*+TDDL_GROUP({", "})*/");
+    }
+
     public static String removeHint(String originsql, Map<Integer, ParameterContext> parameterSettings) {
         String sql = originsql;
-        String tddlHint = TStringUtil.getBetween(sql, "/*+TDDL(", ")*/");
+        String tddlHint = TStringUtil.getBetween(sql.toUpperCase(), "/*+TDDL(", ")*/");
         if (null == tddlHint || "".endsWith(tddlHint)) {
             return originsql;
         }

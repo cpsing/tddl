@@ -11,12 +11,15 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.alibaba.cobar.parser.ast.stmt.SQLStatement;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.taobao.tddl.common.TddlConstants;
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.SqlType;
@@ -117,6 +120,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  */
 public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
 
+    private static final String            _DIRECT         = "_DIRECT_";
     private static final Logger            logger          = LoggerFactory.getLogger(CostBasedOptimizer.class);
     private int                            cacheSize       = 1000;
     private long                           expireTime      = TddlConstants.DEFAULT_OPTIMIZER_EXPIRE_TIME;
@@ -190,13 +194,17 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
             return optimizeAndAssignment(result.getAstNode(parameterSettings), parameterSettings, extraCmd, sql, cached);
         } else {
             sql = SimpleHintParser.removeHint(sql, parameterSettings);
+            String groupHint = SimpleHintParser.extractTDDLGroupHintString(sql);
             // 基于hint直接构造执行计划
             // 目前sql构造依赖于cobar parser的visitor模式，如果cobar
             // parser存在语法解析不过的情况，即使设置hint也无法绕过
             if (routeCondition instanceof DirectlyRouteCondition) {
                 DirectlyRouteCondition drc = (DirectlyRouteCondition) routeCondition;
-                Map<String, String> sqls = buildDirectSqls(result, drc.getVirtualTableName(), drc.getTables());
-                return buildDirectPlan(result.getSqlType(), drc.getDbId(), sqls, parameterSettings);
+                Map<String, String> sqls = buildDirectSqls(result,
+                    drc.getVirtualTableName(),
+                    drc.getTables(),
+                    groupHint);
+                return buildDirectPlan(result.getSqlType(), drc.getDbId(), sqls);
             } else if (routeCondition instanceof RuleRouteCondition) {
                 RuleRouteCondition rrc = (RuleRouteCondition) routeCondition;
                 boolean isWrite = (result.getSqlType() != SqlType.SELECT && result.getSqlType() != SqlType.SELECT_FOR_UPDATE);
@@ -208,8 +216,8 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
                 for (TargetDB target : targetDBs) {
                     tables.addAll(target.getTableNames());
                 }
-                Map<String, String> sqls = buildDirectSqls(result, rrc.getVirtualTableName(), tables);
-                return buildRulePlain(result.getSqlType(), targetDBs, sqls, parameterSettings);
+                Map<String, String> sqls = buildDirectSqls(result, rrc.getVirtualTableName(), tables, groupHint);
+                return buildRulePlain(result.getSqlType(), targetDBs, sqls);
             } else {
                 throw new NotSupportException("RouteCondition : " + routeCondition.toString());
             }
@@ -390,20 +398,39 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
      * 通过visitor替换表名生成sql
      */
     private Map<String, /* table name */String/* sql */> buildDirectSqls(SqlAnalysisResult sqlAnalysisResult,
-                                                                         String vtab, Collection<String> tables) {
+                                                                         String vtab, Collection<String> tables,
+                                                                         String groupHint) {
+        if (groupHint == null) {
+            groupHint = "";
+        }
         Map<String, String> sqls = new HashMap<String, String>();
         // 指定分库分表，直接下推sql
         // 目前先考虑只有一张表的表名需要替换
         SQLStatement statement = ((CobarSqlAnalysisResult) sqlAnalysisResult).getStatement();
         boolean singleNode = (tables.size() > 1);
-        Map<String, String> logicTable2RealTable = new HashMap<String, String>();
-        for (String realTable : tables) {
-            logicTable2RealTable.put(vtab, realTable);
-            MysqlOutputVisitor sqlVisitor = new MysqlOutputVisitor(new StringBuilder(),
-                singleNode,
-                logicTable2RealTable);
+        if (StringUtils.isNotEmpty(vtab) && !tables.isEmpty()) {
+            String[] vtabs = StringUtils.split(vtab, ',');
+            Map<String, String> logicTable2RealTable = new HashMap<String, String>();
+            for (String realTable : tables) {
+                String[] rtabs = StringUtils.split(realTable, ',');
+                if (rtabs.length != vtabs.length) {
+                    throw new TddlRuntimeException("hint中逻辑表和真实表数量不匹配");
+                }
+                int i = 0;
+                for (String v : vtabs) {
+                    logicTable2RealTable.put(v, rtabs[i++]);
+                }
+                MysqlOutputVisitor sqlVisitor = new MysqlOutputVisitor(new StringBuilder(groupHint),
+                    singleNode,
+                    logicTable2RealTable);
+                statement.accept(sqlVisitor);
+                sqls.put(realTable, sqlVisitor.getSql());
+            }
+        } else {
+            // 没有执行表设置，直接下推sql，不需要做表名替换
+            MysqlOutputVisitor sqlVisitor = new MysqlOutputVisitor(new StringBuilder(groupHint), false, null);
             statement.accept(sqlVisitor);
-            sqls.put(realTable, sqlVisitor.getSql());
+            sqls.put(_DIRECT, sqlVisitor.getSql());
         }
         return sqls;
     }
@@ -411,12 +438,11 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
     /**
      * 根据规则生成对应的执行计划
      */
-    private IDataNodeExecutor buildRulePlain(SqlType sqlType, List<TargetDB> targetDBs, Map<String, String> sqls,
-                                             Map<Integer, ParameterContext> parameterSettings) {
+    private IDataNodeExecutor buildRulePlain(SqlType sqlType, List<TargetDB> targetDBs, Map<String, String> sqls) {
         List<IDataNodeExecutor> subs = new ArrayList<IDataNodeExecutor>();
         for (TargetDB target : targetDBs) {
             for (String table : target.getTableNames()) {
-                subs.add(buildOneDirectPlan(sqlType, target.getDbIndex(), sqls.get(table), parameterSettings));
+                subs.add(buildOneDirectPlan(sqlType, target.getDbIndex(), sqls.get(table)));
             }
         }
 
@@ -434,21 +460,19 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
     /**
      * 根据指定的库和表生成执行计划
      */
-    private IDataNodeExecutor buildDirectPlan(SqlType sqlType, String dbId, Map<String, String> tables,
-                                              Map<Integer, ParameterContext> parameterSettings) {
-        if (tables.size() > 1) {
+    private IDataNodeExecutor buildDirectPlan(SqlType sqlType, String dbId, Map<String, String> sqls) {
+        if (sqls.size() > 1) {
             IMerge merge = ASTNodeFactory.getInstance().createMerge();
-            for (String sql : tables.values()) {
-                merge.addSubNode(buildOneDirectPlan(sqlType, dbId, sql, parameterSettings));
+            for (String sql : sqls.values()) {
+                merge.addSubNode(buildOneDirectPlan(sqlType, dbId, sql));
             }
             return merge;
         } else {
-            return buildOneDirectPlan(sqlType, dbId, tables.values().iterator().next(), parameterSettings);
+            return buildOneDirectPlan(sqlType, dbId, sqls.values().iterator().next());
         }
     }
 
-    private IDataNodeExecutor buildOneDirectPlan(SqlType sqlType, String dbId, String sql,
-                                                 Map<Integer, ParameterContext> parameterSettings) {
+    private IDataNodeExecutor buildOneDirectPlan(SqlType sqlType, String dbId, String sql) {
         IDataNodeExecutor executor = null;
         switch (sqlType) {
             case SELECT:
@@ -472,7 +496,6 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
 
         if (executor != null) {
             executor.setSql(sql);
-            executor.setParameterSettings(parameterSettings);
             executor.executeOn(dbId);
         }
 
