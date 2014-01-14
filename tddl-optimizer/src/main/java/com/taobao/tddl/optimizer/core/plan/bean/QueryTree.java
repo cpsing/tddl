@@ -164,17 +164,6 @@ public abstract class QueryTree extends DataNodeExecutor<IQueryTree> implements 
         return queryConcurrency;
     }
 
-    @Override
-    public Map<Integer, ParameterContext> getParameterSettings() {
-        return parameterSettings;
-    }
-
-    @Override
-    public IQueryTree setParameterSettings(Map<Integer, ParameterContext> parameterSettings) {
-        this.parameterSettings = parameterSettings;
-        return this;
-    }
-
     public IQueryTree assignment(Map<Integer, ParameterContext> parameterSettings) {
         if (this.getColumns() != null) {
             for (ISelectable c : this.getColumns()) {
@@ -229,7 +218,6 @@ public abstract class QueryTree extends DataNodeExecutor<IQueryTree> implements 
         o.setSql(sql);
         o.setIsSubQuery(this.isSubQuery);
         o.executeOn(this.getDataNode());
-        o.setParameterSettings(parameterSettings);
     }
 
     @Override

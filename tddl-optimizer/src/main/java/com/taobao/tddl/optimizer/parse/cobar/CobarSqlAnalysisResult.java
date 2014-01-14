@@ -60,23 +60,18 @@ public class CobarSqlAnalysisResult implements SqlAnalysisResult {
 
                 sqlType = SqlType.SELECT;
                 visitor = new MySqlSelectVisitor();
-                statement.accept(visitor);
             } else if (statement instanceof DMLUpdateStatement) {
                 sqlType = SqlType.UPDATE;
                 visitor = new MySqlUpdateVisitor();
-                statement.accept(visitor);
             } else if (statement instanceof DMLDeleteStatement) {
                 sqlType = SqlType.DELETE;
                 visitor = new MySqlDeleteVisitor();
-                statement.accept(visitor);
             } else if (statement instanceof DMLInsertStatement) {
                 sqlType = SqlType.INSERT;
                 visitor = new MySqlInsertVisitor();
-                statement.accept(visitor);
             } else if (statement instanceof DMLReplaceStatement) {
                 sqlType = SqlType.REPLACE;
                 visitor = new MySqlReplaceIntoVisitor();
-                statement.accept(visitor);
             } else if (statement instanceof DDLStatement) {
                 throw new IllegalArgumentException("tddl not support DDL statement:'" + sql + "'");
             } else if (statement instanceof ShowCreate) {

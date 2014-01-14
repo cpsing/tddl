@@ -40,7 +40,6 @@ public class InsertTest extends BaseMatrixTestCase {
     public void initData() throws Exception {
         andorUpdateData("delete from  " + normaltblTableName, null);
         mysqlUpdateData("delete from  " + normaltblTableName, null);
-
     }
 
     @Test

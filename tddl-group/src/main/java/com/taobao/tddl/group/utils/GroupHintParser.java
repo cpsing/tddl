@@ -1,4 +1,3 @@
-//Copyright(c) Taobao.com
 package com.taobao.tddl.group.utils;
 
 import com.taobao.tddl.common.utils.TStringUtil;
@@ -8,7 +7,6 @@ import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
- * @description
  * @author <a href="junyu@taobao.com">junyu</a>
  * @version 1.0
  * @since 1.6

@@ -155,17 +155,6 @@ public class Put<RT extends IPut> extends DataNodeExecutor<RT> implements IPut<R
         }
     }
 
-    @Override
-    public Map<Integer, ParameterContext> getParameterSettings() {
-        return parameterSettings;
-    }
-
-    @Override
-    public RT setParameterSettings(Map<Integer, ParameterContext> parameterSettings) {
-        this.parameterSettings = parameterSettings;
-        return (RT) this;
-    }
-
     public void accept(PlanVisitor visitor) {
         if (this instanceof IInsert) {
             visitor.visit((IInsert) this);

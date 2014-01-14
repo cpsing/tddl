@@ -1117,10 +1117,10 @@ public class SqlParserTest extends BaseOptimizerTest {
     // ==================================================
 
     private QueryTreeNode query(String sql) throws SqlParserException {
-        SqlAnalysisResult sm = parser.parse(sql, null, false);
+        SqlAnalysisResult sm = parser.parse(sql, false);
         QueryTreeNode qn = null;
         if (sm.getSqlType() == SqlType.SELECT) {
-            qn = sm.getQueryTreeNode();
+            qn = sm.getQueryTreeNode(null);
         } else {
             qn = new KVIndexNode(null);
             qn.setSql(sql);
@@ -1129,10 +1129,10 @@ public class SqlParserTest extends BaseOptimizerTest {
     }
 
     private QueryTreeNode query(String sql, List args) throws SqlParserException {
-        SqlAnalysisResult sm = parser.parse(sql, convert(args), false);
+        SqlAnalysisResult sm = parser.parse(sql, false);
         QueryTreeNode qn = null;
         if (sm.getSqlType() == SqlType.SELECT) {
-            qn = sm.getQueryTreeNode();
+            qn = sm.getQueryTreeNode(convert(args));
         } else {
             qn = new KVIndexNode(null);
             qn.setSql(sql);
@@ -1141,30 +1141,30 @@ public class SqlParserTest extends BaseOptimizerTest {
     }
 
     private UpdateNode update(String sql) throws SqlParserException {
-        SqlAnalysisResult sm = parser.parse(sql, null, false);
+        SqlAnalysisResult sm = parser.parse(sql, false);
         UpdateNode qn = null;
         if (sm.getSqlType() == SqlType.UPDATE) {
-            qn = sm.getUpdateNode();
+            qn = sm.getUpdateNode(null);
         }
 
         return qn;
     }
 
     private DeleteNode delete(String sql) throws SqlParserException {
-        SqlAnalysisResult sm = parser.parse(sql, null, false);
+        SqlAnalysisResult sm = parser.parse(sql, false);
         DeleteNode qn = null;
         if (sm.getSqlType() == SqlType.DELETE) {
-            qn = sm.getDeleteNode();
+            qn = sm.getDeleteNode(null);
         }
 
         return qn;
     }
 
     private InsertNode insert(String sql) throws SqlParserException {
-        SqlAnalysisResult sm = parser.parse(sql, null, false);
+        SqlAnalysisResult sm = parser.parse(sql, false);
         InsertNode qn = null;
         if (sm.getSqlType() == SqlType.INSERT) {
-            qn = sm.getInsertNode();
+            qn = sm.getInsertNode(null);
         }
 
         return qn;
