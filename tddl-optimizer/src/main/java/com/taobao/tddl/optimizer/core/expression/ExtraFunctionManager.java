@@ -76,7 +76,7 @@ public class ExtraFunctionManager {
 
     public static void addFuncion(Class clazz) {
         String name = clazz.getSimpleName();
-        Class oldClazz = functionCaches.put(buildKey(name), clazz);
+        Class oldClazz = functionCaches.put(buildKey(name.toUpperCase()), clazz);
         if (oldClazz != null) {
             logger.warn(" dup function :" + name + ", old class : " + oldClazz.getName());
         }
@@ -119,6 +119,6 @@ public class ExtraFunctionManager {
             return "DIVISION";
         }
 
-        return name.toUpperCase();
+        return name;// 默认语法树中所有节点均为大写
     }
 }

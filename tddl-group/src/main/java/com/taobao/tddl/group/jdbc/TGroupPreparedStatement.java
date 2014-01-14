@@ -207,8 +207,8 @@ public class TGroupPreparedStatement extends TGroupStatement implements TPrepare
      * setxxx SQL参数设置
      * ======================================================================
      */
-    public void setArray(int i, Array x) throws SQLException {
-        parameterSettings.put(i, new ParameterContext(ParameterMethod.setArray, new Object[] { i, x }));
+    public void setArray(int parameterIndex, Array x) throws SQLException {
+        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setArray, new Object[] { parameterIndex, x }));
     }
 
     public void setAsciiStream(int parameterIndex, InputStream x, int length) throws SQLException {
@@ -226,8 +226,8 @@ public class TGroupPreparedStatement extends TGroupStatement implements TPrepare
                 parameterIndex, x, length }));
     }
 
-    public void setBlob(int i, Blob x) throws SQLException {
-        parameterSettings.put(i, new ParameterContext(ParameterMethod.setBlob, new Object[] { i, x }));
+    public void setBlob(int parameterIndex, Blob x) throws SQLException {
+        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setBlob, new Object[] { parameterIndex, x }));
     }
 
     public void setBoolean(int parameterIndex, boolean x) throws SQLException {
@@ -250,8 +250,8 @@ public class TGroupPreparedStatement extends TGroupStatement implements TPrepare
                 parameterIndex, reader, length }));
     }
 
-    public void setClob(int i, Clob x) throws SQLException {
-        parameterSettings.put(i, new ParameterContext(ParameterMethod.setClob, new Object[] { i, x }));
+    public void setClob(int parameterIndex, Clob x) throws SQLException {
+        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setClob, new Object[] { parameterIndex, x }));
     }
 
     public void setDate(int parameterIndex, Date x) throws SQLException {
@@ -309,8 +309,8 @@ public class TGroupPreparedStatement extends TGroupStatement implements TPrepare
                 parameterIndex, x, targetSqlType, scale }));
     }
 
-    public void setRef(int i, Ref x) throws SQLException {
-        parameterSettings.put(i, new ParameterContext(ParameterMethod.setRef, new Object[] { i, x }));
+    public void setRef(int parameterIndex, Ref x) throws SQLException {
+        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setRef, new Object[] { parameterIndex, x }));
     }
 
     public void setShort(int parameterIndex, short x) throws SQLException {

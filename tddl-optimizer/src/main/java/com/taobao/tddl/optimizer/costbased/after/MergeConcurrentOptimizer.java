@@ -65,6 +65,11 @@ public class MergeConcurrentOptimizer implements QueryPlanOptimizer {
         String value = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd,
             ExtraCmd.OptimizerExtraCmd.MergeConcurrent));
         if (StringUtils.isEmpty(value)) {
+            if (query.getSql() != null) {
+                // 如果存在sql，那说明是hint直接路由
+                return true;
+            }
+
             if ((query.getLimitFrom() != null || query.getLimitTo() != null)) {
                 if (query.getOrderBys() == null || query.getOrderBys().isEmpty()) {
                     // 存在limit，但不存在order by时不允许走并行

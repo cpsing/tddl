@@ -13,7 +13,6 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
-import com.taobao.tddl.common.jdbc.ParameterMethod;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.rule.model.sqljep.Comparative;
@@ -70,9 +69,9 @@ public class SimpleHintParser {
             try {
                 JSONObject jsonObject = JSON.parseObject(tddlHint);
                 String type = jsonObject.getString("type");
-                if ("direct".equals(type)) {
+                if ("direct".equalsIgnoreCase(type)) {
                     return decodeDirect(jsonObject);
-                } else if ("condition".equals(type)) {
+                } else if ("condition".equalsIgnoreCase(type)) {
                     return decodeCondition(jsonObject);
                 } else {
                     return decodeExtra(jsonObject);
@@ -126,8 +125,10 @@ public class SimpleHintParser {
     private static ExtraCmdRouteCondition decodeExtra(JSONObject jsonObject) throws JSONException {
         ExtraCmdRouteCondition rc = new ExtraCmdRouteCondition();
         String extraCmd = containsKvNotBlank(jsonObject, EXTRACMD);
-        JSONObject extraCmds = JSON.parseObject(extraCmd);
-        rc.getExtraCmds().putAll(extraCmds);
+        if (StringUtils.isNotEmpty(extraCmd)) {
+            JSONObject extraCmds = JSON.parseObject(extraCmd);
+            rc.getExtraCmds().putAll(extraCmds);
+        }
         return rc;
     }
 
@@ -202,14 +203,14 @@ public class SimpleHintParser {
      * @return
      */
     public static String extractHint(String sql, Map<Integer, ParameterContext> parameterSettings) {
-        String tddlHint = TStringUtil.getBetween(sql.toUpperCase(), "/*+TDDL(", ")*/");
+        String tddlHint = TStringUtil.getBetween(sql, "/*+TDDL(", ")*/");
         if (null == tddlHint || "".endsWith(tddlHint)) {
             return null;
         }
 
         StringBuffer sb = new StringBuffer();
         int size = tddlHint.length();
-        int parameters = 1;
+        int parameters = 0;
         for (int i = 0; i < size; i++) {
             if (tddlHint.charAt(i) == '?') {
                 // TDDLHINT只能设置简单值
@@ -218,14 +219,15 @@ public class SimpleHintParser {
                 }
 
                 ParameterContext param = parameterSettings.get(parameters);
-                if (param.getParameterMethod() == ParameterMethod.setString) {
-                    sb.append("'");
-                    sb.append(parameterSettings.get(parameters).getArgs()[1]);
-                    sb.append("'");
-                } else {
-                    sb.append(parameterSettings.get(parameters).getArgs()[1]);
-                }
-
+                sb.append(param.getArgs()[1]);
+                // if (param.getParameterMethod() == ParameterMethod.setString)
+                // {
+                // sb.append("'");
+                // sb.append(parameterSettings.get(parameters).getArgs()[1]);
+                // sb.append("'");
+                // } else {
+                // sb.append(parameterSettings.get(parameters).getArgs()[1]);
+                // }
                 parameters++;
             } else {
                 sb.append(tddlHint.charAt(i));
@@ -235,12 +237,12 @@ public class SimpleHintParser {
     }
 
     public static String extractTDDLGroupHintString(String sql) {
-        return TStringUtil.getBetween(sql.toUpperCase(), "/*+TDDL_GROUP({", "})*/");
+        return TStringUtil.getBetween(sql, "/*+TDDL_GROUP({", "})*/");
     }
 
     public static String removeHint(String originsql, Map<Integer, ParameterContext> parameterSettings) {
         String sql = originsql;
-        String tddlHint = TStringUtil.getBetween(sql.toUpperCase(), "/*+TDDL(", ")*/");
+        String tddlHint = TStringUtil.getBetween(sql, "/*+TDDL(", ")*/");
         if (null == tddlHint || "".endsWith(tddlHint)) {
             return originsql;
         }
@@ -253,21 +255,25 @@ public class SimpleHintParser {
         }
 
         sql = TStringUtil.removeBetweenWithSplitor(sql, "/*+TDDL(", ")*/");
-        // 如果parameters为0，说明TDDLhint中没有参数，所以直接返回sql即可
-        if (parameters == 0) {
-            return sql;
-        }
-
         // TDDL的hint必需写在SQL语句的最前面，如果和ORACLE hint一起用，
         // 也必需写在hint字符串的最前面，否则参数非常难以处理，也就会出错
-        int pSize = parameterSettings.size();
-        for (int i = 1; i <= parameters; i++) {
+
+        // 如果parameters为0，说明TDDLhint中没有参数，所以直接返回sql即可
+        // if (parameters < 0) {
+        // return sql;
+        // }
+        // TODO 需要确认param index的起始位置
+
+        for (int i = 0; i < parameters; i++) {
             parameterSettings.remove(i);
         }
+
         Map<Integer, ParameterContext> newParameterSettings = new TreeMap<Integer, ParameterContext>();
         for (Map.Entry<Integer, ParameterContext> entry : parameterSettings.entrySet()) {
             // 重新计算一下parameters index
-            newParameterSettings.put(entry.getKey() - (pSize - parameters), entry.getValue());
+            // jdbc规范从1开始,database从0开始
+            newParameterSettings.put(entry.getKey() - parameters + 1, entry.getValue());
+            entry.getValue().getArgs()[0] = entry.getKey() - parameters + 1;// args里的第一位也是下标
         }
 
         parameterSettings.clear();
