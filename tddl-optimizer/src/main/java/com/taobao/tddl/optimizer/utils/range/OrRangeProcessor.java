@@ -15,12 +15,12 @@ import com.taobao.tddl.optimizer.core.expression.IFilter;
  */
 public class OrRangeProcessor extends AbstractRangeProcessor {
 
-    private boolean             fullSet      = false;
-    private List<List<IFilter>> otherFilters = new ArrayList();
-    private List<Range>         ranges       = new LinkedList<Range>();
-    private Comparable          column;
+    private boolean                   fullSet      = false;
+    private final List<List<IFilter>> otherFilters = new ArrayList();
+    private final List<Range>         ranges       = new LinkedList<Range>();
+    private final Object              column;
 
-    public OrRangeProcessor(Comparable c){
+    public OrRangeProcessor(Object c){
         this.column = c;
     }
 
@@ -28,6 +28,7 @@ public class OrRangeProcessor extends AbstractRangeProcessor {
         return fullSet;
     }
 
+    @Override
     public boolean process(IFilter node) {
         if (isFullSet()) {
             return true;

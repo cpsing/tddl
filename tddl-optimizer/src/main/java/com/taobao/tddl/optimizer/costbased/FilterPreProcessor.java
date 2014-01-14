@@ -188,7 +188,7 @@ public class FilterPreProcessor {
     private static IFilter exchage(IFilter root) {
         IBooleanFilter bf = (IBooleanFilter) root;
         if (!FilterUtils.isConstValue(bf.getValue()) && FilterUtils.isConstValue(bf.getColumn())) {
-            Comparable val = bf.getColumn();
+            Object val = bf.getColumn();
             bf.setColumn(bf.getValue());
             bf.setValue(val);
             OPERATION newOp = bf.getOperation();
@@ -219,8 +219,7 @@ public class FilterPreProcessor {
         if (bf.getValues() != null && bf.getColumn() instanceof ISelectable) {
             for (int i = 0; i < bf.getValues().size(); i++) {
                 bf.getValues().set(i,
-                    (Comparable) OptimizerUtils.convertType(bf.getValues().get(i),
-                        ((ISelectable) bf.getColumn()).getDataType()));
+                    OptimizerUtils.convertType(bf.getValues().get(i), ((ISelectable) bf.getColumn()).getDataType()));
             }
         } else {
             // 如果是 1 = id情况
@@ -248,7 +247,7 @@ public class FilterPreProcessor {
                     type = ((IFunction) bf.getColumn()).getDataType();
                 }
 
-                bf.setValue((Comparable) OptimizerUtils.convertType(bf.getValue(), type));
+                bf.setValue(OptimizerUtils.convertType(bf.getValue(), type));
             }
         }
         return bf;

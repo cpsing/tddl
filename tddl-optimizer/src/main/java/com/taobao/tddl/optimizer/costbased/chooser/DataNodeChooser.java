@@ -17,6 +17,8 @@ import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
@@ -48,9 +50,6 @@ import com.taobao.tddl.optimizer.utils.FilterUtils;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
 import com.taobao.tddl.rule.model.Field;
 import com.taobao.tddl.rule.model.TargetDB;
-
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * <pre>
@@ -839,7 +838,7 @@ public class DataNodeChooser {
         }
     }
 
-    private static IFilter createFilter(List<ISelectable> columns, List<Comparable> values) {
+    private static IFilter createFilter(List<ISelectable> columns, List<Object> values) {
         IFilter insertFilter = null;
         if (columns.size() == 1) {
             IBooleanFilter f = ASTNodeFactory.getInstance().createBooleanFilter();

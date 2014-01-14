@@ -224,7 +224,7 @@ public interface ICursorFactory {
      * @param op
      * @return
      */
-    IInCursor inCursor(ExecutionContext context, Cursor cursor, List<IOrderBy> orderBys, IColumn c, List<Comparable> v,
+    IInCursor inCursor(ExecutionContext context, Cursor cursor, List<IOrderBy> orderBys, IColumn c, List<Object> v,
                        OPERATION op) throws TddlException;
 
     /**

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 import com.taobao.tddl.optimizer.core.expression.IBindVal;
@@ -13,9 +15,6 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.expression.bean.NullValue;
 import com.taobao.tddl.optimizer.utils.OptimizerToString;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
-
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * DML操作树
@@ -26,7 +25,7 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
 
     protected static final Logger            logger            = LoggerFactory.getLogger(DMLNode.class);
     protected List<ISelectable>              columns;
-    protected List<Comparable>               values;
+    protected List<Object>                   values;
     // 直接依赖为tableNode，如果涉及多库操作，会是一个Merge下面挂多个DML
     protected TableNode                      table             = null;
     protected Map<Integer, ParameterContext> parameterSettings = null;
@@ -59,13 +58,13 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
         return this.columns;
     }
 
-    public DMLNode setValues(List<Comparable> values) {
+    public DMLNode setValues(List<Object> values) {
         this.values = values;
         return this;
 
     }
 
-    public List<Comparable> getValues() {
+    public List<Object> getValues() {
         return this.values;
     }
 
@@ -73,6 +72,7 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
         return getNode().getTableMeta();
     }
 
+    @Override
     public boolean isNeedBuild() {
         return needBuild;
     }
@@ -81,6 +81,7 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
         this.needBuild = needBuild;
     }
 
+    @Override
     public void build() {
         if (this.table != null) {
             table.build();
@@ -127,10 +128,10 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
     /**
      * 尝试根据字段类型进行value转化
      */
-    protected List<Comparable> convertTypeToSatifyColumnMeta(List<ISelectable> cs, List<Comparable> vs) {
+    protected List<Object> convertTypeToSatifyColumnMeta(List<ISelectable> cs, List<Object> vs) {
         for (int i = 0; i < cs.size(); i++) {
             Comparable c = cs.get(i);
-            Comparable v = vs.get(i);
+            Object v = vs.get(i);
             DATA_TYPE type = null;
             if (v == null || v instanceof IBindVal || v instanceof NullValue) {
                 continue;
@@ -140,16 +141,18 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
                 type = ((ISelectable) c).getDataType();
             }
 
-            vs.set(i, (Comparable) OptimizerUtils.convertType(v, type));
+            vs.set(i, OptimizerUtils.convertType(v, type));
         }
         return vs;
     }
 
+    @Override
     public RT executeOn(String dataNode) {
         super.executeOn(dataNode);
         return (RT) this;
     }
 
+    @Override
     public void assignment(Map<Integer, ParameterContext> parameterSettings) {
         QueryTreeNode qct = getNode();
 
@@ -158,8 +161,8 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
         }
 
         if (values != null) {
-            List<Comparable> comps = new ArrayList<Comparable>(values.size());
-            for (Comparable comp : values) {
+            List<Object> comps = new ArrayList<Object>(values.size());
+            for (Object comp : values) {
                 if (comp instanceof IBindVal) {
                     comps.add(((IBindVal) comp).assignment(parameterSettings));
                 } else if (comp instanceof ISelectable) {
@@ -185,16 +188,17 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
         if (this.values != null) {
             to.values = new ArrayList(this.values.size());
 
-            for (Comparable value : this.values) {
+            for (Object value : this.values) {
                 if (value instanceof ISelectable) {
                     to.values.add(((ISelectable) value).copy());
                 } else to.values.add(value);
             }
         }
 
-        to.table = (TableNode) this.table.deepCopy();
+        to.table = this.table.deepCopy();
     }
 
+    @Override
     public String toString(int inden) {
         String tabTittle = OptimizerToString.getTab(inden);
         String tabContent = OptimizerToString.getTab(inden + 1);
@@ -211,6 +215,7 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
         return sb.toString();
     }
 
+    @Override
     public String toString() {
         return this.toString(0);
     }

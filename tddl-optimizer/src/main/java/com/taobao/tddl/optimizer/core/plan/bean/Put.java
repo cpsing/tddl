@@ -24,12 +24,12 @@ public class Put<RT extends IPut> extends DataNodeExecutor<RT> implements IPut<R
 
     protected IQueryTree                     queryTree;
     protected List<ISelectable>              columns;
-    protected List<Comparable>               values;
+    protected List<Object>                   values;
     protected PUT_TYPE                       putType;
     protected String                         tableName;        // 真实表名
     protected String                         indexName;        // 逻辑索引信息
     protected boolean                        ignore = false;
-    protected List<List<Comparable>>         multiValues;
+    protected List<List<Object>>             multiValues;
     protected boolean                        isMutiValues;
     protected Map<Integer, ParameterContext> parameterSettings;
 
@@ -37,46 +37,56 @@ public class Put<RT extends IPut> extends DataNodeExecutor<RT> implements IPut<R
         putType = PUT_TYPE.REPLACE;
     }
 
+    @Override
     public IQueryTree getQueryTree() {
         return queryTree;
     }
 
+    @Override
     public RT setQueryTree(IQueryTree queryTree) {
         this.queryTree = queryTree;
         return (RT) this;
     }
 
+    @Override
     public RT setUpdateColumns(List<ISelectable> columns) {
         this.columns = columns;
         return (RT) this;
     }
 
+    @Override
     public List<ISelectable> getUpdateColumns() {
         return columns;
     }
 
+    @Override
     public RT setTableName(String tableName) {
         this.tableName = tableName;
         return (RT) this;
     }
 
+    @Override
     public String getTableName() {
         return tableName;
     }
 
-    public RT setUpdateValues(List<Comparable> values) {
+    @Override
+    public RT setUpdateValues(List<Object> values) {
         this.values = values;
         return (RT) this;
     }
 
-    public List<Comparable> getUpdateValues() {
+    @Override
+    public List<Object> getUpdateValues() {
         return values;
     }
 
+    @Override
     public com.taobao.tddl.optimizer.core.plan.IPut.PUT_TYPE getPutType() {
         return putType;
     }
 
+    @Override
     public RT assignment(Map<Integer, ParameterContext> parameterSettings) {
         IQueryTree qt = getQueryTree();
         if (qt != null) {
@@ -84,8 +94,8 @@ public class Put<RT extends IPut> extends DataNodeExecutor<RT> implements IPut<R
         }
 
         if (values != null) {
-            List<Comparable> comps = new ArrayList<Comparable>(values.size());
-            for (Comparable comp : values) {
+            List<Object> comps = new ArrayList<Object>(values.size());
+            for (Object comp : values) {
                 if (comp instanceof IBindVal) {
                     comps.add(((IBindVal) comp).assignment(parameterSettings));
                 } else {
@@ -98,42 +108,51 @@ public class Put<RT extends IPut> extends DataNodeExecutor<RT> implements IPut<R
         return (RT) this;
     }
 
+    @Override
     public RT setIndexName(String indexName) {
         this.indexName = indexName;
         return (RT) this;
     }
 
+    @Override
     public String getIndexName() {
         return indexName;
     }
 
+    @Override
     public RT setIgnore(boolean ignore) {
         this.ignore = ignore;
         return (RT) this;
     }
 
+    @Override
     public boolean isIgnore() {
         return ignore;
     }
 
-    public List<List<Comparable>> getMultiValues() {
+    @Override
+    public List<List<Object>> getMultiValues() {
         return multiValues;
     }
 
-    public RT setMultiValues(List<List<Comparable>> multiValues) {
+    @Override
+    public RT setMultiValues(List<List<Object>> multiValues) {
         this.multiValues = multiValues;
         return (RT) this;
     }
 
+    @Override
     public boolean isMutiValues() {
         return isMutiValues;
     }
 
+    @Override
     public RT setMutiValues(boolean isMutiValues) {
         this.isMutiValues = isMutiValues;
         return (RT) this;
     }
 
+    @Override
     public int getMuiltValuesSize() {
         if (this.isMutiValues) {
             return this.multiValues.size();
@@ -143,7 +162,8 @@ public class Put<RT extends IPut> extends DataNodeExecutor<RT> implements IPut<R
 
     }
 
-    public List<Comparable> getValues(int index) {
+    @Override
+    public List<Object> getValues(int index) {
         if (this.isMutiValues) {
             return this.multiValues.get(index);
         }
@@ -166,6 +186,7 @@ public class Put<RT extends IPut> extends DataNodeExecutor<RT> implements IPut<R
         return (RT) this;
     }
 
+    @Override
     public void accept(PlanVisitor visitor) {
         if (this instanceof IInsert) {
             visitor.visit((IInsert) this);
@@ -178,6 +199,7 @@ public class Put<RT extends IPut> extends DataNodeExecutor<RT> implements IPut<R
         }
     }
 
+    @Override
     public RT copy() {
         return null;
     }
@@ -186,10 +208,12 @@ public class Put<RT extends IPut> extends DataNodeExecutor<RT> implements IPut<R
         throw new IllegalArgumentException("should not be here");
     }
 
+    @Override
     public String toString() {
         return this.toStringWithInden(0);
     }
 
+    @Override
     public String toStringWithInden(int inden) {
         String tabTittle = OptimizerToString.getTab(inden);
         String tabContent = OptimizerToString.getTab(inden + 1);

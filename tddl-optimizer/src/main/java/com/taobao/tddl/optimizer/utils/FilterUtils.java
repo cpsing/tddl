@@ -136,7 +136,7 @@ public class FilterUtils {
             throw new IllegalArgumentException("filter is not dnf!\n" + node);
         }
 
-        List<List<IFilter>> dnfNodes = toDNFNodesArray((IFilter) node);
+        List<List<IFilter>> dnfNodes = toDNFNodesArray(node);
         if (dnfNodes.size() == 1 && dnfNodes.get(0).size() == 1) {
             return dnfNodes.get(0).get(0);
         }
@@ -231,8 +231,8 @@ public class FilterUtils {
     /**
      * 根据column进行filter归类
      */
-    public static Map<Comparable, List<IFilter>> toColumnFiltersMap(List<IFilter> DNFNode) {
-        Map<Comparable, List<IFilter>> columns = new HashMap(DNFNode.size());
+    public static Map<Object, List<IFilter>> toColumnFiltersMap(List<IFilter> DNFNode) {
+        Map<Object, List<IFilter>> columns = new HashMap(DNFNode.size());
         for (IFilter boolNode : DNFNode) {
             if (!columns.containsKey(((IBooleanFilter) boolNode).getColumn())) {
                 columns.put(((IBooleanFilter) boolNode).getColumn(), new LinkedList());
@@ -404,11 +404,11 @@ public class FilterUtils {
      * 合并析取式中的Or重复条件
      */
     private static List<List<IFilter>> mergeOrDNFNodes(List<List<IFilter>> DNFNodes) throws EmptyResultFilterException {
-        Map<Comparable, List<IFilter>> columnRestrictions = new HashMap<Comparable, List<IFilter>>();
+        Map<Object, List<IFilter>> columnRestrictions = new HashMap<Object, List<IFilter>>();
         List<List<IFilter>> toRemove = new LinkedList<List<IFilter>>();
         for (List<IFilter> DNFNode : DNFNodes) {
             if (DNFNode.size() == 1) { // 只处理单个or条件的表达式，比如 A = 1 or A < 2
-                Comparable c = (((IBooleanFilter) DNFNode.get(0)).getColumn());
+                Object c = (((IBooleanFilter) DNFNode.get(0)).getColumn());
                 if (!columnRestrictions.containsKey(c)) {
                     columnRestrictions.put(c, new LinkedList());
                 }
@@ -418,7 +418,7 @@ public class FilterUtils {
         }
 
         DNFNodes.removeAll(toRemove); // 先干掉，后面会计算后会重新添加
-        for (Comparable c : columnRestrictions.keySet()) {
+        for (Object c : columnRestrictions.keySet()) {
             OrRangeProcessor ri = new OrRangeProcessor(c);
             for (IFilter boolNode : columnRestrictions.get(c)) {
                 ri.process(boolNode);
@@ -524,7 +524,7 @@ public class FilterUtils {
         IBooleanFilter f = ASTNodeFactory.getInstance().createBooleanFilter();
         f.setOperation(OPERATION.EQ);
         f.setColumn(columnName);
-        f.setValue((Comparable) value);
+        f.setValue(value);
         return f;
     }
 

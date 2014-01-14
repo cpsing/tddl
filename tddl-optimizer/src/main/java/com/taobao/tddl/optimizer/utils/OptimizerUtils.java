@@ -42,7 +42,7 @@ public class OptimizerUtils {
             DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.getPattern(),
             DateFormatUtils.SMTP_DATETIME_FORMAT.getPattern(), };
 
-    public static Comparable convertType(Comparable value, DATA_TYPE type) {
+    public static Object convertType(Object value, DATA_TYPE type) {
         if (value == null) {
             return null;
         }
@@ -159,7 +159,7 @@ public class OptimizerUtils {
 
         List<IBooleanFilter> newFilters = new ArrayList<IBooleanFilter>(filters.size());
         for (IBooleanFilter f : filters) {
-            newFilters.add((IBooleanFilter) f.copy());
+            newFilters.add(f.copy());
         }
         return newFilters;
     }
@@ -259,7 +259,7 @@ public class OptimizerUtils {
 
     private static void setFilter(IFilter f, String tableName) {
         if (f instanceof IBooleanFilter) {
-            Comparable column = ((IBooleanFilter) f).getColumn();
+            Object column = ((IBooleanFilter) f).getColumn();
             if (column instanceof IColumn) {
                 setColumn((IColumn) column, tableName);
             } else if (column instanceof IFilter) {
@@ -268,7 +268,7 @@ public class OptimizerUtils {
                 setFunction((IFunction) column, tableName);
             }
 
-            Comparable value = ((IBooleanFilter) f).getValue();
+            Object value = ((IBooleanFilter) f).getValue();
             if (value instanceof IColumn) {
                 setColumn((IColumn) value, tableName);
             } else if (value instanceof IFilter) {
@@ -364,7 +364,7 @@ public class OptimizerUtils {
 
     public static IColumn getColumn(Object column) {
         if (column instanceof IFunction) {
-            return (IColumn) ASTNodeFactory.getInstance()
+            return ASTNodeFactory.getInstance()
                 .createColumn()
                 .setTableName(((IFunction) column).getTableName())
                 .setColumnName(((IFunction) column).getColumnName())

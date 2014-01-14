@@ -113,6 +113,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
     private String        valueForLike;
     private IFilter       filter;
 
+    @Override
     public void visit(BetweenAndExpression node) {
         Expression first = node.getFirst();
         Expression second = node.getSecond();
@@ -139,6 +140,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         this.filter = ilf;
     }
 
+    @Override
     public void visit(ComparisionIsExpression node) {
         IBooleanFilter ibf = ASTNodeFactory.getInstance().createBooleanFilter();
         MySqlExprVisitor leftEvi = new MySqlExprVisitor();
@@ -176,6 +178,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         this.filter = ibf;
     }
 
+    @Override
     public void visit(BinaryOperatorExpression node) {
         if (eval(node)) { // 计算出了结果
             return;
@@ -228,6 +231,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         }
     }
 
+    @Override
     public void visit(UnaryOperatorExpression node) {
         if (eval(node)) { // 计算出了结果
             return;
@@ -259,6 +263,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         columnOrValue = f;
     }
 
+    @Override
     public void visit(FunctionExpression node) {
         boolean argDistinct = isDistinct(node);
         IFunction ifunc = ASTNodeFactory.getInstance().createFunction();
@@ -285,6 +290,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         columnOrValue = ifunc;
     }
 
+    @Override
     public void visit(RowExpression node) {
         IFunction ifunc = ASTNodeFactory.getInstance().createFunction();
         ifunc.setFunctionName("ROW");
@@ -300,6 +306,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         columnOrValue = ifunc;
     }
 
+    @Override
     public void visit(Identifier node) {
         IColumn column = ASTNodeFactory.getInstance().createColumn();
         if (node.getParent() != null) { // table.column
@@ -309,6 +316,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         this.columnOrValue = column;
     }
 
+    @Override
     public void visit(InnerJoin node) { // inner join
         TableReference ltable = node.getLeftTableRef();
         TableReference rtable = node.getRightTableRef();
@@ -329,6 +337,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         this.tableNode = joinNode;
     }
 
+    @Override
     public void visit(NaturalJoin node) { // 默认是同名字段完全匹配的 INNER JOIN
         TableReference ltable = node.getLeftTableRef();
         TableReference rtable = node.getRightTableRef();
@@ -336,6 +345,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         this.tableNode = joinNode;
     }
 
+    @Override
     public void visit(OuterJoin node) {// left/right join
         TableReference ltable = node.getLeftTableRef();
         TableReference rtable = node.getRightTableRef();
@@ -367,6 +377,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         this.tableNode = joinNode;
     }
 
+    @Override
     public void visit(StraightJoin node) {// inner join
         TableReference ltable = node.getLeftTableRef();
         TableReference rtable = node.getRightTableRef();
@@ -383,6 +394,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         this.tableNode = joinNode;
     }
 
+    @Override
     public void visit(IntervalPrimary node) {
         IFunction f = ASTNodeFactory.getInstance().createFunction();
         f.setColumnName(this.getSqlExprStr(node));
@@ -397,6 +409,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         this.columnOrValue = f;
     }
 
+    @Override
     public void visit(LikeExpression node) {
         MySqlExprVisitor first = new MySqlExprVisitor();
         node.getFirst().accept(first);
@@ -420,6 +433,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         // higherPreExpr)?
     }
 
+    @Override
     public void visit(LiteralBitField node) {
         if (node.getIntroducer() != null) {
             throw new NotSupportException("bit value not support introducer:" + node.getIntroducer());
@@ -427,10 +441,12 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         this.columnOrValue = new LobVal(node.getText(), "b");
     }
 
+    @Override
     public void visit(LiteralBoolean node) {
         this.columnOrValue = node.isTrue();
     }
 
+    @Override
     public void visit(LiteralHexadecimal node) {
         if (node.getIntroducer() != null) {
             throw new NotSupportException("hex value not support introducer:" + node.getIntroducer());
@@ -439,14 +455,17 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         this.columnOrValue = new LobVal(node.getText(), "x");
     }
 
+    @Override
     public void visit(LiteralNull node) {
         this.columnOrValue = NullValue.getNullValue();
     }
 
+    @Override
     public void visit(LiteralNumber node) {
         this.columnOrValue = (Comparable) node.getNumber();
     }
 
+    @Override
     public void visit(LiteralString node) {
         if (node.getIntroducer() != null) {
             this.columnOrValue = new LobVal(node.getString(), node.getIntroducer());
@@ -457,12 +476,14 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         }
     }
 
+    @Override
     public void visit(ParamMarker node) {
         // tddl start with 0,not preparestatement with 1
         IBindVal val = ASTNodeFactory.getInstance().createBindValue(node.getParamIndex() - 1);
         columnOrValue = val;
     }
 
+    @Override
     public void visit(PolyadicOperatorExpression node) {
         if (eval(node)) {// 已经计算出了结果
             return;
@@ -505,6 +526,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         this.filter = root;
     }
 
+    @Override
     public void visit(SubqueryFactor node) {
         MySqlSelectVisitor v = new MySqlSelectVisitor();
         node.accept(v);
@@ -519,6 +541,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         }
     }
 
+    @Override
     public void visit(TableRefFactor node) {
         TableNode table = new TableNode(node.getTable().getIdTextUpUnescape());
         if (node.getAliasUnescapeUppercase() != null) {
@@ -528,22 +551,27 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         this.tableNode = table;
     }
 
+    @Override
     public void visit(CaseWhenOperatorExpression node) {
         throw new NotSupportException("CaseWhenOperatorExpression");
     }
 
+    @Override
     public void visit(ExistsPrimary node) {
         throw new NotSupportException("ExistsPrimary");
     }
 
+    @Override
     public void visit(MatchExpression node) {
         throw new NotSupportException("MatchExpression");
     }
 
+    @Override
     public void visit(IndexHint node) {
         throw new NotSupportException("IndexHint");
     }
 
+    @Override
     public void visit(Dual dual) {
         throw new NotSupportException("Dual");
     }
@@ -582,7 +610,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         }
     }
 
-    public IBooleanFilter buildBooleanFilter(Comparable column, Comparable value, OPERATION operation, Expression exp) {
+    public IBooleanFilter buildBooleanFilter(Object column, Object value, OPERATION operation, Expression exp) {
         IBooleanFilter ibf = ASTNodeFactory.getInstance().createBooleanFilter();
         ibf.setColumn(column);
         ibf.setValue(value);
@@ -659,24 +687,24 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
     private void handleInExpression(InExpression node) {
         MySqlExprVisitor left = new MySqlExprVisitor();
         node.getLeftOprand().accept(left);
-        Comparable leftColumn = left.getColumnOrValue();
+        Object leftColumn = left.getColumnOrValue();
         IBooleanFilter filter = buildBooleanFilter(leftColumn, null, OPERATION.IN, node);
 
         // 构建values参数
         Expression ex = node.getRightOprand();
         if (ex instanceof InExpressionList) {
             List<Expression> elist = ((InExpressionList) ex).getList();
-            List<Comparable> values = new ArrayList<Comparable>();
+            List<Object> values = new ArrayList<Object>();
             for (Expression expr : elist) {
                 MySqlExprVisitor v = new MySqlExprVisitor();
                 expr.accept(v);
-                values.add((Comparable) v.getColumnOrValue());
+                values.add(v.getColumnOrValue());
             }
             filter.setValues(values);
         } else if (ex instanceof QueryExpression) {
             MySqlSelectVisitor v = new MySqlSelectVisitor();
             ex.accept(v);
-            filter.setValues(Arrays.asList((Comparable) v.getTableNode()));
+            filter.setValues(Arrays.asList((Object) v.getTableNode()));
         }
 
         this.filter = filter;

@@ -189,7 +189,7 @@ public class FilterPusher {
         }
 
         // 对于 or连接的条件，就不能下推了
-        IFilter filterInOtherJoin = (IFilter) qtn.getOtherJoinOnFilter();
+        IFilter filterInOtherJoin = qtn.getOtherJoinOnFilter();
         if (filterInOtherJoin != null && FilterUtils.isCNFNode(filterInOtherJoin)) {
             // 需要复制，下推到子节点后，会改变column/value的tableName
             List<IFilter> DNFNode = FilterUtils.toDNFNode((IFilter) filterInOtherJoin.copy());
@@ -346,7 +346,7 @@ public class FilterPusher {
                                 // 交换一下
                                 Object tmp = ((IBooleanFilter) sub).getColumn();
                                 ((IBooleanFilter) sub).setColumn(((IBooleanFilter) sub).getValue());
-                                ((IBooleanFilter) sub).setValue((Comparable) tmp);
+                                ((IBooleanFilter) sub).setValue(tmp);
                                 join.addJoinFilter((IBooleanFilter) sub);
                             } else {
                                 throw new IllegalArgumentException("join查询表左边不包含join column，请修改查询语句...");
@@ -383,11 +383,9 @@ public class FilterPusher {
      * 找到join的列条件的所有列信息，必须是a.id=b.id的情况，针对a.id=1返回为null
      */
     private static ISelectable[] getJoinKeysWithColumnJoin(IBooleanFilter filter) {
-        if (((IBooleanFilter) filter).getColumn() instanceof IColumn
-            && ((IBooleanFilter) filter).getValue() instanceof IColumn) {
+        if (filter.getColumn() instanceof IColumn && filter.getValue() instanceof IColumn) {
             if (OPERATION.EQ.equals(filter.getOperation())) {
-                return new ISelectable[] { (ISelectable) ((IBooleanFilter) filter).getColumn(),
-                        (ISelectable) ((IBooleanFilter) filter).getValue() };
+                return new ISelectable[] { (ISelectable) filter.getColumn(), (ISelectable) filter.getValue() };
             }
         }
 
@@ -403,7 +401,7 @@ public class FilterPusher {
     }
 
     private static boolean tryPushColumn(IFilter filter, boolean isColumn, QueryTreeNode qtn) {
-        Comparable value = null;
+        Object value = null;
         if (isColumn) {
             value = ((IBooleanFilter) filter).getColumn();
         } else {

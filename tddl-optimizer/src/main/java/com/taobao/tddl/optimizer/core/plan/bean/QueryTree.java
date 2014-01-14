@@ -43,123 +43,150 @@ public abstract class QueryTree extends DataNodeExecutor<IQueryTree> implements 
     protected boolean                        isTopQuery           = false;
     protected Map<Integer, ParameterContext> parameterSettings;
 
+    @Override
     public IFilter getValueFilter() {
         return valueFilter;
     }
 
+    @Override
     public IQueryTree setValueFilter(IFilter valueFilter) {
         this.valueFilter = valueFilter;
         return this;
     }
 
+    @Override
     public List<ISelectable> getColumns() {
         return columns;
     }
 
+    @Override
     public IQueryTree setColumns(List<ISelectable> columns) {
         this.columns = columns;
         return this;
     }
 
+    @Override
     public IQueryTree setColumns(ISelectable... columns) {
         return setColumns(Arrays.asList(columns));
     }
 
+    @Override
     public List<IOrderBy> getOrderBys() {
         return orderBys;
     }
 
+    @Override
     public IQueryTree setOrderBys(List<IOrderBy> orderBys) {
         this.orderBys = orderBys;
         return this;
     }
 
+    @Override
     public Comparable getLimitFrom() {
         return limitFrom;
     }
 
+    @Override
     public IQueryTree setLimitFrom(Comparable limitFrom) {
         this.limitFrom = limitFrom;
         return this;
     }
 
+    @Override
     public Comparable getLimitTo() {
         return limitTo;
     }
 
+    @Override
     public IQueryTree setLimitTo(Comparable limitTo) {
         this.limitTo = limitTo;
         return this;
     }
 
+    @Override
     public List<IOrderBy> getGroupBys() {
         return groupBys;
     }
 
+    @Override
     public IQueryTree setGroupBys(List<IOrderBy> groupBys) {
         this.groupBys = groupBys;
         return this;
     }
 
+    @Override
     public IQueryTree setAlias(String alias) {
         this.alias = alias;
         return this;
     }
 
+    @Override
     public String getAlias() {
         return alias;
     }
 
+    @Override
     public IQueryTree setCanMerge(Boolean canMerge) {
         this.canMerge = canMerge;
         return this;
     }
 
+    @Override
     public Boolean canMerge() {
         return canMerge;
     }
 
+    @Override
     public IQueryTree setUseTempTableExplicit(Boolean isUseTempTable) {
         this.useTempTableExplicit = isUseTempTable;
         return this;
     }
 
+    @Override
     public Boolean isUseTempTableExplicit() {
         return useTempTableExplicit;
     }
 
+    @Override
     public Boolean isSubQuery() {
         return isSubQuery;
     }
 
+    @Override
     public IQueryTree setIsSubQuery(Boolean isSubQuery) {
         this.isSubQuery = isSubQuery;
         return this;
     }
 
+    @Override
     public IFilter getHavingFilter() {
         return havingFilter;
     }
 
+    @Override
     public IQueryTree having(IFilter having) {
         this.havingFilter = having;
         return this;
     }
 
+    @Override
     public boolean isTopQuery() {
         return isTopQuery;
     }
 
+    @Override
     public IQueryTree setTopQuery(boolean topQuery) {
         this.isTopQuery = topQuery;
         return this;
     }
 
+    @Override
     public IParallelizableQueryTree setQueryConcurrency(QUERY_CONCURRENCY queryConcurrency) {
         this.queryConcurrency = queryConcurrency;
         return this;
     }
 
+    @Override
     public QUERY_CONCURRENCY getQueryConcurrency() {
         return queryConcurrency;
     }
@@ -175,11 +202,12 @@ public abstract class QueryTree extends DataNodeExecutor<IQueryTree> implements 
         return this;
     }
 
+    @Override
     public IQueryTree assignment(Map<Integer, ParameterContext> parameterSettings) {
         if (this.getColumns() != null) {
             for (ISelectable c : this.getColumns()) {
                 if (c instanceof ISelectable) {
-                    ((ISelectable) c).assignment(parameterSettings);
+                    c.assignment(parameterSettings);
                 }
             }
         }
@@ -196,14 +224,14 @@ public abstract class QueryTree extends DataNodeExecutor<IQueryTree> implements 
 
         Comparable limtFrom = getLimitFrom();
         if (limtFrom != null && limtFrom instanceof BindVal) {
-            Comparable value = ((BindVal) limtFrom).assignment(parameterSettings);
-            this.setLimitFrom(OptimizerUtils.convertType(value, DATA_TYPE.LONG_VAL));// 强制转化为long类型
+            Comparable value = (Comparable) ((BindVal) limtFrom).assignment(parameterSettings);
+            this.setLimitFrom((Comparable) OptimizerUtils.convertType(value, DATA_TYPE.LONG_VAL));// 强制转化为long类型
         }
 
         Comparable limtTo = getLimitTo();
         if (limtTo != null && limtTo instanceof BindVal) {
-            Comparable value = ((BindVal) limtTo).assignment(parameterSettings);
-            this.setLimitTo(OptimizerUtils.convertType(value, DATA_TYPE.LONG_VAL)); // 强制转化为long类型
+            Comparable value = (Comparable) ((BindVal) limtTo).assignment(parameterSettings);
+            this.setLimitTo((Comparable) OptimizerUtils.convertType(value, DATA_TYPE.LONG_VAL)); // 强制转化为long类型
         }
         return this;
     }

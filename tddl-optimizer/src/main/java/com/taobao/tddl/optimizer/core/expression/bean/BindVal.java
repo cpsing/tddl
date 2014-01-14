@@ -21,24 +21,27 @@ public class BindVal implements IBindVal {
         this.index = index;
     }
 
+    @Override
     public int compareTo(Object o) {
         throw new NotSupportException();
     }
 
-    public Comparable assignment(Map<Integer, ParameterContext> parameterSettings) {
+    @Override
+    public Object assignment(Map<Integer, ParameterContext> parameterSettings) {
         ParameterContext paramContext = parameterSettings.get(index);
         if (paramContext == null) {
             throw new TddlRuntimeException("can't find param by index :" + index + " ." + "context : "
                                            + parameterSettings);
         }
 
-        if ((Comparable) paramContext.getArgs()[1] == null) {
+        if (paramContext.getArgs()[1] == null) {
             return NullValue.getNullValue();
         }
 
-        return (Comparable) paramContext.getArgs()[1];
+        return paramContext.getArgs()[1];
     }
 
+    @Override
     public String toString() {
         return "BindVal [index=" + index + "]";
     }
@@ -47,6 +50,7 @@ public class BindVal implements IBindVal {
         return index;
     }
 
+    @Override
     public void accept(PlanVisitor visitor) {
         visitor.visit(this);
     }

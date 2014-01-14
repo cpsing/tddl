@@ -49,9 +49,9 @@ public interface IPut<RT extends IPut> extends IDataNodeExecutor<RT> {
      * 
      * @param columns
      */
-    RT setUpdateValues(List<Comparable> values);
+    RT setUpdateValues(List<Object> values);
 
-    List<Comparable> getUpdateValues();
+    List<Object> getUpdateValues();
 
     PUT_TYPE getPutType();
 
@@ -64,9 +64,9 @@ public interface IPut<RT extends IPut> extends IDataNodeExecutor<RT> {
      * 
      * @return
      */
-    public List<List<Comparable>> getMultiValues();
+    public List<List<Object>> getMultiValues();
 
-    public RT setMultiValues(List<List<Comparable>> multiValues);
+    public RT setMultiValues(List<List<Object>> multiValues);
 
     public boolean isMutiValues();
 
@@ -74,5 +74,5 @@ public interface IPut<RT extends IPut> extends IDataNodeExecutor<RT> {
 
     public int getMuiltValuesSize();
 
-    public List<Comparable> getValues(int index);
+    public List<Object> getValues(int index);
 }

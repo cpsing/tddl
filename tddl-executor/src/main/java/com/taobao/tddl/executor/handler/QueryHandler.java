@@ -34,6 +34,7 @@ public class QueryHandler extends QueryHandlerCommon {
         super();
     }
 
+    @Override
     protected ISchematicCursor doQuery(ISchematicCursor cursor, IDataNodeExecutor executor,
                                        ExecutionContext executionContext) throws TddlException {
         List<IOrderBy> _orderBy = ((IQueryTree) executor).getOrderBys();
@@ -100,7 +101,7 @@ public class QueryHandler extends QueryHandlerCommon {
         IColumn c = ExecUtils.getColumn(bf.getColumn());
         OPERATION op = bf.getOperation();
         if (op == OPERATION.IN) {
-            List<Comparable> values = bf.getValues();
+            List<Object> values = bf.getValues();
             if (values == null) {
                 throw new IllegalArgumentException("values is null ,but operation is in . logical error");
             } else {

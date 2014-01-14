@@ -13,19 +13,23 @@ public class Delete extends Put<IDelete> implements IDelete {
         putType = PUT_TYPE.DELETE;
     }
 
+    @Override
     public IDelete setUpdateColumns(List<ISelectable> columns) {
         throw new NotSupportException();
     }
 
+    @Override
     public List<ISelectable> getUpdateColumns() {
         return Lists.newArrayList();
     }
 
-    public IDelete setUpdateValues(List<Comparable> values) {
+    @Override
+    public IDelete setUpdateValues(List<Object> values) {
         throw new NotSupportException();
     }
 
-    public List<Comparable> getUpdateValues() {
+    @Override
+    public List<Object> getUpdateValues() {
         return Lists.newArrayList();
     }
 }

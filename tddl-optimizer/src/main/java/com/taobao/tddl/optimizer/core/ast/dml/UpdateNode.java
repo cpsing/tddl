@@ -26,15 +26,16 @@ public class UpdateNode extends DMLNode<UpdateNode> {
         return this.columns;
     }
 
-    public UpdateNode setUpdateValues(List<Comparable> values) {
+    public UpdateNode setUpdateValues(List<Object> values) {
         this.values = values;
         return this;
     }
 
-    public List<Comparable> getUpdateValues() {
+    public List<Object> getUpdateValues() {
         return this.values;
     }
 
+    @Override
     public IDataNodeExecutor toDataNodeExecutor() throws QueryException {
         IUpdate update = ASTNodeFactory.getInstance().createUpdate();
         for (ISelectable updateColumn : this.getColumns()) {
@@ -63,12 +64,14 @@ public class UpdateNode extends DMLNode<UpdateNode> {
         return update;
     }
 
+    @Override
     public UpdateNode deepCopy() {
         UpdateNode delete = new UpdateNode(null);
         super.deepCopySelfTo(delete);
         return delete;
     }
 
+    @Override
     public UpdateNode copy() {
         UpdateNode delete = new UpdateNode(null);
         super.copySelfTo(delete);

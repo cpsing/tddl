@@ -148,6 +148,7 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
      */
     public abstract List<IOrderBy> getImplicitOrderBys();
 
+    @Override
     public abstract IQueryTree toDataNodeExecutor() throws QueryException;
 
     /**
@@ -170,6 +171,7 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         return this;
     }
 
+    @Override
     public void assignment(Map<Integer, ParameterContext> parameterSettings) {
         for (ASTNode child : this.getChildren()) {
             child.assignment(parameterSettings);
@@ -183,13 +185,13 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         this.columnsSelected = OptimizerUtils.assignment(this.columnsSelected, parameterSettings);
         this.otherJoinOnFilter = OptimizerUtils.assignment(this.otherJoinOnFilter, parameterSettings);
         if (this.limitFrom instanceof IBindVal) {
-            Comparable value = ((IBindVal) limitFrom).assignment(parameterSettings);
-            limitFrom = OptimizerUtils.convertType(value, DATA_TYPE.LONG_VAL);
+            Object value = ((IBindVal) limitFrom).assignment(parameterSettings);
+            limitFrom = (Comparable) OptimizerUtils.convertType(value, DATA_TYPE.LONG_VAL);
         }
 
         if (this.limitTo instanceof IBindVal) {
-            Comparable value = ((IBindVal) limitTo).assignment(parameterSettings);
-            limitTo = OptimizerUtils.convertType(value, DATA_TYPE.LONG_VAL);
+            Object value = ((IBindVal) limitTo).assignment(parameterSettings);
+            limitTo = (Comparable) OptimizerUtils.convertType(value, DATA_TYPE.LONG_VAL);
         }
     }
 
@@ -199,6 +201,7 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         this.needBuild = needBuild;
     }
 
+    @Override
     public String toString() {
         return this.toString(0);
     }
@@ -332,7 +335,7 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         if (this.getChildren().isEmpty()) {
             return null;
         }
-        return (ASTNode) this.getChildren().get(0);
+        return this.getChildren().get(0);
     }
 
     public void addChild(ASTNode childNode) {
@@ -612,6 +615,7 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         return this;
     }
 
+    @Override
     public boolean isNeedBuild() {
         if (this.needBuild) {
             return true;

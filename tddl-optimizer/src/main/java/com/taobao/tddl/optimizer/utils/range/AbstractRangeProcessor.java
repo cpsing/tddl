@@ -54,7 +54,7 @@ public abstract class AbstractRangeProcessor {
      * @param column
      * @return
      */
-    protected List<IFilter> buildFilter(Range range, Comparable column) {
+    protected List<IFilter> buildFilter(Range range, Object column) {
         List<IFilter> filters = new ArrayList(2);
         if (range == null) {
             return filters;

@@ -18,21 +18,22 @@ import java.util.List;
  */
 public interface IBooleanFilter extends IFilter<IBooleanFilter> {
 
+    @Override
     public IBooleanFilter setOperation(OPERATION operation);
 
-    public Comparable getColumn();
+    public Object getColumn();
 
-    public IBooleanFilter setColumn(Comparable column);
+    public IBooleanFilter setColumn(Object column);
 
-    public Comparable getValue();
+    public Object getValue();
 
-    public IBooleanFilter setValue(Comparable value);
+    public IBooleanFilter setValue(Object value);
 
     /**
      * 多个value，出现id in ()
      */
-    public List<Comparable> getValues();
+    public List<Object> getValues();
 
-    public IBooleanFilter setValues(List<Comparable> values);
+    public IBooleanFilter setValues(List<Object> values);
 
 }

@@ -38,8 +38,7 @@ public class FilterSpliter {
     /**
      * 根据where中的所有条件按照or进行分隔，生成多个query请求. (主要考虑部分存储引擎不支持or语法)
      */
-    public static List<QueryTreeNode> splitByDNF(TableNode node, Map<String, Object> extraCmd)
-                                                                                                  throws QueryException {
+    public static List<QueryTreeNode> splitByDNF(TableNode node, Map<String, Object> extraCmd) throws QueryException {
         if (node.getWhereFilter() == null) {
             return new LinkedList<QueryTreeNode>();
         }
@@ -92,7 +91,7 @@ public class FilterSpliter {
      */
     public static Map<FilterType, IFilter> splitByIndex(List<IFilter> DNFNode, TableNode table) {
         Map<FilterType, IFilter> filters = new HashMap();
-        Map<Comparable, List<IFilter>> columnAndItsFilters = FilterUtils.toColumnFiltersMap(DNFNode);
+        Map<Object, List<IFilter>> columnAndItsFilters = FilterUtils.toColumnFiltersMap(DNFNode);
         IndexMeta index = table.getIndexUsed();
         if (index == null) { // 默认选择主键
             index = table.getTableMeta().getPrimaryIndex();

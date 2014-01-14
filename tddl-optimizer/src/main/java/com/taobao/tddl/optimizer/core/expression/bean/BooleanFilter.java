@@ -25,10 +25,12 @@ public class BooleanFilter extends Function<IBooleanFilter> implements IBooleanF
         this.args.add(null);
     }
 
+    @Override
     public OPERATION getOperation() {
         return operation;
     }
 
+    @Override
     public IBooleanFilter setOperation(OPERATION operation) {
         if (operation == OPERATION.AND || operation == OPERATION.OR) {
             throw new NotSupportException(" and or is not support ");
@@ -39,15 +41,18 @@ public class BooleanFilter extends Function<IBooleanFilter> implements IBooleanF
         return this;
     }
 
+    @Override
     public Comparable getColumn() {
         return (Comparable) this.args.get(0);
     }
 
-    public IBooleanFilter setColumn(Comparable column) {
+    @Override
+    public IBooleanFilter setColumn(Object column) {
         this.args.set(0, column);
         return this;
     }
 
+    @Override
     public Comparable getValue() {
         if (this.args.get(1) instanceof List) {
             return null;
@@ -56,7 +61,8 @@ public class BooleanFilter extends Function<IBooleanFilter> implements IBooleanF
         }
     }
 
-    public List<Comparable> getValues() {
+    @Override
+    public List<Object> getValues() {
         if (this.args.get(1) instanceof List) {
             return (List) this.args.get(1);
         } else {
@@ -64,20 +70,24 @@ public class BooleanFilter extends Function<IBooleanFilter> implements IBooleanF
         }
     }
 
+    @Override
     public IBooleanFilter setValues(List values) {
         this.args.set(1, values);
         return this;
     }
 
-    public IBooleanFilter setValue(Comparable value) {
+    @Override
+    public IBooleanFilter setValue(Object value) {
         this.args.set(1, value);
         return this;
     }
 
+    @Override
     public String toString() {
         return OptimizerToString.printFilterString(this);
     }
 
+    @Override
     public IBooleanFilter copy() {
         IBooleanFilter filterNew = ASTNodeFactory.getInstance().createBooleanFilter();
         super.copy(filterNew);
@@ -85,14 +95,15 @@ public class BooleanFilter extends Function<IBooleanFilter> implements IBooleanF
         return filterNew;
     }
 
+    @Override
     public IBooleanFilter assignment(Map<Integer, ParameterContext> parameterSettings) {
-        IBooleanFilter bf = (IBooleanFilter) super.assignment(parameterSettings);
+        IBooleanFilter bf = super.assignment(parameterSettings);
         bf.setOperation(this.getOperation());
 
         if (bf.getValues() != null) {
-            List<Comparable> vals = getValues();
-            List<Comparable> newVals = new ArrayList(vals.size());
-            for (Comparable val : vals) {
+            List<Object> vals = getValues();
+            List<Object> newVals = new ArrayList(vals.size());
+            for (Object val : vals) {
                 if (val instanceof IBindVal) {
                     newVals.add(((IBindVal) val).assignment(parameterSettings));
                 } else {
@@ -102,7 +113,7 @@ public class BooleanFilter extends Function<IBooleanFilter> implements IBooleanF
 
             this.setValues(newVals);
         } else if (bf.getValue() != null) {
-            Comparable val = bf.getValue();
+            Object val = bf.getValue();
             if (val instanceof IBindVal) {
                 val = ((IBindVal) val).assignment(parameterSettings);
             }
@@ -112,6 +123,7 @@ public class BooleanFilter extends Function<IBooleanFilter> implements IBooleanF
         return bf;
     }
 
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -119,6 +131,7 @@ public class BooleanFilter extends Function<IBooleanFilter> implements IBooleanF
         return result;
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -158,6 +171,7 @@ public class BooleanFilter extends Function<IBooleanFilter> implements IBooleanF
         return true;
     }
 
+    @Override
     public String getColumnName() {
         if (this.columnName == null || this.columnName.isEmpty()) {
             return TStringUtil.upperCase(OptimizerToString.printFilterString(this, 0, false));

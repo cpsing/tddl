@@ -11,6 +11,8 @@ import org.apache.commons.lang.StringUtils;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.codec.CodecFactory;
 import com.taobao.tddl.executor.codec.RecordCodec;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
@@ -38,9 +40,6 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
-
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author mengshi.sunmengshi 2013-12-19 下午12:18:29
@@ -168,14 +167,14 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
             OptimizerContext optimizerContext = OptimizerContext.getContext();
             IBooleanFilter ibf = ASTNodeFactory.getInstance().createBooleanFilter();
             ibf.setOperation(OPERATION.IN);
-            ibf.setValues(new ArrayList<Comparable>());
+            ibf.setValues(new ArrayList<Object>());
             String colName = null;
             for (CloneableRecord record : keys) {
                 Map<String, Object> recordMap = record.getMap();
                 if (recordMap.size() == 1) {
                     // 单字段in
                     Entry<String, Object> entry = recordMap.entrySet().iterator().next();
-                    Comparable comp = (Comparable) entry.getValue();
+                    Object comp = entry.getValue();
                     colName = entry.getKey();
                     IColumn col = ASTNodeFactory.getInstance()
                         .createColumn()

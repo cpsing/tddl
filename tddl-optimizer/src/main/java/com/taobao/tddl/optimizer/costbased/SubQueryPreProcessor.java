@@ -76,8 +76,8 @@ public class SubQueryPreProcessor {
 
     private static SubQueryAndFilter buildSubQuery(SubQueryAndFilter qtn, IFilter filter, boolean existOr) {
         if (filter instanceof IBooleanFilter) {
-            Comparable column = ((IBooleanFilter) filter).getColumn();
-            Comparable value = ((IBooleanFilter) filter).getValue();
+            Object column = ((IBooleanFilter) filter).getColumn();
+            Object value = ((IBooleanFilter) filter).getValue();
             if (filter.getOperation() == OPERATION.IN) {
                 value = ((IBooleanFilter) filter).getValues().get(0);
             }
@@ -92,7 +92,7 @@ public class SubQueryPreProcessor {
                 }
 
                 QueryTreeNode query = (QueryTreeNode) (columnIsSubQuery ? column : value);
-                Comparable c = columnIsSubQuery ? value : column;
+                Object c = columnIsSubQuery ? value : column;
                 if (!(c instanceof ISelectable)) {
                     throw new OptimizerException("不支持常量和子查询组合的条件");
                 }

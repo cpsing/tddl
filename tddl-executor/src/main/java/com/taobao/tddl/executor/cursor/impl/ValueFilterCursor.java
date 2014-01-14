@@ -243,7 +243,7 @@ public class ValueFilterCursor extends SchematicCursor implements IValueFilterCu
         return v;
     }
 
-    private boolean processIn(Object column_value, List<Comparable> values) {
+    private boolean processIn(Object column_value, List<Object> values) {
 
         if (values.contains(column_value)) return true;
 

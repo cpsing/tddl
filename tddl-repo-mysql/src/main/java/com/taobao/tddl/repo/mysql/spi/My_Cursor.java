@@ -203,10 +203,10 @@ public class My_Cursor implements Cursor {
 
         IQuery tmpQuery = (IQuery) query.copy();
 
-        List<Comparable> values = new ArrayList<Comparable>();
+        List<Object> values = new ArrayList<Object>();
         String cm = keys.get(0).getColumnList().get(0);
         for (CloneableRecord key : keys) {
-            values.add((Comparable) key.get(cm));
+            values.add(key.get(cm));
         }
         IColumn ic = ASTNodeFactory.getInstance().createColumn();
         ic.setColumnName(cm);

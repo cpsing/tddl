@@ -47,13 +47,13 @@ import com.taobao.tddl.optimizer.utils.OptimizerUtils;
  */
 public class TableNode extends QueryTreeNode {
 
-    private TableNodeBuilder builder;
-    private String           tableName;
-    private String           actualTableName;              // 比如存在水平分表时，tableName代表逻辑表名,actualTableName代表物理表名
-    private IFilter          indexQueryValueFilter = null;
-    private TableMeta        tableMeta;
-    private IndexMeta        indexUsed             = null; // 当前逻辑表的使用index
-    private boolean          fullTableScan         = false; // 是否需要全表扫描
+    private final TableNodeBuilder builder;
+    private String                 tableName;
+    private String                 actualTableName;              // 比如存在水平分表时，tableName代表逻辑表名,actualTableName代表物理表名
+    private IFilter                indexQueryValueFilter = null;
+    private TableMeta              tableMeta;
+    private IndexMeta              indexUsed             = null; // 当前逻辑表的使用index
+    private boolean                fullTableScan         = false; // 是否需要全表扫描
 
     public TableNode(){
         this(null);
@@ -64,6 +64,7 @@ public class TableNode extends QueryTreeNode {
         builder = new TableNodeBuilder(this);
     }
 
+    @Override
     public void build() {
         if (this.isNeedBuild()) {
             this.builder.build();
@@ -72,11 +73,13 @@ public class TableNode extends QueryTreeNode {
         setNeedBuild(false);
     }
 
+    @Override
     public void assignment(Map<Integer, ParameterContext> parameterSettings) {
         super.assignment(parameterSettings);
         this.indexQueryValueFilter = OptimizerUtils.assignment(indexQueryValueFilter, parameterSettings);
     }
 
+    @Override
     public IQueryTree toDataNodeExecutor() throws QueryException {
         return this.convertToJoinIfNeed().toDataNodeExecutor();
     }
@@ -95,6 +98,7 @@ public class TableNode extends QueryTreeNode {
      *              先根据索引信息查询到主键，再根据主键查询出所需的其他字段，对应的join条件即为主键字段
      * </pre>
      */
+    @Override
     public QueryTreeNode convertToJoinIfNeed() {
         if (this.getIndexUsed() == null || this.getIndexUsed().isPrimaryKeyIndex()) {
             // 若不包含索引，则扫描主表即可或者使用主键索引
@@ -244,6 +248,7 @@ public class TableNode extends QueryTreeNode {
         }
     }
 
+    @Override
     public List getImplicitOrderBys() {
         // 如果有显示group by，直接使用group by
         List<IOrderBy> orderByCombineWithGroupBy = getOrderByCombineWithGroupBy();
@@ -264,10 +269,12 @@ public class TableNode extends QueryTreeNode {
         }
     }
 
+    @Override
     public QueryTreeNodeBuilder getBuilder() {
         return builder;
     }
 
+    @Override
     public String getName() {
         if (this.getAlias() != null) {
             return this.getAlias();
@@ -291,7 +298,7 @@ public class TableNode extends QueryTreeNode {
 
     // ============= insert/update/delete/put==================
 
-    public InsertNode insert(List<ISelectable> columns, List<Comparable> values) {
+    public InsertNode insert(List<ISelectable> columns, List<Object> values) {
         InsertNode insert = new InsertNode(this);
         insert.setColumns(columns);
         insert.setValues(values);
@@ -306,18 +313,18 @@ public class TableNode extends QueryTreeNode {
         return this.insert(columns.split(" "), values);
     }
 
-    public InsertNode insert(String columns[], Comparable values[]) {
+    public InsertNode insert(String columns[], Object values[]) {
         List<ISelectable> cs = new LinkedList<ISelectable>();
         for (String name : columns) {
             ISelectable s = OptimizerUtils.createColumnFromString(name);
             cs.add(s);
         }
 
-        List<Comparable> valueList = new ArrayList<Comparable>(Arrays.asList(values));
+        List<Object> valueList = new ArrayList<Object>(Arrays.asList(values));
         return this.insert(cs, valueList);
     }
 
-    public PutNode put(List<ISelectable> columns, List<Comparable> values) {
+    public PutNode put(List<ISelectable> columns, List<Object> values) {
         if (columns.size() != values.size()) {
             throw new IllegalArgumentException("The size of the columns and values is not matched."
                                                + " columns' size is " + columns.size() + ". values' size is "
@@ -334,18 +341,18 @@ public class TableNode extends QueryTreeNode {
         return put(StringUtils.split(columns, ' '), values);
     }
 
-    public PutNode put(String columns[], Comparable values[]) {
+    public PutNode put(String columns[], Object values[]) {
         List<ISelectable> cs = new LinkedList<ISelectable>();
         for (String name : columns) {
             ISelectable s = OptimizerUtils.createColumnFromString(name);
             cs.add(s);
         }
 
-        List<Comparable> valueList = new ArrayList<Comparable>(Arrays.asList(values));
+        List<Object> valueList = new ArrayList<Object>(Arrays.asList(values));
         return put(cs, valueList);
     }
 
-    public UpdateNode update(List<ISelectable> columns, List<Comparable> values) {
+    public UpdateNode update(List<ISelectable> columns, List<Object> values) {
 
         if (columns.size() != values.size()) {
             throw new IllegalArgumentException("The size of the columns and values is not matched."
@@ -359,18 +366,18 @@ public class TableNode extends QueryTreeNode {
         return update;
     }
 
-    public UpdateNode update(String columns, Comparable values[]) {
+    public UpdateNode update(String columns, Object values[]) {
         return update(columns.split(" "), values);
     }
 
-    public UpdateNode update(String columns[], Comparable values[]) {
+    public UpdateNode update(String columns[], Object values[]) {
         List<ISelectable> cs = new LinkedList<ISelectable>();
         for (String name : columns) {
             ISelectable s = OptimizerUtils.createColumnFromString(name);
             cs.add(s);
         }
 
-        List<Comparable> valueList = new ArrayList<Comparable>(Arrays.asList(values));
+        List<Object> valueList = new ArrayList<Object>(Arrays.asList(values));
         return update(cs, valueList);
     }
 
@@ -380,12 +387,14 @@ public class TableNode extends QueryTreeNode {
     }
 
     // =============== copy =============
+    @Override
     public TableNode copy() {
         TableNode newTableNode = new TableNode(null);
         this.copySelfTo(newTableNode);
         return newTableNode;
     }
 
+    @Override
     protected void copySelfTo(QueryTreeNode to) {
         super.copySelfTo(to);
         TableNode toTable = (TableNode) to;
@@ -397,12 +406,14 @@ public class TableNode extends QueryTreeNode {
         toTable.useIndex(this.getIndexUsed());
     }
 
+    @Override
     public TableNode deepCopy() {
         TableNode newTableNode = new TableNode(null);
         this.deepCopySelfTo(newTableNode);
         return newTableNode;
     }
 
+    @Override
     protected void deepCopySelfTo(QueryTreeNode to) {
         super.deepCopySelfTo(to);
         TableNode toTable = (TableNode) to;
@@ -469,6 +480,7 @@ public class TableNode extends QueryTreeNode {
         this.actualTableName = actualTableName;
     }
 
+    @Override
     public String toString(int inden) {
         String tabTittle = GeneralUtil.getTab(inden);
         String tabContent = GeneralUtil.getTab(inden + 1);

@@ -82,7 +82,7 @@ public abstract class QueryTreeNodeBuilder {
         }
 
         if (filter.getOperation() == OPERATION.IN) {
-            List<Comparable> values = filter.getValues();
+            List<Object> values = filter.getValues();
             if (values != null && !values.isEmpty() && values.get(0) instanceof QueryTreeNode) {
                 // in的子查询
                 ((QueryTreeNode) values.get(0)).build();
@@ -208,7 +208,7 @@ public abstract class QueryTreeNodeBuilder {
     public void buildOrderBy() {
         for (IOrderBy order : node.getOrderBys()) {
             if (order.getColumn() instanceof ISelectable) {
-                order.setColumn(this.buildSelectable((ISelectable) order.getColumn(), true));
+                order.setColumn(this.buildSelectable(order.getColumn(), true));
             }
         }
     }
@@ -216,7 +216,7 @@ public abstract class QueryTreeNodeBuilder {
     public void buildGroupBy() {
         for (IOrderBy order : node.getGroupBys()) {
             if (order.getColumn() instanceof ISelectable) {
-                order.setColumn(this.buildSelectable((ISelectable) order.getColumn(), true));
+                order.setColumn(this.buildSelectable(order.getColumn(), true));
             }
         }
 

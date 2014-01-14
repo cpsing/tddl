@@ -11,7 +11,8 @@ import com.taobao.tddl.optimizer.core.PlanVisitor;
  */
 public interface IBindVal extends Comparable, CanVisit {
 
-    public Comparable assignment(Map<Integer, ParameterContext> parameterSettings);
+    public Object assignment(Map<Integer, ParameterContext> parameterSettings);
 
+    @Override
     void accept(PlanVisitor visitor);
 }

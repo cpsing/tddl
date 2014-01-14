@@ -37,8 +37,8 @@
 		</dependency>
 
 		<!-- test libs -->
-		<!-- <dependency> <groupId>${project.groupId}</groupId> <artifactId>tddl-client</artifactId> 
-			<version>${project.version}</version> <scope>test</scope> </dependency> -->
+		<dependency> <groupId>${project.groupId}</groupId> <artifactId>tddl-client</artifactId> 
+			<version>${project.version}</version> <scope>test</scope> </dependency> 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>tddl-repo-mysql</artifactId>

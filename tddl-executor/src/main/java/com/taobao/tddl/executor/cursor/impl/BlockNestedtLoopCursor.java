@@ -33,7 +33,7 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor impleme
     ICursorFactory      cursorFactory    = null;
     ExecutionContext    executionContext = null;
     ICursorMeta         rightCursorMeta  = null;
-    private IJoin       join;
+    private final IJoin join;
     private RecordCodec leftCodec;
 
     public BlockNestedtLoopCursor(ISchematicCursor leftCursor, ISchematicCursor rightCursor, List leftColumns,
@@ -73,7 +73,7 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor impleme
         right_cursor.beforeFirst();
         IBooleanFilter filter = ASTNodeFactory.getInstance().createBooleanFilter();
 
-        List<Comparable> values = new ArrayList<Comparable>();
+        List<Object> values = new ArrayList<Object>();
         for (CloneableRecord record : leftJoinOnColumnCache) {
             Map<String, Object> recordMap = record.getMap();
             if (recordMap.size() != 1) {
@@ -103,6 +103,7 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor impleme
         return records;
     }
 
+    @Override
     protected Map<CloneableRecord, DuplicateKVPair> getRecordFromRight(List<CloneableRecord> leftJoinOnColumnCache)
                                                                                                                    throws TddlException {
         // 子查询的话不能用mget

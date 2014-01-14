@@ -12,7 +12,6 @@ import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
-import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.costbased.esitimater.CostEsitimaterFactory;
@@ -46,7 +45,7 @@ public class IndexChooser {
             return null;
         }
 
-        Map<Comparable, List<IFilter>> columnFilters = FilterUtils.toColumnFiltersMap(filters);
+        Map<Object, List<IFilter>> columnFilters = FilterUtils.toColumnFiltersMap(filters);
         int scores[] = new int[indexs.size()];
         for (int i = 0; i < scores.length; i++) {
             scores[i] = initialScore;
@@ -74,7 +73,7 @@ public class IndexChooser {
 
                 if (isContain) {
                     scores[i] = (int) CostEsitimaterFactory.estimateRowCount(scores[i],
-                        columnFilters.get(((IColumn) indexColumns.get(j))),
+                        columnFilters.get((indexColumns.get(j))),
                         indexs.get(i),
                         kvIndexStat);
                     scores[i] -= 1; // 命中一个主键字段

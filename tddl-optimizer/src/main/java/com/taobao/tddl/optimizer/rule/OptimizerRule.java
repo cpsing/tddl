@@ -41,18 +41,20 @@ import com.taobao.tddl.rule.model.sqljep.ComparativeOR;
 public class OptimizerRule extends AbstractLifecycle {
 
     private final static int DEFAULT_OPERATION_COMP = -1000;
-    private TddlRule         tddlRule;
+    private final TddlRule   tddlRule;
 
     public OptimizerRule(TddlRule tddlRule){
         this.tddlRule = tddlRule;
     }
 
+    @Override
     protected void doInit() throws TddlException {
         if (!tddlRule.isInited()) {
             tddlRule.init();
         }
     }
 
+    @Override
     protected void doDestory() throws TddlException {
         if (tddlRule.isInited()) {
             tddlRule.destory();
@@ -83,6 +85,7 @@ public class OptimizerRule extends AbstractLifecycle {
         try {
             result = tddlRule.routeMverAndCompare(!isWrite, logicTable, new ComparativeMapChoicer() {
 
+                @Override
                 public Map<String, Comparative> getColumnsMap(List<Object> arguments, Set<String> partnationSet) {
                     Map<String, Comparative> map = new HashMap<String, Comparative>();
                     for (String str : partnationSet) {
@@ -92,6 +95,7 @@ public class OptimizerRule extends AbstractLifecycle {
                     return map;
                 }
 
+                @Override
                 public Comparative getColumnComparative(List<Object> arguments, String colName) {
                     return getComparative(ifilter, colName);
                 }
@@ -282,7 +286,7 @@ public class OptimizerRule extends AbstractLifecycle {
 
             if (booleanFilter.getOperation() == OPERATION.IN) {// in不能出现isReverse
                 ComparativeBaseList orComp = new ComparativeOR();
-                for (Comparable value : booleanFilter.getValues()) {
+                for (Object value : booleanFilter.getValues()) {
                     IBooleanFilter ef = ASTNodeFactory.getInstance().createBooleanFilter();
                     ef.setOperation(OPERATION.EQ);
                     ef.setColumn(booleanFilter.getColumn());
@@ -322,7 +326,7 @@ public class OptimizerRule extends AbstractLifecycle {
                 }
 
                 IColumn column = null;
-                Comparable value = null;
+                Object value = null;
                 if (booleanFilter.getColumn() instanceof IColumn) {
                     column = OptimizerUtils.getColumn(booleanFilter.getColumn());
                     value = getComparableWhenTypeIsNowReturnDate(booleanFilter.getValue());
@@ -333,7 +337,12 @@ public class OptimizerRule extends AbstractLifecycle {
                 }
 
                 if (colName.equalsIgnoreCase(column.getColumnName()) && operationComp != DEFAULT_OPERATION_COMP) {
-                    comp = new Comparative(operationComp, value);
+
+                    if (!(value instanceof Comparable)) {
+                        throw new TddlRuntimeException("type: " + value.getClass().getSimpleName()
+                                                       + " is not comparable, cannot be used in partition column");
+                    }
+                    comp = new Comparative(operationComp, (Comparable) value);
                 }
 
                 return comp;
@@ -344,7 +353,7 @@ public class OptimizerRule extends AbstractLifecycle {
         }
     }
 
-    private static Comparable getComparableWhenTypeIsNowReturnDate(Comparable val) {
+    private static Object getComparableWhenTypeIsNowReturnDate(Object val) {
         if (val instanceof IFunction) {
             IFunction func = (IFunction) val;
             if ("NOW".equalsIgnoreCase(func.getFunctionName())) {

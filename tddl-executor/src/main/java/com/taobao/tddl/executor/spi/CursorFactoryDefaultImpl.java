@@ -240,7 +240,7 @@ public class CursorFactoryDefaultImpl implements ICursorFactory {
 
     @Override
     public IInCursor inCursor(ExecutionContext executionContext, Cursor cursor, List<IOrderBy> orderBys, IColumn c,
-                              List<Comparable> v, OPERATION op) {
+                              List<Object> v, OPERATION op) {
         return new InCursor(cursor, orderBys, c, v, op);
     }
 

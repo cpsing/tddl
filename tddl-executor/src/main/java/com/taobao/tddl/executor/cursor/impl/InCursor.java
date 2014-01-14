@@ -41,7 +41,7 @@ public class InCursor extends SchematicCursor implements IInCursor {
     /**
      * 需要查找的数据
      */
-    List<Comparable>          valuesToFind       = null;
+    List<Object>              valuesToFind       = null;
     OPERATION                 op                 = null; ;
     RecordCodec               keyCodec;
 
@@ -62,15 +62,15 @@ public class InCursor extends SchematicCursor implements IInCursor {
      */
     DuplicateKVPair           duplicatePairCache = null;
 
-    public InCursor(Cursor cursor, List<IOrderBy> orderBys, IColumn c, List<Comparable> v, OPERATION op){
+    public InCursor(Cursor cursor, List<IOrderBy> orderBys, IColumn c, List<Object> v, OPERATION op){
         super(cursor, null, orderBys);
         keyCodec = CodecFactory.getInstance(CodecFactory.FIXED_LENGTH)
             .getCodec(Arrays.asList(ExecUtils.getColumnMeta(c)));
         this.c = c;
 
         if (c.getDataType() == DATA_TYPE.DATE_VAL) {
-            List<Comparable> vNew = new ArrayList<Comparable>(v.size());
-            for (Comparable comp : v) {
+            List<Object> vNew = new ArrayList<Object>(v.size());
+            for (Object comp : v) {
                 vNew.add(new Date((Long) comp));
             }
             v = vNew;
@@ -120,7 +120,7 @@ public class InCursor extends SchematicCursor implements IInCursor {
         if (pairToReturnIterator == null) {
             // 还未初始化
             List<CloneableRecord> list = new ArrayList<CloneableRecord>(valuesToFind.size());
-            for (Comparable valOne : valuesToFind) {
+            for (Object valOne : valuesToFind) {
                 list.add(getCloneableRecordOfKey(c.getColumnName(), valOne, keyCodec));
             }
             pairToReturn = cursor.mgetWithDuplicateList(list, false, true);
