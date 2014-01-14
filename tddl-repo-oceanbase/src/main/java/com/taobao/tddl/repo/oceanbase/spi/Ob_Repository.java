@@ -129,7 +129,9 @@ public class Ob_Repository extends AbstractLifecycle implements IRepository {
                     OceanbaseDataSourceProxy obDS = new OceanbaseDataSourceProxy();
                     String configUrl = group.getProperties().get(CONFIG_URL);
 
-                    if (configUrl == null) throw new TddlRuntimeException("config url is not assigned, oceanbase datasource cannot be inited");
+                    if (configUrl == null) {
+                        throw new TddlRuntimeException("config url is not assigned, oceanbase datasource cannot be inited");
+                    }
 
                     obDS.setConfigURL(configUrl);
                     obDS.init();

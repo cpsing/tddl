@@ -28,47 +28,47 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  */
 public class TStatement implements Statement {
 
-    private static final Logger       log                  = LoggerFactory.getLogger(TStatement.class);
+    private static final Logger   log                  = LoggerFactory.getLogger(TStatement.class);
 
-    protected String                  sql;
-    protected TDataSource             ds;
-    protected TConnection             conn;
+    protected String              sql;
+    protected TDataSource         ds;
+    protected TConnection         conn;
 
-    protected ExecutionContext        executionContext     = null;
+    protected ExecutionContext    executionContext     = null;
     /**
      * 更新计数，如果执行了多次，那么这个值只会返回最后一次执行的结果。 如果是一个query，那么返回的数据应该是-1
      */
-    protected int                     updateCount;
+    protected int                 updateCount;
 
     /**
      * 经过计算后的结果集，允许使用 getResult函数调用. 一个statement只允许有一个结果集
      */
-    protected ResultSet               currentResultSet;
+    protected ResultSet           currentResultSet;
 
-    protected Map<String, Comparable> extraCmd             = new HashMap<String, Comparable>(4);
+    protected Map<String, Object> extraCmd             = new HashMap<String, Object>(4);
 
     /**
      * 当前statment 是否是关闭的
      */
-    protected boolean                 closed;
+    protected boolean             closed;
 
-    protected PreparedStatement       proxyStatement;
+    protected PreparedStatement   proxyStatement;
 
-    private int                       maxFieldSize;
+    private int                   maxFieldSize;
 
-    private int                       maxRows;
+    private int                   maxRows;
 
-    private int                       queryTimeOut;
+    private int                   queryTimeOut;
 
-    private int                       direction;
+    private int                   direction;
 
-    protected List<String>            batchedArgs;
+    protected List<String>        batchedArgs;
 
-    private int                       resultSetType        = -1;
+    private int                   resultSetType        = -1;
 
-    private int                       resultSetConcurrency = -1;
+    private int                   resultSetConcurrency = -1;
 
-    private int                       resultSetHoldability = -1;
+    private int                   resultSetHoldability = -1;
 
     public TStatement(TDataSource ds, TConnection tConnection, ExecutionContext executionContext){
         this.ds = ds;
@@ -322,7 +322,7 @@ public class TStatement implements Statement {
     }
 
     public int getFetchSize() throws SQLException {
-        Comparable val = extraCmd.get(ExtraCmd.ExecutionExtraCmd.FETCH_SIZE);
+        Object val = extraCmd.get(ExtraCmd.ExecutionExtraCmd.FETCH_SIZE);
         if (val == null) {
             return 0;
         }

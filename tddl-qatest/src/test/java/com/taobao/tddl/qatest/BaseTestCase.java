@@ -17,7 +17,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 
 import com.taobao.diamond.mockserver.MockServer;
-import com.taobao.tddl.atom.TAtomDataSource;
 import com.taobao.tddl.matrix.jdbc.TDataSource;
 import com.taobao.tddl.qatest.util.DateUtil;
 import com.taobao.tddl.qatest.util.Validator;
@@ -66,13 +65,13 @@ public class BaseTestCase extends Validator {
     @BeforeClass
     public static void diamondSetUp() {
         MockServer.setUpMockServer();
-        TAtomDataSource.cleanAllDataSource();
+        // TAtomDataSource.cleanAllDataSource();
     }
 
     @AfterClass
     public static void diamondTearDown() {
         MockServer.tearDownMockServer();
-        TAtomDataSource.cleanAllDataSource();
+        // TAtomDataSource.cleanAllDataSource();
     }
 
     // 获取配置

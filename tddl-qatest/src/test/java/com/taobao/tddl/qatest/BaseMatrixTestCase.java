@@ -98,7 +98,7 @@ public class BaseMatrixTestCase extends PrepareData {
             us.setSchemaFile(schemaFile + dbTypeStack + "_" + schema);
         }
 
-        Map<String, Comparable> cp = new HashMap<String, Comparable>();
+        Map<String, Object> cp = new HashMap<String, Object>();
         if ("tdhs".equalsIgnoreCase(dbTypeStack)) {
             cp.put(ExtraCmd.ConnectionExtraCmd.USE_TDHS_FOR_DEFAULT, "true");
         }
@@ -137,39 +137,39 @@ public class BaseMatrixTestCase extends PrepareData {
         }
 
         // -----------------oracle or mysql
-        String groupPath = GROUP_PATH;
-        String atomPath = ATOM_PATH;
+        String groupPath = BaseAtomGroupTestCase.GROUP_PATH;
+        String atomPath = BaseAtomGroupTestCase.ATOM_PATH;
         if (isOracle) {
-            groupPath = GROUP_ORA_PATH;
-            atomPath = ATOM_ORA_PATH;
+            groupPath = BaseAtomGroupTestCase.GROUP_ORA_PATH;
+            atomPath = BaseAtomGroupTestCase.ATOM_ORA_PATH;
         }
 
         // -----------------获取group信息
-        dataMap = new HashMap<String, String>();
+        BaseAtomGroupTestCase.dataMap = new HashMap<String, String>();
         String[] groupArr = groupsStr.split(",");
 
         for (String group : groupArr) {
             group = group.trim();
             String groupStr = "";
-            groupStr = LoadPropsUtil.loadProps2OneLine(groupPath + group + PROPERTIES_FILE, group);
+            groupStr = LoadPropsUtil.loadProps2OneLine(groupPath + group + BaseAtomGroupTestCase.PROPERTIES_FILE, group);
             if (groupsStr != null && StringUtils.isNotBlank(groupsStr)) {
                 // 获取atom信息
                 String[] atomArr = groupStr.split(",");
                 for (String atom : atomArr) {
                     atom = atom.trim();
                     atom = atom.substring(0, atom.indexOf(":"));
-                    initAtomConfig(atomPath + atom, APPNAME, atom);
+                    BaseAtomGroupTestCase.initAtomConfig(atomPath + atom, BaseAtomGroupTestCase.APPNAME, atom);
                 }
                 // 获取groupkey
-                dataMap.put(TGroupDataSource.getFullDbGroupKey(group), groupStr);
+                BaseAtomGroupTestCase.dataMap.put(TGroupDataSource.getFullDbGroupKey(group), groupStr);
             }
         }
 
         // -----------------dbgroups
-        dataMap.put(new MessageFormat(ConfigServerHelper.DATA_ID_DB_GROUP_KEYS).format(new Object[] { APPNAME }),
+        BaseAtomGroupTestCase.dataMap.put(new MessageFormat(ConfigServerHelper.DATA_ID_DB_GROUP_KEYS).format(new Object[] { BaseAtomGroupTestCase.APPNAME }),
             groupsStr);
 
         // 建立MockServer
-        MockServer.setConfigInfos(dataMap);
+        MockServer.setConfigInfos(BaseAtomGroupTestCase.dataMap);
     }
 }

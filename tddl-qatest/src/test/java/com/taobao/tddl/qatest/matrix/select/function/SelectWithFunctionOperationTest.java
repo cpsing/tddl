@@ -9,14 +9,14 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
 
-@RunWith(Parameterized.class)
+@RunWith(EclipseParameterized.class)
 public class SelectWithFunctionOperationTest extends BaseMatrixTestCase {
 
     @Parameters(name = "{index}:table={0}")
@@ -121,6 +121,13 @@ public class SelectWithFunctionOperationTest extends BaseMatrixTestCase {
         sql = "SELECT max(id)*count(id)/8-count(*)*2+min(id) as c FROM " + normaltblTableName;
         String[] columnParam1 = { "c" };
         selectOrderAssert(sql, columnParam1, Collections.EMPTY_LIST);
+    }
+
+    @Test
+    public void testFunctionAddDupTest() throws Exception {
+        String sql = "SELECT pk+1 as b  FROM " + normaltblTableName + " order by pk";
+        String[] columnParam = { "b" };
+        selectOrderAssert(sql, columnParam, Collections.EMPTY_LIST);
     }
 
 }

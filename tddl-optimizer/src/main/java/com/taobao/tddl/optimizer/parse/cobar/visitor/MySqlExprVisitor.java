@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
@@ -106,6 +107,7 @@ import com.taobao.tddl.optimizer.exceptions.OptimizerException;
  */
 public class MySqlExprVisitor extends EmptySQLASTVisitor {
 
+    private static Map    emptyMap  = Maps.newHashMap();
     private Comparable    columnOrValue;
     private QueryTreeNode tableNode = null;
     private String        valueForLike;
@@ -227,6 +229,10 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
     }
 
     public void visit(UnaryOperatorExpression node) {
+        if (eval(node)) { // 计算出了结果
+            return;
+        }
+
         if (node instanceof BitInvertExpression) {
         } else if (node instanceof CastBinaryExpression) {
         } else if (node instanceof LogicalNotExpression) {
@@ -239,10 +245,6 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
             throw new NotSupportException("not support SubqueryAnyExpression");
         } else {
             throw new NotSupportException("not supported this UnaryOperatorExpression type " + node.getOperator());
-        }
-
-        if (eval(node)) { // 计算出了结果
-            return;
         }
 
         IFunction f = ASTNodeFactory.getInstance().createFunction();
@@ -473,9 +475,9 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
             expr.accept(ev);
             if (expr instanceof LiteralBoolean) {
                 if ((Boolean) ev.getColumnOrValue()) {
-                    ev.filter = this.buildBooleanFilter(new Boolean(true), new Boolean(true), OPERATION.EQ, node);
+                    ev.filter = this.buildConstanctFilter(1);
                 } else {
-                    ev.filter = this.buildBooleanFilter(new Boolean(false), new Boolean(true), OPERATION.EQ, node);
+                    ev.filter = this.buildConstanctFilter(0);
                 }
             }
 
@@ -611,7 +613,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
     }
 
     protected boolean eval(Expression expr) {
-        Object value = expr.evaluation(Maps.newHashMap());
+        Object value = expr.evaluation(emptyMap);
         if (value != null && value != Expression.UNEVALUATABLE) {
             this.columnOrValue = (Comparable) value;
             return true;

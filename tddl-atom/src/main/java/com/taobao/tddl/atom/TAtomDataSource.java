@@ -13,6 +13,7 @@ import com.taobao.tddl.atom.config.listener.AtomDbStatusListener;
 import com.taobao.tddl.atom.exception.AtomAlreadyInitException;
 import com.taobao.tddl.common.model.Atom;
 import com.taobao.tddl.common.utils.TStringUtil;
+
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
@@ -38,7 +39,7 @@ public class TAtomDataSource extends AbstractTAtomDataSource {
     }
 
     public void init() throws Exception {
-        String dbName = TAtomConstants.getDbNameStr(this.getAppName(), this.getDbKey());
+        String dbName = TAtomConstants.getDbNameStr(this.getUnitName(), this.getAppName(), this.getDbKey());
         synchronized (cacheConfHandleMap) {
             TAtomDsConfHandle cacheConfHandle = cacheConfHandleMap.get(dbName);
             if (null == cacheConfHandle) {
@@ -83,7 +84,7 @@ public class TAtomDataSource extends AbstractTAtomDataSource {
      * @throws Exception
      */
     public void destroyDataSource() throws Exception {
-        String dbName = TAtomConstants.getDbNameStr(this.getAppName(), this.getDbKey());
+        String dbName = TAtomConstants.getDbNameStr(this.getUnitName(), this.getAppName(), this.getDbKey());
         synchronized (cacheConfHandleMap) {
             this.dsConfHandle.destroyDataSource();
             cacheConfHandleMap.remove(dbName);
@@ -108,6 +109,10 @@ public class TAtomDataSource extends AbstractTAtomDataSource {
 
     public void setUnitName(String unitName) {
         this.dsConfHandle.setUnitName(unitName);
+    }
+
+    public String getUnitName() {
+        return this.dsConfHandle.getUnitName();
     }
 
     public TAtomDbStatusEnum getDbStatus() {

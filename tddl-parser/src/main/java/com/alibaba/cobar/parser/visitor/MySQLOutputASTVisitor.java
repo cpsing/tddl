@@ -139,6 +139,7 @@ import com.alibaba.cobar.parser.ast.stmt.dal.ShowTriggers;
 import com.alibaba.cobar.parser.ast.stmt.dal.ShowVariables;
 import com.alibaba.cobar.parser.ast.stmt.dal.ShowWarnings;
 import com.alibaba.cobar.parser.ast.stmt.ddl.DDLAlterTableStatement;
+import com.alibaba.cobar.parser.ast.stmt.ddl.DDLAlterTableStatement.AlterSpecification;
 import com.alibaba.cobar.parser.ast.stmt.ddl.DDLCreateIndexStatement;
 import com.alibaba.cobar.parser.ast.stmt.ddl.DDLCreateTableStatement;
 import com.alibaba.cobar.parser.ast.stmt.ddl.DDLDropIndexStatement;
@@ -146,7 +147,6 @@ import com.alibaba.cobar.parser.ast.stmt.ddl.DDLDropTableStatement;
 import com.alibaba.cobar.parser.ast.stmt.ddl.DDLRenameTableStatement;
 import com.alibaba.cobar.parser.ast.stmt.ddl.DDLTruncateStatement;
 import com.alibaba.cobar.parser.ast.stmt.ddl.DescTableStatement;
-import com.alibaba.cobar.parser.ast.stmt.ddl.DDLAlterTableStatement.AlterSpecification;
 import com.alibaba.cobar.parser.ast.stmt.dml.DMLCallStatement;
 import com.alibaba.cobar.parser.ast.stmt.dml.DMLDeleteStatement;
 import com.alibaba.cobar.parser.ast.stmt.dml.DMLInsertStatement;
@@ -165,21 +165,22 @@ import com.alibaba.cobar.parser.util.Pair;
 /**
  * @author <a href="mailto:shuo.qius@alibaba-inc.com">QIU Shuo</a>
  */
-public final class MySQLOutputASTVisitor implements SQLASTVisitor {
+public class MySQLOutputASTVisitor implements SQLASTVisitor {
 
-    private static final Object[]    EMPTY_OBJ_ARRAY = new Object[0];
-    private static final int[]       EMPTY_INT_ARRAY = new int[0];
-    private final StringBuilder      appendable;
-    private final Object[]           args;
-    private int[]                    argsIndex;
-    private Map<PlaceHolder, Object> placeHolderToString;
+    protected static final Object[]    EMPTY_OBJ_ARRAY = new Object[0];
+    protected static final int[]       EMPTY_INT_ARRAY = new int[0];
+    protected final StringBuilder      appendable;
+    protected final Object[]           args;
+    protected int[]                    argsIndex;
+    protected Map<PlaceHolder, Object> placeHolderToString;
 
     public MySQLOutputASTVisitor(StringBuilder appendable){
         this(appendable, null);
     }
 
     /**
-     * @param args parameters for {@link java.sql.PreparedStatement preparedStmt}
+     * @param args parameters for {@link java.sql.PreparedStatement
+     * preparedStmt}
      */
     public MySQLOutputASTVisitor(StringBuilder appendable, Object[] args){
         this.appendable = appendable;
@@ -221,14 +222,14 @@ public final class MySQLOutputASTVisitor implements SQLASTVisitor {
     /**
      * @param list never null
      */
-    private void printList(List<? extends ASTNode> list) {
+    protected void printList(List<? extends ASTNode> list) {
         printList(list, ", ");
     }
 
     /**
      * @param list never null
      */
-    private void printList(List<? extends ASTNode> list, String sep) {
+    protected void printList(List<? extends ASTNode> list, String sep) {
         boolean isFst = true;
         for (ASTNode arg : list) {
             if (isFst) isFst = false;
@@ -731,7 +732,7 @@ public final class MySQLOutputASTVisitor implements SQLASTVisitor {
         appendable.append(node.getIdText().toUpperCase());
     }
 
-    private static boolean containsCompIn(Expression pat) {
+    protected static boolean containsCompIn(Expression pat) {
         if (pat.getPrecedence() > Expression.PRECEDENCE_COMPARISION) return false;
         if (pat instanceof BinaryOperatorExpression) {
             if (pat instanceof InExpression) {
@@ -788,9 +789,9 @@ public final class MySQLOutputASTVisitor implements SQLASTVisitor {
         appendable.append(')');
     }
 
-    private int index = -1;
+    protected int index = -1;
 
-    private void appendArgsIndex(int value) {
+    protected void appendArgsIndex(int value) {
         int i = ++index;
         if (argsIndex.length <= i) {
             int[] a = new int[i + 1];
@@ -1101,7 +1102,7 @@ public final class MySQLOutputASTVisitor implements SQLASTVisitor {
             node.getKeyBlockSize().accept(this);
         } else if (node.getIndexType() != null) {
             appendable.append("USING ");
-            switch (node.getIndexType()) {//USING {BTREE | HASH}
+            switch (node.getIndexType()) {// USING {BTREE | HASH}
                 case BTREE:
                     appendable.append("BTREE");
                     break;
@@ -1139,7 +1140,7 @@ public final class MySQLOutputASTVisitor implements SQLASTVisitor {
         throw new UnsupportedOperationException("subclass have not implement visit");
     }
 
-    private void printSimpleShowStmt(String attName) {
+    protected void printSimpleShowStmt(String attName) {
         appendable.append("SHOW ").append(attName);
     }
 
@@ -1173,7 +1174,7 @@ public final class MySQLOutputASTVisitor implements SQLASTVisitor {
     /**
      * ' ' will be prepended
      */
-    private void printLikeOrWhere(String like, Expression where) {
+    protected void printLikeOrWhere(String like, Expression where) {
         if (like != null) {
             appendable.append(" LIKE ").append(like);
         } else if (where != null) {

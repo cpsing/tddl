@@ -165,7 +165,7 @@ public class TAtomDsConfHandle {
             // 8.转换tAtomDsConfDO
             DruidDataSource druidDataSource = convertTAtomDsConf2DruidConf(TAtomDsConfHandle.this.dbKey,
                 this.runTimeConf,
-                TAtomConstants.getDbNameStr(this.appName, this.dbKey));
+                TAtomConstants.getDbNameStr(this.unitName, this.appName, this.dbKey));
             // 9.参数检查如果参数不正确直接抛出异常
             if (!checkLocalTxDataSourceDO(druidDataSource)) {
                 String errorMsg = "[ConfigError]init dataSource Prams Error! config is : " + druidDataSource.toString();
@@ -295,7 +295,8 @@ public class TAtomDsConfHandle {
                         try {
                             druidDataSource = convertTAtomDsConf2DruidConf(TAtomDsConfHandle.this.dbKey,
                                 newConf,
-                                TAtomConstants.getDbNameStr(TAtomDsConfHandle.this.appName,
+                                TAtomConstants.getDbNameStr(TAtomDsConfHandle.this.unitName,
+                                    TAtomDsConfHandle.this.appName,
                                     TAtomDsConfHandle.this.dbKey));
                         } catch (Exception e1) {
                             logger.error("[DRUID GlobaConfError] convertTAtomDsConf2DruidConf Error! dataId : "
@@ -429,7 +430,8 @@ public class TAtomDsConfHandle {
                         try {
                             druidDataSource = convertTAtomDsConf2DruidConf(TAtomDsConfHandle.this.dbKey,
                                 newConf,
-                                TAtomConstants.getDbNameStr(TAtomDsConfHandle.this.appName,
+                                TAtomConstants.getDbNameStr(TAtomDsConfHandle.this.unitName,
+                                    TAtomDsConfHandle.this.appName,
                                     TAtomDsConfHandle.this.dbKey));
                         } catch (Exception e1) {
                             logger.error("[DRUID GlobaConfError] convertTAtomDsConf2DruidConf Error! dataId : "

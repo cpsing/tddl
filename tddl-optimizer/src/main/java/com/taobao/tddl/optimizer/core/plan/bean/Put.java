@@ -22,15 +22,16 @@ import com.taobao.tddl.optimizer.utils.OptimizerToString;
 
 public class Put<RT extends IPut> extends DataNodeExecutor<RT> implements IPut<RT> {
 
-    protected IQueryTree             queryTree;
-    protected List<ISelectable>      columns;
-    protected List<Comparable>       values;
-    protected PUT_TYPE               putType;
-    protected String                 tableName;     // 真实表名
-    protected String                 indexName;     // 逻辑索引信息
-    protected boolean                ignore = false;
-    protected List<List<Comparable>> multiValues;
-    protected boolean                isMutiValues;
+    protected IQueryTree                     queryTree;
+    protected List<ISelectable>              columns;
+    protected List<Comparable>               values;
+    protected PUT_TYPE                       putType;
+    protected String                         tableName;        // 真实表名
+    protected String                         indexName;        // 逻辑索引信息
+    protected boolean                        ignore = false;
+    protected List<List<Comparable>>         multiValues;
+    protected boolean                        isMutiValues;
+    protected Map<Integer, ParameterContext> parameterSettings;
 
     public Put(){
         putType = PUT_TYPE.REPLACE;
@@ -152,6 +153,17 @@ public class Put<RT extends IPut> extends DataNodeExecutor<RT> implements IPut<R
         } else {
             return this.values;
         }
+    }
+
+    @Override
+    public Map<Integer, ParameterContext> getParameterSettings() {
+        return parameterSettings;
+    }
+
+    @Override
+    public RT setParameterSettings(Map<Integer, ParameterContext> parameterSettings) {
+        this.parameterSettings = parameterSettings;
+        return (RT) this;
     }
 
     public void accept(PlanVisitor visitor) {

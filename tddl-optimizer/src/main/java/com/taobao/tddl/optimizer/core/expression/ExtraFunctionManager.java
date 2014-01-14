@@ -30,14 +30,18 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  */
 public class ExtraFunctionManager {
 
-    private static final Logger          logger          = LoggerFactory.getLogger(ExtraFunctionManager.class);
-    private static Map<String, Class<?>> functionCaches  = Maps.newConcurrentMap();
-    private static String                DUMMAY_FUNCTION = "DUMMY";
-    private static IExtraFunction        dummyFunction;                                                        // 缓存一下dummy，避免每次都反射创建
+    private static final Logger          logger               = LoggerFactory.getLogger(ExtraFunctionManager.class);
+    private static Map<String, Class<?>> functionCaches       = Maps.newConcurrentMap();
+    private static String                DUMMAY_FUNCTION      = "DUMMY";
+    private static String                DUMMAY_TEST_FUNCTION = "DUMMYTEST";
+    private static IExtraFunction        dummyFunction;                                                             // 缓存一下dummy，避免每次都反射创建
 
     static {
         initFunctions();
         dummyFunction = getExtraFunction(DUMMAY_FUNCTION);
+        if (dummyFunction == null) {
+            dummyFunction = getExtraFunction(DUMMAY_TEST_FUNCTION);
+        }
     }
 
     /**

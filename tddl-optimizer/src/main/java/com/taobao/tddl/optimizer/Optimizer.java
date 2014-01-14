@@ -26,7 +26,7 @@ public interface Optimizer extends Lifecycle {
      * @throws QueryException
      */
     IDataNodeExecutor optimizeAndAssignment(ASTNode node, Map<Integer, ParameterContext> parameterSettings,
-                                            Map<String, Comparable> extraCmd) throws QueryException;
+                                            Map<String, Object> extraCmd) throws QueryException;
 
     /**
      * 根据sql生成执行计划，根据cached参数判断是否进行缓存处理
@@ -39,7 +39,6 @@ public interface Optimizer extends Lifecycle {
      * @throws QueryException
      */
     IDataNodeExecutor optimizeAndAssignment(String sql, Map<Integer, ParameterContext> parameterSettings,
-                                            Map<String, Comparable> extraCmd, boolean cached)
-                                                                                             throws SqlParserException,
-                                                                                             QueryException;
+                                            Map<String, Object> extraCmd, boolean cached) throws SqlParserException,
+                                                                                         QueryException;
 }

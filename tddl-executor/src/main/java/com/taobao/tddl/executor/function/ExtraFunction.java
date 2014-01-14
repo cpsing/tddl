@@ -36,6 +36,10 @@ public abstract class ExtraFunction implements IExtraFunction {
         return Arrays.asList(obs);
     }
 
+    protected List getMapArgs(IFunction func) {
+        return func.getArgs();
+    }
+
     /**
      * 用于标记数据应该在server端进行计算。
      * 
@@ -88,7 +92,7 @@ public abstract class ExtraFunction implements IExtraFunction {
      */
     public void serverMap(IRowSet kvPair) throws TddlRuntimeException {
         // 当前function需要的args 有些可能是函数，也有些是其他的一些数据
-        List<Object> argsArr = function.getArgs();
+        List<Object> argsArr = getMapArgs(function);
         // 函数的input参数
         Object[] inputArg = new Object[argsArr.size()];
         int index = 0;
@@ -137,9 +141,10 @@ public abstract class ExtraFunction implements IExtraFunction {
                     Object v = kvPair.getObject(index);
                     ((ScalarFunction) this).setResult(v);
                 } else {
-                    throw new RuntimeException(this.function.getFunctionName() + " 没有实现，结果集中也没有");
+                    throw new TddlRuntimeException(this.function.getFunctionName() + " 没有实现，结果集中也没有");
                 }
             } else {
+                // 目前存在一问题，如果是row+1的字段，tddl还会再计算一次
                 try {
                     this.serverMap(kvPair);
                 } catch (RuntimeException e) {
@@ -156,6 +161,7 @@ public abstract class ExtraFunction implements IExtraFunction {
             // 函数的input参数
             List<Object> reduceArgs = this.getReduceArgs(function);
             Object[] inputArg = new Object[reduceArgs.size()];
+            // 目前认为所有scalar函数可下推
             for (int i = 0; i < reduceArgs.size(); i++) {
                 String name = reduceArgs.get(i).toString();
                 Object val = ExecUtils.getValueByTableAndName(kvPair, this.function.getTableName(), name);

@@ -216,7 +216,7 @@ public class FilterPreProcessor {
     private static IFilter typeConvert(IFilter root) {
         IBooleanFilter bf = (IBooleanFilter) root;
         // 如果是id in (xx)
-        if (bf.getValues() != null) {
+        if (bf.getValues() != null && bf.getColumn() instanceof ISelectable) {
             for (int i = 0; i < bf.getValues().size(); i++) {
                 bf.getValues().set(i,
                     (Comparable) OptimizerUtils.convertType(bf.getValues().get(i),

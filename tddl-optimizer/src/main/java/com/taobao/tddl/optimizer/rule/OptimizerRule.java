@@ -59,6 +59,22 @@ public class OptimizerRule extends AbstractLifecycle {
         }
     }
 
+    public List<TargetDB> shard(String logicTable, ComparativeMapChoicer choicer, boolean isWrite) {
+        MatcherResult result;
+        try {
+            result = tddlRule.routeMverAndCompare(!isWrite, logicTable, choicer, Lists.newArrayList());
+        } catch (RouteCompareDiffException e) {
+            throw new TddlRuntimeException(e);
+        }
+
+        List<TargetDB> targetDbs = result.getCalculationResult();
+        if (targetDbs == null || targetDbs.isEmpty()) {
+            throw new IllegalArgumentException("can't find target db. table is " + logicTable + ".");
+        }
+
+        return targetDbs;
+    }
+
     /**
      * 根据逻辑表和条件，计算一下目标库
      */
@@ -86,7 +102,8 @@ public class OptimizerRule extends AbstractLifecycle {
 
         List<TargetDB> targetDbs = result.getCalculationResult();
         if (targetDbs == null || targetDbs.isEmpty()) {
-            throw new IllegalArgumentException("can't find target db. table is " + logicTable + ". fiter is " + ifilter);
+            throw new IllegalArgumentException("can't find target db. table is " + logicTable + ". filter is "
+                                               + ifilter);
         }
 
         return targetDbs;
@@ -105,7 +122,7 @@ public class OptimizerRule extends AbstractLifecycle {
             throw new TddlRuntimeException(logicTable + "不是broadCast的表");
         }
 
-        List<TargetDB> targets = this.shard(logicTable, null, isWrite);
+        List<TargetDB> targets = this.shard(logicTable, (IFilter) null, isWrite);
         List<TargetDB> targetsMatched = new ArrayList<TargetDB>();
         for (TargetDB target : targets) {
             if (expectedGroups.contains(target.getDbIndex())) {
@@ -168,8 +185,7 @@ public class OptimizerRule extends AbstractLifecycle {
 
     private TableRule getTableRule(String logicTable) {
         VirtualTableRoot root = tddlRule.getCurrentRule();
-        logicTable = logicTable.toLowerCase();
-        TableRule table = root.getTableRules().get(logicTable);
+        TableRule table = root.getVirtualTable(logicTable);
         return table;
     }
 

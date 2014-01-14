@@ -24,8 +24,8 @@ public class VirtualTableRoot extends AbstractLifecycle implements Lifecycle {
 
     private static final Logger                 logger           = LoggerFactory.getLogger(VirtualTableRoot.class);
     protected String                            dbType           = "MYSQL";
-    protected Map<String/* 小写key */, TableRule> virtualTableMap;
-    protected Map<String/* 小写key */, String>    dbIndexMap;
+    protected Map<String/* 大写key */, TableRule> virtualTableMap;
+    protected Map<String/* 大写key */, String>    dbIndexMap;
 
     protected String                            defaultDbIndex;
     protected boolean                           needIdInGroup    = false;
@@ -48,10 +48,10 @@ public class VirtualTableRoot extends AbstractLifecycle implements Lifecycle {
      */
     public TableRule getVirtualTable(String virtualTableName) {
         RuleUtils.notNull(virtualTableName, "virtual table name is null");
-        TableRule tablRule = virtualTableMap.get(virtualTableName.toLowerCase());
-        if (lazyInit && !tablRule.isInited()) {
+        TableRule tablRule = virtualTableMap.get(virtualTableName.toUpperCase());
+        if (tablRule != null && lazyInit && !tablRule.isInited()) {
             try {
-                initTableRule(virtualTableName.toLowerCase(), tablRule);
+                initTableRule(virtualTableName, tablRule);
             } catch (TddlException e) {
                 throw new TddlRuleException(e);
             }
@@ -61,22 +61,23 @@ public class VirtualTableRoot extends AbstractLifecycle implements Lifecycle {
     }
 
     public void setTableRules(Map<String, TableRule> virtualTableMap) {
-        Map<String, TableRule> lowerKeysLogicTableMap = new HashMap<String, TableRule>(virtualTableMap.size());
+        Map<String, TableRule> logicTableMap = new HashMap<String, TableRule>(virtualTableMap.size());
         for (Entry<String, TableRule> entry : virtualTableMap.entrySet()) {
-            lowerKeysLogicTableMap.put(entry.getKey().toLowerCase(), entry.getValue()); // 转化小写
+            logicTableMap.put(entry.getKey().toUpperCase(), entry.getValue()); // 转化大写
         }
-        this.virtualTableMap = lowerKeysLogicTableMap;
+        this.virtualTableMap = logicTableMap;
     }
 
     public void setDbIndexMap(Map<String, String> dbIndexMap) {
-        Map<String, String> lowerKeysDbIndexMap = new HashMap<String, String>(dbIndexMap.size());
+        Map<String, String> logicTableMap = new HashMap<String, String>(dbIndexMap.size());
         for (Entry<String, String> entry : dbIndexMap.entrySet()) {
-            lowerKeysDbIndexMap.put(entry.getKey().toLowerCase(), entry.getValue());// 转化小写
+            logicTableMap.put(entry.getKey().toUpperCase(), entry.getValue());// 转化大写
         }
-        this.dbIndexMap = lowerKeysDbIndexMap;
+        this.dbIndexMap = logicTableMap;
     }
 
     private void initTableRule(String tableNameKey, TableRule tableRule) throws TddlException {
+        tableNameKey = tableNameKey.toUpperCase();
         logger.warn("virtual table start to init :" + tableNameKey);
         if (tableRule.getDbType() == null) {
             // 如果虚拟表中dbType为null,那指定全局dbType

@@ -387,7 +387,7 @@ public class FilterUtils {
                 AndRangeProcessor ri = new AndRangeProcessor(c);
                 for (IFilter node : columnRestrictions.get(c)) {
                     if (!ri.process(node)) {
-                        throw new EmptyResultFilterException("empty result filter");
+                        throw new EmptyResultFilterException("空结果");
                     }
                 }
                 List<IFilter> boolNodesOfCurrentColumn = ri.toFilterList();

@@ -134,7 +134,7 @@ public class FilterPusherTest extends BaseOptimizerTest {
         query.build();
 
         QueryNode nextQuery = new QueryNode(query);
-        nextQuery.query("B.ID = 6 AND B.ID = B.NAME");
+        nextQuery.query("B.ID = 6");
         nextQuery.build();
 
         FilterPusher.optimize(nextQuery);

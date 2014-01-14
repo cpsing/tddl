@@ -31,13 +31,13 @@ public class MergeConcurrentOptimizer implements QueryPlanOptimizer {
      */
     @Override
     public IDataNodeExecutor optimize(IDataNodeExecutor dne, Map<Integer, ParameterContext> parameterSettings,
-                                      Map<String, Comparable> extraCmd) {
+                                      Map<String, Object> extraCmd) {
         this.findMergeAndSetConcurrent(dne, extraCmd);
 
         return dne;
     }
 
-    private void findMergeAndSetConcurrent(IDataNodeExecutor dne, Map<String, Comparable> extraCmd) {
+    private void findMergeAndSetConcurrent(IDataNodeExecutor dne, Map<String, Object> extraCmd) {
         if (dne instanceof IMerge) {
             if (isMergeConcurrent(extraCmd, (IMerge) dne)) {
                 ((IMerge) dne).setQueryConcurrency(QUERY_CONCURRENCY.CONCURRENT);
@@ -61,7 +61,7 @@ public class MergeConcurrentOptimizer implements QueryPlanOptimizer {
         }
     }
 
-    private static boolean isMergeConcurrent(Map<String, Comparable> extraCmd, IMerge query) {
+    private static boolean isMergeConcurrent(Map<String, Object> extraCmd, IMerge query) {
         String value = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd,
             ExtraCmd.OptimizerExtraCmd.MergeConcurrent));
         if (StringUtils.isEmpty(value)) {

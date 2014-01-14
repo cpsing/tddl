@@ -70,7 +70,7 @@ public class ComparativeStringAnalyser {
                     String[] compValues = TStringUtil.twoPartSplit(value, op);
                     String key = null;
                     for (String compValue : compValues) {
-                        Comparative comparative = decodeComparative(compValue);
+                        Comparative comparative = decodeComparative(compValue, null);
                         if (null != comparative) {
                             comparativeBaseList.addComparative(comparative);
                         }
@@ -86,7 +86,7 @@ public class ComparativeStringAnalyser {
                 } else {
                     // 说明只是Comparative
                     String key = decodeComparativeKey(value);
-                    Comparative comparative = decodeComparative(value);
+                    Comparative comparative = decodeComparative(value, null);
                     if (null != comparative) {
                         comparativeMap.put(key.toUpperCase(), comparative); // 必须大写
                     }
@@ -102,11 +102,11 @@ public class ComparativeStringAnalyser {
      * @param compValue
      * @return
      */
-    public static Comparative decodeComparative(String compValue) {
+    public static Comparative decodeComparative(String compValue, String globalType) {
         boolean containsIn = TStringUtil.contains(compValue, " in");
         Comparative comparative = null;
         if (!containsIn) {
-            int compEnum = Comparative.getComparisonByIdent(compValue);
+            int compEnum = Comparative.getComparisonByCompleteString(compValue);
             String splitor = Comparative.getComparisonName(compEnum);
             int size = splitor.length();
             int index = compValue.indexOf(splitor);
@@ -117,7 +117,7 @@ public class ComparativeStringAnalyser {
                 String type = valueTypeStr.substring(lastColonIndex + 1);
                 comparative = decodeComparative(type, compEnum, value);
             } else { // 如果不存在类型
-                comparative = decodeComparative(null, compEnum, valueTypeStr);
+                comparative = decodeComparative(globalType, compEnum, valueTypeStr);
             }
         } else {
             // 处理下in表达式
@@ -128,6 +128,9 @@ public class ComparativeStringAnalyser {
             if (lastColonIndex != -1) {
                 inValues = compValues[1].substring(0, lastColonIndex);
                 type = compValues[1].substring(lastColonIndex + 1);
+            } else {
+                inValues = compValues[1];
+                type = globalType;
             }
 
             ComparativeOR comparativeBaseList = new ComparativeOR();
@@ -191,13 +194,13 @@ public class ComparativeStringAnalyser {
     /**
      * 获取对应的key，类似id=xx中的id信息
      */
-    private static String decodeComparativeKey(String compValue) {
+    public static String decodeComparativeKey(String compValue) {
         boolean containsIn = TStringUtil.contains(compValue, " in");
         if (containsIn) {
             String[] compValues = TStringUtil.twoPartSplit(compValue, " in");
             return compValues[0].trim();
         } else {
-            int value = Comparative.getComparisonByIdent(compValue);
+            int value = Comparative.getComparisonByCompleteString(compValue);
             String splitor = Comparative.getComparisonName(value);
             int index = compValue.indexOf(splitor);
             return TStringUtil.substring(compValue, 0, index).trim();

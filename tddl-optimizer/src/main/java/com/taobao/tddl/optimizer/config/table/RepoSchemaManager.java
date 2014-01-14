@@ -60,7 +60,6 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
             delegate.setDelegate(true);
             delegate.setRule(rule);
             delegate.init();
-
         }
     }
 
@@ -76,9 +75,7 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
         }
 
         if (meta == null) {// 本地没有
-
-            return delegate.getTable0(logicalTableName, actualTableName);
-
+            meta = delegate.getTable0(logicalTableName, actualTableName);
         }
 
         return meta;
@@ -122,7 +119,6 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
             delegate.destory();
 
         }
-
     }
 
     public void setGroup(Group group) {

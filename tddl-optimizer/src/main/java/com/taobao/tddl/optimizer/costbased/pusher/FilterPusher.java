@@ -15,6 +15,7 @@ import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.exceptions.QueryException;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
+import com.taobao.tddl.optimizer.utils.OptimizerUtils;
 
 /**
  * 将filter进行下推
@@ -65,7 +66,7 @@ public class FilterPusher {
         if (qtn.getChildren().isEmpty()) {
             IFilter node = FilterUtils.DNFToAndLogicTree(DNFNodeToPush);
             if (node != null) {
-                qtn.query(FilterUtils.and(qtn.getWhereFilter(), (IFilter) node.copy()));
+                qtn.query(FilterUtils.and(qtn.getWhereFilter(), node));
                 qtn.build();
             }
             return qtn;
@@ -74,13 +75,13 @@ public class FilterPusher {
         // 对于or连接的条件，就不能下推了
         IFilter filterInWhere = qtn.getWhereFilter();
         if (filterInWhere != null && FilterUtils.isCNFNode(filterInWhere)) {
-            List<IFilter> DNFNode = FilterUtils.toDNFNode(filterInWhere);
+            List DNFNode = FilterUtils.toDNFNode(filterInWhere);
             qtn.query((IFilter) null);// 清空where条件
             if (DNFNodeToPush == null) {
                 DNFNodeToPush = new ArrayList<IFilter>();
             }
 
-            DNFNodeToPush.addAll(DNFNode);
+            DNFNodeToPush.addAll(OptimizerUtils.copyFilter(DNFNode));// 需要复制一份出来
         }
 
         if (qtn instanceof QueryNode) {
@@ -88,7 +89,6 @@ public class FilterPusher {
             List<IFilter> DNFNodeToCurrent = new LinkedList<IFilter>();
             if (DNFNodeToPush != null) {
                 for (IFilter node : DNFNodeToPush) {
-                    node = (IFilter) node.copy();
                     // 可能是多级节点，字段在select中，设置为select中的字段，这样才可以继续下推
                     if (!tryPushColumn(node, qn.getChild())) {
                         // 可能where条件是函数，暂时不下推
@@ -103,7 +103,7 @@ public class FilterPusher {
             // 针对不能下推的，合并到当前的where
             IFilter node = FilterUtils.DNFToAndLogicTree(DNFNodeToCurrent);
             if (node != null) {
-                qtn.query(FilterUtils.and(qtn.getWhereFilter(), (IFilter) node.copy()));
+                qtn.query(FilterUtils.and(qtn.getWhereFilter(), node));
             }
 
             ((QueryNode) qtn).setChild(child);
@@ -119,9 +119,7 @@ public class FilterPusher {
                 // 2. 处理a.id = b.id + 1，一边为column，一边为function
                 // 情况2这种不优化，直接当作where条件处理
                 findJoinKeysAndRemoveIt(DNFNodeToPush, jn);
-
                 for (IFilter node : DNFNodeToPush) {
-                    node = (IFilter) node.copy();
                     if (tryPushColumn(node, jn.getLeftNode())) {
                         DNFNodetoPushToLeft.add(node);
                     } else if (tryPushColumn(node, jn.getRightNode())) {
@@ -143,7 +141,7 @@ public class FilterPusher {
             // 针对不能下推的，合并到当前的where
             IFilter node = FilterUtils.DNFToAndLogicTree(DNFNodeToCurrent);
             if (node != null) {
-                qtn.query(FilterUtils.and(qtn.getWhereFilter(), (IFilter) node.copy()));
+                qtn.query(FilterUtils.and(qtn.getWhereFilter(), node));
             }
 
             if (jn.isInnerJoin()) {

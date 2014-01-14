@@ -57,7 +57,9 @@ public class RuleSchemaManager extends AbstractLifecycle implements SchemaManage
     protected void doInit() throws TddlException {
         super.doInit();
 
-        if (local != null) local.init();
+        if (local != null) {
+            local.init();
+        }
         repos = CacheBuilder.newBuilder().build(new CacheLoader<Group, RepoSchemaManager>() {
 
             @Override
@@ -113,6 +115,10 @@ public class RuleSchemaManager extends AbstractLifecycle implements SchemaManage
             }
         }
 
+        if (ts == null) {
+            throw new TddlRuntimeException(tableName + " is not found");
+        }
+
         return ts;
     }
 
@@ -148,10 +154,7 @@ public class RuleSchemaManager extends AbstractLifecycle implements SchemaManage
     public void putTable(String tableName, TableMeta tableMeta) {
         if (local != null) {
             local.putTable(tableName, tableMeta);
-        }
-
-        else if (useCache) {
-
+        } else if (useCache) {
             cache.put(tableName, tableMeta);
         }
     }

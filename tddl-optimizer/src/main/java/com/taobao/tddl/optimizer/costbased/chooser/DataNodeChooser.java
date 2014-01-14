@@ -68,7 +68,7 @@ public class DataNodeChooser {
     private static final Logger logger        = LoggerFactory.getLogger(DataNodeChooser.class);
 
     public static ASTNode shard(ASTNode dne, Map<Integer, ParameterContext> parameterSettings,
-                                Map<String, Comparable> extraCmd) throws QueryException {
+                                Map<String, Object> extraCmd) throws QueryException {
         if (dne instanceof DMLNode) {
             if (dne instanceof InsertNode) {
                 return shardInsert((InsertNode) dne, parameterSettings, extraCmd);
@@ -91,7 +91,7 @@ public class DataNodeChooser {
     }
 
     private static QueryTreeNode shardQuery(QueryTreeNode qtn, Map<Integer, ParameterContext> parameterSettings,
-                                            Map<String, Comparable> extraCmd) throws QueryException {
+                                            Map<String, Object> extraCmd) throws QueryException {
         if (qtn instanceof QueryNode) {
             QueryNode query = (QueryNode) qtn;
             QueryTreeNode child = query.getChild();
@@ -224,7 +224,7 @@ public class DataNodeChooser {
     }
 
     private static ASTNode shardInsert(InsertNode dne, Map<Integer, ParameterContext> parameterSettings,
-                                       Map<String, Comparable> extraCmd) {
+                                       Map<String, Object> extraCmd) {
 
         String indexName = null;
         if (dne.getNode() instanceof KVIndexNode) {
@@ -253,7 +253,7 @@ public class DataNodeChooser {
     }
 
     private static ASTNode shardUpdate(UpdateNode dne, Map<Integer, ParameterContext> parameterSettings,
-                                       Map<String, Comparable> extraCmd) throws QueryException {
+                                       Map<String, Object> extraCmd) throws QueryException {
         QueryTreeNode qtn = shardQuery(dne.getNode(), parameterSettings, extraCmd);
         List<ASTNode> subs = new ArrayList();
         if (qtn instanceof MergeNode) {
@@ -275,7 +275,7 @@ public class DataNodeChooser {
     }
 
     private static ASTNode shardDelete(DeleteNode dne, Map<Integer, ParameterContext> parameterSettings,
-                                       Map<String, Comparable> extraCmd) throws QueryException {
+                                       Map<String, Object> extraCmd) throws QueryException {
         QueryTreeNode qtn = shardQuery(dne.getNode(), parameterSettings, extraCmd);
         List<ASTNode> subs = new ArrayList();
         if (qtn instanceof MergeNode) {
@@ -297,7 +297,7 @@ public class DataNodeChooser {
     }
 
     private static ASTNode shardPut(PutNode dne, Map<Integer, ParameterContext> parameterSettings,
-                                    Map<String, Comparable> extraCmd) {
+                                    Map<String, Object> extraCmd) {
         String indexName = null;
         if (dne.getNode() instanceof KVIndexNode) {
             indexName = ((KVIndexNode) dne.getNode()).getIndexName();
@@ -543,7 +543,7 @@ public class DataNodeChooser {
         }
     }
 
-    private static boolean chooseJoinMergeJoinByRule(Map<String, Comparable> extraCmd) {
+    private static boolean chooseJoinMergeJoinByRule(Map<String, Object> extraCmd) {
         String choose = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd,
             ExtraCmd.OptimizerExtraCmd.JoinMergeJoinJudgeByRule));
         if (StringUtils.isEmpty(choose)) {
@@ -554,8 +554,9 @@ public class DataNodeChooser {
         }
     }
 
-    private static boolean chooseJoinMergeJoinForce(Map<String, Comparable> extraCmd) {
-        String choose = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd, ExtraCmd.OptimizerExtraCmd.JoinMergeJoin));
+    private static boolean chooseJoinMergeJoinForce(Map<String, Object> extraCmd) {
+        String choose = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd,
+            ExtraCmd.OptimizerExtraCmd.JoinMergeJoin));
         return BooleanUtils.toBoolean(choose);
     }
 

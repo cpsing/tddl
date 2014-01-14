@@ -11,7 +11,7 @@ import com.taobao.tddl.optimizer.exceptions.FunctionException;
  * 
  * @author Whisper
  */
-public class Dummy2 implements IExtraFunction {
+public class DummyTest implements IExtraFunction {
 
     public DATA_TYPE getReturnType() {
         return DATA_TYPE.LONG_VAL;

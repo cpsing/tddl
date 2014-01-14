@@ -38,7 +38,7 @@ public class FilterSpliter {
     /**
      * 根据where中的所有条件按照or进行分隔，生成多个query请求. (主要考虑部分存储引擎不支持or语法)
      */
-    public static List<QueryTreeNode> splitByDNF(TableNode node, Map<String, Comparable> extraCmd)
+    public static List<QueryTreeNode> splitByDNF(TableNode node, Map<String, Object> extraCmd)
                                                                                                   throws QueryException {
         if (node.getWhereFilter() == null) {
             return new LinkedList<QueryTreeNode>();
@@ -160,7 +160,7 @@ public class FilterSpliter {
         return filters;
     }
 
-    private static boolean isOptimizeIndexMerge(Map<String, Comparable> extraCmd) {
+    private static boolean isOptimizeIndexMerge(Map<String, Object> extraCmd) {
         String value = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd,
             ExtraCmd.OptimizerExtraCmd.ChooseIndexMerge));
         return BooleanUtils.toBoolean(value);

@@ -15,7 +15,7 @@ public class ExtraFunctionManagerTest {
     @Test
     public void test_extension() {
         IExtraFunction func = ExtraFunctionManager.getExtraFunction("DUMMY2");
-        Assert.assertEquals(Dummy2.class, func.getClass());
+        Assert.assertEquals(DummyTest.class, func.getClass());
 
         func = ExtraFunctionManager.getExtraFunction("NOT_EXIST");
         Assert.assertEquals(null, func);

@@ -8,14 +8,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.util.ExecuteTableName;
 
-@RunWith(Parameterized.class)
+@RunWith(EclipseParameterized.class)
 public class SelectDateFunctionTest extends BaseMatrixTestCase {
 
     @Parameters(name = "{index}:table={0}")

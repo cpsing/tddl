@@ -36,7 +36,7 @@ public class IndexChooser {
     private static final int initialScore = 10000;
 
     public static IndexMeta findBestIndex(TableMeta tableMeta, List<ISelectable> columns, List<IFilter> filters,
-                                          String tablename, Map<String, Comparable> extraCmd) {
+                                          String tablename, Map<String, Object> extraCmd) {
         if (!chooseIndex(extraCmd)) {
             return null;
         }
@@ -109,7 +109,7 @@ public class IndexChooser {
      * 根据查询字段，查找一个索引包含所有选择列，并且包含的无关列最少则选择该索引
      */
     public static IndexMeta findBestIndexByAllColumnsSelected(TableMeta tableMeta, List<ISelectable> queryColumns,
-                                                              Map<String, Comparable> extraCmd) {
+                                                              Map<String, Object> extraCmd) {
         if (!chooseIndex(extraCmd)) {
             return null;
         }
@@ -130,7 +130,7 @@ public class IndexChooser {
         return indexChoosed;
     }
 
-    private static boolean chooseIndex(Map<String, Comparable> extraCmd) {
+    private static boolean chooseIndex(Map<String, Object> extraCmd) {
         String ifChooseIndex = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd,
             ExtraCmd.OptimizerExtraCmd.ChooseIndex));
         // 默认返回true

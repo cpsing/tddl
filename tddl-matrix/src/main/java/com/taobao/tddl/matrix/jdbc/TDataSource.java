@@ -36,7 +36,7 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
     private String                               schemaFile            = null;
     private String                               appName               = null;
     private MatrixExecutor                       executor              = null;
-    private Map<String, Comparable>              connectionProperties  = new HashMap(2);
+    private Map<String, Object>                  connectionProperties  = new HashMap(2);
     private ConfigHolder                         configHolder;
     /**
      * 用于并行查询的线程池
@@ -189,11 +189,11 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
         return this.executor;
     }
 
-    public Map<String, Comparable> getConnectionProperties() {
+    public Map<String, Object> getConnectionProperties() {
         return this.connectionProperties;
     }
 
-    public void setConnectionProperties(Map<String, Comparable> cp) {
+    public void setConnectionProperties(Map<String, Object> cp) {
         this.connectionProperties = cp;
     }
 

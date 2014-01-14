@@ -29,7 +29,7 @@ public class MergeJoinMergeOptimizer implements QueryPlanOptimizer {
      */
     @Override
     public IDataNodeExecutor optimize(IDataNodeExecutor dne, Map<Integer, ParameterContext> parameterSettings,
-                                      Map<String, Comparable> extraCmd) {
+                                      Map<String, Object> extraCmd) {
         if (isMergeExpand(extraCmd)) {
             return this.findEveryJoin(dne, true, true);
         } else {
@@ -214,8 +214,9 @@ public class MergeJoinMergeOptimizer implements QueryPlanOptimizer {
         return newMerge;
     }
 
-    private static boolean isMergeExpand(Map<String, Comparable> extraCmd) {
-        String value = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd, ExtraCmd.OptimizerExtraCmd.MergeExpand));
+    private static boolean isMergeExpand(Map<String, Object> extraCmd) {
+        String value = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd,
+            ExtraCmd.OptimizerExtraCmd.MergeExpand));
         return BooleanUtils.toBoolean(value);
     }
 }

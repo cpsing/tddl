@@ -957,4 +957,22 @@
 		</columns>
 		<primaryKey>id</primaryKey>
 	</table>
+	
+	<table name="student">
+		<columns>
+			<column name="id" type="long" />
+			<column name="name" type="string" />
+			<column name="school" type="string" />
+		</columns>
+		<primaryKey>id</primaryKey>
+	</table>
+	
+	<table name="course">
+		<columns>
+			<column name="cid" type="long" />
+			<column name="sid" type="long" />
+			<column name="course_name" type="string" />
+		</columns>
+		<primaryKey>cid</primaryKey>
+	</table>
 </tables>
