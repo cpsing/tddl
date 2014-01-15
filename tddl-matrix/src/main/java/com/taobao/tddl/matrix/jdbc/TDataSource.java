@@ -35,6 +35,7 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
     private String                               machineTopologyFile   = null;
     private String                               schemaFile            = null;
     private String                               appName               = null;
+    private boolean                              dynamicRule           = true;          // 是否使用动态规则
     private MatrixExecutor                       executor              = null;
     private Map<String, Object>                  connectionProperties  = new HashMap(2);
     private ConfigHolder                         configHolder;
@@ -55,6 +56,7 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
         configHolder.setSchemaFilePath(this.schemaFile);
         configHolder.setRuleFilePath(this.ruleFilePath);
         configHolder.setConnectionProperties(this.connectionProperties);
+        configHolder.setDynamicRule(dynamicRule);
         configHolder.init();
         this.configHolder = configHolder;
 
@@ -204,6 +206,10 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
 
     public ConfigHolder getConfigHolder() {
         return this.configHolder;
+    }
+
+    public void setDynamicRule(boolean dynamicRule) {
+        this.dynamicRule = dynamicRule;
     }
 
     @Override

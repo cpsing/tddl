@@ -1,10 +1,18 @@
 package com.taobao.tddl.common.utils;
 
 import java.io.InputStream;
+import java.io.Writer;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -57,4 +65,18 @@ public class XmlHelper {
         }
     }
 
+    public static void callWriteXmlFile(Document doc, Writer w, String encoding) {
+        try {
+            Source source = new DOMSource(doc);
+            Result result = new StreamResult(w);
+
+            Transformer xformer = TransformerFactory.newInstance().newTransformer();
+            xformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            xformer.setOutputProperty(OutputKeys.ENCODING, encoding);
+            xformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            xformer.transform(source, result);
+        } catch (Exception e) {
+            throw new TddlRuntimeException(e);
+        }
+    }
 }

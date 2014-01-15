@@ -27,7 +27,6 @@
 			<artifactId>tddl-executor</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<!-- Test libs -->
 		<dependency>
 			<groupId>junit</groupId>

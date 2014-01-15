@@ -36,6 +36,7 @@ public class ConfigHolder extends AbstractLifecycle {
     final static Logger         logger = LoggerFactory.getLogger(ConfigHolder.class);
     private String              appName;
     private String              ruleFilePath;
+    private boolean             dynamicRule;
     private String              schemaFilePath;
     private String              topologyFilePath;
     private String              unitName;
@@ -193,6 +194,14 @@ public class ConfigHolder extends AbstractLifecycle {
 
     public void setConnectionProperties(Map<String, Object> connectionProperties) {
         this.connectionProperties = connectionProperties;
+    }
+
+    public boolean isDynamicRule() {
+        return dynamicRule;
+    }
+
+    public void setDynamicRule(boolean dynamicRule) {
+        this.dynamicRule = dynamicRule;
     }
 
 }

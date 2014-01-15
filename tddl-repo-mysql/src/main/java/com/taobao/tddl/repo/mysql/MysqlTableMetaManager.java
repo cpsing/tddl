@@ -2,7 +2,6 @@ package com.taobao.tddl.repo.mysql;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -14,18 +13,12 @@ import java.util.List;
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
+import com.taobao.tddl.common.utils.XmlHelper;
 import com.taobao.tddl.common.utils.extension.Activate;
 import com.taobao.tddl.executor.spi.IDataSourceGetter;
 import com.taobao.tddl.optimizer.config.table.RepoSchemaManager;
@@ -200,7 +193,7 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 OutputStreamWriter outwriter = new OutputStreamWriter(baos);
 
-                callWriteXmlFile(doc, outwriter, "utf-8");
+                XmlHelper.callWriteXmlFile(doc, outwriter, "utf-8");
                 outwriter.close();
                 String content = baos.toString();
                 return content;
@@ -216,18 +209,4 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
 
     }
 
-    public static void callWriteXmlFile(Document doc, Writer w, String encoding) {
-        try {
-            Source source = new DOMSource(doc);
-            Result result = new StreamResult(w);
-
-            Transformer xformer = TransformerFactory.newInstance().newTransformer();
-            xformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            xformer.setOutputProperty(OutputKeys.ENCODING, encoding);
-            xformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-            xformer.transform(source, result);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }
