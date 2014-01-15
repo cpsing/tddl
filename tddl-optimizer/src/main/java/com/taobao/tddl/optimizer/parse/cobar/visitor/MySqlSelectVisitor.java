@@ -37,6 +37,7 @@ public class MySqlSelectVisitor extends EmptySQLASTVisitor {
         return tableNode;
     }
 
+    @Override
     public void visit(DMLSelectStatement node) {
         TableReferences tables = node.getTables();
         if (tables != null) {
@@ -79,6 +80,7 @@ public class MySqlSelectVisitor extends EmptySQLASTVisitor {
         }
     }
 
+    @Override
     public void visit(DMLSelectUnionStatement node) {
         throw new NotSupportException();
     }
@@ -191,14 +193,14 @@ public class MySqlSelectVisitor extends EmptySQLASTVisitor {
     private void handleLimit(Limit limit) {
         if (limit.getOffset() instanceof ParamMarker) {
             tableNode.setLimitFrom(ASTNodeFactory.getInstance()
-                .createBindValue(((ParamMarker) limit.getOffset()).getParamIndex() - 1));
+                .createBindValue(((ParamMarker) limit.getOffset()).getParamIndex()));
         } else {
             tableNode.setLimitFrom(Long.valueOf(String.valueOf(limit.getOffset())));
         }
 
         if (limit.getSize() instanceof ParamMarker) {
             tableNode.setLimitTo(ASTNodeFactory.getInstance()
-                .createBindValue(((ParamMarker) limit.getSize()).getParamIndex() - 1));
+                .createBindValue(((ParamMarker) limit.getSize()).getParamIndex()));
         } else {
             tableNode.setLimitTo(Long.valueOf(String.valueOf(limit.getSize())));
         }
