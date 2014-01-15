@@ -7,11 +7,13 @@
 	<name>root module for tddl ${project.version}</name>
 	<version>5.1.0-SNAPSHOT</version>
 	<url>https://github.com/tddl/tddl</url>
+	<!-- 
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
 		<artifactId>oss-parent</artifactId>
 		<version>7</version>
 	</parent>
+	 -->
 	<developers>
 		<developer>
 			<name>agapple</name>
@@ -46,7 +48,7 @@
 			</snapshots>
 		</repository>
 	</repositories>
-
+ 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!--maven properties -->
@@ -285,6 +287,7 @@
 		</testResources>
 	</build>
 
+	<!-- 
 	<distributionManagement>
 		<snapshotRepository>
 			<id>sonatype-nexus-snapshots</id>
@@ -296,5 +299,22 @@
 			<name>Nexus Release Repository</name>
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
+	</distributionManagement>
+	 -->
+	 
+	 <distributionManagement>
+		<!-- use the following if you're not using a snapshot version. -->
+		<repository>
+			<id>releases</id>
+			<name>taobao mirror</name>
+			<url>http://mvnrepo.taobao.ali.com/mvn/releases</url>
+			<!-- <url>http://mvnrepo.taobao.ali.com/mvn/repository</url> -->
+		</repository>
+		<!-- use the following if you ARE using a snapshot version. -->
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>taobao mirror snapshots</name>
+			<url>http://mvnrepo.taobao.ali.com/mvn/snapshots</url>
+		</snapshotRepository>
 	</distributionManagement>
 </project>
