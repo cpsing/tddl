@@ -28,18 +28,22 @@ public abstract class AbstractRowSet implements IRowSet {
 
     @Override
     public Integer getInteger(int index) {
-        Object val = this.getObject(index);
-        if (val == null) return 0;
 
-        if (val instanceof Integer) return (Integer) val;
+        ColumnMeta cm = iCursorMeta.getColumns().get(index);
+        return (Integer) cm.getDataType().getResultGetter().get(this, index);
 
-        if (val instanceof Number) return ((Number) val).intValue();
-
-        if (val instanceof BigDecimal) return ((BigDecimal) val).intValue();
-
-        String strVal = this.getString(index);
-
-        return Integer.valueOf(strVal);
+        // Object val = this.getObject(index);
+        // if (val == null) return 0;
+        //
+        // if (val instanceof Integer) return (Integer) val;
+        //
+        // if (val instanceof Number) return ((Number) val).intValue();
+        //
+        // if (val instanceof BigDecimal) return ((BigDecimal) val).intValue();
+        //
+        // String strVal = this.getString(index);
+        //
+        // return Integer.valueOf(strVal);
     }
 
     @Override

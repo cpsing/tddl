@@ -601,16 +601,8 @@ public class ExecUtils {
                     if (c1 == null && c2 == null) {
                         continue;
                     }
-                    int n = comp(c1, c2);
-                    if (n == 0) {
-                        continue;
-                    }
-                    boolean isAsc = orderBy.getDirection();
-                    if (isAsc) {
-                        return n;
-                    } else {
-                        return n < 0 ? 1 : -1;
-                    }
+                    int n = comp(c1, c2, orderBy);
+
                 }
                 return 0;
             }
@@ -649,14 +641,19 @@ public class ExecUtils {
         };
     }
 
-    public static int comp(Comparable c1, Comparable c2) {
-        if (c1 == null) {
-            return -1;
+    public static int comp(Comparable c1, Comparable c2, IOrderBy order) {
+
+        int n = order.getColumn().getDataType().compare(c1, c2);
+
+        if (n == 0) {
+            return n;
         }
-        if (c2 == null) {
-            return 1;
+        boolean isAsc = order.getDirection();
+        if (isAsc) {
+            return n;
+        } else {
+            return n < 0 ? 1 : -1;
         }
-        return c1.compareTo(c2);
     }
 
     public static List<IOrderBy> copyOrderBys(List<IOrderBy> orders) {

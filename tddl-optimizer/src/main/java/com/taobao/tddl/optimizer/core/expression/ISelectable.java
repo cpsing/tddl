@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.optimizer.core.CanVisit;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 
 /**
  * 描述一个列信息，可能会是字段列，函数列，常量列<br>
@@ -27,9 +28,9 @@ public interface ISelectable<RT extends ISelectable> extends CanVisit, Comparabl
         DATE_VAL, TIMESTAMP_VAL, TIME_VAL, BLOB_VAL, BIT_VAL
     }
 
-    public RT setDataType(DATA_TYPE dataType);
+    public RT setDataType(DataType dataType);
 
-    public DATA_TYPE getDataType();
+    public DataType getDataType();
 
     // --------------- name相关信息 ----------------------
 
