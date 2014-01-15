@@ -20,38 +20,40 @@ public class ExecutionContext {
     /**
      * 当前事务的执行group，只支持单group的事务
      */
-    private String                 transactionGroup = null;
+    private String                         transactionGroup = null;
 
     /**
      * 当前运行时的存储对象
      */
-    private IRepository            currentRepository;
+    private IRepository                    currentRepository;
 
     /**
      * 是否自动关闭结果集。目前这个东西已经基本无效。除了在update等查询中有使用
      */
-    private boolean                closeResultSet;
+    private boolean                        closeResultSet;
     /**
      * 当前事务
      */
-    private ITransaction           transaction;
+    private ITransaction                   transaction;
     /**
      * 当前查询所使用的IndexMeta/这个放这里不是非常明确，他其实和生命周期无关。只是为了统一返回值，所以放在一起。
      */
-    private IndexMeta              meta;
+    private IndexMeta                      meta;
     /**
      * 当前查询所使用的table
      */
-    private ITable                 table;
+    private ITable                         table;
 
-    Map<String, Object>            extraCmds        = new HashMap();
+    private Map<String, Object>            extraCmds        = new HashMap();
 
-    Map<Integer, ParameterContext> params           = null;
-    String                         isolation        = null;
+    private Map<Integer, ParameterContext> params           = null;
+    private String                         isolation        = null;
 
-    private ExecutorService        concurrentService;
+    private ExecutorService                concurrentService;
 
-    private boolean                autoCommit       = true;
+    private boolean                        autoCommit       = true;
+
+    private String                         groupHint        = null;
 
     public ExecutionContext(){
 
@@ -149,6 +151,14 @@ public class ExecutionContext {
         if (this.getTransaction() != null) {
             this.getTransaction().setAutoCommit(autoCommit);
         }
+    }
+
+    public String getGroupHint() {
+        return groupHint;
+    }
+
+    public void setGroupHint(String groupHint) {
+        this.groupHint = groupHint;
     }
 
 }

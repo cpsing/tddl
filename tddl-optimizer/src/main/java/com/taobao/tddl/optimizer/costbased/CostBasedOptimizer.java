@@ -21,6 +21,7 @@ import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
+import com.taobao.tddl.common.jdbc.SqlTypeParser;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.SqlType;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
@@ -204,16 +205,25 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
         long time = System.currentTimeMillis();
         IDataNodeExecutor qc;
         String groupHint = SimpleHintParser.extractTDDLGroupHintString(sql);
-        SqlAnalysisResult result = sqlParseManager.parse(sql, cached);
         // 基于hint直接构造执行计划
-        // 目前sql构造依赖于cobar parser的visitor模式，如果cobar
-        // parser存在语法解析不过的情况，即使设置hint也无法绕过
         if (routeCondition instanceof DirectlyRouteCondition) {
             DirectlyRouteCondition drc = (DirectlyRouteCondition) routeCondition;
-            Map<String, String> sqls = buildDirectSqls(result, drc.getVirtualTableName(), drc.getTables(), groupHint);
-            qc = buildDirectPlan(result.getSqlType(), drc.getDbId(), sqls);
+            if (!drc.getTables().isEmpty()) {
+                SqlAnalysisResult result = sqlParseManager.parse(sql, cached);
+                Map<String, String> sqls = buildDirectSqls(result,
+                    drc.getVirtualTableName(),
+                    drc.getTables(),
+                    groupHint);
+                qc = buildDirectPlan(result.getSqlType(), drc.getDbId(), sqls);
+            } else {
+                // 直接下推sql时，不做任何sql解析
+                Map<String, String> sqls = new HashMap<String, String>();
+                sqls.put(_DIRECT, sql);
+                qc = buildDirectPlan(SqlTypeParser.getSqlType(sql), drc.getDbId(), sqls);
+            }
         } else if (routeCondition instanceof RuleRouteCondition) {
             RuleRouteCondition rrc = (RuleRouteCondition) routeCondition;
+            SqlAnalysisResult result = sqlParseManager.parse(sql, cached);
             boolean isWrite = (result.getSqlType() != SqlType.SELECT && result.getSqlType() != SqlType.SELECT_FOR_UPDATE);
             List<TargetDB> targetDBs = OptimizerContext.getContext()
                 .getRule()

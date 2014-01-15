@@ -478,7 +478,6 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
 
     @Override
     public void visit(ParamMarker node) {
-        // tddl start with 0,not preparestatement with 1
         IBindVal val = ASTNodeFactory.getInstance().createBindValue(node.getParamIndex());
         columnOrValue = val;
     }

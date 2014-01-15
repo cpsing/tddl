@@ -100,7 +100,12 @@ public class My_JdbcHandler implements GeneralQueryHandler {
                 logger.warn("sqlAndParam:\n" + sqlAndParam);
             }
 
-            ps = connection.prepareStatement(sqlAndParam.sql);
+            if (executionContext.getGroupHint() != null) {
+                // 如果有group hint，传递一下hint
+                ps = connection.prepareStatement(executionContext.getGroupHint() + sqlAndParam.sql);
+            } else {
+                ps = connection.prepareStatement(sqlAndParam.sql);
+            }
             if (isStreaming) {
                 // 当prev的时候 不能设置
                 setStreamingForStatement(ps);
@@ -152,7 +157,12 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         try {
             // 可能执行过程有失败，需要释放链接
             connection = myTransaction.getConnection(groupName, ds);
-            ps = prepareStatement(sqlAndParam.sql, connection);
+            if (executionContext.getGroupHint() != null) {
+                // 如果有group hint，传递一下hint
+                ps = prepareStatement(executionContext.getGroupHint() + sqlAndParam.sql, connection);
+            } else {
+                ps = prepareStatement(sqlAndParam.sql, connection);
+            }
             ParameterMethod.setParameters(ps, sqlAndParam.param);
             if (logger.isDebugEnabled()) {
                 logger.warn("sqlAndParam:\n" + sqlAndParam);

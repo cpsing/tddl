@@ -210,7 +210,7 @@ public class SimpleHintParser {
 
         StringBuffer sb = new StringBuffer();
         int size = tddlHint.length();
-        int parameters = 0;
+        int parameters = 1;
         for (int i = 0; i < size; i++) {
             if (tddlHint.charAt(i) == '?') {
                 // TDDLHINT只能设置简单值
@@ -259,21 +259,19 @@ public class SimpleHintParser {
         // 也必需写在hint字符串的最前面，否则参数非常难以处理，也就会出错
 
         // 如果parameters为0，说明TDDLhint中没有参数，所以直接返回sql即可
-        // if (parameters < 0) {
-        // return sql;
-        // }
-        // TODO 需要确认param index的起始位置
+        if (parameters == 0) {
+            return sql;
+        }
 
-        for (int i = 0; i < parameters; i++) {
+        for (int i = 1; i <= parameters; i++) {
             parameterSettings.remove(i);
         }
 
         Map<Integer, ParameterContext> newParameterSettings = new TreeMap<Integer, ParameterContext>();
         for (Map.Entry<Integer, ParameterContext> entry : parameterSettings.entrySet()) {
             // 重新计算一下parameters index
-            // jdbc规范从1开始,database从0开始
-            newParameterSettings.put(entry.getKey() - parameters + 1, entry.getValue());
-            entry.getValue().getArgs()[0] = entry.getKey() - parameters + 1;// args里的第一位也是下标
+            newParameterSettings.put(entry.getKey() - parameters, entry.getValue());
+            entry.getValue().getArgs()[0] = entry.getKey() - parameters;// args里的第一位也是下标
         }
 
         parameterSettings.clear();

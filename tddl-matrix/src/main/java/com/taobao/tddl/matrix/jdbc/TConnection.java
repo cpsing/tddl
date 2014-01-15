@@ -26,6 +26,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.utils.TStringUtil;
@@ -34,6 +36,7 @@ import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ExecutorContext;
 import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.cursor.impl.ResultSetCursor;
+import com.taobao.tddl.group.utils.GroupHintParser;
 import com.taobao.tddl.matrix.jdbc.utils.ExceptionUtils;
 import com.taobao.tddl.optimizer.OptimizerContext;
 
@@ -68,6 +71,12 @@ public class TConnection implements Connection {
         ResultCursor resultCursor;
         ResultSet rs = null;
         extraCmd.putAll(buildExtraCommand(sql));
+        // 处理下group hint
+        String groupHint = GroupHintParser.extractTDDLGroupHint(sql);
+        if (!StringUtils.isEmpty(groupHint)) {
+            sql = GroupHintParser.removeTddlGroupHint(sql);
+            executionContext.setGroupHint(GroupHintParser.buildTddlGroupHint(groupHint));
+        }
         executionContext.setExecutorService(executorService);
         executionContext.setParams(context);
         executionContext.setExtraCmds(extraCmd);

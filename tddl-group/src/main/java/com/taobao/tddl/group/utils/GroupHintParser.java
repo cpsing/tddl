@@ -17,7 +17,7 @@ public class GroupHintParser {
     public static Logger log = LoggerFactory.getLogger(GroupHintParser.class);
 
     public static GroupIndex convertHint2Index(String sql) {
-        String groupIndexHint = extractTDDLGroupHintString(sql);
+        String groupIndexHint = extractTDDLGroupHint(sql);
         if (null != groupIndexHint && !groupIndexHint.equals("")) {
             String[] hintWithRetry = groupIndexHint.split(",");
             if (hintWithRetry.length == 1) {
@@ -56,18 +56,22 @@ public class GroupHintParser {
         }
     }
 
-    private static String extractTDDLGroupHintString(String sql) {
+    public static String extractTDDLGroupHint(String sql) {
         return TStringUtil.getBetween(sql, "/*+TDDL_GROUP({", "})*/");
     }
 
     public static String removeTddlGroupHint(String sql) {
-        String tddlHint = extractTDDLGroupHintString(sql);
+        String tddlHint = extractTDDLGroupHint(sql);
         if (null == tddlHint || "".equals(tddlHint)) {
             return sql;
         }
 
         sql = TStringUtil.removeBetweenWithSplitor(sql, "/*+TDDL_GROUP({", "})*/");
         return sql;
+    }
+
+    public static String buildTddlGroupHint(String groupHint) {
+        return "/*+TDDL_GROUP({" + groupHint + "})*/";
     }
 
     public static void main(String[] args) {

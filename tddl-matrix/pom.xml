@@ -17,21 +17,16 @@
 			<artifactId>tddl-group</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>tddl-optimizer</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>tddl-executor</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
-
-
 
 		<!-- Test libs -->
 		<dependency>
@@ -39,7 +34,5 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-		
 	</dependencies>
 </project>

@@ -1,8 +1,8 @@
 package com.taobao.tddl.common.jdbc;
 
-import java.sql.SQLException;
 import java.util.regex.Pattern;
 
+import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.SqlType;
 import com.taobao.tddl.common.utils.TStringUtil;
 
@@ -20,7 +20,7 @@ public class SqlTypeParser {
     private static final Pattern SELECT_FOR_UPDATE_PATTERN = Pattern.compile("^select\\s+.*\\s+for\\s+update.*$",
                                                                Pattern.CASE_INSENSITIVE);
 
-    public static boolean isQuerySql(String sql) throws SQLException {
+    public static boolean isQuerySql(String sql) {
         SqlType sqlType = getSqlType(sql);
         if (sqlType == SqlType.SELECT || sqlType == SqlType.SELECT_FOR_UPDATE || sqlType == SqlType.SHOW
             || sqlType == SqlType.DUMP || sqlType == SqlType.DEBUG || sqlType == SqlType.EXPLAIN) {
@@ -39,9 +39,9 @@ public class SqlTypeParser {
      * 获得SQL语句种类
      * 
      * @param sql SQL语句
-     * @throws SQLException 当SQL语句不是SELECT、INSERT、UPDATE、DELETE语句时，抛出异常。
+     * @throws 当SQL语句不是SELECT、INSERT、UPDATE、DELETE语句时，抛出异常。
      */
-    public static SqlType getSqlType(String sql) throws SQLException {
+    public static SqlType getSqlType(String sql) {
         // #bug 2011-11-24,modify by junyu,先不走缓存，否则sql变化巨大，缓存换入换出太多，gc太明显
         // SqlType sqlType = globalCache.getSqlType(sql);
         // if (sqlType == null) {
@@ -101,7 +101,7 @@ public class SqlTypeParser {
         return sqlType;
     }
 
-    public static boolean throwNotSupportSqlTypeException() throws SQLException {
-        throw new SQLException("only select, insert, update, delete, replace, show, truncate, create, drop, load, merge, dump sql is supported");
+    public static boolean throwNotSupportSqlTypeException() {
+        throw new TddlRuntimeException("only select, insert, update, delete, replace, show, truncate, create, drop, load, merge, dump sql is supported");
     }
 }
