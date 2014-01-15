@@ -44,7 +44,6 @@ public class NamedRecord extends CloneableRecord {
 
     @Override
     public Object clone() {
-
         NamedRecord nameR = (NamedRecord) super.clone();
         if (nameR.record != null) {
             nameR.record = (CloneableRecord) nameR.record.clone();
@@ -126,7 +125,6 @@ public class NamedRecord extends CloneableRecord {
 
     @Override
     public Object getIngoreTableName(String key) {
-
         return get(key);
     }
 

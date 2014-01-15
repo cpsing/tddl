@@ -18,6 +18,8 @@ public interface SqlAnalysisResult {
 
     public SqlType getSqlType();
 
+    public String getSql();
+
     public ASTNode getAstNode(Map<Integer, ParameterContext> parameterSettings);
 
     public QueryTreeNode getQueryTreeNode(Map<Integer, ParameterContext> parameterSettings);

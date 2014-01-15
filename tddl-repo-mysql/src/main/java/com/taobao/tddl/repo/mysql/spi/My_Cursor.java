@@ -98,7 +98,6 @@ public class My_Cursor implements Cursor {
                 }
 
                 String name = rsmd.getColumnLabel(i);
-
                 ColumnMeta cm = new ColumnMeta(null, name, type, null, true);
                 returnColumns.add(cm);
             }

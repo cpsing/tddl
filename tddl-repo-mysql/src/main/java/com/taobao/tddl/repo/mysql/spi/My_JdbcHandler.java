@@ -13,8 +13,6 @@ import javax.sql.DataSource;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.jdbc.ParameterMethod;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -32,6 +30,9 @@ import com.taobao.tddl.repo.mysql.common.ResultSetAutoCloseConnection;
 import com.taobao.tddl.repo.mysql.common.ResultSetRemeberIfClosed;
 import com.taobao.tddl.repo.mysql.sqlconvertor.MysqlPlanVisitorImpl;
 import com.taobao.tddl.repo.mysql.sqlconvertor.SqlAndParam;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * jdbc 方法执行相关的数据封装. 每个需要执行的cursor都可以持有这个对象进行数据库操作。 ps .. fuxk java
@@ -74,7 +75,11 @@ public class My_JdbcHandler implements GeneralQueryHandler {
         sqlAndParam = new SqlAndParam();
         if (plan instanceof IQuery && ((IQuery) plan).getSql() != null) {
             sqlAndParam.sql = ((IQuery) plan).getSql();
-            sqlAndParam.param = new HashMap<Integer, ParameterContext>();
+            if (executionContext.getParams() != null) {
+                sqlAndParam.param = executionContext.getParams();
+            } else {
+                sqlAndParam.param = new HashMap<Integer, ParameterContext>();
+            }
             isControlSql = true;
         } else {
             cursorMeta.setIsSureLogicalIndexEqualActualIndex(true);
@@ -121,7 +126,6 @@ public class My_JdbcHandler implements GeneralQueryHandler {
                     connection,
                     ps));
             } else {
-
                 throw new TddlRuntimeException("sql generated is :\n" + sqlAndParam.toString(), e);
             }
         }
@@ -130,13 +134,21 @@ public class My_JdbcHandler implements GeneralQueryHandler {
     @Override
     public void executeUpdate(ExecutionContext executionContext, IPut put, ITable table, IndexMeta meta)
                                                                                                         throws SQLException {
-        MysqlPlanVisitorImpl visitor = new MysqlPlanVisitorImpl(put, null, null, true);
-        put.accept(visitor);
-
         SqlAndParam sqlAndParam = new SqlAndParam();
-        sqlAndParam.sql = visitor.getString();
-        sqlAndParam.param = visitor.getParamMap();
+        if (put.getSql() != null) {
+            sqlAndParam.sql = put.getSql();
+            if (executionContext.getParams() != null) {
+                sqlAndParam.param = executionContext.getParams();
+            } else {
+                sqlAndParam.param = new HashMap<Integer, ParameterContext>();
+            }
+        } else {
+            MysqlPlanVisitorImpl visitor = new MysqlPlanVisitorImpl(put, null, null, true);
+            put.accept(visitor);
 
+            sqlAndParam.sql = visitor.getString();
+            sqlAndParam.param = visitor.getParamMap();
+        }
         try {
             // 可能执行过程有失败，需要释放链接
             connection = myTransaction.getConnection(groupName, ds);

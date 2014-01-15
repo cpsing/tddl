@@ -48,9 +48,11 @@ public class CobarSqlAnalysisResult implements SqlAnalysisResult {
     private QueryTreeNode dalQueryTreeNode;
     private SQLStatement  statement;
     private boolean       hasVisited;
+    private String        sql;
 
     public void parse(String sql) throws SQLSyntaxErrorException {
         if (sql != null) {
+            this.sql = sql;
             this.statement = SQLParserDelegate.parse(sql);
             if (statement instanceof DMLSelectStatement) {
                 if (isSysSelectStatement((DMLSelectStatement) statement, sql)) {
@@ -177,6 +179,10 @@ public class CobarSqlAnalysisResult implements SqlAnalysisResult {
 
     public SQLStatement getStatement() {
         return statement;
+    }
+
+    public String getSql() {
+        return this.sql;
     }
 
 }

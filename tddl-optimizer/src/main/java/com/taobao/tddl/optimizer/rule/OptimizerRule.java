@@ -337,7 +337,6 @@ public class OptimizerRule extends AbstractLifecycle {
                 }
 
                 if (colName.equalsIgnoreCase(column.getColumnName()) && operationComp != DEFAULT_OPERATION_COMP) {
-
                     if (!(value instanceof Comparable)) {
                         throw new TddlRuntimeException("type: " + value.getClass().getSimpleName()
                                                        + " is not comparable, cannot be used in partition column");

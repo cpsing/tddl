@@ -38,7 +38,7 @@ public class GroupHintParser {
 
     private static int getIndexFromHintPiece(String indexPiece) {
         String[] piece = indexPiece.split(":");
-        if (piece[0].trim().toLowerCase().equals("groupindex")) {
+        if (piece[0].trim().equalsIgnoreCase("groupIndex")) {
             return Integer.valueOf(piece[1]);
         } else {
             throw new IllegalArgumentException("the standard group hint is:'groupIndex:12[,failRetry:true]'"
@@ -48,7 +48,7 @@ public class GroupHintParser {
 
     private static boolean getFailRetryFromHintPiece(String retryPiece) {
         String[] piece = retryPiece.split(":");
-        if (piece[0].trim().toLowerCase().equals("failretry")) {
+        if (piece[0].trim().equalsIgnoreCase("failRetry")) {
             return Boolean.valueOf(piece[1]);
         } else {
             throw new IllegalArgumentException("the standard group hint is:'groupIndex:12[,failRetry:true]'"
@@ -57,7 +57,7 @@ public class GroupHintParser {
     }
 
     private static String extractTDDLGroupHintString(String sql) {
-        return TStringUtil.getBetween(sql.toUpperCase(), "/*+TDDL_GROUP({", "})*/");
+        return TStringUtil.getBetween(sql, "/*+TDDL_GROUP({", "})*/");
     }
 
     public static String removeTddlGroupHint(String sql) {
@@ -66,7 +66,7 @@ public class GroupHintParser {
             return sql;
         }
 
-        sql = TStringUtil.removeBetweenWithSplitor(sql.toUpperCase(), "/*+TDDL_GROUP({", "})*/");
+        sql = TStringUtil.removeBetweenWithSplitor(sql, "/*+TDDL_GROUP({", "})*/");
         return sql;
     }
 

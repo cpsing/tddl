@@ -43,7 +43,9 @@ public class QueryMyHandler extends QueryHandler implements ICommandHandler {
     @SuppressWarnings("rawtypes")
     @Override
     public ISchematicCursor handle(IDataNodeExecutor executor, ExecutionContext executionContext) throws TddlException {
-        if (!canComposeOneSql(executor)) return super.handle(executor, executionContext);
+        if (!canComposeOneSql(executor)) {
+            return super.handle(executor, executionContext);
+        }
 
         IndexMeta indexMeta = null;
 

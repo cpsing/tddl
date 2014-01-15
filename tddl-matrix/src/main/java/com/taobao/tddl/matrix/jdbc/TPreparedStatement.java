@@ -152,7 +152,7 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
 
     @Override
     public void setDate(int parameterIndex, Date x, Calendar cal) throws SQLException {
-        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setDate2, new Object[] {
+        parameterSettings.put(parameterIndex - 1, new ParameterContext(ParameterMethod.setDate2, new Object[] {
                 parameterIndex, x, cal }));
     }
 
@@ -198,19 +198,19 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
 
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x, int length) throws SQLException {
-        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setAsciiStream, new Object[] {
+        parameterSettings.put(parameterIndex - 1, new ParameterContext(ParameterMethod.setAsciiStream, new Object[] {
                 parameterIndex, x, length }));
     }
 
     @Override
     public void setUnicodeStream(int parameterIndex, InputStream x, int length) throws SQLException {
-        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setUnicodeStream, new Object[] {
+        parameterSettings.put(parameterIndex - 1, new ParameterContext(ParameterMethod.setUnicodeStream, new Object[] {
                 parameterIndex, x, length }));
     }
 
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x, int length) throws SQLException {
-        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setBinaryStream, new Object[] {
+        parameterSettings.put(parameterIndex - 1, new ParameterContext(ParameterMethod.setBinaryStream, new Object[] {
                 parameterIndex, x, length }));
     }
 
@@ -230,25 +230,25 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
         parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setObject1, new Object[] {
                 parameterIndex, x }));
         // if (x == null) {
-        // setNull(parameterIndex, x);
+        // setNull(parameterIndex -1, x);
         // } else if (x instanceof Integer) {
-        // setInt(parameterIndex, (Integer) x);
+        // setInt(parameterIndex -1, (Integer) x);
         // } else if (x instanceof Long) {
-        // setLong(parameterIndex, (Long) x);
+        // setLong(parameterIndex -1, (Long) x);
         // } else if (x instanceof String) {
-        // setString(parameterIndex, (String) x);
+        // setString(parameterIndex -1, (String) x);
         // } else if (x instanceof Boolean) {
-        // setBoolean(parameterIndex, (Boolean) x);
+        // setBoolean(parameterIndex -1, (Boolean) x);
         // } else if (x instanceof Float) {
-        // setFloat(parameterIndex, (Float) x);
+        // setFloat(parameterIndex -1, (Float) x);
         // } else if (x instanceof Double) {
-        // setDouble(parameterIndex, (Double) x);
+        // setDouble(parameterIndex -1, (Double) x);
         // } else if (x instanceof byte[]) {
-        // setBytes(parameterIndex, (byte[]) x);
+        // setBytes(parameterIndex -1, (byte[]) x);
         // } else if (x instanceof Date) {
-        // setDate(parameterIndex, (Date) x);
+        // setDate(parameterIndex -1, (Date) x);
         // } else if (x instanceof java.util.Date) {
-        // setDate(parameterIndex,new Date(((java.util.Date)x).getTime()));
+        // setDate(parameterIndex -1,new Date(((java.util.Date)x).getTime()));
         // }else
         // {
         // throw new
@@ -263,13 +263,13 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader, int length) throws SQLException {
-        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setCharacterStream, new Object[] {
-                parameterIndex, reader, length }));
+        parameterSettings.put(parameterIndex - 1, new ParameterContext(ParameterMethod.setCharacterStream,
+            new Object[] { parameterIndex, reader, length }));
     }
 
     @Override
     public void setRef(int parameterIndex, Ref x) throws SQLException {
-        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setRef, new Object[] {
+        parameterSettings.put(parameterIndex - 1, new ParameterContext(ParameterMethod.setRef, new Object[] {
                 parameterIndex, x }));
     }
 
@@ -287,7 +287,7 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
 
     @Override
     public void setArray(int parameterIndex, Array x) throws SQLException {
-        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setArray, new Object[] {
+        parameterSettings.put(parameterIndex - 1, new ParameterContext(ParameterMethod.setArray, new Object[] {
                 parameterIndex, x }));
     }
 
@@ -318,13 +318,13 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
 
     @Override
     public void setURL(int parameterIndex, URL x) throws SQLException {
-        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setURL, new Object[] {
+        parameterSettings.put(parameterIndex - 1, new ParameterContext(ParameterMethod.setURL, new Object[] {
                 parameterIndex, x }));
     }
 
     @Override
     public void setObject(int parameterIndex, Object x, int targetSqlType, int scaleOrLength) throws SQLException {
-        parameterSettings.put(parameterIndex, new ParameterContext(ParameterMethod.setObject3, new Object[] {
+        parameterSettings.put(parameterIndex - 1, new ParameterContext(ParameterMethod.setObject3, new Object[] {
                 parameterIndex, x, targetSqlType, scaleOrLength }));
     }
 

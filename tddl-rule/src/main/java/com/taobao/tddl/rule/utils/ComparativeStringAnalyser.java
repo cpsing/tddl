@@ -51,19 +51,19 @@ public class ComparativeStringAnalyser {
         // 处理 ComparativeMap
         String[] comStrs = conditionStr.split(";");
         for (int i = 0; i < comStrs.length; i++) {
-            String value = comStrs[i].toLowerCase();
+            String value = comStrs[i].toUpperCase();
             if (TStringUtil.isNotBlank(value)) {
-                boolean containsAnd = TStringUtil.contains(value, " and ");
-                boolean containsOr = TStringUtil.contains(value, " or ");
+                boolean containsAnd = TStringUtil.contains(value, " AND ");
+                boolean containsOr = TStringUtil.contains(value, " OR ");
                 if (containsAnd || containsOr) {
                     ComparativeBaseList comparativeBaseList = null;
                     String op;
                     if (containsOr) {
                         comparativeBaseList = new ComparativeOR();
-                        op = "or";
+                        op = "OR";
                     } else if (containsAnd) {
                         comparativeBaseList = new ComparativeAND();
-                        op = "and";
+                        op = "AND";
                     } else {
                         throw new TddlRuleException("decodeComparative not support ComparativeBaseList value:" + value);
                     }
@@ -82,13 +82,13 @@ public class ComparativeStringAnalyser {
                                                        + value);
                         }
                     }
-                    comparativeMap.put(key.toUpperCase(), comparativeBaseList); // 必须大写
+                    comparativeMap.put(key, comparativeBaseList); // 必须大写
                 } else {
                     // 说明只是Comparative
                     String key = decodeComparativeKey(value);
                     Comparative comparative = decodeComparative(value, null);
                     if (null != comparative) {
-                        comparativeMap.put(key.toUpperCase(), comparative); // 必须大写
+                        comparativeMap.put(key, comparative); // 必须大写
                     }
                 }
             }
@@ -103,7 +103,7 @@ public class ComparativeStringAnalyser {
      * @return
      */
     public static Comparative decodeComparative(String compValue, String globalType) {
-        boolean containsIn = TStringUtil.contains(compValue, " in");
+        boolean containsIn = TStringUtil.contains(compValue, " IN");
         Comparative comparative = null;
         if (!containsIn) {
             int compEnum = Comparative.getComparisonByCompleteString(compValue);
@@ -121,7 +121,7 @@ public class ComparativeStringAnalyser {
             }
         } else {
             // 处理下in表达式
-            String[] compValues = TStringUtil.twoPartSplit(compValue, " in");
+            String[] compValues = TStringUtil.twoPartSplit(compValue, " IN");
             int lastColonIndex = compValues[1].lastIndexOf(TYPE_SPLIT);
             String inValues = compValues[1];
             String type = null;
@@ -164,13 +164,13 @@ public class ComparativeStringAnalyser {
         }
 
         Comparative comparative = null;
-        if ("i".equals(type.trim()) || "int".equals(type.trim())) {
+        if ("i".equalsIgnoreCase(type.trim()) || "int".equalsIgnoreCase(type.trim())) {
             comparative = new Comparative(compEnum, Integer.valueOf(value.trim()));
-        } else if ("l".equals(type.trim()) || "long".equals(type.trim())) {
+        } else if ("l".equalsIgnoreCase(type.trim()) || "long".equalsIgnoreCase(type.trim())) {
             comparative = new Comparative(compEnum, Long.valueOf(value.trim()));
-        } else if ("s".equals(type.trim()) || "string".equals(type.trim())) {
+        } else if ("s".equalsIgnoreCase(type.trim()) || "string".equalsIgnoreCase(type.trim())) {
             comparative = new Comparative(compEnum, value.trim());
-        } else if ("d".equals(type.trim()) || "date".equals(type.trim())) {
+        } else if ("d".equalsIgnoreCase(type.trim()) || "date".equalsIgnoreCase(type.trim())) {
             Date date = null;
             try {
                 date = parseDate(value.trim(), DATE_FORMATS, Locale.ENGLISH);
@@ -195,9 +195,9 @@ public class ComparativeStringAnalyser {
      * 获取对应的key，类似id=xx中的id信息
      */
     public static String decodeComparativeKey(String compValue) {
-        boolean containsIn = TStringUtil.contains(compValue, " in");
+        boolean containsIn = TStringUtil.contains(compValue, " IN");
         if (containsIn) {
-            String[] compValues = TStringUtil.twoPartSplit(compValue, " in");
+            String[] compValues = TStringUtil.twoPartSplit(compValue, " IN");
             return compValues[0].trim();
         } else {
             int value = Comparative.getComparisonByCompleteString(compValue);

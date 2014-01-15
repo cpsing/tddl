@@ -23,7 +23,7 @@ public abstract class QueryTree extends DataNodeExecutor<IQueryTree> implements 
     protected List<IOrderBy>                 groupBys             = Collections.emptyList();
     protected Comparable                     limitFrom;
     protected Comparable                     limitTo;
-    protected List<ISelectable>              columns;
+    protected List<ISelectable>              columns              = Collections.emptyList();
     protected String                         alias;
     /**
      * 查询模式，并行？串行？
