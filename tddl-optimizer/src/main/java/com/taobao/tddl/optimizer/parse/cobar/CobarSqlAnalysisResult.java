@@ -1,6 +1,5 @@
 package com.taobao.tddl.optimizer.parse.cobar;
 
-import java.sql.SQLSyntaxErrorException;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,6 @@ import com.alibaba.cobar.parser.ast.stmt.dml.DMLInsertStatement;
 import com.alibaba.cobar.parser.ast.stmt.dml.DMLReplaceStatement;
 import com.alibaba.cobar.parser.ast.stmt.dml.DMLSelectStatement;
 import com.alibaba.cobar.parser.ast.stmt.dml.DMLUpdateStatement;
-import com.alibaba.cobar.parser.recognizer.SQLParserDelegate;
 import com.alibaba.cobar.parser.util.Pair;
 import com.alibaba.cobar.parser.visitor.SQLASTVisitor;
 import com.taobao.tddl.common.exception.NotSupportException;
@@ -50,10 +48,10 @@ public class CobarSqlAnalysisResult implements SqlAnalysisResult {
     private boolean       hasVisited;
     private String        sql;
 
-    public void parse(String sql) throws SQLSyntaxErrorException {
+    public void build(String sql, SQLStatement statement) {
         if (sql != null) {
             this.sql = sql;
-            this.statement = SQLParserDelegate.parse(sql);
+            this.statement = statement;
             if (statement instanceof DMLSelectStatement) {
                 if (isSysSelectStatement((DMLSelectStatement) statement, sql)) {
                     sqlType = SqlType.SHOW_WITHOUT_TABLE;

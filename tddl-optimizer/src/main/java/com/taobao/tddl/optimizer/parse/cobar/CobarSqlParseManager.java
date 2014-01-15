@@ -3,6 +3,8 @@ package com.taobao.tddl.optimizer.parse.cobar;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import com.alibaba.cobar.parser.ast.stmt.SQLStatement;
+import com.alibaba.cobar.parser.recognizer.SQLParserDelegate;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.taobao.tddl.common.TddlConstants;
@@ -16,9 +18,9 @@ import com.taobao.tddl.optimizer.parse.SqlParseManager;
  */
 public class CobarSqlParseManager extends AbstractLifecycle implements SqlParseManager {
 
-    private int                                          cacheSize  = 1000;
-    private long                                         expireTime = TddlConstants.DEFAULT_OPTIMIZER_EXPIRE_TIME;
-    private static Cache<String, CobarSqlAnalysisResult> cache      = null;
+    private int                                cacheSize  = 1000;
+    private long                               expireTime = TddlConstants.DEFAULT_OPTIMIZER_EXPIRE_TIME;
+    private static Cache<String, SQLStatement> cache      = null;
 
     @Override
     protected void doInit() {
@@ -35,22 +37,20 @@ public class CobarSqlParseManager extends AbstractLifecycle implements SqlParseM
 
     @Override
     public SqlAnalysisResult parse(final String sql, boolean cached) throws SqlParserException {
-        CobarSqlAnalysisResult result = null;
+        SQLStatement statement = null;
         try {
+            // 只缓存sql的解析结果
             if (cached) {
-                result = cache.get(sql, new Callable<CobarSqlAnalysisResult>() {
+                statement = cache.get(sql, new Callable<SQLStatement>() {
 
                     @Override
-                    public CobarSqlAnalysisResult call() throws Exception {
-                        CobarSqlAnalysisResult bean = new CobarSqlAnalysisResult();
-                        bean.parse(sql);
-                        return bean;
+                    public SQLStatement call() throws Exception {
+                        return SQLParserDelegate.parse(sql);
                     }
 
                 });
             } else {
-                result = new CobarSqlAnalysisResult();
-                result.parse(sql);
+                statement = SQLParserDelegate.parse(sql);
             }
         } catch (Exception e) {
             if (e.getCause() instanceof RuntimeException) {
@@ -60,6 +60,9 @@ public class CobarSqlParseManager extends AbstractLifecycle implements SqlParseM
             }
         }
 
+        // AstNode visitor结果不能做缓存
+        CobarSqlAnalysisResult result = new CobarSqlAnalysisResult();
+        result.build(sql, statement);
         return result;
 
     }

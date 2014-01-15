@@ -194,8 +194,7 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
             sql = SimpleHintParser.removeHint(sql, parameterSettings);
             return optimizerHint(sql, cached, routeCondition, parameterSettings, extraCmd);
         } else {
-            SqlAnalysisResult result = sqlParseManager.parse(sql, cached);
-            return optimizeAndAssignment(result.getAstNode(parameterSettings), parameterSettings, extraCmd, sql, cached);
+            return optimizeAndAssignment(null, parameterSettings, extraCmd, sql, cached);
         }
     }
 
@@ -256,17 +255,8 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
 
     private IDataNodeExecutor optimizeAndAssignment(final ASTNode node,
                                                     final Map<Integer, ParameterContext> parameterSettings,
-                                                    final Map<String, Object> extraCmd, String sql, boolean cached)
-                                                                                                                   throws QueryException {
-        if (node.getSql() != null) { // 如果指定了sql，则绕过优化器直接返回
-            if (logger.isDebugEnabled()) {
-                logger.warn("node.getSql() != null:\n" + node.getSql());
-            }
-
-            node.executeOn(OptimizerContext.getContext().getRule().getDefaultGroup());
-            return node.toDataNodeExecutor();
-        }
-
+                                                    final Map<String, Object> extraCmd, final String sql,
+                                                    final boolean cached) throws QueryException {
         long time = System.currentTimeMillis();
         ASTNode optimized = null;
         if (cached && sql != null && !sql.isEmpty()) {
@@ -278,7 +268,8 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
                     public OptimizeResult call() throws Exception {
                         OptimizeResult or = new OptimizeResult();
                         try {
-                            or.optimized = optimize(node, parameterSettings, extraCmd);
+                            SqlAnalysisResult result = sqlParseManager.parse(sql, true);
+                            or.optimized = optimize(result.getAstNode(parameterSettings), parameterSettings, extraCmd);
                         } catch (Exception e) {
                             if (e instanceof QueryException) {
                                 or.ex = (QueryException) e;
@@ -299,7 +290,12 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
             optimized = or.optimized.deepCopy();
             optimized.build();
         } else {
-            optimized = this.optimize(node, parameterSettings, extraCmd);
+            if (node == null) {
+                SqlAnalysisResult result = sqlParseManager.parse(sql, cached);
+                optimized = this.optimize(result.getAstNode(parameterSettings), parameterSettings, extraCmd);
+            } else {
+                optimized = this.optimize(node, parameterSettings, extraCmd);
+            }
         }
 
         if (parameterSettings != null) {

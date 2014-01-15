@@ -17,7 +17,7 @@ public class TddlConstants {
     /**
      * default cache expire time, 30000ms
      */
-    public static final long DEFAULT_TABLE_META_EXPIRE_TIME = 30000;
+    public static final long DEFAULT_TABLE_META_EXPIRE_TIME = 300 * 1000;
 
-    public static final int  DEFAULT_OPTIMIZER_EXPIRE_TIME  = 30000;
+    public static final int  DEFAULT_OPTIMIZER_EXPIRE_TIME  = 300 * 1000;
 }
