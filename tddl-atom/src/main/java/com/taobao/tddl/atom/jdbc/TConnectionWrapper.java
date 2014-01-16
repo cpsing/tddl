@@ -70,10 +70,16 @@ public class TConnectionWrapper implements Connection {
 
         for (TStatementWrapper statementWrapper : this.statements) {
             try {
-                statementWrapper.close();
+                statementWrapper.close(false);
             } catch (SQLException e) {
                 log.error("", e);
             }
+        }
+    }
+
+    void removeOpenedStatements(Statement statement) {
+        if (!statements.remove(statement)) {
+            log.warn("current statmenet ：" + statement + " doesn't exist!");
         }
     }
 

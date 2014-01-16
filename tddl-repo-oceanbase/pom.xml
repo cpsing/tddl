@@ -33,15 +33,13 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.alipay.oceanbase</groupId>
-			<artifactId>oceanbase</artifactId>
-			<version>1.1.1</version>
-		</dependency>
-		
-		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>tddl-repo-mysql</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alipay.oceanbase</groupId>
+			<artifactId>oceanbase</artifactId>
 		</dependency>
 		<!-- Test libs -->
 		<dependency>
@@ -49,7 +47,5 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-
 	</dependencies>
 </project>

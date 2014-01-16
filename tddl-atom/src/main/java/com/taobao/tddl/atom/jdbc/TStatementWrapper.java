@@ -9,11 +9,12 @@ import java.sql.Statement;
 import com.taobao.tddl.atom.TAtomDbStatusEnum;
 import com.taobao.tddl.common.jdbc.SqlTypeParser;
 import com.taobao.tddl.common.model.SqlMetaData;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.monitor.Monitor;
 import com.taobao.tddl.monitor.eagleeye.EagleeyeHelper;
 import com.taobao.tddl.monitor.unit.UnitDeployProtect;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * Statement 包装类
@@ -26,7 +27,7 @@ public class TStatementWrapper implements TStatement {
     protected static final String      UPDATE      = "UPDATE";
     protected static final String      QUERY       = "QUERY";
 
-    protected final Statement          targetStatement;
+    protected Statement                targetStatement;
     protected final TConnectionWrapper connectionWrapper;
     protected final TDataSourceWrapper datasourceWrapper;
 
@@ -64,14 +65,28 @@ public class TStatementWrapper implements TStatement {
     }
 
     public void close() throws SQLException {
-        if (currentResultSet != null) {
-            try {
-                this.currentResultSet.close();
-            } catch (SQLException e) {
-                log.error("", e);
+        close(true);
+    }
+
+    void close(boolean removeThis) throws SQLException {
+        try {
+            if (currentResultSet != null) currentResultSet.close();
+        } catch (SQLException e) {
+            log.warn("Close currentResultSet failed.", e);
+        } finally {
+            currentResultSet = null;
+        }
+
+        try {
+            if (this.targetStatement != null) this.targetStatement.close();
+        } finally {
+            this.targetStatement = null; // 端口与物理statement的引用，底下可能会有ps
+                                         // cache，导致节点无法被gc
+            if (removeThis) {
+                // 关闭之后，移除
+                connectionWrapper.removeOpenedStatements(this);
             }
         }
-        this.targetStatement.close();
     }
 
     protected void recordReadTimes() throws SQLException {

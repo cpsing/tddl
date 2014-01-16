@@ -120,17 +120,12 @@
 			<dependency>
 				<groupId>com.taobao.diamond</groupId>
 				<artifactId>diamond-client</artifactId>
-				<version>3.6.7.1-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>com.taobao.tbdatasource</groupId>
-				<artifactId>tbdatasource</artifactId>
-				<version>2.0.3</version>
+				<version>3.6.8</version>
 			</dependency>
 			<dependency>
 				<groupId>com.alibaba</groupId>
 				<artifactId>druid</artifactId>
-				<version>1.0.1</version>
+				<version>1.0.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
@@ -152,11 +147,29 @@
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-jdbc</artifactId>
 				<version>${spring_version}</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-orm</artifactId>
 				<version>${spring_version}</version>
+				<scope>test</scope>
+			</dependency>
+			<!-- driver -->
+			<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>5.1.18</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sleepycat</groupId>
+				<artifactId>je</artifactId>
+				<version>5.0.73</version>
+			</dependency>
+			<dependency>
+				<groupId>com.alipay.oceanbase</groupId>
+				<artifactId>oceanbase</artifactId>
+				<version>1.2.2</version>
 			</dependency>
 			<!-- Log libs -->
 			<dependency>
@@ -195,11 +208,6 @@
 				<artifactId>junit</artifactId>
 				<version>${junit_version}</version>
 				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>mysql</groupId>
-				<artifactId>mysql-connector-java</artifactId>
-				<version>5.1.18</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.ibatis</groupId>
