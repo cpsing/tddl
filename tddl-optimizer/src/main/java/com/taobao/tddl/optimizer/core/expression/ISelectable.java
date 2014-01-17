@@ -23,10 +23,11 @@ public interface ISelectable<RT extends ISelectable> extends CanVisit, Comparabl
      */
     public RT assignment(Map<Integer, ParameterContext> parameterSettings);
 
-    public static enum DATA_TYPE {
-        BYTES_VAL, LONG_VAL, SHORT_VAL, BOOLEAN_VAL, CHAR_VAL, STRING_VAL, FLOAT_VAL, DOUBLE_VAL, INT_VAL, BIND_VAL,
-        DATE_VAL, TIMESTAMP_VAL, TIME_VAL, BLOB_VAL, BIT_VAL
-    }
+    // public static enum DATA_TYPE {
+    // BYTES_VAL, LONG_VAL, SHORT_VAL, BOOLEAN_VAL, CHAR_VAL, STRING_VAL,
+    // FLOAT_VAL, DOUBLE_VAL, INT_VAL, BIND_VAL,
+    // DATE_VAL, TIMESTAMP_VAL, TIME_VAL, BLOB_VAL, BIT_VAL
+    // }
 
     public RT setDataType(DataType dataType);
 

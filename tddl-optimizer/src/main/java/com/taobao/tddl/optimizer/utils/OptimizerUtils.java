@@ -19,6 +19,7 @@ import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
@@ -26,11 +27,9 @@ import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.expression.bean.BindVal;
 import com.taobao.tddl.optimizer.core.expression.bean.NullValue;
 import com.taobao.tddl.optimizer.parse.cobar.visitor.MySqlExprVisitor;
-import com.taobao.tddl.rule.exceptions.TddlRuleException;
 
 /**
  * @since 5.1.0
@@ -42,7 +41,7 @@ public class OptimizerUtils {
             DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.getPattern(),
             DateFormatUtils.SMTP_DATETIME_FORMAT.getPattern(), };
 
-    public static Object convertType(Object value, DATA_TYPE type) {
+    public static Object convertType(Object value, DataType type) {
         if (value == null) {
             return null;
         }
@@ -51,52 +50,58 @@ public class OptimizerUtils {
             return value;
         }
 
-        String strValue = value.toString();
-        try {
-            if (type.equals(DATA_TYPE.LONG_VAL)) {
-                value = Long.valueOf(strValue);
-            } else if (type.equals(DATA_TYPE.INT_VAL)) {
-                value = Integer.valueOf(strValue);
-            } else if (type.equals(DATA_TYPE.BOOLEAN_VAL)) {
-                value = Boolean.valueOf(strValue);
-            } else if (type.equals(DATA_TYPE.BYTES_VAL)) {
-                value = Byte.valueOf(strValue);
-            } else if (type.equals(DATA_TYPE.CHAR_VAL)) {
-                value = strValue;
-            } else if (type.equals(DATA_TYPE.DATE_VAL) || type.equals(DATA_TYPE.TIMESTAMP_VAL)) {
-                if (value != null && value instanceof Long) {
-                    value = new Date((Long) value);
-                }
+        return type.converFromObject(value);
 
-                if (!(value instanceof Date)) {
-                    value = null;
-                    try {
-                        value = parseDate(strValue.trim(), DATE_FORMATS, Locale.ENGLISH);
-                    } catch (Exception err) {
-                        try {
-                            value = parseDate(strValue.trim(), DATE_FORMATS, Locale.getDefault());
-                        } catch (Exception e) {
-                            throw new TddlRuleException("unSupport date parse :" + strValue.trim());
-                        }
-                    }
-                }
-            } else if (type.equals(DATA_TYPE.DOUBLE_VAL)) {
-                value = Double.valueOf(strValue);
-            } else if (type.equals(DATA_TYPE.FLOAT_VAL)) {
-                value = Float.valueOf(strValue);
-            } else if (type.equals(DATA_TYPE.SHORT_VAL)) {
-                value = Short.valueOf(strValue);
-            } else if (type.equals(DATA_TYPE.STRING_VAL)) {
-                value = strValue;
-            } else {
-                throw new UnsupportedOperationException("Not supported yet : " + type);
-            }
-        } catch (Exception ex) {
-            // 若转换失败，则交给filter的function自己处理
-            return value;
-        }
-
-        return value;
+        // String strValue = value.toString();
+        // try {
+        // if (type.equals(DATA_TYPE.LONG_VAL)) {
+        // value = Long.valueOf(strValue);
+        // } else if (type.equals(DATA_TYPE.INT_VAL)) {
+        // value = Integer.valueOf(strValue);
+        // } else if (type.equals(DATA_TYPE.BOOLEAN_VAL)) {
+        // value = Boolean.valueOf(strValue);
+        // } else if (type.equals(DATA_TYPE.BYTES_VAL)) {
+        // value = Byte.valueOf(strValue);
+        // } else if (type.equals(DATA_TYPE.CHAR_VAL)) {
+        // value = strValue;
+        // } else if (type.equals(DATA_TYPE.DATE_VAL) ||
+        // type.equals(DATA_TYPE.TIMESTAMP_VAL)) {
+        // if (value != null && value instanceof Long) {
+        // value = new Date((Long) value);
+        // }
+        //
+        // if (!(value instanceof Date)) {
+        // value = null;
+        // try {
+        // value = parseDate(strValue.trim(), DATE_FORMATS, Locale.ENGLISH);
+        // } catch (Exception err) {
+        // try {
+        // value = parseDate(strValue.trim(), DATE_FORMATS,
+        // Locale.getDefault());
+        // } catch (Exception e) {
+        // throw new TddlRuleException("unSupport date parse :" +
+        // strValue.trim());
+        // }
+        // }
+        // }
+        // } else if (type.equals(DATA_TYPE.DOUBLE_VAL)) {
+        // value = Double.valueOf(strValue);
+        // } else if (type.equals(DATA_TYPE.FLOAT_VAL)) {
+        // value = Float.valueOf(strValue);
+        // } else if (type.equals(DATA_TYPE.SHORT_VAL)) {
+        // value = Short.valueOf(strValue);
+        // } else if (type.equals(DATA_TYPE.STRING_VAL)) {
+        // value = strValue;
+        // } else {
+        // throw new UnsupportedOperationException("Not supported yet : " +
+        // type);
+        // }
+        // } catch (Exception ex) {
+        // // 若转换失败，则交给filter的function自己处理
+        // return value;
+        // }
+        //
+        // return value;
     }
 
     private static Date parseDate(String str, String[] parsePatterns, Locale locale) throws ParseException {

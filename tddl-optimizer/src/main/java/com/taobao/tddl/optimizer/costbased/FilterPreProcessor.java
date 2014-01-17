@@ -13,6 +13,7 @@ import com.taobao.tddl.optimizer.core.ast.ASTNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.query.JoinNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
@@ -20,7 +21,6 @@ import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.exceptions.EmptyResultFilterException;
 import com.taobao.tddl.optimizer.exceptions.QueryException;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
@@ -224,7 +224,7 @@ public class FilterPreProcessor {
         } else {
             // 如果是 1 = id情况
             if (FilterUtils.isConstValue(bf.getColumn()) && !FilterUtils.isConstValue(bf.getValue())) {
-                DATA_TYPE type = null;
+                DataType type = null;
                 if (bf.getValue() instanceof IColumn) {
                     type = ((IColumn) bf.getValue()).getDataType();
                 }
@@ -238,7 +238,7 @@ public class FilterPreProcessor {
 
             // 如果是 id = 1情况
             if (FilterUtils.isConstValue(bf.getValue()) && !FilterUtils.isConstValue(bf.getColumn())) {
-                DATA_TYPE type = null;
+                DataType type = null;
                 if (bf.getColumn() instanceof IColumn) {
                     type = ((IColumn) bf.getColumn()).getDataType();
                 }

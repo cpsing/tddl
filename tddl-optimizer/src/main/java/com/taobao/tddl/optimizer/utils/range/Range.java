@@ -2,6 +2,8 @@ package com.taobao.tddl.optimizer.utils.range;
 
 import java.io.Serializable;
 
+import com.taobao.tddl.optimizer.core.datatype.DataType;
+
 /**
  * A class to represent ranges of values. A range is defined to contain all the
  * values between the minimum and maximum values, where the minimum/maximum
@@ -38,11 +40,13 @@ public class Range implements Serializable {
     private Class             elementClass;
 
     // The minimum and maximum values of the range.
-    private Comparable        minValue, maxValue;
+    private final Comparable  minValue, maxValue;
 
     // The the minimum/maximum value is included in the range.i
     // The default value is true, that is, included.
     private boolean           isMinIncluded    = true, isMaxIncluded = true;
+
+    private final DataType    type;
 
     /**
      * Constructs a <code>Range</code> object given the <code>Class</code> of
@@ -65,7 +69,7 @@ public class Range implements Serializable {
      * @throws IllegalArgumentException if maxValue is not the same
      * <code>Class</code> as elementClass.
      */
-    public Range(Class elementClassNoUsed, Comparable minValue, Comparable maxValue){
+    public Range(Class elementClassNoUsed, DataType type, Comparable minValue, Comparable maxValue){
 
         // If both minValue and maxValue are null, check whether elementClass
         // is an instanceof Comparable.
@@ -92,6 +96,7 @@ public class Range implements Serializable {
             throw new IllegalArgumentException(("Range2"));
         }
 
+        this.type = type;
         this.maxValue = maxValue;
     }
 
@@ -123,9 +128,9 @@ public class Range implements Serializable {
      * @throws IllegalArgumentException if maxValue is not the same
      * <code>Class</code> as elementClass.
      */
-    public Range(Class elementClass, Comparable minValue, boolean isMinIncluded, Comparable maxValue,
+    public Range(Class elementClass, DataType type, Comparable minValue, boolean isMinIncluded, Comparable maxValue,
                  boolean isMaxIncluded){
-        this(elementClass, minValue, maxValue);
+        this(elementClass, type, minValue, maxValue);
         this.isMinIncluded = isMinIncluded;
         this.isMaxIncluded = isMaxIncluded;
     }
@@ -213,9 +218,15 @@ public class Range implements Serializable {
         // if the object passed in is null, return false: suppose it is
         // the "positive infinite". So be care when use this method.
         if (value == null) return false;
+        if (isMaxIncluded) {
+            return type.compare(maxValue, value) >= 0;
 
-        if (isMaxIncluded) return maxValue.compareTo(value) >= 0;
-        return maxValue.compareTo(value) > 0;
+        }
+
+        // if (isMaxIncluded) return maxValue.compareTo(value) >= 0;
+
+        return type.compare(maxValue, value) > 0;
+        // return maxValue.compareTo(value) > 0;
     }
 
     /**
@@ -230,9 +241,13 @@ public class Range implements Serializable {
         // if the object passed in is null, return false: suppose it is
         // the "negative infinite". So be care when use this method.
         if (value == null) return false;
+        if (isMinIncluded) {
+            return type.compare(minValue, value) <= 0;
+        }
+        // if (isMinIncluded) return minValue.compareTo(value) <= 0;
 
-        if (isMinIncluded) return minValue.compareTo(value) <= 0;
-        else return minValue.compareTo(value) < 0;
+        return type.compare(minValue, value) < 0;
+        // else return minValue.compareTo(value) < 0;
     }
 
     /**
@@ -256,12 +271,21 @@ public class Range implements Serializable {
         Comparable min = range.getMinValue();
         Comparable max = range.getMaxValue();
         boolean maxSide, minSide;
+        //
+        // if (max == null) maxSide = (maxValue == null);
+        // else maxSide = isUnderUpperBound(max) || (isMaxIncluded ==
+        // range.isMaxIncluded() && max.equals(maxValue));
 
         if (max == null) maxSide = (maxValue == null);
-        else maxSide = isUnderUpperBound(max) || (isMaxIncluded == range.isMaxIncluded() && max.equals(maxValue));
+        else maxSide = isUnderUpperBound(max)
+                       || (isMaxIncluded == range.isMaxIncluded() && type.compare(max, maxValue) == 0);
 
         if (min == null) minSide = (minValue == null);
-        else minSide = isOverLowerBound(min) || (isMinIncluded == range.isMinIncluded() && min.equals(minValue));
+        else minSide = isOverLowerBound(min)
+                       || (isMinIncluded == range.isMinIncluded() && type.compare(min, minValue) == 0);
+        // if (min == null) minSide = (minValue == null);
+        // else minSide = isOverLowerBound(min) || (isMinIncluded ==
+        // range.isMinIncluded() && min.equals(minValue));
         return minSide && maxSide;
     }
 
@@ -301,12 +325,14 @@ public class Range implements Serializable {
         if (elementClass != range.getElementClass()) throw new IllegalArgumentException(("Range4"));
 
         if (this.isEmpty()) return new Range(elementClass,
+            type,
             range.getMinValue(),
             range.isMinIncluded(),
             range.getMaxValue(),
             range.isMaxIncluded());
 
         if (range.isEmpty()) return new Range(elementClass,
+            type,
             this.minValue,
             this.isMinIncluded,
             this.maxValue,
@@ -323,7 +349,7 @@ public class Range implements Serializable {
         Comparable maxValue = containMax ? range.getMaxValue() : this.maxValue;
         boolean isMinIncluded = containMin ? range.isMinIncluded() : this.isMinIncluded;
         boolean isMaxIncluded = containMax ? range.isMaxIncluded() : this.isMaxIncluded;
-        return new Range(elementClass, minValue, isMinIncluded, maxValue, isMaxIncluded);
+        return new Range(elementClass, type, minValue, isMinIncluded, maxValue, isMaxIncluded);
     }
 
     /**
@@ -347,7 +373,7 @@ public class Range implements Serializable {
             // get a non-null object to create an empty Range
             // because the range is empty, so temp will not be
             // null
-            return new Range(elementClass, temp, false, temp, false);
+            return new Range(elementClass, type, temp, false, temp, false);
         }
 
         if (range.isEmpty()) {
@@ -357,7 +383,7 @@ public class Range implements Serializable {
             // get a non-null object to create an empty Range
             // because the range is empty, so temp will not be
             // null
-            return new Range(elementClass, temp, false, temp, false);
+            return new Range(elementClass, type, temp, false, temp, false);
         }
 
         boolean containMin = !isOverLowerBound(range.getMinValue());
@@ -370,7 +396,7 @@ public class Range implements Serializable {
         Comparable maxValue = containMax ? this.maxValue : range.getMaxValue();
         boolean isMinIncluded = containMin ? this.isMinIncluded : range.isMinIncluded();
         boolean isMaxIncluded = containMax ? this.isMaxIncluded : range.isMaxIncluded();
-        return new Range(elementClass, minValue, isMinIncluded, maxValue, isMaxIncluded);
+        return new Range(elementClass, type, minValue, isMinIncluded, maxValue, isMaxIncluded);
     }
 
     /**
@@ -398,7 +424,12 @@ public class Range implements Serializable {
         // if this range is empty, return an empty range by copying this range;
         // if the given range is empty, return this range
         if (this.isEmpty() || range.isEmpty()) {
-            Range[] ra = { new Range(elementClass, this.minValue, this.isMinIncluded, this.maxValue, this.isMaxIncluded) };
+            Range[] ra = { new Range(elementClass,
+                type,
+                this.minValue,
+                this.isMinIncluded,
+                this.maxValue,
+                this.isMaxIncluded) };
             return ra;
         }
 
@@ -417,8 +448,8 @@ public class Range implements Serializable {
 
         // this range may be a full range [null, null]
         if (containMin && containMax) {
-            Range r1 = new Range(elementClass, this.minValue, this.isMinIncluded, min, !minIn);
-            Range r2 = new Range(elementClass, max, !maxIn, this.maxValue, this.isMaxIncluded);
+            Range r1 = new Range(elementClass, type, this.minValue, this.isMinIncluded, min, !minIn);
+            Range r2 = new Range(elementClass, type, max, !maxIn, this.maxValue, this.isMaxIncluded);
 
             // if r1 is empty , return the second section only;
             // or if this range and the given range are all unbounded
@@ -440,25 +471,30 @@ public class Range implements Serializable {
         // if the max of the given range is in this range, return the range
         // from max of given range to the max of this range
         else if (containMax) {
-            Range[] ra = { new Range(elementClass, max, !maxIn, this.maxValue, this.isMaxIncluded) };
+            Range[] ra = { new Range(elementClass, type, max, !maxIn, this.maxValue, this.isMaxIncluded) };
             return ra;
         }
         // if the min of the given range is in this range, return the range
         // from the min of this range to the min of the given range
         else if (containMin) {
-            Range[] ra = { new Range(elementClass, this.minValue, this.isMinIncluded, min, !minIn) };
+            Range[] ra = { new Range(elementClass, type, this.minValue, this.isMinIncluded, min, !minIn) };
             return ra;
         }
 
         // no overlap, just copy this range
         if ((min != null && !isUnderUpperBound(min)) || (max != null && !isOverLowerBound(max))) {
-            Range[] ra = { new Range(elementClass, this.minValue, this.isMinIncluded, this.maxValue, this.isMaxIncluded) };
+            Range[] ra = { new Range(elementClass,
+                type,
+                this.minValue,
+                this.isMinIncluded,
+                this.maxValue,
+                this.isMaxIncluded) };
             return ra;
         }
 
         // this range is contained in the given range, return an empty range
         min = (this.minValue == null) ? this.maxValue : this.minValue;
-        Range[] ra = { new Range(elementClass, min, false, min, false) };
+        Range[] ra = { new Range(elementClass, type, min, false, min, false) };
         return ra;
     }
 
@@ -468,6 +504,7 @@ public class Range implements Serializable {
      * @return a hash code value for this <code>Range</code> object.
      */
 
+    @Override
     public int hashCode() {
 
         int code = this.elementClass.hashCode();
@@ -498,6 +535,7 @@ public class Range implements Serializable {
      * the <code>Class</code> of their elements is the same, they will be found
      * to be equal and true will be returned.
      */
+    @Override
     public boolean equals(Object other) {
 
         // this range is not null, so if the given object is null,
@@ -573,6 +611,7 @@ public class Range implements Serializable {
     /**
      * Returns a <code>String</code> representation of this <code>Range</code>.
      */
+    @Override
     public String toString() {
 
         // if inclusive, display '[' otherwise display '('

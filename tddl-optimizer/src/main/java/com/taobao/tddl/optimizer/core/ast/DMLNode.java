@@ -9,9 +9,9 @@ import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IBindVal;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.expression.bean.NullValue;
 import com.taobao.tddl.optimizer.utils.OptimizerToString;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
@@ -132,7 +132,7 @@ public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
         for (int i = 0; i < cs.size(); i++) {
             Comparable c = cs.get(i);
             Object v = vs.get(i);
-            DATA_TYPE type = null;
+            DataType type = null;
             if (v == null || v instanceof IBindVal || v instanceof NullValue) {
                 continue;
             }

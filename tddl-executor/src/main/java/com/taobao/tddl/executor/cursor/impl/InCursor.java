@@ -2,7 +2,6 @@ package com.taobao.tddl.executor.cursor.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,6 @@ import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 
 /**
  * 专门处理 id in (xx,xx,xx,xx)的cursor 接受一大批的id in请求，然后分批，batch的方式，调用mget拿到具体的值。
@@ -68,13 +66,13 @@ public class InCursor extends SchematicCursor implements IInCursor {
             .getCodec(Arrays.asList(ExecUtils.getColumnMeta(c)));
         this.c = c;
 
-        if (c.getDataType() == DATA_TYPE.DATE_VAL) {
-            List<Object> vNew = new ArrayList<Object>(v.size());
-            for (Object comp : v) {
-                vNew.add(new Date((Long) comp));
-            }
-            v = vNew;
-        }
+        // if (c.getDataType() == DATA_TYPE.DATE_VAL) {
+        // List<Object> vNew = new ArrayList<Object>(v.size());
+        // for (Object comp : v) {
+        // vNew.add(new Date((Long) comp));
+        // }
+        // v = vNew;
+        // }
         this.valuesToFind = v;
         this.op = op;
     }

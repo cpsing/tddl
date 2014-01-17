@@ -11,8 +11,8 @@ import com.taobao.tddl.executor.cursor.MockArrayCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
 import com.taobao.tddl.executor.cursor.impl.LimitFromToCursor;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.expression.bean.Column;
 import com.taobao.tddl.optimizer.core.expression.bean.OrderBy;
 
@@ -20,9 +20,9 @@ public class LimitCursorTest {
 
     MockArrayCursor getCursor(String tableName, Integer[] ids) throws TddlException {
         MockArrayCursor cursor = new MockArrayCursor(tableName);
-        cursor.addColumn("id", DATA_TYPE.INT_VAL);
-        cursor.addColumn("name", DATA_TYPE.STRING_VAL);
-        cursor.addColumn("school", DATA_TYPE.STRING_VAL);
+        cursor.addColumn("id", DataType.IntType);
+        cursor.addColumn("name", DataType.StringType);
+        cursor.addColumn("school", DataType.StringType);
         cursor.initMeta();
 
         for (Integer id : ids) {
@@ -41,7 +41,7 @@ public class LimitCursorTest {
 
         MockArrayCursor mockCursor1 = this.getCursor("T1", new Integer[] { 2, 2, 4, 5, 6, 7, 7, 9, 9, 10, 13 });
         IOrderBy order = new OrderBy();
-        order.setColumn(new Column().setColumnName("ID").setTableName("T1").setDataType(DATA_TYPE.INT_VAL));
+        order.setColumn(new Column().setColumnName("ID").setTableName("T1").setDataType(DataType.IntType));
         List<IOrderBy> orderBys = new ArrayList();
 
         orderBys.add(order);
@@ -66,7 +66,7 @@ public class LimitCursorTest {
 
         MockArrayCursor mockCursor1 = this.getCursor("T1", new Integer[] { 2, 2, 4, 5, 6, 7, 7, 9, 9, 10, 13 });
         IOrderBy order = new OrderBy();
-        order.setColumn(new Column().setColumnName("ID").setTableName("T1").setDataType(DATA_TYPE.INT_VAL));
+        order.setColumn(new Column().setColumnName("ID").setTableName("T1").setDataType(DataType.IntType));
         List<IOrderBy> orderBys = new ArrayList();
 
         orderBys.add(order);
@@ -83,7 +83,7 @@ public class LimitCursorTest {
 
         MockArrayCursor mockCursor1 = this.getCursor("T1", new Integer[] { 2, 2, 4, 5, 6, 7, 7, 9, 9, 10, 13 });
         IOrderBy order = new OrderBy();
-        order.setColumn(new Column().setColumnName("ID").setTableName("T1").setDataType(DATA_TYPE.INT_VAL));
+        order.setColumn(new Column().setColumnName("ID").setTableName("T1").setDataType(DataType.IntType));
         List<IOrderBy> orderBys = new ArrayList();
 
         orderBys.add(order);

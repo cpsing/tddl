@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.optimizer.core.CanVisit;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 
 /**
  * @since 5.1.0
@@ -31,7 +31,7 @@ public interface IOrderBy extends CanVisit {
 
     public String getColumnName();
 
-    public DATA_TYPE getDataType();
+    public DataType getDataType();
 
     public String toStringWithInden(int inden);
 

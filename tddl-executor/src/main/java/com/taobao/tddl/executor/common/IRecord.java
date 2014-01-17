@@ -3,6 +3,8 @@ package com.taobao.tddl.executor.common;
 import java.util.List;
 import java.util.Map;
 
+import com.taobao.tddl.optimizer.core.datatype.DataType;
+
 /**
  * @author mengshi.sunmengshi 2013-12-2 下午4:22:43
  * @since 5.1.0
@@ -72,5 +74,9 @@ public interface IRecord extends Comparable<IRecord> {
     List<Object> getValueList();
 
     Map<String, Object> getMap();
+
+    DataType getType(int index);
+
+    DataType getType(String columnName);
 
 }

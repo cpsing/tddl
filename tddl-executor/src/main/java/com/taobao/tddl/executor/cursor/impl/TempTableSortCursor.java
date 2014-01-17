@@ -9,6 +9,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.common.utils.TStringUtil;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.codec.CodecFactory;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.KVPair;
@@ -28,12 +30,9 @@ import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.config.table.IndexType;
 import com.taobao.tddl.optimizer.config.table.Relationship;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
-import com.taobao.tddl.optimizer.core.expression.IColumn;
+import com.taobao.tddl.optimizer.core.datatype.IntType;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * 用于临时表排序，需要依赖bdb
@@ -59,7 +58,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
     ITable                      targetTable      = null;
 
     protected ICursorMeta       returnMeta       = null;
-    private long                requestID;
+    private final long          requestID;
     ExecutionContext            executionContext = null;
 
     /**
@@ -282,7 +281,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
                     }
                 }
             }
-            values.add(new ColumnMeta(columns.get(0).getTableName(), identity, IColumn.DATA_TYPE.INT_VAL, null, true));
+            values.add(new ColumnMeta(columns.get(0).getTableName(), identity, new IntType(), null, true));
         }
     }
 
@@ -396,6 +395,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
         return toStringWithInden(0);
     }
 
+    @Override
     public String toStringWithInden(int inden) {
         String tabTittle = GeneralUtil.getTab(inden);
         String tabContent = GeneralUtil.getTab(inden + 1);

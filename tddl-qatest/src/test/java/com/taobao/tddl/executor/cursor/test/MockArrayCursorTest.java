@@ -6,14 +6,14 @@ import org.junit.Test;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.executor.cursor.MockArrayCursor;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 
 public class MockArrayCursorTest {
 
     @Test
     public void test1() throws TddlException {
         MockArrayCursor cursor = new MockArrayCursor("table1");
-        cursor.addColumn("id", DATA_TYPE.INT_VAL);
+        cursor.addColumn("id", DataType.IntType);
         cursor.addColumn("name", DATA_TYPE.STRING_VAL);
         cursor.addColumn("school", DATA_TYPE.STRING_VAL);
         cursor.initMeta();

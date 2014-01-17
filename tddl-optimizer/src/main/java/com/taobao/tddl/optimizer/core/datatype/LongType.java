@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 import com.taobao.tddl.common.model.BaseRowSet;
 
-public class LongType implements DataType {
+public class LongType extends NumberType {
 
     @Override
     public int compare(Object o1, Object o2) {
@@ -47,6 +47,34 @@ public class LongType implements DataType {
             }
 
         };
+    }
+
+    @Override
+    public Object convertFromLong(Long value) {
+        return value;
+    }
+
+    @Override
+    public Object convertFromShort(Short value) {
+        return value.longValue();
+    }
+
+    @Override
+    public Object convertFromInteger(Integer value) {
+        return value.longValue();
+    }
+
+    @Override
+    public Object convertToType(Object value, DataType toType) {
+        return ((AbstractDataType) toType).convertFromLong((Long) value);
+    }
+
+    @Override
+    public Object converFromString(String value) {
+        if (value == null) {
+            return 0L;
+        }
+        return Long.valueOf(value);
     }
 
 }

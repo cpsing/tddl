@@ -12,8 +12,8 @@ import com.taobao.tddl.executor.cursor.MockArrayCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
 import com.taobao.tddl.executor.cursor.impl.MergeSortedCursors;
 import com.taobao.tddl.executor.rowset.IRowSet;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.expression.bean.Column;
 import com.taobao.tddl.optimizer.core.expression.bean.OrderBy;
 
@@ -21,9 +21,9 @@ public class MergeSortedCursorTest {
 
     MockArrayCursor getCursor(String tableName, Integer[] ids) throws TddlException {
         MockArrayCursor cursor = new MockArrayCursor(tableName);
-        cursor.addColumn("id", DATA_TYPE.INT_VAL);
-        cursor.addColumn("name", DATA_TYPE.STRING_VAL);
-        cursor.addColumn("school", DATA_TYPE.STRING_VAL);
+        cursor.addColumn("id", DataType.IntType);
+        cursor.addColumn("name", DataType.StringType);
+        cursor.addColumn("school", DataType.StringType);
         cursor.initMeta();
 
         for (Integer id : ids) {

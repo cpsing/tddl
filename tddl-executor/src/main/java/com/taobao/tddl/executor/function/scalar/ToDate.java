@@ -5,7 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import com.taobao.tddl.executor.function.ScalarFunction;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.exceptions.FunctionException;
 
 /**
@@ -13,6 +13,7 @@ import com.taobao.tddl.optimizer.exceptions.FunctionException;
  */
 public class ToDate extends ScalarFunction {
 
+    @Override
     public void compute(Object[] args) {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         try {
@@ -22,8 +23,9 @@ public class ToDate extends ScalarFunction {
         }
     }
 
-    public DATA_TYPE getReturnType() {
-        return DATA_TYPE.DATE_VAL;
+    @Override
+    public DataType getReturnType() {
+        return DataType.DateType;
     }
 
 }

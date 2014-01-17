@@ -10,6 +10,7 @@ import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.record.FixedLengthRecord;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 
 /**
@@ -39,7 +40,7 @@ public class FixedLengthCodec implements RecordCodec<byte[]> {
         int offset = 0;
         for (ColumnMeta c : columns) {
             Object v = record.get(c.getName());
-            DATA_TYPE t = c.getDataType();
+            DataType t = c.getDataType();
             if (v == null && !c.isNullable()) {
                 throw new RuntimeException(c + " is not nullable.");
             }
@@ -53,7 +54,7 @@ public class FixedLengthCodec implements RecordCodec<byte[]> {
 
         for (ColumnMeta c : columns) {
             Object v = record.get(c.getName());
-            DATA_TYPE t = c.getDataType();
+            DataType t = c.getDataType();
             if (t == DATA_TYPE.LONG_VAL) {
                 if (v == null) {
                     length += 1;
@@ -132,7 +133,7 @@ public class FixedLengthCodec implements RecordCodec<byte[]> {
     }
 
     @Override
-    public CloneableRecord decode(byte[] bytes, boolean reuse) {
+    public CloneableRecord decode(byte[] bytes, boolean ) {
         if (bytes == null) {
             return null;
         }
@@ -140,7 +141,7 @@ public class FixedLengthCodec implements RecordCodec<byte[]> {
         int offset = 0;
         for (int i = 0; i < columns.size(); i++) {
             ColumnMeta c = columns.get(i);
-            DATA_TYPE t = c.getDataType();
+            DataType t = c.getDataType();
             Object v = null;
             try {
                 if (t == DATA_TYPE.LONG_VAL) {

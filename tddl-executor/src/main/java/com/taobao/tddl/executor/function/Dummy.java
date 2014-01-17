@@ -1,7 +1,8 @@
 package com.taobao.tddl.executor.function;
 
+import com.taobao.tddl.optimizer.core.datatype.DataType;
+import com.taobao.tddl.optimizer.core.datatype.IntType;
 import com.taobao.tddl.optimizer.core.expression.IExtraFunction;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.exceptions.FunctionException;
 
 /**
@@ -11,10 +12,12 @@ import com.taobao.tddl.optimizer.exceptions.FunctionException;
  */
 public class Dummy extends ScalarFunction implements IExtraFunction {
 
-    public DATA_TYPE getReturnType() {
-        return DATA_TYPE.LONG_VAL;
+    @Override
+    public DataType getReturnType() {
+        return new IntType();
     }
 
+    @Override
     public void compute(Object[] args) throws FunctionException {
 
     }

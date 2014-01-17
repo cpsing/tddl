@@ -5,9 +5,9 @@ import java.util.Map;
 
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.executor.function.AggregateFunction;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.exceptions.FunctionException;
 
 /**
@@ -20,10 +20,12 @@ public class Max extends AggregateFunction {
     public Max(){
     }
 
+    @Override
     public void serverMap(Object[] args) throws FunctionException {
         doMax(args);
     }
 
+    @Override
     public void serverReduce(Object[] args) throws FunctionException {
         doMax(args);
     }
@@ -45,21 +47,25 @@ public class Max extends AggregateFunction {
         return 1;
     }
 
+    @Override
     public Map<String, Object> getResult() {
         Map<String, Object> resMap = new HashMap<String, Object>();
         resMap.put(function.getColumnName(), max);
         return resMap;
     }
 
+    @Override
     public void clear() {
         max = null;
     }
 
-    public DATA_TYPE getReturnType() {
+    @Override
+    public DataType getReturnType() {
         return this.getMapReturnType();
     }
 
-    public DATA_TYPE getMapReturnType() {
+    @Override
+    public DataType getMapReturnType() {
         Object[] args = function.getArgs().toArray();
 
         if (args[0] instanceof IColumn) {

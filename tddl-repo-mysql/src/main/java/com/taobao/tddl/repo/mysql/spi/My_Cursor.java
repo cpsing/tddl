@@ -24,10 +24,10 @@ import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.parse.TableMetaParser;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
@@ -91,7 +91,7 @@ public class My_Cursor implements Cursor {
             ResultSetMetaData rsmd = this.myJdbcHandler.getResultSet().getMetaData();
             returnColumns = new ArrayList();
             for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                DATA_TYPE type = TableMetaParser.jdbcTypeToDataType(rsmd.getColumnType(i));
+                DataType type = TableMetaParser.jdbcTypeToDataType(rsmd.getColumnType(i));
                 if (type == null) {
                     throw new IllegalArgumentException("列：" + rsmd.getColumnName(i) + " 类型" + rsmd.getColumnType(i)
                                                        + "无法识别,联系七锋");

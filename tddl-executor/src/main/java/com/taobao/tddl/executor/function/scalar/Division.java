@@ -5,13 +5,14 @@ import java.math.RoundingMode;
 
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.executor.function.ScalarFunction;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 
 /**
  * @since 5.1.0
  */
 public class Division extends ScalarFunction {
 
+    @Override
     public void compute(Object[] args) {
         this.result = computeInner(args);
     }
@@ -32,8 +33,9 @@ public class Division extends ScalarFunction {
         }
     }
 
-    public DATA_TYPE getReturnType() {
-        return DATA_TYPE.DOUBLE_VAL;
+    @Override
+    public DataType getReturnType() {
+        return DataType.DoubleType;
     }
 
 }

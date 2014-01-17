@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.taobao.tddl.executor.function.AggregateFunction;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
@@ -20,10 +21,12 @@ public class Sum extends AggregateFunction {
     public Sum(){
     }
 
+    @Override
     public void serverMap(Object[] args) throws FunctionException {
         doSum(args);
     }
 
+    @Override
     public void serverReduce(Object[] args) throws FunctionException {
         doSum(args);
     }
@@ -68,23 +71,27 @@ public class Sum extends AggregateFunction {
         return 1;
     }
 
+    @Override
     public Map<String, Object> getResult() {
         Map<String, Object> resMap = new HashMap<String, Object>();
         resMap.put(function.getColumnName(), total);
         return resMap;
     }
 
+    @Override
     public void clear() {
         total = null;
     }
 
-    public DATA_TYPE getReturnType() {
+    @Override
+    public DataType getReturnType() {
         return this.getMapReturnType();
     }
 
-    public DATA_TYPE getMapReturnType() {
+    @Override
+    public DataType getMapReturnType() {
         Object[] args = function.getArgs().toArray();
-        DATA_TYPE type = null;
+        DataType type = null;
         if (args[0] instanceof IColumn) {
             type = ((IColumn) args[0]).getDataType();
         }
@@ -97,12 +104,12 @@ public class Sum extends AggregateFunction {
             return null;
         }
 
-        if (type.equals(DATA_TYPE.LONG_VAL) || type.equals(DATA_TYPE.INT_VAL) || type.equals(DATA_TYPE.SHORT_VAL)) {
-            return DATA_TYPE.LONG_VAL;
+        if (type.equals(DataType.LongType) || type.equals(DataType.IntType) || type.equals(DataType.ShortType)) {
+            return DataType.LongType;
         } else if (type.equals(DATA_TYPE.FLOAT_VAL)) {
-            return DATA_TYPE.FLOAT_VAL;
+            return DataType.FloatType;
         } else if (type.equals(DATA_TYPE.DOUBLE_VAL)) {
-            return DATA_TYPE.DOUBLE_VAL;
+            return DataType.DoubleType;
         }
 
         return null;

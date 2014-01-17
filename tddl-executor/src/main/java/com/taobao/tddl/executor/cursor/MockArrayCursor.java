@@ -14,23 +14,23 @@ import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
-import com.taobao.tddl.optimizer.core.expression.ISelectable;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 
 public class MockArrayCursor extends AbstractLifecycle implements Cursor {
 
-    List<IRowSet>       rows    = new ArrayList();
-    Iterator<IRowSet>   iter    = null;
-    private ICursorMeta meta;
-    private String      tableName;
-    List<ColumnMeta>    columns = new ArrayList();
-    private IRowSet     current;
-    private boolean     closed  = false;
+    List<IRowSet>        rows    = new ArrayList();
+    Iterator<IRowSet>    iter    = null;
+    private ICursorMeta  meta;
+    private final String tableName;
+    List<ColumnMeta>     columns = new ArrayList();
+    private IRowSet      current;
+    private boolean      closed  = false;
 
     public MockArrayCursor(String tableName){
         this.tableName = tableName;
     }
 
-    public void addColumn(String columnName, ISelectable.DATA_TYPE type) {
+    public void addColumn(String columnName, DataType type) {
         ColumnMeta c = new ColumnMeta(this.tableName, columnName, type, null, true);
         columns.add(c);
 

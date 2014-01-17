@@ -2,19 +2,21 @@ package com.taobao.tddl.executor.function.scalar;
 
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.executor.function.ScalarFunction;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 
 /**
  * @since 5.1.0
  */
 public class Not extends ScalarFunction {
 
+    @Override
     public void compute(Object[] args) {
         result = this.computeInner(args);
     }
 
-    public DATA_TYPE getReturnType() {
-        return DATA_TYPE.BOOLEAN_VAL;
+    @Override
+    public DataType getReturnType() {
+        return DataType.BooleanType;
     }
 
     private Comparable computeInner(Object[] args) {
