@@ -43,9 +43,36 @@ public interface DataType extends Comparator<Object> {
 
     Object convertToType(Object value, DataType toType);
 
-    byte[] encodeToBytes(Object value);
+    /**
+     * @param value
+     * @param dst
+     * @param offset
+     * @return encode之后的byte[]的length
+     */
+    int encodeToBytes(Object value, byte[] dst, int offset);
 
-    Object decodeFromBytes(byte[] bytes);
+    /**
+     * encode之后的byte[]的length
+     * 
+     * @param value
+     * @return
+     */
+    int getLength(Object value);
+
+    public class DecodeResult {
+
+        public Object value;
+        public int    length;
+
+        public DecodeResult(Object value, int length){
+            super();
+            this.value = value;
+            this.length = length;
+        }
+
+    }
+
+    DecodeResult decodeFromBytes(byte[] bytes, int offset);
 
     Object incr(Object value);
 
