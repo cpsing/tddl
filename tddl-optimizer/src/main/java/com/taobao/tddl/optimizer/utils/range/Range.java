@@ -556,7 +556,9 @@ public class Range implements Serializable {
         Comparable min = r.getMinValue();
         // if the minimum is not null, compare both minValue and the boolean
         if (this.minValue != null) {
-            if (!this.minValue.equals(min)) return false;
+
+            if (!(this.type.compare(minValue, min) == 0)) return false;
+            // if (!this.minValue.equals(min)) return false;
 
             if (this.isMinIncluded != r.isMinIncluded()) return false;
         }
@@ -567,7 +569,9 @@ public class Range implements Serializable {
         Comparable max = r.getMaxValue();
         // if the maximum is not null, compare both maxValue and the boolean
         if (this.maxValue != null) {
-            if (!this.maxValue.equals(max)) return false;
+
+            if (!(this.type.compare(maxValue, max) == 0)) return false;
+            // if (!this.maxValue.equals(max)) return false;
 
             if (this.isMaxIncluded != r.isMaxIncluded()) return false;
         }
@@ -589,7 +593,8 @@ public class Range implements Serializable {
         // an unbounded range is not empty
         if (minValue == null || maxValue == null) return false;
 
-        int cmp = this.minValue.compareTo(this.maxValue);
+        int cmp = this.type.compare(minValue, maxValue);
+        // int cmp = this.minValue.compareTo(this.maxValue);
 
         // if the minimum is larger than the maximum, this range is empty
         if (cmp > 0) return true;
@@ -603,8 +608,12 @@ public class Range implements Serializable {
     }
 
     public boolean isSingleValue() {
+
         if (this.maxValue != null && this.minValue != null && this.isMaxIncluded && this.isMinIncluded
-            && this.maxValue.equals(minValue)) return true;
+            && this.type.compare(maxValue, minValue) == 0) return true;
+        // if (this.maxValue != null && this.minValue != null &&
+        // this.isMaxIncluded && this.isMinIncluded
+        // && this.maxValue.equals(minValue)) return true;
         return false;
     }
 
