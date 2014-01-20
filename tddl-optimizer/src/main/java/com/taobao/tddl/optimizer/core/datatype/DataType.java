@@ -28,8 +28,6 @@ public interface DataType extends Comparator<Object> {
     public static final DataType BitType        = null;
     public static final DataType BytesType      = null;
 
-    Object add(Object o1, Object o2);
-
     public static interface ResultGetter {
 
         Object get(ResultSet rs, int index) throws SQLException;
@@ -39,7 +37,7 @@ public interface DataType extends Comparator<Object> {
 
     ResultGetter getResultGetter();
 
-    Object converFromObject(Object value);
+    Object convertFromObject(Object value);
 
     Object convertToType(Object value, DataType toType);
 

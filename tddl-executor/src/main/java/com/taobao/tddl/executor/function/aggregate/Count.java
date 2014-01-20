@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.taobao.tddl.executor.function.AggregateFunction;
 import com.taobao.tddl.optimizer.core.datatype.DataType;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.exceptions.FunctionException;
 
 /**

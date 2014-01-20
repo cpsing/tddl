@@ -8,6 +8,6 @@ public abstract class AbstractDataType implements DataType {
 
     protected abstract Object convertFromInteger(Integer value);
 
-    protected abstract Object converFromString(String value);
+    protected abstract Object convertFromString(String value);
 
 }

@@ -8,7 +8,6 @@ import com.taobao.tddl.executor.function.AggregateFunction;
 import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.exceptions.FunctionException;
 
 /**

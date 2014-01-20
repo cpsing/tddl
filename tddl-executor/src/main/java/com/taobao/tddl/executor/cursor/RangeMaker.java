@@ -330,7 +330,7 @@ public class RangeMaker {
             // }
         } else {
             // 任何类型的最小值都是null;
-            return null;
+            return type.getMin();
         }
         // return null;
     }

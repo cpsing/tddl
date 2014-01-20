@@ -37,11 +37,11 @@ public class StringType extends AbstractDataType {
 
     @Override
     public Object convertToType(Object value, DataType toType) {
-        return ((AbstractDataType) toType).converFromString((String) value);
+        return ((AbstractDataType) toType).convertFromString((String) value);
     }
 
     @Override
-    public Object converFromString(String value) {
+    public Object convertFromString(String value) {
         return value;
     }
 

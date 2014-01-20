@@ -50,7 +50,7 @@ public class OptimizerUtils {
             return value;
         }
 
-        return type.converFromObject(value);
+        return type.convertFromObject(value);
 
         // String strValue = value.toString();
         // try {

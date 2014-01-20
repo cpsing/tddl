@@ -70,7 +70,7 @@ public class LongType extends NumberType {
     }
 
     @Override
-    public Object converFromString(String value) {
+    public Object convertFromString(String value) {
         if (value == null) {
             return 0L;
         }

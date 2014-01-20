@@ -1,4 +1,4 @@
-package com.taobao.tddl.executor.codec;
+package com.taobao.tddl.optimizer.core.datatype;
 
 import com.taobao.tddl.common.exception.TddlException;
 

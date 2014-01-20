@@ -4,20 +4,21 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.BaseRowSet;
+import com.taobao.tddl.optimizer.core.expression.bean.NullValue;
 
 public class IntType extends NumberType {
 
     @Override
     public int compare(Object o1, Object o2) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
+        if (o1 == o2) return 0;
 
-    @Override
-    public Object add(Object o1, Object o2) {
-        // TODO Auto-generated method stub
-        return null;
+        if (o1 == null) return -1;
+
+        if (o2 == null) return 1;
+
+        return convertFromObject(o1).compareTo(convertFromObject(o2));
     }
 
     @Override
@@ -33,14 +34,14 @@ public class IntType extends NumberType {
             @Override
             public Object get(BaseRowSet rs, int index) {
                 Object val = rs.getObject(index);
-                if (val == null) return 0;
 
-                if (val instanceof Integer) return val;
+                try {
+                    val = convertFromObject(val);
 
-                if (val instanceof Number) return ((Number) val).intValue();
+                    return val;
+                } catch (Exception ex) {
 
-                if (val instanceof BigDecimal) return ((BigDecimal) val).intValue();
-
+                }
                 String strVal = rs.getString(index);
 
                 return Integer.valueOf(strVal);
@@ -50,17 +51,17 @@ public class IntType extends NumberType {
     }
 
     @Override
-    public Object convertFromLong(Long value) {
+    public Integer convertFromLong(Long value) {
         return value.intValue();
     }
 
     @Override
-    public Object convertFromShort(Short value) {
+    public Integer convertFromShort(Short value) {
         return value.intValue();
     }
 
     @Override
-    public Object convertFromInteger(Integer value) {
+    public Integer convertFromInteger(Integer value) {
         return value;
     }
 
@@ -70,7 +71,7 @@ public class IntType extends NumberType {
     }
 
     @Override
-    public Object converFromString(String value) {
+    public Integer convertFromString(String value) {
         if (value == null) {
             return 0;
         }
@@ -78,13 +79,64 @@ public class IntType extends NumberType {
     }
 
     @Override
-    public byte[] encodeToBytes(Object value) {
-        // TODO Auto-generated method stub
-        return null;
+    public Integer convertFromObject(Object value) {
+        if (value == null || value instanceof NullValue) return null;
+
+        if (value instanceof Integer) return (Integer) value;
+
+        if (value instanceof Number) return ((Number) value).intValue();
+
+        if (value instanceof String) return Integer.valueOf((String) value);
+
+        if (value instanceof BigDecimal) return ((BigDecimal) value).intValue();
+
+        throw new RuntimeException("unsupported type: " + value.getClass().getSimpleName() + " converted to integer");
     }
 
     @Override
-    public Object decodeFromBytes(byte[] bytes) {
+    public int encodeToBytes(Object value, byte[] dst, int offset) {
+        Integer v = this.convertFromObject(value);
+        return DataEncoder.encode(v, dst, offset);
+
+    }
+
+    @Override
+    public int getLength(Object value) {
+
+        if (value == null) return 1;
+
+        return 5;
+
+    }
+
+    @Override
+    public DecodeResult decodeFromBytes(byte[] bytes, int offset) {
+        try {
+            Integer v = DataDecoder.decodeIntegerObj(bytes, offset);
+
+            return new DecodeResult(v, getLength(v));
+        } catch (CorruptEncodingException e) {
+            throw new TddlRuntimeException(e);
+        }
+    }
+
+    @Override
+    public Integer incr(Object value) {
+        return convertFromObject(value) + 1;
+    }
+
+    @Override
+    public Integer decr(Object value) {
+        return convertFromObject(value) - 1;
+    }
+
+    @Override
+    public Object getMax() {
+        return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public Object getMin() {
         // TODO Auto-generated method stub
         return null;
     }

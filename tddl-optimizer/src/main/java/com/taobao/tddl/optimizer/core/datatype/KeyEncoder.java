@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-package com.taobao.tddl.executor.codec;
+package com.taobao.tddl.optimizer.core.datatype;
 
-import static com.taobao.tddl.executor.codec.EncodingConstants.NOT_NULL_BYTE_LOW;
-import static com.taobao.tddl.executor.codec.EncodingConstants.NULL_BYTE_HIGH;
-import static com.taobao.tddl.executor.codec.EncodingConstants.NULL_BYTE_LOW;
-import static com.taobao.tddl.executor.codec.EncodingConstants.ONE_HUNDRED;
-import static com.taobao.tddl.executor.codec.EncodingConstants.ONE_THOUSAND;
-import static com.taobao.tddl.executor.codec.EncodingConstants.TERMINATOR;
+import static com.taobao.tddl.optimizer.core.datatype.EncodingConstants.NOT_NULL_BYTE_LOW;
+import static com.taobao.tddl.optimizer.core.datatype.EncodingConstants.NULL_BYTE_HIGH;
+import static com.taobao.tddl.optimizer.core.datatype.EncodingConstants.NULL_BYTE_LOW;
+import static com.taobao.tddl.optimizer.core.datatype.EncodingConstants.ONE_HUNDRED;
+import static com.taobao.tddl.optimizer.core.datatype.EncodingConstants.ONE_THOUSAND;
+import static com.taobao.tddl.optimizer.core.datatype.EncodingConstants.TERMINATOR;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
