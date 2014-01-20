@@ -19,7 +19,7 @@ import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.impl.ColMetaAndIndex;
 import com.taobao.tddl.executor.cursor.impl.CursorMetaImp;
 import com.taobao.tddl.executor.record.CloneableRecord;
-import com.taobao.tddl.executor.record.MapRecord;
+import com.taobao.tddl.executor.record.FixedLengthRecord;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.rowset.ResultSetRowSet;
@@ -654,9 +654,10 @@ public class ExecUtils {
 
     public static CloneableRecord convertToClonableRecord(IRowSet iRowSet) {
         Iterator<ColMetaAndIndex> columnIterator = iRowSet.getParentCursorMeta().indexIterator();
-        CloneableRecord cr = new MapRecord();
+        CloneableRecord cr = new FixedLengthRecord(iRowSet.getParentCursorMeta().getColumns());
         while (columnIterator.hasNext()) {
             ColMetaAndIndex cmAndIndex = columnIterator.next();
+
             cr.put(cmAndIndex.getName(), iRowSet.getObject(cmAndIndex.getIndex()));
         }
         return cr;

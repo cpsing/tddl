@@ -15,7 +15,7 @@ import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.cursor.IInCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
-import com.taobao.tddl.executor.record.MapRecord;
+import com.taobao.tddl.executor.record.FixedLengthRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
@@ -97,9 +97,12 @@ public class InCursor extends SchematicCursor implements IInCursor {
         throw new IllegalArgumentException("should not be here");
     }
 
-    public static MapRecord getCloneableRecordOfKey(String keyCol, Object keyVal, RecordCodec keyCodec) {
-        MapRecord record = new MapRecord();
-        record.put(keyCol, keyVal);
+    public CloneableRecord getCloneableRecordOfKey(Object keyVal, RecordCodec keyCodec) {
+        List cs = new ArrayList(1);
+        cs.add(c);
+
+        FixedLengthRecord record = new FixedLengthRecord(ExecUtils.convertISelectablesToColumnMeta(cs));
+        record.put(this.c.getColumnName(), keyVal);
         return record;
     }
 
@@ -119,7 +122,7 @@ public class InCursor extends SchematicCursor implements IInCursor {
             // 还未初始化
             List<CloneableRecord> list = new ArrayList<CloneableRecord>(valuesToFind.size());
             for (Object valOne : valuesToFind) {
-                list.add(getCloneableRecordOfKey(c.getColumnName(), valOne, keyCodec));
+                list.add(getCloneableRecordOfKey(valOne, keyCodec));
             }
             pairToReturn = cursor.mgetWithDuplicateList(list, false, true);
             pairToReturnIterator = pairToReturn.iterator();

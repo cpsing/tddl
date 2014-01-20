@@ -11,6 +11,7 @@ import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.IRecord;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 
 /**
  * @author mengshi.sunmengshi 2013-12-3 下午1:51:05
@@ -164,7 +165,7 @@ public class FixedLengthRecord extends CloneableRecord {
                 r = a.length - b.length;
             } else {
                 if (v != null && v1 != null) {
-                    r = ((Comparable) v).compareTo((Comparable) v1);
+                    r = ((Comparable) v).compareTo(v1);
                 } else if (v == null && v1 == null) {
                     r = 0;
                 } else if (v == null) {
@@ -231,6 +232,18 @@ public class FixedLengthRecord extends CloneableRecord {
         hash = 29 * hash + Arrays.deepHashCode(this.values);
         hash = 29 * hash + (this.index != null ? this.index.hashCode() : 0);
         return hash;
+    }
+
+    @Override
+    public DataType getType(int index) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public DataType getType(String columnName) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

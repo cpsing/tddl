@@ -235,7 +235,7 @@ public class JE_Table extends AbstractTable {
             return null;
         }
         if (valueEntry.getSize() != 0) {
-            return indexCodecMap.get(indexMeta.getName()).getValue_codec().decode(valueEntry.getData(), false);
+            return indexCodecMap.get(indexMeta.getName()).getValue_codec().decode(valueEntry.getData());
         } else {
             return null;
         }
