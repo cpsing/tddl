@@ -80,16 +80,6 @@ public class BytesType extends AbstractDataType<byte[]> {
 
     @Override
     public int compare(Object o1, Object o2) {
-        return 0;
-    }
-
-    @Override
-    public Calculator getCalculator() {
-        return null;
-    }
-
-    @Override
-    public int compare(Object o1, Object o2) {
         if (o1 == o2) {
             return 0;
         }
@@ -106,11 +96,15 @@ public class BytesType extends AbstractDataType<byte[]> {
         int notZeroOffset = 0;
         int targetNotZeroOffset = 0;
         for (notZeroOffset = 0; notZeroOffset < value.length; notZeroOffset++) {
-            if (value[notZeroOffset] != 0) break;
+            if (value[notZeroOffset] != 0) {
+                break;
+            }
         }
 
         for (targetNotZeroOffset = 0; targetNotZeroOffset < targetValue.length; targetNotZeroOffset++) {
-            if (targetValue[targetNotZeroOffset] != 0) break;
+            if (targetValue[targetNotZeroOffset] != 0) {
+                break;
+            }
         }
 
         int actualLength = value.length - notZeroOffset;
@@ -124,8 +118,9 @@ public class BytesType extends AbstractDataType<byte[]> {
             int index = notZeroOffset;
             int targetIndex = targetNotZeroOffset;
             while (true) {
-
-                if (index >= value.length || targetIndex >= targetValue.length) break;
+                if (index >= value.length || targetIndex >= targetValue.length) {
+                    break;
+                }
                 short shortValue = (short) (value[index] & 0xff);
                 short shortTargetValue = (short) (targetValue[targetIndex] & 0xff);
                 boolean re = (shortValue == shortTargetValue);
@@ -142,4 +137,8 @@ public class BytesType extends AbstractDataType<byte[]> {
         }
     }
 
+    @Override
+    public Calculator getCalculator() {
+        return null;
+    }
 }
