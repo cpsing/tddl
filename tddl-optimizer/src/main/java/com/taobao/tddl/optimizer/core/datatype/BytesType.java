@@ -1,6 +1,7 @@
 package com.taobao.tddl.optimizer.core.datatype;
 
 import com.google.common.primitives.Bytes;
+import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 
 /**
@@ -9,7 +10,7 @@ import com.taobao.tddl.common.exception.TddlRuntimeException;
  * @author mengshi.sunmengshi 2014年1月21日 下午5:16:00
  * @since 5.1.0
  */
-public class BytesType extends CommonType<Byte> {
+public class BytesType extends CommonType<byte[]> {
 
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
@@ -21,38 +22,39 @@ public class BytesType extends CommonType<Byte> {
         if (value == null) {
             return 1;
         } else {
-            return 2;
+            return DataEncoder.calculateEncodedLength((byte[]) value);
         }
     }
 
     @Override
     public DecodeResult decodeFromBytes(byte[] bytes, int offset) {
         try {
-            Byte v = DataDecoder.decodeByteObj(bytes, offset);
-            return new DecodeResult(v, getLength(v));
+            byte[][] data = new byte[0][];
+            int length = DataDecoder.decode(bytes, offset, data);
+            return new DecodeResult(data[0], length);
         } catch (CorruptEncodingException e) {
             throw new TddlRuntimeException(e);
         }
     }
 
     @Override
-    public Byte incr(Object value) {
-        return Byte.valueOf(((Integer) (this.convertFrom(value).intValue() + 1)).byteValue());
+    public byte[] incr(Object value) {
+        throw new NotSupportException("bytes类型不支持incr操作");
     }
 
     @Override
-    public Byte decr(Object value) {
-        return Byte.valueOf(((Integer) (this.convertFrom(value).intValue() - 1)).byteValue());
+    public byte[] decr(Object value) {
+        throw new NotSupportException("bytes类型不支持decr操作");
     }
 
     @Override
-    public Byte getMaxValue() {
-        return Byte.MAX_VALUE;
+    public byte[] getMaxValue() {
+        return new byte[] { Byte.MAX_VALUE };
     }
 
     @Override
-    public Byte getMinValue() {
-        return Byte.MIN_VALUE;
+    public byte[] getMinValue() {
+        return new byte[] { Byte.MIN_VALUE };
     }
 
     @Override
