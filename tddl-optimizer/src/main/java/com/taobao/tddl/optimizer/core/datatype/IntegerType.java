@@ -9,57 +9,98 @@ import com.taobao.tddl.common.exception.TddlRuntimeException;
  */
 public class IntegerType extends CommonType<Integer> {
 
-    private Calculator calculator = new Calculator() {
+    private final Calculator calculator = new Calculator() {
 
-                                      @Override
-                                      public Object add(Object v1, Object v2) {
-                                          Integer i1 = convertFrom(v1);
-                                          Integer i2 = convertFrom(v2);
-                                          return i1 + i2;
-                                      }
+                                            @Override
+                                            public Object add(Object v1, Object v2) {
+                                                Integer i1 = convertFrom(v1);
+                                                Integer i2 = convertFrom(v2);
+                                                return i1 + i2;
+                                            }
 
-                                      @Override
-                                      public Object sub(Object v1, Object v2) {
-                                          // TODO Auto-generated method stub
-                                          return null;
-                                      }
+                                            @Override
+                                            public Object sub(Object v1, Object v2) {
+                                                Integer i1 = convertFrom(v1);
+                                                Integer i2 = convertFrom(v2);
+                                                return i1 - i2;
+                                            }
 
-                                      @Override
-                                      public Object multiply(Object v1, Object v2) {
-                                          // TODO Auto-generated method stub
-                                          return null;
-                                      }
+                                            @Override
+                                            public Object multiply(Object v1, Object v2) {
+                                                Integer i1 = convertFrom(v1);
+                                                Integer i2 = convertFrom(v2);
+                                                return i1 * i2;
+                                            }
 
-                                      @Override
-                                      public Object divide(Object v1, Object v2) {
-                                          // TODO Auto-generated method stub
-                                          return null;
-                                      }
+                                            @Override
+                                            public Object divide(Object v1, Object v2) {
+                                                Integer i1 = convertFrom(v1);
+                                                Integer i2 = convertFrom(v2);
+                                                return i1 / i2;
+                                            }
 
-                                      @Override
-                                      public Object mod(Object v1, Object v2) {
-                                          // TODO Auto-generated method stub
-                                          return null;
-                                      }
+                                            @Override
+                                            public Object mod(Object v1, Object v2) {
+                                                Integer i1 = convertFrom(v1);
+                                                Integer i2 = convertFrom(v2);
+                                                return i1 % i2;
+                                            }
 
-                                      @Override
-                                      public Object and(Object v1, Object v2) {
-                                          // TODO Auto-generated method stub
-                                          return null;
-                                      }
+                                            @Override
+                                            public Object and(Object v1, Object v2) {
+                                                Integer i1 = convertFrom(v1);
+                                                Integer i2 = convertFrom(v2);
+                                                return (i1 != 0) && (i2 != 0);
+                                            }
 
-                                      @Override
-                                      public Object or(Object v1, Object v2) {
-                                          // TODO Auto-generated method stub
-                                          return null;
-                                      }
+                                            @Override
+                                            public Object or(Object v1, Object v2) {
+                                                Integer i1 = convertFrom(v1);
+                                                Integer i2 = convertFrom(v2);
+                                                return (i1 != 0) || (i2 != 0);
+                                            }
 
-                                      @Override
-                                      public Object not(Object v1) {
-                                          // TODO Auto-generated method stub
-                                          return null;
-                                      }
-                                  };
+                                            @Override
+                                            public Object not(Object v1) {
+                                                Integer i1 = convertFrom(v1);
+
+                                                return i1 == 0;
+                                            }
+
+                                            @Override
+                                            public Object bitAnd(Object v1, Object v2) {
+                                                Integer i1 = convertFrom(v1);
+                                                Integer i2 = convertFrom(v2);
+                                                return i1 & i2;
+                                            }
+
+                                            @Override
+                                            public Object bitOr(Object v1, Object v2) {
+                                                Integer i1 = convertFrom(v1);
+                                                Integer i2 = convertFrom(v2);
+                                                return i1 | i2;
+                                            }
+
+                                            @Override
+                                            public Object bitNot(Object v1) {
+                                                Integer i1 = convertFrom(v1);
+                                                return ~i1;
+                                            }
+
+                                            @Override
+                                            public Object xor(Object v1, Object v2) {
+                                                Integer i1 = convertFrom(v1);
+                                                Integer i2 = convertFrom(v2);
+                                                return (i1 != 0) ^ (i2 != 0);
+                                            }
+
+                                            @Override
+                                            public Object bitXor(Object v1, Object v2) {
+                                                Integer i1 = convertFrom(v1);
+                                                Integer i2 = convertFrom(v2);
+                                                return i1 ^ i2;
+                                            }
+                                        };
 
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
@@ -107,7 +148,7 @@ public class IntegerType extends CommonType<Integer> {
 
     @Override
     public Calculator getCalculator() {
-        return null;
+        return calculator;
     }
 
 }
