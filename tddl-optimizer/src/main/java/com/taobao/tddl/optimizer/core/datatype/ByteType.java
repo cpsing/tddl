@@ -2,7 +2,18 @@ package com.taobao.tddl.optimizer.core.datatype;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 
-public class LongType extends CommonType {
+/**
+ * {@link Byte} 类型
+ * 
+ * @author jianghang 2014-1-21 下午3:28:17
+ * @since 5.1.0
+ */
+public class ByteType extends CommonType {
+
+    @Override
+    public Byte convertFrom(Object value) {
+        return (Byte) super.convertFrom(value);
+    }
 
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
@@ -14,14 +25,14 @@ public class LongType extends CommonType {
         if (value == null) {
             return 1;
         } else {
-            return 9;
+            return 2;
         }
     }
 
     @Override
     public DecodeResult decodeFromBytes(byte[] bytes, int offset) {
         try {
-            Long v = DataDecoder.decodeLongObj(bytes, offset);
+            Byte v = DataDecoder.decodeByteObj(bytes, offset);
             return new DecodeResult(v, getLength(v));
         } catch (CorruptEncodingException e) {
             throw new TddlRuntimeException(e);
@@ -29,33 +40,28 @@ public class LongType extends CommonType {
     }
 
     @Override
-    public Long convertFrom(Object value) {
-        return (Long) super.convertFrom(value);
+    public Byte incr(Object value) {
+        return Byte.valueOf(((Integer) (this.convertFrom(value).intValue() + 1)).byteValue());
     }
 
     @Override
-    public Long incr(Object value) {
-        return convertFrom(value) + 1;
+    public Byte decr(Object value) {
+        return Byte.valueOf(((Integer) (this.convertFrom(value).intValue() - 1)).byteValue());
     }
 
     @Override
-    public Long decr(Object value) {
-        return convertFrom(value) - 1;
+    public Byte getMaxValue() {
+        return Byte.MAX_VALUE;
     }
 
     @Override
-    public Long getMaxValue() {
-        return Long.MAX_VALUE;
-    }
-
-    @Override
-    public Long getMinValue() {
-        return Long.MIN_VALUE;
+    public Byte getMinValue() {
+        return Byte.MIN_VALUE;
     }
 
     @Override
     public Class getDataClass() {
-        return Long.class;
+        return Byte.class;
     }
 
 }

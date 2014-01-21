@@ -2,7 +2,22 @@ package com.taobao.tddl.optimizer.core.datatype;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 
-public class LongType extends CommonType {
+/**
+ * int/Integer类型
+ * 
+ * @since 5.1.0
+ */
+public class IntegerType extends CommonType {
+
+    @Override
+    public Class getDataClass() {
+        return Integer.class;
+    }
+
+    @Override
+    public Integer convertFrom(Object value) {
+        return (Integer) super.convertFrom(value);
+    }
 
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
@@ -14,14 +29,14 @@ public class LongType extends CommonType {
         if (value == null) {
             return 1;
         } else {
-            return 9;
+            return 5;
         }
     }
 
     @Override
     public DecodeResult decodeFromBytes(byte[] bytes, int offset) {
         try {
-            Long v = DataDecoder.decodeLongObj(bytes, offset);
+            Integer v = DataDecoder.decodeIntegerObj(bytes, offset);
             return new DecodeResult(v, getLength(v));
         } catch (CorruptEncodingException e) {
             throw new TddlRuntimeException(e);
@@ -29,33 +44,23 @@ public class LongType extends CommonType {
     }
 
     @Override
-    public Long convertFrom(Object value) {
-        return (Long) super.convertFrom(value);
-    }
-
-    @Override
-    public Long incr(Object value) {
+    public Integer incr(Object value) {
         return convertFrom(value) + 1;
     }
 
     @Override
-    public Long decr(Object value) {
+    public Integer decr(Object value) {
         return convertFrom(value) - 1;
     }
 
     @Override
-    public Long getMaxValue() {
-        return Long.MAX_VALUE;
+    public Integer getMaxValue() {
+        return Integer.MAX_VALUE;
     }
 
     @Override
-    public Long getMinValue() {
-        return Long.MIN_VALUE;
-    }
-
-    @Override
-    public Class getDataClass() {
-        return Long.class;
+    public Integer getMinValue() {
+        return Integer.MIN_VALUE;
     }
 
 }

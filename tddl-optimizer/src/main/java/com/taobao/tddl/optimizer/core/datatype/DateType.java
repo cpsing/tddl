@@ -2,11 +2,13 @@ package com.taobao.tddl.optimizer.core.datatype;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 
+import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.BaseRowSet;
 
-public class StringType extends AbstractDataType {
+public class DateType extends AbstractDataType {
 
     @Override
     public ResultGetter getResultGetter() {
@@ -14,7 +16,7 @@ public class StringType extends AbstractDataType {
 
             @Override
             public Object get(ResultSet rs, int index) throws SQLException {
-                return rs.getString(index);
+                return rs.getDate(index);
             }
 
             @Override
@@ -27,7 +29,9 @@ public class StringType extends AbstractDataType {
 
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
-        return DataEncoder.encode(this.convertFrom(value), dst, offset);
+        Date date = this.convertFrom(value);
+        String v = (String) DateType.StringType.convertFrom(value);
+        return DataEncoder.encode(v, dst, offset);
     }
 
     @Override
@@ -52,18 +56,12 @@ public class StringType extends AbstractDataType {
 
     @Override
     public Object incr(Object value) {
-        String c = convertFrom(value);
-        StringBuilder newStr = new StringBuilder(c);
-        newStr.setCharAt(newStr.length() - 1, (char) (newStr.charAt(newStr.length() - 1) + 1));
-        return newStr.toString();
+        throw new NotSupportException("string类型不支持incr操作");
     }
 
     @Override
     public Object decr(Object value) {
-        String c = convertFrom(value);
-        StringBuilder newStr = new StringBuilder(c);
-        newStr.setCharAt(newStr.length() - 1, (char) (newStr.charAt(newStr.length() - 1) - 1));
-        return newStr.toString();
+        throw new NotSupportException("string类型不支持decr操作");
     }
 
     @Override
@@ -82,8 +80,8 @@ public class StringType extends AbstractDataType {
     }
 
     @Override
-    public String convertFrom(Object value) {
-        return (String) super.convertFrom(value);
+    public Date convertFrom(Object value) {
+        return (Date) super.convertFrom(value);
     }
 
     @Override

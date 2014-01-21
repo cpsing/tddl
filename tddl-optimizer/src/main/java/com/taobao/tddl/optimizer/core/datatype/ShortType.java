@@ -2,7 +2,17 @@ package com.taobao.tddl.optimizer.core.datatype;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 
-public class LongType extends CommonType {
+public class ShortType extends CommonType {
+
+    @Override
+    public Class getDataClass() {
+        return Short.class;
+    }
+
+    @Override
+    public Short convertFrom(Object value) {
+        return (Short) super.convertFrom(value);
+    }
 
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
@@ -14,14 +24,14 @@ public class LongType extends CommonType {
         if (value == null) {
             return 1;
         } else {
-            return 9;
+            return 3;
         }
     }
 
     @Override
     public DecodeResult decodeFromBytes(byte[] bytes, int offset) {
         try {
-            Long v = DataDecoder.decodeLongObj(bytes, offset);
+            Short v = DataDecoder.decodeShortObj(bytes, offset);
             return new DecodeResult(v, getLength(v));
         } catch (CorruptEncodingException e) {
             throw new TddlRuntimeException(e);
@@ -29,33 +39,23 @@ public class LongType extends CommonType {
     }
 
     @Override
-    public Long convertFrom(Object value) {
-        return (Long) super.convertFrom(value);
+    public Short incr(Object value) {
+        return (short) (convertFrom(value) + 1);
     }
 
     @Override
-    public Long incr(Object value) {
-        return convertFrom(value) + 1;
+    public Short decr(Object value) {
+        return (short) (convertFrom(value) - 1);
     }
 
     @Override
-    public Long decr(Object value) {
-        return convertFrom(value) - 1;
+    public Short getMaxValue() {
+        return Short.MAX_VALUE;
     }
 
     @Override
-    public Long getMaxValue() {
-        return Long.MAX_VALUE;
-    }
-
-    @Override
-    public Long getMinValue() {
-        return Long.MIN_VALUE;
-    }
-
-    @Override
-    public Class getDataClass() {
-        return Long.class;
+    public Short getMinValue() {
+        return Short.MIN_VALUE;
     }
 
 }

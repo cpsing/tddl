@@ -30,7 +30,7 @@ import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.config.table.IndexType;
 import com.taobao.tddl.optimizer.config.table.Relationship;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
-import com.taobao.tddl.optimizer.core.datatype.IntType;
+import com.taobao.tddl.optimizer.core.datatype.IntegerType;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
@@ -281,7 +281,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
                     }
                 }
             }
-            values.add(new ColumnMeta(columns.get(0).getTableName(), identity, new IntType(), null, true));
+            values.add(new ColumnMeta(columns.get(0).getTableName(), identity, new IntegerType(), null, true));
         }
     }
 

@@ -2,26 +2,32 @@ package com.taobao.tddl.optimizer.core.datatype;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 
-public class LongType extends CommonType {
+public class FloatType extends CommonType {
+
+    @Override
+    public Float convertFrom(Object value) {
+        return (Float) super.convertFrom(value);
+    }
 
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
-        return DataEncoder.encode(this.convertFrom(value), dst, offset);
+        DataEncoder.encode(this.convertFrom(value), dst, offset);
+        return getLength(null);
     }
 
     @Override
     public int getLength(Object value) {
         if (value == null) {
-            return 1;
+            return 4;
         } else {
-            return 9;
+            return 4;
         }
     }
 
     @Override
     public DecodeResult decodeFromBytes(byte[] bytes, int offset) {
         try {
-            Long v = DataDecoder.decodeLongObj(bytes, offset);
+            Float v = DataDecoder.decodeFloatObj(bytes, offset);
             return new DecodeResult(v, getLength(v));
         } catch (CorruptEncodingException e) {
             throw new TddlRuntimeException(e);
@@ -29,33 +35,28 @@ public class LongType extends CommonType {
     }
 
     @Override
-    public Long convertFrom(Object value) {
-        return (Long) super.convertFrom(value);
+    public Float incr(Object value) {
+        return this.convertFrom(value) + 0.000001f;
     }
 
     @Override
-    public Long incr(Object value) {
-        return convertFrom(value) + 1;
+    public Float decr(Object value) {
+        return this.convertFrom(value) - 0.000001f;
     }
 
     @Override
-    public Long decr(Object value) {
-        return convertFrom(value) - 1;
+    public Float getMaxValue() {
+        return Float.MAX_VALUE;
     }
 
     @Override
-    public Long getMaxValue() {
-        return Long.MAX_VALUE;
-    }
-
-    @Override
-    public Long getMinValue() {
-        return Long.MIN_VALUE;
+    public Float getMinValue() {
+        return Float.MIN_VALUE;
     }
 
     @Override
     public Class getDataClass() {
-        return Long.class;
+        return Float.class;
     }
 
 }

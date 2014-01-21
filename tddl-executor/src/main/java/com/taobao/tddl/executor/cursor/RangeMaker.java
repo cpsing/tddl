@@ -303,7 +303,7 @@ public class RangeMaker {
     public Object getExtremum(boolean max, DataType type) {
         if (max) {
 
-            return type.getMax();
+            return type.getMaxValue();
             // switch (type) {
             // case INT_VAL:
             // return Integer.MAX_VALUE;
@@ -330,7 +330,7 @@ public class RangeMaker {
             // }
         } else {
             // 任何类型的最小值都是null;
-            return type.getMin();
+            return type.getMinValue();
         }
         // return null;
     }

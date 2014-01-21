@@ -8,18 +8,14 @@ import com.taobao.tddl.common.model.BaseRowSet;
 
 public interface DataType extends Comparator<Object> {
 
-    public final static DataType IntType        = new IntType();
+    public static final DataType IntType        = new IntegerType();
     public static final DataType LongType       = null;
     public static final DataType ShortType      = null;
-
-    public final static DataType StringType     = new StringType();
-
+    public static final DataType StringType     = new StringType();
     public static final DataType DoubleType     = null;
     public static final DataType FloatType      = null;
-
     public static final DataType DateType       = null;
     public static final DataType TimestampType  = null;
-
     public static final DataType BooleanType    = null;
     public static final DataType BigDecimalType = null;
     public static final DataType DatetimeType   = null;
@@ -36,10 +32,6 @@ public interface DataType extends Comparator<Object> {
     }
 
     ResultGetter getResultGetter();
-
-    Object convertFromObject(Object value);
-
-    Object convertToType(Object value, DataType toType);
 
     /**
      * @param value
@@ -85,12 +77,17 @@ public interface DataType extends Comparator<Object> {
     /**
      * 对应数据类型的最大值
      */
-    Object getMax();
+    Object getMaxValue();
 
     /**
      * 对应数据类型的最小值
      */
-    Object getMin();
+    Object getMinValue();
+
+    /**
+     * 将数据转化为当前DataType类型
+     */
+    Object convertFrom(Object value);
 
     /**
      * 数据类型对应的class
