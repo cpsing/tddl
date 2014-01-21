@@ -3,11 +3,10 @@ package com.taobao.tddl.executor.function.aggregate;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.executor.function.AggregateFunction;
 import com.taobao.tddl.optimizer.core.datatype.DataType;
-import com.taobao.tddl.optimizer.core.expression.IColumn;
-import com.taobao.tddl.optimizer.core.expression.IFunction;
+import com.taobao.tddl.optimizer.core.datatype.DataTypeUtil;
+import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.exceptions.FunctionException;
 
 /**
@@ -32,11 +31,14 @@ public class Max extends AggregateFunction {
 
     private void doMax(Object[] args) {
         Object o = args[0];
+
+        DataType type = this.getReturnType();
+
         if (o != null) {
             if (max == null) {
                 max = o;
             }
-            if (((Comparable) o).compareTo(max) > 0) {
+            if (type.compare(o, max) > 0) {
                 max = o;
             }
 
@@ -68,15 +70,12 @@ public class Max extends AggregateFunction {
     public DataType getMapReturnType() {
         Object[] args = function.getArgs().toArray();
 
-        if (args[0] instanceof IColumn) {
-            return ((IColumn) args[0]).getDataType();
+        if (args[0] instanceof ISelectable) {
+            return ((ISelectable) args[0]).getDataType();
         }
 
-        if (args[0] instanceof IFunction) {
-            return ((IFunction) args[0]).getDataType();
-        }
+        return DataTypeUtil.getTypeOfObject(args[0]);
 
-        throw new NotSupportException();
     }
 
 }

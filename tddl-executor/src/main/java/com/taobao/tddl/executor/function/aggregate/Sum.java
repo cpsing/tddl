@@ -34,9 +34,10 @@ public class Sum extends AggregateFunction {
 
         DataType type = this.getMapReturnType();
 
-        o = type.convertFromObject(o);
-
         if (total == null) {
+
+            o = type.convertFromObject(o);
+
             total = o;
         } else {
             total = type.getCalculator().add(total, o);

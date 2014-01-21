@@ -78,7 +78,24 @@ public class StringType extends AbstractDataType<String> {
 
     @Override
     public int compare(Object o1, Object o2) {
-        return 0;
+        if (o1 == o2) {
+            return 0;
+        }
+        if (o1 == null) {
+            return -1;
+        }
+
+        if (o2 == null) {
+            return 1;
+        }
+
+        String no1 = convertFrom(o1);
+        String no2 = convertFrom(o2);
+
+        /**
+         * mysql 默认不区分大小写，这里可能是个坑
+         */
+        return no1.compareToIgnoreCase(no2);
     }
 
     @Override

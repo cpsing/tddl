@@ -14,10 +14,7 @@ public class Add extends ScalarFunction {
 
         DataType type = this.getReturnType();
 
-        Object v1 = type.convertFromObject(args[0]);
-        Object v2 = type.convertFromObject(args[1]);
-
-        return type.getCalculator().add(v1, v2);
+        return type.getCalculator().add(args[0], args[1]);
 
     }
 
