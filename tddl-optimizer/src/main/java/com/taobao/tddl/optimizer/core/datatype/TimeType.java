@@ -1,26 +1,26 @@
 package com.taobao.tddl.optimizer.core.datatype;
 
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.BaseRowSet;
 import com.taobao.tddl.common.utils.convertor.Convertor;
 
 /**
- * {@link Date}类型
+ * {@link Time}类型
  * 
- * @author jianghang 2014-1-21 下午5:20:32
+ * @author jianghang 2014-1-21 下午5:33:07
  * @since 5.1.0
  */
-public class DateType extends AbstractDataType<java.sql.Date> {
+public class TimeType extends AbstractDataType<java.sql.Time> {
 
-    private static final Date maxDate      = Date.valueOf("9999-12-31");
-    private static final Date minDate      = Date.valueOf("1900-01-01");
+    private static final Time maxTime      = Time.valueOf("23:59:59");
+    private static final Time minTime      = Time.valueOf("00:00:00");
     private Convertor         stringToDate = null;
 
-    public DateType(){
+    public TimeType(){
         stringToDate = this.getConvertor(String.class);
     }
 
@@ -30,7 +30,7 @@ public class DateType extends AbstractDataType<java.sql.Date> {
 
             @Override
             public Object get(ResultSet rs, int index) throws SQLException {
-                return rs.getDate(index);
+                return rs.getTime(index);
             }
 
             @Override
@@ -60,7 +60,7 @@ public class DateType extends AbstractDataType<java.sql.Date> {
         try {
             String[] vs = new String[1];
             int lenght = DataDecoder.decodeString(bytes, offset, vs);
-            Date date = (Date) stringToDate.convert(vs[0], getDataClass());
+            Time date = (Time) stringToDate.convert(vs[0], getDataClass());
             return new DecodeResult(date, lenght);
         } catch (CorruptEncodingException e) {
             throw new TddlRuntimeException(e);
@@ -68,23 +68,23 @@ public class DateType extends AbstractDataType<java.sql.Date> {
     }
 
     @Override
-    public Date incr(Object value) {
-        return new Date(((Date) value).getTime() + 1l);
+    public Time incr(Object value) {
+        return new Time(((Time) value).getTime() + 1l);
     }
 
     @Override
-    public Date decr(Object value) {
-        return new Date(((Date) value).getTime() - 1l);
+    public Time decr(Object value) {
+        return new Time(((Time) value).getTime() - 1l);
     }
 
     @Override
-    public Date getMaxValue() {
-        return maxDate;
+    public Time getMaxValue() {
+        return maxTime;
     }
 
     @Override
-    public Date getMinValue() {
-        return minDate;
+    public Time getMinValue() {
+        return minTime;
     }
 
     @Override
@@ -100,9 +100,8 @@ public class DateType extends AbstractDataType<java.sql.Date> {
             return 1;
         }
 
-        Date d1 = convertFrom(o1);
-        Date d2 = convertFrom(o2);
-
+        Time d1 = convertFrom(o1);
+        Time d2 = convertFrom(o2);
         return d1.compareTo(d2);
     }
 
