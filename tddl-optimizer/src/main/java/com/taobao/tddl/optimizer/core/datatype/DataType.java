@@ -24,9 +24,14 @@ public interface DataType extends Comparator<Object> {
     public static final DataType BigDecimalType = null;
     public static final DataType DatetimeType   = null;
     public static final DataType TimeType       = null;
+
     public static final DataType BlobType       = null;
+    public static final DataType ClobType       = null;
+
     public static final DataType BitType        = null;
     public static final DataType BytesType      = null;
+    public static final DataType ByteType       = null;
+    public static final DataType NullType       = null;
 
     public static interface ResultGetter {
 
@@ -72,12 +77,30 @@ public interface DataType extends Comparator<Object> {
 
     DecodeResult decodeFromBytes(byte[] bytes, int offset);
 
+    /**
+     * 针对数据类型做加法
+     */
     Object incr(Object value);
 
+    /**
+     * 针对数据类型做减法
+     */
     Object decr(Object value);
 
+    /**
+     * 对应数据类型的最大值
+     */
     Object getMax();
 
+    /**
+     * 对应数据类型的最小值
+     */
     Object getMin();
 
+    /**
+     * 数据类型对应的class
+     */
+    Class getDataClass();
+
+    Calculator getCalculator();
 }

@@ -10,15 +10,8 @@ import com.taobao.tddl.optimizer.core.expression.bean.NullValue;
 
 public class IntType extends NumberType {
 
-    @Override
-    public int compare(Object o1, Object o2) {
-        if (o1 == o2) return 0;
-
-        if (o1 == null) return -1;
-
-        if (o2 == null) return 1;
-
-        return convertFromObject(o1).compareTo(convertFromObject(o2));
+    public Class getDataClass() {
+        return Integer.class;
     }
 
     @Override
@@ -63,11 +56,6 @@ public class IntType extends NumberType {
     @Override
     public Integer convertFromInteger(Integer value) {
         return value;
-    }
-
-    @Override
-    public Object convertToType(Object value, DataType toType) {
-        return ((AbstractDataType) toType).convertFromInteger((Integer) value);
     }
 
     @Override
