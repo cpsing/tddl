@@ -6,7 +6,6 @@ import java.lang.reflect.Type;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.utils.convertor.Convertor;
-import com.taobao.tddl.common.utils.convertor.ConvertorException;
 import com.taobao.tddl.common.utils.convertor.ConvertorHelper;
 
 /**
@@ -31,7 +30,12 @@ public abstract class AbstractDataType<DATA> implements DataType<DATA> {
             return null;
         } else {
             Convertor convertor = getConvertor(value.getClass());
-            return (DATA) convertor.convert(value, getDataClass());
+            if (convertor != null) {
+                // 没有convertor代表类型和目标相同，不需要做转化
+                return (DATA) convertor.convert(value, getDataClass());
+            } else {
+                return (DATA) value;
+            }
         }
     }
 
@@ -39,12 +43,7 @@ public abstract class AbstractDataType<DATA> implements DataType<DATA> {
      * 获取convertor接口
      */
     protected Convertor getConvertor(Class clazz) {
-        Convertor convertor = ConvertorHelper.getInstance().getConvertor(clazz, getDataClass());
-        if (convertor == null) {
-            throw new ConvertorException("not found convertor for : " + clazz.getName() + " to "
-                                         + getDataClass().getName());
-        }
-        return convertor;
+        return ConvertorHelper.getInstance().getConvertor(clazz, getDataClass());
     }
 
     /**

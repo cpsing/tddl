@@ -2,6 +2,7 @@ package com.taobao.tddl.common.utils.convertor;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Blob;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,6 +37,8 @@ public class ConvertorHelper {
     private static final Convertor          enumToString                  = new StringAndEnumConvertor.EnumToString();
     private static final Convertor          sqlToDate                     = new SqlDateAndDateConvertor.SqlDateToDateConvertor();
     private static final Convertor          dateToSql                     = new SqlDateAndDateConvertor.DateToSqlDateConvertor();
+    private static final Convertor          blobToBytes                   = new BlobAndBytesConvertor.BlobToBytes();
+    private static final Convertor          stringToBytes                 = new StringAndObjectConvertor.StringToBytes();
 
     private static volatile ConvertorHelper singleton                     = null;
 
@@ -159,6 +162,8 @@ public class ConvertorHelper {
         repository.registerConvertor(Date.class, java.sql.Date.class, dateToSql);
         repository.registerConvertor(Date.class, java.sql.Time.class, dateToSql);
         repository.registerConvertor(Date.class, java.sql.Timestamp.class, dateToSql);
+        repository.registerConvertor(Blob.class, byte[].class, blobToBytes);
+        repository.registerConvertor(String.class, byte[].class, stringToBytes);
         // 注册为别名
         repository.registerConvertor(ALIAS_STRING_TO_DATE_DAY, stringToDateDay);
         repository.registerConvertor(ALIAS_STRING_TO_DATE_TIME, stringToDateTime);
