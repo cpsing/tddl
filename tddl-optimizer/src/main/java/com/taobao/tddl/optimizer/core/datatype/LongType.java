@@ -15,12 +15,6 @@ public class LongType extends NumberType {
     }
 
     @Override
-    public Object add(Object o1, Object o2) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public ResultGetter getResultGetter() {
         return new ResultGetter() {
 
