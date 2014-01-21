@@ -5,8 +5,8 @@ import java.util.Map;
 
 import com.taobao.tddl.executor.function.AggregateFunction;
 import com.taobao.tddl.optimizer.core.datatype.DataType;
-import com.taobao.tddl.optimizer.core.expression.IColumn;
-import com.taobao.tddl.optimizer.core.expression.IFunction;
+import com.taobao.tddl.optimizer.core.datatype.DataTypeUtil;
+import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.exceptions.FunctionException;
 
 /**
@@ -101,12 +101,10 @@ public class Sum extends AggregateFunction {
     public DataType getMapReturnType() {
         Object[] args = function.getArgs().toArray();
         DataType type = null;
-        if (args[0] instanceof IColumn) {
-            type = ((IColumn) args[0]).getDataType();
-        }
-
-        if (args[0] instanceof IFunction) {
-            type = ((IFunction) args[0]).getDataType();
+        if (args[0] instanceof ISelectable) {
+            type = ((ISelectable) args[0]).getDataType();
+        } else {
+            type = DataTypeUtil.getTypeOfObject(args[0]);
         }
 
         if (type == null) {

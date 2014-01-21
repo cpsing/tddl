@@ -2,6 +2,7 @@ package com.taobao.tddl.executor.function.scalar;
 
 import com.taobao.tddl.executor.function.ScalarFunction;
 import com.taobao.tddl.optimizer.core.datatype.DataType;
+import com.taobao.tddl.optimizer.core.datatype.DataTypeUtil;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
 /**
@@ -31,6 +32,8 @@ public class Add extends ScalarFunction {
         DataType type = null;
         if (args[0] instanceof ISelectable) {
             type = ((ISelectable) args[0]).getDataType();
+        } else {
+            type = DataTypeUtil.getTypeOfObject(args[0]);
         }
 
         return type;

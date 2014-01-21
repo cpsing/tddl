@@ -10,6 +10,7 @@ import com.taobao.tddl.optimizer.core.expression.bean.NullValue;
 
 public class IntType extends NumberType {
 
+    @Override
     public Class getDataClass() {
         return Integer.class;
     }
@@ -125,6 +126,23 @@ public class IntType extends NumberType {
 
     @Override
     public Object getMin() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    Calculator calculator = new Calculator() {
+
+                              @Override
+                              public Object add(Object v1, Object v2) {
+                                  Integer i1 = convertFromObject(v1);
+                                  Integer i2 = convertFromObject(v2);
+
+                                  return i1 + i2;
+                              }
+                          };
+
+    @Override
+    public Calculator getCalculator() {
         // TODO Auto-generated method stub
         return null;
     }
