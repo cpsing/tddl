@@ -59,7 +59,7 @@ public class BytesType extends CommonType<byte[]> {
 
     @Override
     public Calculator getCalculator() {
-        return null;
+        throw new NotSupportException("bytes类型不支持计算操作");
     }
 
     @Override
