@@ -2,12 +2,7 @@ package com.taobao.tddl.optimizer.core.datatype;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 
-public class FloatType extends CommonType {
-
-    @Override
-    public Float convertFrom(Object value) {
-        return (Float) super.convertFrom(value);
-    }
+public class FloatType extends CommonType<Float> {
 
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
@@ -55,8 +50,9 @@ public class FloatType extends CommonType {
     }
 
     @Override
-    public Class getDataClass() {
-        return Float.class;
+    public Calculator getCalculator() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

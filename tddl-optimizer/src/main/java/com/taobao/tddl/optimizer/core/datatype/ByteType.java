@@ -8,12 +8,7 @@ import com.taobao.tddl.common.exception.TddlRuntimeException;
  * @author jianghang 2014-1-21 下午3:28:17
  * @since 5.1.0
  */
-public class ByteType extends CommonType {
-
-    @Override
-    public Byte convertFrom(Object value) {
-        return (Byte) super.convertFrom(value);
-    }
+public class ByteType extends CommonType<Byte> {
 
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
@@ -60,8 +55,8 @@ public class ByteType extends CommonType {
     }
 
     @Override
-    public Class getDataClass() {
-        return Byte.class;
+    public Calculator getCalculator() {
+        return null;
     }
 
 }

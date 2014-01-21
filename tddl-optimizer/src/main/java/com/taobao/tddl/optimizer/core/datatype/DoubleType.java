@@ -8,12 +8,7 @@ import com.taobao.tddl.common.exception.TddlRuntimeException;
  * @author jianghang 2014-1-21 下午3:28:33
  * @since 5.1.0
  */
-public class DoubleType extends CommonType {
-
-    @Override
-    public Double convertFrom(Object value) {
-        return (Double) super.convertFrom(value);
-    }
+public class DoubleType extends CommonType<Double> {
 
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
@@ -61,8 +56,9 @@ public class DoubleType extends CommonType {
     }
 
     @Override
-    public Class getDataClass() {
-        return Double.class;
+    public Calculator getCalculator() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

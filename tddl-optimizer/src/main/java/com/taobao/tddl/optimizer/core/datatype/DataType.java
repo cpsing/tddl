@@ -1,28 +1,38 @@
 package com.taobao.tddl.optimizer.core.datatype;
 
+import java.math.BigDecimal;
+import java.sql.Blob;
+import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Comparator;
+import java.util.Date;
 
 import com.taobao.tddl.common.model.BaseRowSet;
 
-public interface DataType extends Comparator<Object> {
+public interface DataType<DATA> extends Comparator<Object> {
 
-    public static final DataType IntType        = new IntegerType();
-    public static final DataType LongType       = null;
-    public static final DataType ShortType      = null;
-    public static final DataType StringType     = new StringType();
-    public static final DataType DoubleType     = null;
-    public static final DataType FloatType      = null;
-    public static final DataType DateType       = null;
-    public static final DataType TimestampType  = null;
-    public static final DataType BooleanType    = null;
-    public static final DataType BigDecimalType = null;
-    public static final DataType DatetimeType   = null;
-    public static final DataType TimeType       = null;
-    public static final DataType BlobType       = null;
-    public static final DataType BitType        = null;
-    public static final DataType BytesType      = null;
+    public static final DataType<Integer>    IntType        = new IntegerType();
+    public static final DataType<Long>       LongType       = null;
+    public static final DataType<Short>      ShortType      = null;
+    public static final DataType<String>     StringType     = new StringType();
+    public static final DataType<Double>     DoubleType     = null;
+    public static final DataType<Float>      FloatType      = null;
+    public static final DataType<Date>       DateType       = null;
+    public static final DataType<Timestamp>  TimestampType  = null;
+    public static final DataType<Boolean>    BooleanType    = null;
+    public static final DataType<BigDecimal> BigDecimalType = null;
+    public static final DataType             DatetimeType   = null;
+    public static final DataType             TimeType       = null;
+
+    public static final DataType<Blob>       BlobType       = null;
+    public static final DataType<Clob>       ClobType       = null;
+
+    public static final DataType             BitType        = null;
+    public static final DataType<Byte[]>     BytesType      = null;
+    public static final DataType<Byte>       ByteType       = null;
+    public static final DataType             NullType       = null;
 
     public static interface ResultGetter {
 
@@ -65,32 +75,37 @@ public interface DataType extends Comparator<Object> {
     DecodeResult decodeFromBytes(byte[] bytes, int offset);
 
     /**
-     * 针对数据类型做加法
+     * 针对数据类型获取开区间的下一条
      */
-    Object incr(Object value);
+    DATA incr(Object value);
 
     /**
-     * 针对数据类型做减法
+     * 针对数据类型获取开区间的下一条
      */
-    Object decr(Object value);
+    DATA decr(Object value);
 
     /**
      * 对应数据类型的最大值
      */
-    Object getMaxValue();
+    DATA getMaxValue();
 
     /**
      * 对应数据类型的最小值
      */
-    Object getMinValue();
+    DATA getMinValue();
 
     /**
      * 将数据转化为当前DataType类型
      */
-    Object convertFrom(Object value);
+    DATA convertFrom(Object value);
 
     /**
      * 数据类型对应的class
      */
     Class getDataClass();
+
+    /**
+     * 数据计算器
+     */
+    Calculator getCalculator();
 }

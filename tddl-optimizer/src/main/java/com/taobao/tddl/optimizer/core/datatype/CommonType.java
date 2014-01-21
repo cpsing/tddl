@@ -15,7 +15,7 @@ import com.taobao.tddl.common.utils.convertor.Convertor;
  * @author jianghang 2014-1-21 上午12:39:45
  * @since 5.1.0
  */
-public abstract class CommonType extends AbstractDataType {
+public abstract class CommonType<DATA> extends AbstractDataType<DATA> {
 
     private Convertor convertor = null;
 
@@ -75,18 +75,17 @@ public abstract class CommonType extends AbstractDataType {
             return 1;
         }
 
-        Comparable no1 = convertFrom(o1);
-        Comparable no2 = convertFrom(o2);
-
+        DATA no1 = convertFrom(o1);
+        DATA no2 = convertFrom(o2);
         return ((Comparable) no1).compareTo(no2);
     }
 
     @Override
-    public Comparable convertFrom(Object value) {
+    public DATA convertFrom(Object value) {
         if (value == null) {
             return null;
         } else {
-            return (Comparable) convertor.convert(value, getDataClass());
+            return (DATA) convertor.convert(value, getDataClass());
         }
     }
 

@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.BaseRowSet;
 
-public class StringType extends AbstractDataType {
+public class StringType extends AbstractDataType<String> {
 
     @Override
     public ResultGetter getResultGetter() {
@@ -51,7 +51,7 @@ public class StringType extends AbstractDataType {
     }
 
     @Override
-    public Object incr(Object value) {
+    public String incr(Object value) {
         String c = convertFrom(value);
         StringBuilder newStr = new StringBuilder(c);
         newStr.setCharAt(newStr.length() - 1, (char) (newStr.charAt(newStr.length() - 1) + 1));
@@ -59,7 +59,7 @@ public class StringType extends AbstractDataType {
     }
 
     @Override
-    public Object decr(Object value) {
+    public String decr(Object value) {
         String c = convertFrom(value);
         StringBuilder newStr = new StringBuilder(c);
         newStr.setCharAt(newStr.length() - 1, (char) (newStr.charAt(newStr.length() - 1) - 1));
@@ -77,18 +77,13 @@ public class StringType extends AbstractDataType {
     }
 
     @Override
-    public Class getDataClass() {
-        return String.class;
-    }
-
-    @Override
-    public String convertFrom(Object value) {
-        return (String) super.convertFrom(value);
-    }
-
-    @Override
     public int compare(Object o1, Object o2) {
         return 0;
+    }
+
+    @Override
+    public Calculator getCalculator() {
+        return null;
     }
 
 }

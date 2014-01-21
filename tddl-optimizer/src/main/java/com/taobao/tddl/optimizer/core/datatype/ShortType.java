@@ -2,17 +2,7 @@ package com.taobao.tddl.optimizer.core.datatype;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 
-public class ShortType extends CommonType {
-
-    @Override
-    public Class getDataClass() {
-        return Short.class;
-    }
-
-    @Override
-    public Short convertFrom(Object value) {
-        return (Short) super.convertFrom(value);
-    }
+public class ShortType extends CommonType<Short> {
 
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
@@ -56,6 +46,11 @@ public class ShortType extends CommonType {
     @Override
     public Short getMinValue() {
         return Short.MIN_VALUE;
+    }
+
+    @Override
+    public Calculator getCalculator() {
+        return null;
     }
 
 }

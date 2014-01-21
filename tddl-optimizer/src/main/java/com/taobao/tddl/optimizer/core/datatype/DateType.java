@@ -8,7 +8,7 @@ import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.BaseRowSet;
 
-public class DateType extends AbstractDataType {
+public class DateType extends AbstractDataType<java.util.Date> {
 
     @Override
     public ResultGetter getResultGetter() {
@@ -55,22 +55,22 @@ public class DateType extends AbstractDataType {
     }
 
     @Override
-    public Object incr(Object value) {
+    public Date incr(Object value) {
         throw new NotSupportException("string类型不支持incr操作");
     }
 
     @Override
-    public Object decr(Object value) {
+    public Date decr(Object value) {
         throw new NotSupportException("string类型不支持decr操作");
     }
 
     @Override
-    public String getMaxValue() {
-        return new String(new char[] { Character.MAX_VALUE });
+    public Date getMaxValue() {
+        return null;
     }
 
     @Override
-    public String getMinValue() {
+    public Date getMinValue() {
         return null; // 返回null值
     }
 
@@ -87,6 +87,11 @@ public class DateType extends AbstractDataType {
     @Override
     public int compare(Object o1, Object o2) {
         return 0;
+    }
+
+    @Override
+    public Calculator getCalculator() {
+        return null;
     }
 
 }

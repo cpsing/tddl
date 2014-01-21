@@ -3,12 +3,7 @@ package com.taobao.tddl.optimizer.core.datatype;
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 
-public class BooleanType extends CommonType {
-
-    @Override
-    public Boolean convertFrom(Object value) {
-        return (Boolean) super.convertFrom(value);
-    }
+public class BooleanType extends CommonType<Boolean> {
 
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
@@ -52,8 +47,8 @@ public class BooleanType extends CommonType {
     }
 
     @Override
-    public Class getDataClass() {
-        return Boolean.class;
+    public Calculator getCalculator() {
+        return null;
     }
 
 }

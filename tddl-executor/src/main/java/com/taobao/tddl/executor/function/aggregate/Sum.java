@@ -1,13 +1,12 @@
 package com.taobao.tddl.executor.function.aggregate;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.taobao.tddl.executor.function.AggregateFunction;
 import com.taobao.tddl.optimizer.core.datatype.DataType;
-import com.taobao.tddl.optimizer.core.expression.IColumn;
-import com.taobao.tddl.optimizer.core.expression.IFunction;
+import com.taobao.tddl.optimizer.core.datatype.DataTypeUtil;
+import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.exceptions.FunctionException;
 
 /**
@@ -15,7 +14,7 @@ import com.taobao.tddl.optimizer.exceptions.FunctionException;
  */
 public class Sum extends AggregateFunction {
 
-    private Number total;
+    private Object total;
 
     public Sum(){
     }
@@ -32,38 +31,49 @@ public class Sum extends AggregateFunction {
 
     private void doSum(Object[] args) {
         Object o = args[0];
-        if (o != null) {
-            if (o instanceof BigDecimal) {
-                if (total == null) {
-                    total = new BigDecimal(0);
-                }
 
-                total = ((BigDecimal) total).add((BigDecimal) o);
-            }
-            if (o instanceof Integer || o instanceof Long) {
-                if (o instanceof Integer) {
-                    o = new Long((Integer) o);
-                }
+        DataType type = this.getMapReturnType();
 
-                if (total == null) {
-                    total = new Long(0);
-                }
-                total = (Long) total + ((Long) o);
-            } else if (o instanceof Double) {
-                if (total == null) {
-                    total = new Double(0);
-                }
+        o = type.convertFromObject(o);
 
-                total = (Double) total + ((Double) o);
-            } else if (o instanceof Float) {
-                if (total == null) {
-                    total = new Float(0);
-                }
-
-                total = (Float) total + ((Float) o);
-            }
-
+        if (total == null) {
+            total = o;
+        } else {
+            total = type.getCalculator().add(total, o);
         }
+
+        // if (o != null) {
+        // if (o instanceof BigDecimal) {
+        // if (total == null) {
+        // total = new BigDecimal(0);
+        // }
+        //
+        // total = ((BigDecimal) total).add((BigDecimal) o);
+        // }
+        // if (o instanceof Integer || o instanceof Long) {
+        // if (o instanceof Integer) {
+        // o = new Long((Integer) o);
+        // }
+        //
+        // if (total == null) {
+        // total = new Long(0);
+        // }
+        // total = (Long) total + ((Long) o);
+        // } else if (o instanceof Double) {
+        // if (total == null) {
+        // total = new Double(0);
+        // }
+        //
+        // total = (Double) total + ((Double) o);
+        // } else if (o instanceof Float) {
+        // if (total == null) {
+        // total = new Float(0);
+        // }
+        //
+        // total = (Float) total + ((Float) o);
+        // }
+        //
+        // }
     }
 
     public int getArgSize() {
@@ -91,23 +101,21 @@ public class Sum extends AggregateFunction {
     public DataType getMapReturnType() {
         Object[] args = function.getArgs().toArray();
         DataType type = null;
-        if (args[0] instanceof IColumn) {
-            type = ((IColumn) args[0]).getDataType();
-        }
-
-        if (args[0] instanceof IFunction) {
-            type = ((IFunction) args[0]).getDataType();
+        if (args[0] instanceof ISelectable) {
+            type = ((ISelectable) args[0]).getDataType();
+        } else {
+            type = DataTypeUtil.getTypeOfObject(args[0]);
         }
 
         if (type == null) {
             return null;
         }
 
-        if (type.equals(DataType.LongType) || type.equals(DataType.IntType) || type.equals(DataType.ShortType)) {
+        if (type == DataType.LongType || type == DataType.IntType || type == DataType.ShortType) {
             return DataType.LongType;
-        } else if (type.equals(DATA_TYPE.FLOAT_VAL)) {
+        } else if (type == DataType.FloatType) {
             return DataType.FloatType;
-        } else if (type.equals(DATA_TYPE.DOUBLE_VAL)) {
+        } else if (type == DataType.DoubleType) {
             return DataType.DoubleType;
         }
 

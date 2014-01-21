@@ -10,15 +10,10 @@ import com.taobao.tddl.common.exception.TddlRuntimeException;
  * @author jianghang 2014-1-21 下午1:49:09
  * @since 5.1.0
  */
-public class BigIntegerType extends CommonType {
+public class BigIntegerType extends CommonType<BigInteger> {
 
     private static final BigInteger maxValue = BigInteger.valueOf(Long.MAX_VALUE);
     private static final BigInteger minValue = BigInteger.valueOf(Long.MIN_VALUE);
-
-    @Override
-    public BigInteger convertFrom(Object value) {
-        return (BigInteger) super.convertFrom(value);
-    }
 
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
@@ -66,8 +61,8 @@ public class BigIntegerType extends CommonType {
     }
 
     @Override
-    public Class getDataClass() {
-        return BigInteger.class;
+    public Calculator getCalculator() {
+        return null;
     }
 
 }

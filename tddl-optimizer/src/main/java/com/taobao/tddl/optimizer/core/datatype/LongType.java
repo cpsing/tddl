@@ -2,7 +2,7 @@ package com.taobao.tddl.optimizer.core.datatype;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 
-public class LongType extends CommonType {
+public class LongType extends CommonType<Long> {
 
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
@@ -29,11 +29,6 @@ public class LongType extends CommonType {
     }
 
     @Override
-    public Long convertFrom(Object value) {
-        return (Long) super.convertFrom(value);
-    }
-
-    @Override
     public Long incr(Object value) {
         return convertFrom(value) + 1;
     }
@@ -54,8 +49,8 @@ public class LongType extends CommonType {
     }
 
     @Override
-    public Class getDataClass() {
-        return Long.class;
+    public Calculator getCalculator() {
+        return null;
     }
 
 }
