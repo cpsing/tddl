@@ -45,10 +45,6 @@ public class DataTypeUtil {
             return DataType.BigDecimalType;
         }
 
-        if (clazz == String.class || clazz == Clob.class) {
-            return DataType.StringType;
-        }
-
         if (clazz == Timestamp.class || clazz == java.util.Date.class || Calendar.class.isAssignableFrom(clazz)) {
             return DataType.TimestampType;
         }
