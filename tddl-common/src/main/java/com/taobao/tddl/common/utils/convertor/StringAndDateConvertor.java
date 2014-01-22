@@ -19,7 +19,7 @@ public class StringAndDateConvertor {
     public static final String TIME_FORMAT      = "HH:mm:ss";
 
     /**
-     * string -> Calendar
+     * string -> Date
      */
     public static class StringToDate extends AbastactConvertor {
 
@@ -27,6 +27,21 @@ public class StringAndDateConvertor {
         public Object convert(Object src, Class destClass) {
             if (String.class.isInstance(src)) { // 必须是字符串
                 return DateUtils.str_to_time((String) src);
+            }
+
+            throw new ConvertorException("Unsupported convert: [" + src + "," + destClass.getName() + "]");
+        }
+    }
+
+    /**
+     * string -> sql Date
+     */
+    public static class StringToSqlDate extends AbastactConvertor {
+
+        @Override
+        public Object convert(Object src, Class destClass) {
+            if (String.class.isInstance(src)) { // 必须是字符串
+                return ConvertorHelper.dateToSql.convert(DateUtils.str_to_time((String) src), destClass);
             }
 
             throw new ConvertorException("Unsupported convert: [" + src + "," + destClass.getName() + "]");

@@ -999,7 +999,7 @@ public class SqlParserTest extends BaseOptimizerTest {
 
     @Test
     public void testWhere_表子查询() throws QueryException, SqlParserException {
-        String sql = "SELECT NAME FROM (SELECT * FROM TABLE1 A WHERE A.ID=1) B";
+        String sql = "SELECT NAME FROM (SELECT * FROM TABLE1 A WHERE A.ID=1) B ORDER BY NAME LIMIT 10";
         QueryTreeNode qn = query(sql);
         qn.build();
 

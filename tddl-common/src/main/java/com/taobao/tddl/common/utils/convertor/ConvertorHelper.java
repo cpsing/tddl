@@ -161,6 +161,7 @@ public class ConvertorHelper {
         // 注册string<->date对象处理
         Convertor stringToDate = new StringAndDateConvertor.StringToDate();
         Convertor stringToCalendar = new StringAndDateConvertor.StringToCalendar();
+        Convertor stringToSqlDate = new StringAndDateConvertor.StringToSqlDate();
         Convertor sqlDateToString = new StringAndDateConvertor.SqlDateToString();
         Convertor sqlTimeToString = new StringAndDateConvertor.SqlTimeToString();
         Convertor sqlTimestampToString = new StringAndDateConvertor.SqlTimestampToString();
@@ -168,6 +169,9 @@ public class ConvertorHelper {
         // 注册默认的String <-> Date的处理
         repository.registerConvertor(String.class, Date.class, stringToDate);
         repository.registerConvertor(String.class, Calendar.class, stringToCalendar);
+        repository.registerConvertor(String.class, java.sql.Date.class, stringToSqlDate);
+        repository.registerConvertor(String.class, java.sql.Time.class, stringToSqlDate);
+        repository.registerConvertor(String.class, java.sql.Timestamp.class, stringToSqlDate);
         // 如果是date，默认用timestamp
         repository.registerConvertor(java.util.Date.class, String.class, sqlTimestampToString);
         repository.registerConvertor(java.sql.Date.class, String.class, sqlDateToString);
