@@ -21,7 +21,7 @@ public class MergeCursorTest {
 
     MockArrayCursor getCursor(String tableName, Integer[] ids) throws TddlException {
         MockArrayCursor cursor = new MockArrayCursor(tableName);
-        cursor.addColumn("id", DataType.IntType);
+        cursor.addColumn("id", DataType.IntegerType);
         cursor.addColumn("name", DataType.StringType);
         cursor.addColumn("school", DataType.StringType);
         cursor.initMeta();
@@ -44,7 +44,7 @@ public class MergeCursorTest {
 
         MockArrayCursor mockCursor2 = this.getCursor("T1", new Integer[] { 2, 2, 4, 5, 6, 7, 7, 9, 9, 10, 13 });
         IOrderBy order = new OrderBy();
-        order.setColumn(new Column().setColumnName("ID").setTableName("T1").setDataType(DataType.IntType));
+        order.setColumn(new Column().setColumnName("ID").setTableName("T1").setDataType(DataType.IntegerType));
         List<IOrderBy> orderBys = new ArrayList();
 
         orderBys.add(order);
@@ -74,7 +74,7 @@ public class MergeCursorTest {
 
         MockArrayCursor mockCursor2 = this.getCursor("T1", new Integer[] { 2, 2, 4, 5, 6, 7, 7, 9, 9, 10, 13 });
         IOrderBy order = new OrderBy();
-        order.setColumn(new Column().setColumnName("ID").setTableName("T1").setDataType(DataType.IntType));
+        order.setColumn(new Column().setColumnName("ID").setTableName("T1").setDataType(DataType.IntegerType));
         List<IOrderBy> orderBys = new ArrayList();
 
         orderBys.add(order);
@@ -96,7 +96,7 @@ public class MergeCursorTest {
 
         MockArrayCursor mockCursor2 = this.getCursor("T1", new Integer[] { 2, 2, 4, 5, 6, 7, 7, 9, 9, 10, 13 });
         IOrderBy order = new OrderBy();
-        order.setColumn(new Column().setColumnName("ID").setTableName("T1").setDataType(DataType.IntType));
+        order.setColumn(new Column().setColumnName("ID").setTableName("T1").setDataType(DataType.IntegerType));
         List<IOrderBy> orderBys = new ArrayList();
 
         orderBys.add(order);

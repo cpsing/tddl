@@ -19,7 +19,7 @@ public class SortMergeCursorTest {
 
     MockArrayCursor getCursor(String tableName, Integer[] ids) throws TddlException {
         MockArrayCursor cursor = new MockArrayCursor(tableName);
-        cursor.addColumn("id", DataType.IntType);
+        cursor.addColumn("id", DataType.IntegerType);
         cursor.addColumn("name", DataType.StringType);
         cursor.addColumn("school", DataType.StringType);
         cursor.initMeta();
@@ -45,11 +45,11 @@ public class SortMergeCursorTest {
 
         List leftJoinOnColumns = new ArrayList();
 
-        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T1"));
+        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T1"));
 
         List rightJoinOnColumns = new ArrayList();
 
-        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T2"));
+        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T2"));
 
         SortMergeJoinCursor c = new SortMergeJoinCursor(left_cursor,
             right_cursor,
@@ -76,11 +76,11 @@ public class SortMergeCursorTest {
 
         List leftJoinOnColumns = new ArrayList();
 
-        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T1"));
+        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T1"));
 
         List rightJoinOnColumns = new ArrayList();
 
-        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T2"));
+        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T2"));
 
         SortMergeJoinCursor c = new SortMergeJoinCursor(left_cursor,
             right_cursor,
@@ -106,11 +106,11 @@ public class SortMergeCursorTest {
 
         List leftJoinOnColumns = new ArrayList();
 
-        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T1"));
+        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T1"));
 
         List rightJoinOnColumns = new ArrayList();
 
-        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T2"));
+        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T2"));
 
         SortMergeJoinCursor c = new SortMergeJoinCursor(left_cursor,
             right_cursor,
@@ -138,13 +138,13 @@ public class SortMergeCursorTest {
 
         List leftJoinOnColumns = new ArrayList();
 
-        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T1"));
-        leftJoinOnColumns.add(new Column().setColumnName("NAME").setDataType(DATA_TYPE.STRING_VAL).setTableName("T1"));
+        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T1"));
+        leftJoinOnColumns.add(new Column().setColumnName("NAME").setDataType(DataType.StringType).setTableName("T1"));
 
         List rightJoinOnColumns = new ArrayList();
 
-        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T2"));
-        rightJoinOnColumns.add(new Column().setColumnName("NAME").setDataType(DATA_TYPE.STRING_VAL).setTableName("T2"));
+        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T2"));
+        rightJoinOnColumns.add(new Column().setColumnName("NAME").setDataType(DataType.StringType).setTableName("T2"));
 
         SortMergeJoinCursor c = new SortMergeJoinCursor(left_cursor,
             right_cursor,
@@ -170,11 +170,11 @@ public class SortMergeCursorTest {
 
         List leftJoinOnColumns = new ArrayList();
 
-        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T1"));
+        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T1"));
 
         List rightJoinOnColumns = new ArrayList();
 
-        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T2"));
+        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T2"));
 
         SortMergeJoinCursor c = new SortMergeJoinCursor(left_cursor,
             right_cursor,
@@ -206,11 +206,11 @@ public class SortMergeCursorTest {
 
         List leftJoinOnColumns = new ArrayList();
 
-        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T1"));
+        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T1"));
 
         List rightJoinOnColumns = new ArrayList();
 
-        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T2"));
+        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T2"));
 
         SortMergeJoinCursor c = new SortMergeJoinCursor(left_cursor,
             right_cursor,
@@ -242,11 +242,11 @@ public class SortMergeCursorTest {
 
         List leftJoinOnColumns = new ArrayList();
 
-        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T1"));
+        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T1"));
 
         List rightJoinOnColumns = new ArrayList();
 
-        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T2"));
+        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T2"));
 
         SortMergeJoinCursor c = new SortMergeJoinCursor(left_cursor,
             right_cursor,
@@ -278,11 +278,11 @@ public class SortMergeCursorTest {
 
         List leftJoinOnColumns = new ArrayList();
 
-        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T1"));
+        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T1"));
 
         List rightJoinOnColumns = new ArrayList();
 
-        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T2"));
+        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T2"));
 
         SortMergeJoinCursor c = new SortMergeJoinCursor(left_cursor,
             right_cursor,
@@ -314,11 +314,11 @@ public class SortMergeCursorTest {
 
         List leftJoinOnColumns = new ArrayList();
 
-        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T1"));
+        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T1"));
 
         List rightJoinOnColumns = new ArrayList();
 
-        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T2"));
+        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T2"));
 
         SortMergeJoinCursor c = new SortMergeJoinCursor(left_cursor,
             right_cursor,
@@ -351,11 +351,11 @@ public class SortMergeCursorTest {
 
         List leftJoinOnColumns = new ArrayList();
 
-        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T1"));
+        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T1"));
 
         List rightJoinOnColumns = new ArrayList();
 
-        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T2"));
+        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T2"));
 
         SortMergeJoinCursor c = new SortMergeJoinCursor(left_cursor,
             right_cursor,
@@ -387,11 +387,11 @@ public class SortMergeCursorTest {
 
         List leftJoinOnColumns = new ArrayList();
 
-        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T1"));
+        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T1"));
 
         List rightJoinOnColumns = new ArrayList();
 
-        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T2"));
+        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T2"));
 
         SortMergeJoinCursor c = new SortMergeJoinCursor(left_cursor,
             right_cursor,
@@ -423,11 +423,11 @@ public class SortMergeCursorTest {
 
         List leftJoinOnColumns = new ArrayList();
 
-        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T1"));
+        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T1"));
 
         List rightJoinOnColumns = new ArrayList();
 
-        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T2"));
+        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T2"));
 
         SortMergeJoinCursor c = new SortMergeJoinCursor(left_cursor,
             right_cursor,
@@ -460,11 +460,11 @@ public class SortMergeCursorTest {
 
         List leftJoinOnColumns = new ArrayList();
 
-        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T1"));
+        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T1"));
 
         List rightJoinOnColumns = new ArrayList();
 
-        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T2"));
+        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T2"));
 
         SortMergeJoinCursor c = new SortMergeJoinCursor(left_cursor,
             right_cursor,
@@ -496,11 +496,11 @@ public class SortMergeCursorTest {
 
         List leftJoinOnColumns = new ArrayList();
 
-        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T1"));
+        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T1"));
 
         List rightJoinOnColumns = new ArrayList();
 
-        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T2"));
+        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T2"));
 
         SortMergeJoinCursor c = new SortMergeJoinCursor(left_cursor,
             right_cursor,
@@ -534,11 +534,11 @@ public class SortMergeCursorTest {
 
         List leftJoinOnColumns = new ArrayList();
 
-        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T1"));
+        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T1"));
 
         List rightJoinOnColumns = new ArrayList();
 
-        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T2"));
+        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T2"));
 
         SortMergeJoinCursor c = new SortMergeJoinCursor(left_cursor,
             right_cursor,
@@ -547,8 +547,8 @@ public class SortMergeCursorTest {
 
         c.setRightJoin(true);
         c.setLeftJoin(true);
-        Object[] leftExpected = new Object[] { 2, null, 4, 5, 6, null };
-        Object[] rightExpected = new Object[] { 2, 3, 4, 5, null, 9 };
+        // Object[] leftExpected = new Object[] { 2, null, 4, 5, 6, null };
+        // Object[] rightExpected = new Object[] { 2, 3, 4, 5, null, 9 };
         List leftActual = new ArrayList();
         List rightActual = new ArrayList();
         IRowSet row = null;
@@ -575,11 +575,11 @@ public class SortMergeCursorTest {
 
         List leftJoinOnColumns = new ArrayList();
 
-        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T1"));
+        leftJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T1"));
 
         List rightJoinOnColumns = new ArrayList();
 
-        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntType).setTableName("T2"));
+        rightJoinOnColumns.add(new Column().setColumnName("ID").setDataType(DataType.IntegerType).setTableName("T2"));
 
         SortMergeJoinCursor c = new SortMergeJoinCursor(left_cursor,
             right_cursor,
@@ -588,8 +588,8 @@ public class SortMergeCursorTest {
 
         c.setRightJoin(true);
         c.setLeftJoin(true);
-        Object[] leftExpected = new Object[] { 2, null, 4, 5, 6, null };
-        Object[] rightExpected = new Object[] { 2, 3, 4, 5, null, 9 };
+        // Object[] leftExpected = new Object[] { 2, null, 4, 5, 6, null };
+        // Object[] rightExpected = new Object[] { 2, 3, 4, 5, null, 9 };
         List leftActual = new ArrayList();
         List rightActual = new ArrayList();
         IRowSet row = null;

@@ -13,9 +13,9 @@ public class MockArrayCursorTest {
     @Test
     public void test1() throws TddlException {
         MockArrayCursor cursor = new MockArrayCursor("table1");
-        cursor.addColumn("id", DataType.IntType);
-        cursor.addColumn("name", DATA_TYPE.STRING_VAL);
-        cursor.addColumn("school", DATA_TYPE.STRING_VAL);
+        cursor.addColumn("id", DataType.IntegerType);
+        cursor.addColumn("name", DataType.StringType);
+        cursor.addColumn("school", DataType.StringType);
         cursor.initMeta();
 
         cursor.addRow(new Object[] { 1, "name1", "school1" });

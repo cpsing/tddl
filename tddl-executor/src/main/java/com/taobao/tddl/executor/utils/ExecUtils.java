@@ -621,7 +621,7 @@ public class ExecUtils {
         }
 
         // 类型不同，先进行类型转换
-        c2 = type2.convertToType(c2, type1);
+        c2 = type1.convertFrom(c2);
 
         return type1.compare(c1, c2);
     }
