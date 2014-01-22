@@ -55,8 +55,12 @@ public class DataTypeUtil {
             return DataType.TimeType;
         }
 
-        if (clazz == Byte[].class || clazz == byte[].class || clazz == Blob.class) {
+        if (clazz == Byte[].class || clazz == byte[].class || Blob.class.isAssignableFrom(clazz)) {
             return DataType.BytesType;
+        }
+
+        if (clazz == String.class || Clob.class.isAssignableFrom(clazz)) {
+            return DataType.StringType;
         }
 
         throw new TddlRuntimeException("type: " + v.getClass().getSimpleName() + " is not supported");
