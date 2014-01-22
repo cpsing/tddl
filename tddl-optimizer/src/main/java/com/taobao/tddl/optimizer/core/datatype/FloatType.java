@@ -4,6 +4,99 @@ import com.taobao.tddl.common.exception.TddlRuntimeException;
 
 public class FloatType extends CommonType<Float> {
 
+    private final Calculator calculator = new Calculator() {
+
+                                            @Override
+                                            public Object add(Object v1, Object v2) {
+                                                Float i1 = convertFrom(v1);
+                                                Float i2 = convertFrom(v2);
+                                                return i1 + i2;
+                                            }
+
+                                            @Override
+                                            public Object sub(Object v1, Object v2) {
+                                                Float i1 = convertFrom(v1);
+                                                Float i2 = convertFrom(v2);
+                                                return i1 - i2;
+                                            }
+
+                                            @Override
+                                            public Object multiply(Object v1, Object v2) {
+                                                Float i1 = convertFrom(v1);
+                                                Float i2 = convertFrom(v2);
+                                                return i1 * i2;
+                                            }
+
+                                            @Override
+                                            public Object divide(Object v1, Object v2) {
+                                                Float i1 = convertFrom(v1);
+                                                Float i2 = convertFrom(v2);
+                                                return i1 / i2;
+                                            }
+
+                                            @Override
+                                            public Object mod(Object v1, Object v2) {
+                                                Float i1 = convertFrom(v1);
+                                                Float i2 = convertFrom(v2);
+                                                return i1 % i2;
+                                            }
+
+                                            @Override
+                                            public Object and(Object v1, Object v2) {
+                                                Float i1 = convertFrom(v1);
+                                                Float i2 = convertFrom(v2);
+                                                return (i1 != 0) && (i2 != 0);
+                                            }
+
+                                            @Override
+                                            public Object or(Object v1, Object v2) {
+                                                Float i1 = convertFrom(v1);
+                                                Float i2 = convertFrom(v2);
+                                                return (i1 != 0) || (i2 != 0);
+                                            }
+
+                                            @Override
+                                            public Object not(Object v1) {
+                                                Float i1 = convertFrom(v1);
+
+                                                return i1 == 0;
+                                            }
+
+                                            @Override
+                                            public Object bitAnd(Object v1, Object v2) {
+                                                Float i1 = convertFrom(v1);
+                                                Float i2 = convertFrom(v2);
+                                                return i1.longValue() & i2.longValue();
+                                            }
+
+                                            @Override
+                                            public Object bitOr(Object v1, Object v2) {
+                                                Float i1 = convertFrom(v1);
+                                                Float i2 = convertFrom(v2);
+                                                return i1.longValue() | i2.longValue();
+                                            }
+
+                                            @Override
+                                            public Object bitNot(Object v1) {
+                                                Float i1 = convertFrom(v1);
+                                                return ~i1.longValue();
+                                            }
+
+                                            @Override
+                                            public Object xor(Object v1, Object v2) {
+                                                Float i1 = convertFrom(v1);
+                                                Float i2 = convertFrom(v2);
+                                                return (i1 != 0) ^ (i2 != 0);
+                                            }
+
+                                            @Override
+                                            public Object bitXor(Object v1, Object v2) {
+                                                Float i1 = convertFrom(v1);
+                                                Float i2 = convertFrom(v2);
+                                                return i1.longValue() ^ i2.longValue();
+                                            }
+                                        };
+
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
         DataEncoder.encode(this.convertFrom(value), dst, offset);
@@ -51,8 +144,7 @@ public class FloatType extends CommonType<Float> {
 
     @Override
     public Calculator getCalculator() {
-        // TODO Auto-generated method stub
-        return null;
+        return calculator;
     }
 
 }

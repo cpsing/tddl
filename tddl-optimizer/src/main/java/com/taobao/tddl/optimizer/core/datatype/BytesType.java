@@ -62,6 +62,11 @@ public class BytesType extends AbstractDataType<byte[]> {
     }
 
     @Override
+    public Calculator getCalculator() {
+        throw new NotSupportException("bytes类型不支持计算操作");
+    }
+
+    @Override
     public ResultGetter getResultGetter() {
         return new ResultGetter() {
 
@@ -137,8 +142,4 @@ public class BytesType extends AbstractDataType<byte[]> {
         }
     }
 
-    @Override
-    public Calculator getCalculator() {
-        return null;
-    }
 }
