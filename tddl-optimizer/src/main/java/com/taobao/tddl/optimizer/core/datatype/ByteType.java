@@ -149,7 +149,7 @@ public class ByteType extends CommonType<Byte> {
 
     @Override
     public Calculator getCalculator() {
-        return null;
+        return calculator;
     }
 
 }

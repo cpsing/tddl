@@ -1,5 +1,6 @@
 package com.taobao.tddl.optimizer.core.datatype;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -7,6 +8,120 @@ import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.BaseRowSet;
 
 public class StringType extends AbstractDataType<String> {
+
+    private final Calculator calculator = new Calculator() {
+
+                                            public BigDecimal convertToBigDecimal(Object v) {
+                                                String str = convertFrom(v);
+                                                try {
+                                                    return DataType.BigDecimalType.convertFrom(str);
+                                                } catch (Exception ex) {
+                                                    return BigDecimal.ZERO;
+                                                }
+                                            }
+
+                                            @Override
+                                            public Object xor(Object v1, Object v2) {
+                                                BigDecimal d1 = convertToBigDecimal(v1);
+                                                BigDecimal d2 = convertToBigDecimal(v2);
+
+                                                return DataType.BigDecimalType.getCalculator().xor(d1, d2);
+                                            }
+
+                                            @Override
+                                            public Object sub(Object v1, Object v2) {
+                                                BigDecimal d1 = convertToBigDecimal(v1);
+                                                BigDecimal d2 = convertToBigDecimal(v2);
+
+                                                return DataType.BigDecimalType.getCalculator().sub(d1, d2);
+                                            }
+
+                                            @Override
+                                            public Object or(Object v1, Object v2) {
+                                                BigDecimal d1 = convertToBigDecimal(v1);
+                                                BigDecimal d2 = convertToBigDecimal(v2);
+
+                                                return DataType.BigDecimalType.getCalculator().or(d1, d2);
+                                            }
+
+                                            @Override
+                                            public Object not(Object v1) {
+                                                BigDecimal d1 = convertToBigDecimal(v1);
+
+                                                return DataType.BigDecimalType.getCalculator().not(d1);
+                                            }
+
+                                            @Override
+                                            public Object multiply(Object v1, Object v2) {
+                                                BigDecimal d1 = convertToBigDecimal(v1);
+                                                BigDecimal d2 = convertToBigDecimal(v2);
+
+                                                return DataType.BigDecimalType.getCalculator().multiply(d1, d2);
+                                            }
+
+                                            @Override
+                                            public Object mod(Object v1, Object v2) {
+                                                BigDecimal d1 = convertToBigDecimal(v1);
+                                                BigDecimal d2 = convertToBigDecimal(v2);
+
+                                                return DataType.BigDecimalType.getCalculator().mod(d1, d2);
+                                            }
+
+                                            @Override
+                                            public Object divide(Object v1, Object v2) {
+                                                BigDecimal d1 = convertToBigDecimal(v1);
+                                                BigDecimal d2 = convertToBigDecimal(v2);
+
+                                                return DataType.BigDecimalType.getCalculator().divide(d1, d2);
+                                            }
+
+                                            @Override
+                                            public Object bitXor(Object v1, Object v2) {
+                                                BigDecimal d1 = convertToBigDecimal(v1);
+                                                BigDecimal d2 = convertToBigDecimal(v2);
+
+                                                return DataType.BigDecimalType.getCalculator().bitXor(d1, d2);
+                                            }
+
+                                            @Override
+                                            public Object bitOr(Object v1, Object v2) {
+                                                BigDecimal d1 = convertToBigDecimal(v1);
+                                                BigDecimal d2 = convertToBigDecimal(v2);
+
+                                                return DataType.BigDecimalType.getCalculator().bitOr(d1, d2);
+                                            }
+
+                                            @Override
+                                            public Object bitNot(Object v1) {
+                                                BigDecimal d1 = convertToBigDecimal(v1);
+
+                                                return DataType.BigDecimalType.getCalculator().bitNot(d1);
+                                            }
+
+                                            @Override
+                                            public Object bitAnd(Object v1, Object v2) {
+                                                BigDecimal d1 = convertToBigDecimal(v1);
+                                                BigDecimal d2 = convertToBigDecimal(v2);
+
+                                                return DataType.BigDecimalType.getCalculator().bitAnd(d1, d2);
+                                            }
+
+                                            @Override
+                                            public Object and(Object v1, Object v2) {
+                                                BigDecimal d1 = convertToBigDecimal(v1);
+                                                BigDecimal d2 = convertToBigDecimal(v2);
+
+                                                return DataType.BigDecimalType.getCalculator().and(d1, d2);
+                                            }
+
+                                            @Override
+                                            public Object add(Object v1, Object v2) {
+                                                BigDecimal d1 = convertToBigDecimal(v1);
+                                                BigDecimal d2 = convertToBigDecimal(v2);
+
+                                                return DataType.BigDecimalType.getCalculator().add(d1, d2);
+                                            }
+                                        };
 
     @Override
     public ResultGetter getResultGetter() {
@@ -100,7 +215,7 @@ public class StringType extends AbstractDataType<String> {
 
     @Override
     public Calculator getCalculator() {
-        return null;
+        return calculator;
     }
 
 }

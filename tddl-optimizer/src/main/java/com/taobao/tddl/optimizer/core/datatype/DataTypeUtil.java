@@ -13,7 +13,7 @@ public class DataTypeUtil {
 
     public static DataType getTypeOfObject(Object v) {
 
-        if (v == null) return DataType.NullType;
+        if (v == null) return DataType.LongType;
 
         if (v instanceof Integer) return DataType.IntType;
         if (v instanceof Long) return DataType.LongType;

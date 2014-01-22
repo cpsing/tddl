@@ -145,7 +145,7 @@ public class BooleanType extends CommonType<Boolean> {
 
     @Override
     public Calculator getCalculator() {
-        return null;
+        return calculator;
     }
 
 }
