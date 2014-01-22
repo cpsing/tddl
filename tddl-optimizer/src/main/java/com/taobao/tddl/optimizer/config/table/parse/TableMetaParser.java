@@ -230,7 +230,7 @@ public class TableMetaParser {
 
     private static DataType getDataType(String type) {
         if ("INT".equalsIgnoreCase(type) || "INTEGER".equalsIgnoreCase(type)) {
-            return DataType.IntType;
+            return DataType.IntegerType;
         } else if ("LONG".equalsIgnoreCase(type)) {
             return DataType.LongType;
         } else if ("SHORT".equalsIgnoreCase(type)) {

@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.model.BaseRowSet;
 import com.taobao.tddl.common.utils.convertor.Convertor;
+import com.taobao.tddl.common.utils.convertor.ConvertorException;
+import com.taobao.tddl.common.utils.convertor.ConvertorHelper;
 
 /**
  * 常见类型的转化处理
@@ -20,7 +22,7 @@ public abstract class CommonType<DATA> extends AbstractDataType<DATA> {
     private Convertor convertor = null;
 
     public CommonType(){
-        convertor = getConvertor(getDataClass()); // number类型之间的互相转换
+        convertor = ConvertorHelper.commonToCommon;
     }
 
     @Override
@@ -85,7 +87,16 @@ public abstract class CommonType<DATA> extends AbstractDataType<DATA> {
         if (value == null) {
             return null;
         } else {
-            return (DATA) convertor.convert(value, getDataClass());
+            try {
+                return (DATA) convertor.convert(value, getDataClass());
+            } catch (ConvertorException e) {
+                Convertor cv = getConvertor(value.getClass());
+                if (cv != null) {
+                    return (DATA) cv.convert(value, getDataClass());
+                } else {
+                    return (DATA) value;
+                }
+            }
         }
     }
 

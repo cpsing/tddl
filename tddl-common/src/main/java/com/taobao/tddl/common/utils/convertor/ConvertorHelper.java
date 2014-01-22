@@ -27,18 +27,18 @@ public class ConvertorHelper {
     public static final String              ALIAS_STRING_TO_CALENDAR_DAY  = StringAndDateConvertor.StringToCalendarDay.class.getSimpleName();
 
     // common对象范围：8种Primitive和对应的Java类型，BigDecimal, BigInteger
-    private static Map<Class, Object>       commonTypes                   = new HashMap<Class, Object>();
-    private static final Convertor          stringToCommon                = new StringAndCommonConvertor.StringToCommon();
-    private static final Convertor          commonToCommon                = new CommonAndCommonConvertor.CommonToCommon();
+    public static Map<Class, Object>        commonTypes                   = new HashMap<Class, Object>();
+    public static final Convertor           stringToCommon                = new StringAndCommonConvertor.StringToCommon();
+    public static final Convertor           commonToCommon                = new CommonAndCommonConvertor.CommonToCommon();
     // toString处理
-    private static final Convertor          objectToString                = new StringAndObjectConvertor.ObjectToString();
+    public static final Convertor           objectToString                = new StringAndObjectConvertor.ObjectToString();
     // 枚举处理
-    private static final Convertor          stringToEnum                  = new StringAndEnumConvertor.StringToEnum();
-    private static final Convertor          enumToString                  = new StringAndEnumConvertor.EnumToString();
-    private static final Convertor          sqlToDate                     = new SqlDateAndDateConvertor.SqlDateToDateConvertor();
-    private static final Convertor          dateToSql                     = new SqlDateAndDateConvertor.DateToSqlDateConvertor();
-    private static final Convertor          blobToBytes                   = new BlobAndBytesConvertor.BlobToBytes();
-    private static final Convertor          stringToBytes                 = new StringAndObjectConvertor.StringToBytes();
+    public static final Convertor           stringToEnum                  = new StringAndEnumConvertor.StringToEnum();
+    public static final Convertor           enumToString                  = new StringAndEnumConvertor.EnumToString();
+    public static final Convertor           sqlToDate                     = new SqlDateAndDateConvertor.SqlDateToDateConvertor();
+    public static final Convertor           dateToSql                     = new SqlDateAndDateConvertor.DateToSqlDateConvertor();
+    public static final Convertor           blobToBytes                   = new BlobAndBytesConvertor.BlobToBytes();
+    public static final Convertor           stringToBytes                 = new StringAndObjectConvertor.StringToBytes();
 
     private static volatile ConvertorHelper singleton                     = null;
 

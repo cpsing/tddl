@@ -2,6 +2,12 @@ package com.taobao.tddl.optimizer.core.datatype;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 
+/**
+ * {@linkplain Long}类型
+ * 
+ * @author jianghang 2014-1-22 上午10:41:28
+ * @since 5.1.0
+ */
 public class LongType extends CommonType<Long> {
 
     @Override

@@ -13,15 +13,23 @@ import com.taobao.tddl.common.utils.convertor.ConvertorHelper;
  */
 public abstract class AbstractDataType<DATA> implements DataType<DATA> {
 
+    private Class dataClass = null;
+
     @Override
     public Class getDataClass() {
-        Type type = this.getClass().getGenericInterfaces()[0];
-        if (!(type instanceof ParameterizedType)) {
-            // 用户不指定AsyncLoadCallBack的泛型信息
-            throw new TddlRuntimeException("you should specify DataType<DATA> for DATA type, ie: DataType<String>");
+        if (dataClass == null) {
+            Type type = this.getClass().getGenericSuperclass();
+            while (type != null && !(type instanceof ParameterizedType)) {
+                type = ((Class) type).getGenericSuperclass();
+            }
+
+            if (type == null) {
+                throw new TddlRuntimeException("you should specify DataType<DATA> for DATA type, ie: DataType<String>");
+            }
+            dataClass = (Class) getGenericClass((ParameterizedType) type, 0);
         }
 
-        return (Class) getGenericClass((ParameterizedType) type, 0);
+        return dataClass;
     }
 
     @Override

@@ -1,37 +1,40 @@
 package com.taobao.tddl.optimizer.core.datatype;
 
 import java.math.BigDecimal;
-import java.sql.Blob;
-import java.sql.Clob;
+import java.math.BigInteger;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Comparator;
-import java.util.Date;
 
 import com.taobao.tddl.common.model.BaseRowSet;
 
+/**
+ * http://dev.mysql.com/doc/refman/5.6/en/type-conversion.html
+ */
 public interface DataType<DATA> extends Comparator<Object> {
 
-    public static final DataType<Integer>    IntType        = new IntegerType();
-    public static final DataType<Long>       LongType       = null;
-    public static final DataType<Short>      ShortType      = null;
+    public static final DataType<Integer>    IntegerType    = new IntegerType();
+    public static final DataType<Long>       LongType       = new LongType();
+    public static final DataType<Short>      ShortType      = new ShortType();
     public static final DataType<String>     StringType     = new StringType();
-    public static final DataType<Double>     DoubleType     = null;
-    public static final DataType<Float>      FloatType      = null;
-    public static final DataType<Date>       DateType       = null;
-    public static final DataType<Timestamp>  TimestampType  = null;
-    public static final DataType<Boolean>    BooleanType    = null;
-    public static final DataType<BigDecimal> BigDecimalType = null;
-    public static final DataType             DatetimeType   = null;
-    public static final DataType             TimeType       = null;
+    public static final DataType<Double>     DoubleType     = new DoubleType();
+    public static final DataType<Float>      FloatType      = new FloatType();
+    public static final DataType<Date>       DateType       = new DateType();
+    public static final DataType<Timestamp>  TimestampType  = new TimestampType();
+    public static final DataType<Boolean>    BooleanType    = new BooleanType();
+    public static final DataType<BigInteger> BigIntegerType = new BigIntegerType();
+    public static final DataType<BigDecimal> BigDecimalType = new BigDecimalType();
+    public static final DataType             DatetimeType   = new TimestampType();
+    public static final DataType             TimeType       = new TimeType();
 
-    public static final DataType<Blob>       BlobType       = null;
-    public static final DataType<Clob>       ClobType       = null;
+    public static final DataType<byte[]>     BlobType       = new BlobType();
+    public static final DataType<String>     ClobType       = new ClobType();
 
-    public static final DataType             BitType        = null;
-    public static final DataType<Byte[]>     BytesType      = null;
-    public static final DataType<Byte>       ByteType       = null;
+    public static final DataType<Integer>    BitType        = new BitType();
+    public static final DataType<byte[]>     BytesType      = new BytesType();
+    public static final DataType<Byte>       ByteType       = new ByteType();
     public static final DataType             NullType       = null;
 
     public static interface ResultGetter {

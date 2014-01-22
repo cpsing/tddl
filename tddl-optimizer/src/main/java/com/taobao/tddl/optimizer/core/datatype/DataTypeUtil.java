@@ -1,41 +1,68 @@
 package com.taobao.tddl.optimizer.core.datatype;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Date;
+import java.util.Calendar;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 
 public class DataTypeUtil {
 
     public static DataType getTypeOfObject(Object v) {
+        if (v == null) {
+            return DataType.NullType;
+        }
+        Class clazz = v.getClass();
+        if (clazz == Integer.class || clazz == int.class) {
+            return DataType.IntegerType;
+        }
+        if (clazz == Long.class || clazz == long.class) {
+            return DataType.LongType;
+        }
+        if (clazz == Short.class || clazz == short.class) {
+            return DataType.ShortType;
+        }
+        if (clazz == Float.class || clazz == float.class) {
+            return DataType.FloatType;
+        }
+        if (clazz == Double.class || clazz == double.class) {
+            return DataType.DoubleType;
+        }
+        if (clazz == Byte.class || clazz == byte.class) {
+            return DataType.ByteType;
+        }
+        if (clazz == Boolean.class || clazz == boolean.class) {
+            return DataType.BooleanType;
+        }
+        if (clazz == BigInteger.class) {
+            return DataType.BigIntegerType;
+        }
+        if (clazz == BigDecimal.class) {
+            return DataType.BigDecimalType;
+        }
 
-        if (v == null) return DataType.NullType;
+        if (clazz == String.class || clazz == Clob.class) {
+            return DataType.StringType;
+        }
 
-        if (v instanceof Integer) return DataType.IntType;
-        if (v instanceof Long) return DataType.LongType;
-        if (v instanceof Short) return DataType.ShortType;
-        if (v instanceof Float) return DataType.FloatType;
-        if (v instanceof Double) return DataType.DoubleType;
-        if (v instanceof BigDecimal) return DataType.BigDecimalType;
+        if (clazz == Timestamp.class || clazz == java.util.Date.class || Calendar.class.isAssignableFrom(clazz)) {
+            return DataType.TimestampType;
+        }
+        if (clazz == java.sql.Date.class) {
+            return DataType.DateType;
+        }
+        if (clazz == Time.class) {
+            return DataType.TimeType;
+        }
 
-        if (v instanceof String) return DataType.StringType;
-
-        if (v instanceof Date) return DataType.DateType;
-        if (v instanceof Time) return DataType.TimeType;
-        if (v instanceof Timestamp) return DataType.TimestampType;
-
-        if (v instanceof Byte) return DataType.ByteType;
-        if (v instanceof Byte[]) return DataType.BytesType;
-        if (v instanceof Boolean) return DataType.BooleanType;
-
-        if (v instanceof Blob) return DataType.BlobType;
-        if (v instanceof Clob) return DataType.ClobType;
+        if (clazz == Byte[].class || clazz == byte[].class || clazz == Blob.class) {
+            return DataType.BytesType;
+        }
 
         throw new TddlRuntimeException("type: " + v.getClass().getSimpleName() + " is not supported");
-
     }
 }
