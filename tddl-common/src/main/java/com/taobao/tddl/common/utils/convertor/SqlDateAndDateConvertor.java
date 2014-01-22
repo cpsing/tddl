@@ -16,6 +16,7 @@ public class SqlDateAndDateConvertor {
             if (Date.class != destClass) {
                 throw new ConvertorException("Unsupported convert: [" + src + "," + destClass.getName() + "]");
             }
+
             if (src instanceof java.sql.Date) {
                 return new Date(((java.sql.Date) src).getTime());
             }
@@ -33,7 +34,7 @@ public class SqlDateAndDateConvertor {
 
         @Override
         public Object convert(Object src, Class destClass) {
-            if (Date.class.isInstance(src)) { // 必须是字符串
+            if (Date.class.isInstance(src)) { // 必须是Date类型
                 Date date = (Date) src;
                 long value = date.getTime();
                 // java.sql.Date

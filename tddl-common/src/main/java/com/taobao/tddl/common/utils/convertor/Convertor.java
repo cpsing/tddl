@@ -10,4 +10,9 @@ public interface Convertor {
 
     public Object convert(Object src, Class destClass);
 
+    /**
+     * 支持多级collection映射，需指定多级的componentClass
+     */
+    public Object convertCollection(Object src, Class destClass, Class... componentClasses);
+
 }

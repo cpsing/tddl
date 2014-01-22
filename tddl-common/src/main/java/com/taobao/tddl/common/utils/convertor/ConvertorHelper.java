@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Blob;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,32 +18,28 @@ import org.apache.commons.lang.ObjectUtils;
  */
 public class ConvertorHelper {
 
-    public static final String              ALIAS_DATE_TIME_TO_STRING     = StringAndDateConvertor.DateTimeToString.class.getSimpleName();
-    public static final String              ALIAS_DATE_DAY_TO_STRING      = StringAndDateConvertor.DateDayToString.class.getSimpleName();
-    public static final String              ALIAS_STRING_TO_DATE_TIME     = StringAndDateConvertor.StringToDateTime.class.getSimpleName();
-    public static final String              ALIAS_STRING_TO_DATE_DAY      = StringAndDateConvertor.StringToDateDay.class.getSimpleName();
-    public static final String              ALIAS_CALENDAR_TIME_TO_STRING = StringAndDateConvertor.CalendarTimeToString.class.getSimpleName();
-    public static final String              ALIAS_CALENDAR_DAY_TO_STRING  = StringAndDateConvertor.CalendarDayToString.class.getSimpleName();
-    public static final String              ALIAS_STRING_TO_CALENDAR_TIME = StringAndDateConvertor.StringToCalendarTime.class.getSimpleName();
-    public static final String              ALIAS_STRING_TO_CALENDAR_DAY  = StringAndDateConvertor.StringToCalendarDay.class.getSimpleName();
-
     // common对象范围：8种Primitive和对应的Java类型，BigDecimal, BigInteger
-    public static Map<Class, Object>        commonTypes                   = new HashMap<Class, Object>();
-    public static final Convertor           stringToCommon                = new StringAndCommonConvertor.StringToCommon();
-    public static final Convertor           commonToCommon                = new CommonAndCommonConvertor.CommonToCommon();
+    public static Map<Class, Object>        commonTypes            = new HashMap<Class, Object>();
+    public static final Convertor           stringToCommon         = new StringAndCommonConvertor.StringToCommon();
+    public static final Convertor           commonToCommon         = new CommonAndCommonConvertor.CommonToCommon();
     // toString处理
-    public static final Convertor           objectToString                = new StringAndObjectConvertor.ObjectToString();
+    public static final Convertor           objectToString         = new StringAndObjectConvertor.ObjectToString();
+    // 数组处理
+    private static final Convertor          arrayToArray           = new CollectionAndCollectionConvertor.ArrayToArray();
+    private static final Convertor          arrayToCollection      = new CollectionAndCollectionConvertor.ArrayToCollection();
+    private static final Convertor          collectionToArray      = new CollectionAndCollectionConvertor.CollectionToArray();
+    private static final Convertor          collectionToCollection = new CollectionAndCollectionConvertor.CollectionToCollection();
     // 枚举处理
-    public static final Convertor           stringToEnum                  = new StringAndEnumConvertor.StringToEnum();
-    public static final Convertor           enumToString                  = new StringAndEnumConvertor.EnumToString();
-    public static final Convertor           sqlToDate                     = new SqlDateAndDateConvertor.SqlDateToDateConvertor();
-    public static final Convertor           dateToSql                     = new SqlDateAndDateConvertor.DateToSqlDateConvertor();
-    public static final Convertor           blobToBytes                   = new BlobAndBytesConvertor.BlobToBytes();
-    public static final Convertor           stringToBytes                 = new StringAndObjectConvertor.StringToBytes();
+    public static final Convertor           stringToEnum           = new StringAndEnumConvertor.StringToEnum();
+    public static final Convertor           enumToString           = new StringAndEnumConvertor.EnumToString();
+    public static final Convertor           sqlToDate              = new SqlDateAndDateConvertor.SqlDateToDateConvertor();
+    public static final Convertor           dateToSql              = new SqlDateAndDateConvertor.DateToSqlDateConvertor();
+    public static final Convertor           blobToBytes            = new BlobAndBytesConvertor.BlobToBytes();
+    public static final Convertor           stringToBytes          = new StringAndObjectConvertor.StringToBytes();
 
-    private static volatile ConvertorHelper singleton                     = null;
+    private static volatile ConvertorHelper singleton              = null;
 
-    private ConvertorRepository             repository                    = null;
+    private ConvertorRepository             repository             = null;
 
     public ConvertorHelper(){
         repository = new ConvertorRepository();
@@ -90,6 +87,26 @@ public class ConvertorHelper {
                 convertor = enumToString;
             } else { // 默认进行toString输出
                 convertor = objectToString;
+            }
+        }
+
+        // 处理下Array|Collection的映射
+        // 如果src|dest是array类型，取一下Array.class的映射，因为默认数组处理的注册直接注册了Array.class
+        boolean isSrcArray = src.isArray();
+        boolean isDestArray = dest.isArray();
+        if (convertor == null && src.isArray() && dest.isArray()) {
+            convertor = arrayToArray;
+        } else {
+            boolean isSrcCollection = Collection.class.isAssignableFrom(src);
+            boolean isDestCollection = Collection.class.isAssignableFrom(dest);
+            if (convertor == null && isSrcArray && isDestCollection) {
+                convertor = arrayToCollection;
+            }
+            if (convertor == null && isDestArray && isSrcCollection) {
+                convertor = collectionToArray;
+            }
+            if (convertor == null && isSrcCollection && isDestCollection) {
+                convertor = collectionToCollection;
             }
         }
 
@@ -142,19 +159,21 @@ public class ConvertorHelper {
 
     private void StringDateRegister() {
         // 注册string<->date对象处理
-        Convertor stringToDateDay = new StringAndDateConvertor.StringToDateDay();
-        Convertor stringToDateTime = new StringAndDateConvertor.StringToDateTime();
-        Convertor stringToCalendarDay = new StringAndDateConvertor.StringToCalendarDay();
-        Convertor stringToCalendarTime = new StringAndDateConvertor.StringToCalendarTime();
-        Convertor dateDayToString = new StringAndDateConvertor.DateDayToString();
-        Convertor dateTimeToString = new StringAndDateConvertor.DateTimeToString();
-        Convertor calendarDayToString = new StringAndDateConvertor.CalendarDayToString();
-        Convertor calendarTimeToString = new StringAndDateConvertor.CalendarTimeToString();
+        Convertor stringToDate = new StringAndDateConvertor.StringToDate();
+        Convertor stringToCalendar = new StringAndDateConvertor.StringToCalendar();
+        Convertor sqlDateToString = new StringAndDateConvertor.SqlDateToString();
+        Convertor sqlTimeToString = new StringAndDateConvertor.SqlTimeToString();
+        Convertor sqlTimestampToString = new StringAndDateConvertor.SqlTimestampToString();
+        Convertor calendarToString = new StringAndDateConvertor.CalendarToString();
         // 注册默认的String <-> Date的处理
-        repository.registerConvertor(String.class, Date.class, stringToDateTime);
-        repository.registerConvertor(Date.class, String.class, dateTimeToString);
-        repository.registerConvertor(String.class, Calendar.class, stringToCalendarTime);
-        repository.registerConvertor(Calendar.class, String.class, calendarTimeToString);
+        repository.registerConvertor(String.class, Date.class, stringToDate);
+        repository.registerConvertor(String.class, Calendar.class, stringToCalendar);
+        // 如果是date，默认用timestamp
+        repository.registerConvertor(java.util.Date.class, String.class, sqlTimestampToString);
+        repository.registerConvertor(java.sql.Date.class, String.class, sqlDateToString);
+        repository.registerConvertor(java.sql.Time.class, String.class, sqlTimeToString);
+        repository.registerConvertor(java.sql.Timestamp.class, String.class, sqlTimestampToString);
+        repository.registerConvertor(Calendar.class, String.class, calendarToString);
         // 注册默认的Date <-> SqlDate的处理
         repository.registerConvertor(java.sql.Date.class, Date.class, sqlToDate);
         repository.registerConvertor(java.sql.Time.class, Date.class, sqlToDate);
@@ -162,17 +181,10 @@ public class ConvertorHelper {
         repository.registerConvertor(Date.class, java.sql.Date.class, dateToSql);
         repository.registerConvertor(Date.class, java.sql.Time.class, dateToSql);
         repository.registerConvertor(Date.class, java.sql.Timestamp.class, dateToSql);
+        repository.registerConvertor(java.sql.Timestamp.class, java.sql.Date.class, dateToSql);
+        repository.registerConvertor(java.sql.Timestamp.class, java.sql.Time.class, dateToSql);
         repository.registerConvertor(Blob.class, byte[].class, blobToBytes);
         repository.registerConvertor(String.class, byte[].class, stringToBytes);
-        // 注册为别名
-        repository.registerConvertor(ALIAS_STRING_TO_DATE_DAY, stringToDateDay);
-        repository.registerConvertor(ALIAS_STRING_TO_DATE_TIME, stringToDateTime);
-        repository.registerConvertor(ALIAS_STRING_TO_CALENDAR_DAY, stringToCalendarDay);
-        repository.registerConvertor(ALIAS_STRING_TO_CALENDAR_TIME, stringToCalendarTime);
-        repository.registerConvertor(ALIAS_DATE_DAY_TO_STRING, dateDayToString);
-        repository.registerConvertor(ALIAS_DATE_TIME_TO_STRING, dateTimeToString);
-        repository.registerConvertor(ALIAS_CALENDAR_DAY_TO_STRING, calendarDayToString);
-        repository.registerConvertor(ALIAS_CALENDAR_TIME_TO_STRING, calendarTimeToString);
     }
 
     private void initCommonTypes() {

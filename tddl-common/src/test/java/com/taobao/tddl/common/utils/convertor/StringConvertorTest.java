@@ -18,26 +18,6 @@ public class StringConvertorTest {
     private ConvertorHelper helper = new ConvertorHelper();
 
     @Test
-    public void testObjectToString() {
-        Convertor ct = helper.getConvertor(Object.class, String.class);
-        String VALUE = "1";
-
-        Object integer = ct.convert(Integer.valueOf(VALUE), String.class); // 数字
-        Assert.assertEquals(integer, VALUE);
-        Object bigDecimal = ct.convert(new BigDecimal(VALUE), String.class); // BigDecimal
-        Assert.assertEquals(bigDecimal, VALUE);
-        Object bigInteger = ct.convert(new BigInteger(VALUE), String.class); // BigInteger
-        Assert.assertEquals(bigInteger, VALUE);
-
-        ConvertorModel model = new ConvertorModel();
-        model.setI(1);
-        model.setInteger(1);
-        model.setBigDecimal(new BigDecimal(VALUE));
-        Object modelStr = ct.convert(model, String.class); // ConvertorModel
-        Assert.assertNotNull(modelStr);
-    }
-
-    @Test
     public void testStringToCommon() {
         String strValue = "10";
         int value = 10;
@@ -102,50 +82,6 @@ public class StringConvertorTest {
         Assert.assertTrue(c1.equals(stringCalendarValue));
         Object calendarStringValue = calendarString.convert(c1, String.class);
         Assert.assertTrue(time.equals(calendarStringValue));
-    }
-
-    @Test
-    public void testStringAndDateAlias() {
-        Convertor stringDateDay = helper.getConvertor(ConvertorHelper.ALIAS_STRING_TO_DATE_DAY);
-        Convertor stringDateTime = helper.getConvertor(ConvertorHelper.ALIAS_STRING_TO_DATE_TIME);
-        Convertor dateDayString = helper.getConvertor(ConvertorHelper.ALIAS_DATE_DAY_TO_STRING);
-        Convertor dateTimeString = helper.getConvertor(ConvertorHelper.ALIAS_DATE_TIME_TO_STRING);
-
-        Convertor stringCalendarDay = helper.getConvertor(ConvertorHelper.ALIAS_STRING_TO_CALENDAR_DAY);
-        Convertor stringCalendarTime = helper.getConvertor(ConvertorHelper.ALIAS_STRING_TO_CALENDAR_TIME);
-        Convertor calendarDayString = helper.getConvertor(ConvertorHelper.ALIAS_CALENDAR_DAY_TO_STRING);
-        Convertor calendarTimeString = helper.getConvertor(ConvertorHelper.ALIAS_CALENDAR_TIME_TO_STRING);
-
-        String day = "2010-10-01";
-        String time = "2010-10-01 23:59:59";
-        Calendar timeCalendar = Calendar.getInstance();
-        timeCalendar.set(2010, 10 - 1, 01, 23, 59, 59);
-        timeCalendar.set(Calendar.MILLISECOND, 0);
-        Date timeDate = timeCalendar.getTime();
-        Calendar dayCalendar = Calendar.getInstance();
-        dayCalendar.set(2010, 10 - 1, 1, 0, 0, 0);
-        dayCalendar.set(Calendar.MILLISECOND, 0);
-        Date dayDate = dayCalendar.getTime();
-
-        // date转化验证
-        Object stringDateDayValue = stringDateDay.convert(day, Date.class);
-        Assert.assertTrue(dayDate.equals(stringDateDayValue));
-        Object stringDateTimeValue = stringDateTime.convert(time, Date.class);
-        Assert.assertTrue(timeDate.equals(stringDateTimeValue));
-        Object dateDayStringValue = dateDayString.convert(dayDate, String.class);
-        Assert.assertTrue(day.equals(dateDayStringValue));
-        Object dateTimeStringValue = dateTimeString.convert(timeDate, String.class);
-        Assert.assertTrue(time.equals(dateTimeStringValue));
-        // calendar转化验证
-        Object stringCalendarDayValue = stringCalendarDay.convert(day, Calendar.class);
-        Assert.assertTrue(dayCalendar.getTime().equals(((Calendar) stringCalendarDayValue).getTime()));
-        Object stringCalendarTimeValue = stringCalendarTime.convert(time, Calendar.class);
-        Assert.assertTrue(timeCalendar.getTime().equals(((Calendar) stringCalendarTimeValue).getTime()));
-        Object calendarDayStringValue = calendarDayString.convert(dayCalendar, String.class);
-        Assert.assertTrue(day.equals(calendarDayStringValue));
-        Object calendarTimeStringValue = calendarTimeString.convert(timeCalendar, String.class);
-        Assert.assertTrue(time.equals(calendarTimeStringValue));
-
     }
 
 }

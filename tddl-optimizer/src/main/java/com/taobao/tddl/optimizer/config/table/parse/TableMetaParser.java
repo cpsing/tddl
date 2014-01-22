@@ -301,7 +301,6 @@ public class TableMetaParser {
                 type = "LONG";
                 break;
             case Types.INTEGER:
-
             case Types.TINYINT:
             case Types.SMALLINT:
             case Types.NUMERIC:
@@ -326,6 +325,7 @@ public class TableMetaParser {
             case Types.NVARCHAR:
             case Types.LONGNVARCHAR:
             case Types.LONGVARCHAR:
+            case Types.CLOB:
                 type = "STRING";
                 break;
             case Types.BINARY:
