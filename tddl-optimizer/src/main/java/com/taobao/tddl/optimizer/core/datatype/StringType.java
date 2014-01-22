@@ -12,9 +12,9 @@ public class StringType extends AbstractDataType<String> {
     private final Calculator calculator = new Calculator() {
 
                                             public BigDecimal convertToBigDecimal(Object v) {
-                                                String str = convertFrom(v);
+
                                                 try {
-                                                    return DataType.BigDecimalType.convertFrom(str);
+                                                    return DataType.BigDecimalType.convertFrom(v);
                                                 } catch (Exception ex) {
                                                     return BigDecimal.ZERO;
                                                 }
