@@ -12,7 +12,7 @@ import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMessage;
-import com.taobao.tddl.optimizer.core.datatype.IntegerType;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 
 public class AffectRowCursor extends SchematicCursor implements IAffectRowCursor {
 
@@ -31,7 +31,7 @@ public class AffectRowCursor extends SchematicCursor implements IAffectRowCursor
             return cursormeta;
         }
         schemaInited = true;
-        ColumnMessage colMeta = new ColumnMessage(ResultCursor.AFFECT_ROW, new IntegerType());
+        ColumnMessage colMeta = new ColumnMessage(ResultCursor.AFFECT_ROW, DataType.IntegerType);
         CursorMetaImp cursurMetaImp = CursorMetaImp.buildNew("", Arrays.asList(colMeta), 1);
         this.cursormeta = cursurMetaImp;
         return cursurMetaImp;

@@ -28,6 +28,7 @@ import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.datatype.DataType;
+import com.taobao.tddl.optimizer.core.datatype.DataTypeUtil;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
@@ -575,6 +576,10 @@ public class ExecUtils {
                     }
                     int n = comp(c1, c2, orderBy);
 
+                    if (n == 0) continue;
+
+                    return n;
+
                 }
                 return 0;
             }
@@ -615,6 +620,8 @@ public class ExecUtils {
 
     public static int comp(Object c1, Object c2, DataType type1, DataType type2) {
 
+        if (type1 == null) type1 = DataTypeUtil.getTypeOfObject(c1);
+
         // 类型相同，直接比较
         if (type1 == type2) {
             return type1.compare(c1, c2);
@@ -628,7 +635,11 @@ public class ExecUtils {
 
     public static int comp(Comparable c1, Comparable c2, IOrderBy order) {
 
-        int n = order.getColumn().getDataType().compare(c1, c2);
+        DataType type = order.getColumn().getDataType();
+
+        if (type == null) type = DataTypeUtil.getTypeOfObject(c1);
+
+        int n = type.compare(c1, c2);
 
         if (n == 0) {
             return n;

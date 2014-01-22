@@ -1,6 +1,5 @@
 package com.taobao.tddl.executor.rowset;
 
-import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
@@ -53,18 +52,22 @@ public abstract class AbstractRowSet implements IRowSet {
 
     @Override
     public Long getLong(int index) {
-        Object val = this.getObject(index);
-        if (val == null) return 0L;
 
-        if (val instanceof Long) return (Long) val;
+        ColumnMeta cm = iCursorMeta.getColumns().get(index);
+        return (Long) cm.getDataType().getResultGetter().get(this, index);
 
-        if (val instanceof Number) return ((Number) val).longValue();
-
-        if (val instanceof BigDecimal) return ((BigDecimal) val).longValue();
-
-        String strVal = this.getString(index);
-
-        return Long.valueOf(strVal);
+        // Object val = this.getObject(index);
+        // if (val == null) return 0L;
+        //
+        // if (val instanceof Long) return (Long) val;
+        //
+        // if (val instanceof Number) return ((Number) val).longValue();
+        //
+        // if (val instanceof BigDecimal) return ((BigDecimal) val).longValue();
+        //
+        // String strVal = this.getString(index);
+        //
+        // return Long.valueOf(strVal);
     }
 
     @Override
@@ -100,15 +103,19 @@ public abstract class AbstractRowSet implements IRowSet {
 
     @Override
     public Boolean getBoolean(int index) {
-        Object val = this.getObject(index);
-        // -1 || >0 是true
-        if (val == null) return false;
 
-        if (val instanceof Boolean) return (Boolean) val;
+        ColumnMeta cm = iCursorMeta.getColumns().get(index);
+        return (Boolean) cm.getDataType().getResultGetter().get(this, index);
 
-        String strVal = this.getString(index);
-
-        return Boolean.valueOf(strVal);
+        // Object val = this.getObject(index);
+        // // -1 || >0 是true
+        // if (val == null) return false;
+        //
+        // if (val instanceof Boolean) return (Boolean) val;
+        //
+        // String strVal = this.getString(index);
+        //
+        // return Boolean.valueOf(strVal);
     }
 
     @Override
@@ -118,18 +125,23 @@ public abstract class AbstractRowSet implements IRowSet {
 
     @Override
     public Short getShort(int index) {
-        Object val = this.getObject(index);
-        if (val == null) return 0;
 
-        if (val instanceof Short) return (Short) val;
+        ColumnMeta cm = iCursorMeta.getColumns().get(index);
+        return (Short) cm.getDataType().getResultGetter().get(this, index);
 
-        if (val instanceof Number) return ((Number) val).shortValue();
-
-        if (val instanceof BigDecimal) return ((BigDecimal) val).shortValue();
-
-        String strVal = this.getString(index);
-
-        return Short.valueOf(strVal);
+        // Object val = this.getObject(index);
+        // if (val == null) return 0;
+        //
+        // if (val instanceof Short) return (Short) val;
+        //
+        // if (val instanceof Number) return ((Number) val).shortValue();
+        //
+        // if (val instanceof BigDecimal) return ((BigDecimal)
+        // val).shortValue();
+        //
+        // String strVal = this.getString(index);
+        //
+        // return Short.valueOf(strVal);
     }
 
     @Override
@@ -139,18 +151,23 @@ public abstract class AbstractRowSet implements IRowSet {
 
     @Override
     public Float getFloat(int index) {
-        Object val = this.getObject(index);
-        if (val == null) return (float) 0.0;
 
-        if (val instanceof Float) return (Float) val;
+        ColumnMeta cm = iCursorMeta.getColumns().get(index);
+        return (Float) cm.getDataType().getResultGetter().get(this, index);
 
-        if (val instanceof Number) return ((Number) val).floatValue();
-
-        if (val instanceof BigDecimal) return ((BigDecimal) val).floatValue();
-
-        String strVal = this.getString(index);
-
-        return Float.valueOf(strVal);
+        // Object val = this.getObject(index);
+        // if (val == null) return (float) 0.0;
+        //
+        // if (val instanceof Float) return (Float) val;
+        //
+        // if (val instanceof Number) return ((Number) val).floatValue();
+        //
+        // if (val instanceof BigDecimal) return ((BigDecimal)
+        // val).floatValue();
+        //
+        // String strVal = this.getString(index);
+        //
+        // return Float.valueOf(strVal);
     }
 
     @Override
@@ -160,18 +177,22 @@ public abstract class AbstractRowSet implements IRowSet {
 
     @Override
     public Double getDouble(int index) {
-        Object val = this.getObject(index);
-        if (val == null) return 0.0;
+        ColumnMeta cm = iCursorMeta.getColumns().get(index);
+        return (Double) cm.getDataType().getResultGetter().get(this, index);
 
-        if (val instanceof Double) return (Double) val;
-
-        if (val instanceof Number) return ((Number) val).doubleValue();
-
-        if (val instanceof BigDecimal) return ((BigDecimal) val).doubleValue();
-
-        String strVal = this.getString(index);
-
-        return Double.valueOf(strVal);
+        // Object val = this.getObject(index);
+        // if (val == null) return 0.0;
+        //
+        // if (val instanceof Double) return (Double) val;
+        //
+        // if (val instanceof Number) return ((Number) val).doubleValue();
+        //
+        // if (val instanceof BigDecimal) return ((BigDecimal)
+        // val).doubleValue();
+        //
+        // String strVal = this.getString(index);
+        //
+        // return Double.valueOf(strVal);
     }
 
     @Override
@@ -181,10 +202,15 @@ public abstract class AbstractRowSet implements IRowSet {
 
     @Override
     public byte[] getBytes(int index) {
-        Object obj = getObject(index);
-        if (obj == null) return null;
-        if (obj instanceof byte[]) return (byte[]) obj;
-        else throw new RuntimeException("暂不支持类型:" + obj.getClass() + " 的getBytes操作");
+
+        ColumnMeta cm = iCursorMeta.getColumns().get(index);
+        return (byte[]) cm.getDataType().getResultGetter().get(this, index);
+
+        // Object obj = getObject(index);
+        // if (obj == null) return null;
+        // if (obj instanceof byte[]) return (byte[]) obj;
+        // else throw new RuntimeException("暂不支持类型:" + obj.getClass() +
+        // " 的getBytes操作");
     }
 
     @Override
@@ -194,12 +220,17 @@ public abstract class AbstractRowSet implements IRowSet {
 
     @Override
     public Date getDate(int index) {
-        Object obj = getObject(index);
-        if (obj == null) return null;
-        if (obj instanceof Date) return (Date) obj;
-        if (obj instanceof java.util.Date) {
-            return new Date(((java.util.Date) obj).getTime());
-        } else throw new RuntimeException("暂不支持类型:" + obj.getClass() + " 的getDate操作");
+
+        ColumnMeta cm = iCursorMeta.getColumns().get(index);
+        return (Date) cm.getDataType().getResultGetter().get(this, index);
+
+        // Object obj = getObject(index);
+        // if (obj == null) return null;
+        // if (obj instanceof Date) return (Date) obj;
+        // if (obj instanceof java.util.Date) {
+        // return new Date(((java.util.Date) obj).getTime());
+        // } else throw new RuntimeException("暂不支持类型:" + obj.getClass() +
+        // " 的getDate操作");
     }
 
     @Override
@@ -209,13 +240,15 @@ public abstract class AbstractRowSet implements IRowSet {
 
     @Override
     public Timestamp getTimestamp(int index) {
-
-        Object obj = getObject(index);
-        if (obj == null) return null;
-        if (obj instanceof Timestamp) return (Timestamp) obj;
-        if (obj instanceof java.util.Date) {
-            return new Timestamp(((java.util.Date) obj).getTime());
-        } else throw new RuntimeException("暂不支持类型:" + obj.getClass() + " 的getTimestamp操作");
+        ColumnMeta cm = iCursorMeta.getColumns().get(index);
+        return (Timestamp) cm.getDataType().getResultGetter().get(this, index);
+        // Object obj = getObject(index);
+        // if (obj == null) return null;
+        // if (obj instanceof Timestamp) return (Timestamp) obj;
+        // if (obj instanceof java.util.Date) {
+        // return new Timestamp(((java.util.Date) obj).getTime());
+        // } else throw new RuntimeException("暂不支持类型:" + obj.getClass() +
+        // " 的getTimestamp操作");
     }
 
     @Override

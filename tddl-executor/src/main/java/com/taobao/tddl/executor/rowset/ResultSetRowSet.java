@@ -1,11 +1,8 @@
 package com.taobao.tddl.executor.rowset;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,16 +27,16 @@ public class ResultSetRowSet extends AbstractRowSet implements IRowSet {
         try {
             int actIndex = index + 1;
             Object obValue = rs.getObject(actIndex);
-            if (obValue instanceof BigDecimal) {
-                // obValue = ((BigDecimal) obValue).longValue();
-            } else if (obValue instanceof BigInteger) {
-                obValue = ((BigInteger) obValue).longValue();
-            }
-
-            // Date和Time要做转换，防止丢掉了时间或者日期部分
-            if (obValue instanceof Date || (obValue instanceof Time)) {
-                obValue = rs.getTimestamp(actIndex);
-            }
+            // if (obValue instanceof BigDecimal) {
+            // // obValue = ((BigDecimal) obValue).longValue();
+            // } else if (obValue instanceof BigInteger) {
+            // obValue = ((BigInteger) obValue).longValue();
+            // }
+            //
+            // // Date和Time要做转换，防止丢掉了时间或者日期部分
+            // if (obValue instanceof Date || (obValue instanceof Time)) {
+            // obValue = rs.getTimestamp(actIndex);
+            // }
             if (rs.wasNull()) {
                 return null;
             }

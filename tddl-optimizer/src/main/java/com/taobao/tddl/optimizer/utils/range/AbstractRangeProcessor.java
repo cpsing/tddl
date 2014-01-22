@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.datatype.DataType;
+import com.taobao.tddl.optimizer.core.datatype.DataTypeUtil;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
@@ -29,6 +30,11 @@ public abstract class AbstractRangeProcessor {
      */
     protected Range getRange(IBooleanFilter f) {
         DataType type = getColumn(f).getDataType();
+
+        if (type == null) {
+            type = DataTypeUtil.getTypeOfObject(f.getValue());
+        }
+
         switch (f.getOperation()) {
             case EQ:
                 return new Range(null, type, getValue(f), getValue(f));

@@ -640,14 +640,13 @@ public class TResultSet implements ResultSet {
     @Override
     public Object getObject(String columnLabel) throws SQLException {
         validateColumnLabel(columnLabel);
-        // 对日期类型特殊处理
         DataType a = getColumnLabelDataType(columnLabel);
-        boolean dataFlag = false;
-        if (a != null) {
-            dataFlag = (a == DataType.DatetimeType);
-        } else {
-            dataFlag = false;
-        }
+        // boolean dataFlag = false;
+        // if (a != null) {
+        // dataFlag = (a == DataType.DatetimeType);
+        // } else {
+        // dataFlag = false;
+        // }
 
         try {
             Integer index = getIndexByColumnLabel(columnLabel);
@@ -660,33 +659,6 @@ public class TResultSet implements ResultSet {
             if (null == result) {
                 wasNull = true;
                 return null;
-            } else if (dataFlag) {
-                // 为了保持和mysql数据库date类型返回值一直对date类型数据 进行特殊的处理
-                java.sql.Date date_value = null;
-                if (result instanceof java.util.Date) {
-                    date_value = new java.sql.Date(((java.util.Date) result).getTime());
-                } else {
-                    date_value = (java.sql.Date) result;
-                }
-                Calendar dateCal = Calendar.getInstance();
-                dateCal.setTime(date_value);
-
-                int year = dateCal.get(Calendar.YEAR);
-                int month = dateCal.get(Calendar.MONTH);
-                int day = dateCal.get(Calendar.DAY_OF_MONTH);
-
-                dateCal.set(year, month, day, 0, 0, 0);
-                dateCal.set(Calendar.MILLISECOND, 0);
-
-                long dateAsMillis = 0;
-                try {
-                    dateAsMillis = dateCal.getTimeInMillis();
-                } catch (IllegalAccessError iae) {
-                    // Must be on JDK-1.3.1 or older....
-                    dateAsMillis = dateCal.getTime().getTime();
-                }
-                wasNull = false;
-                return new Date(dateAsMillis);
             } else {
                 wasNull = false;
                 return result;

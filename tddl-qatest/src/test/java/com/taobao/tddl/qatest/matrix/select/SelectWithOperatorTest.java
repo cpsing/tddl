@@ -141,7 +141,7 @@ public class SelectWithOperatorTest extends BaseMatrixTestCase {
         param.add(gmtNext);
         selectContentSameAssert(sql, columnParam, param);
 
-        sql = "select * from " + normaltblTableName + " where pk>? or id<? and name like ? and gmt_create= ?";
+        sql = "select * from " + normaltblTableName + " where pk>? or (id<? and name like ? and gmt_create= ?)";
         param.clear();
         param.add(start1);
         param.add(1500);

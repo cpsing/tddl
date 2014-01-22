@@ -10,6 +10,7 @@ import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.datatype.StringType;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.bean.Column;
@@ -27,7 +28,7 @@ public class QueryPlanResultCursor extends ResultCursor {
     static {
         IColumn c = new Column();
         c.setColumnName("EXPLAIN");
-        c.setDataType(new StringType());
+        c.setDataType(DataType.StringType);
         columns.add(c);
 
         ColumnMeta cm = new ColumnMeta(null, "EXPLAIN", new StringType(), null, false);

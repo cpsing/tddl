@@ -36,7 +36,7 @@ public class Sum extends AggregateFunction {
 
         if (total == null) {
 
-            o = type.convertFromObject(o);
+            o = type.convertFrom(o);
 
             total = o;
         } else {
@@ -112,7 +112,7 @@ public class Sum extends AggregateFunction {
             return null;
         }
 
-        if (type == DataType.LongType || type == DataType.IntType || type == DataType.ShortType) {
+        if (type == DataType.LongType || type == DataType.IntegerType || type == DataType.ShortType) {
             return DataType.LongType;
         } else if (type == DataType.FloatType) {
             return DataType.FloatType;

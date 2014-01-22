@@ -32,15 +32,19 @@ public class Min extends AggregateFunction {
 
     private void doMin(Object[] args) {
         Object o = args[0];
-        
-        DataType type = 
+
+        DataType type = this.getReturnType();
         if (o != null) {
             if (min == null) {
                 min = o;
             }
-            if (((Comparable) o).compareTo(min) < 0) {
+
+            if (type.compare(o, min) < 0) {
                 min = o;
             }
+            // if (((Comparable) o).compareTo(min) < 0) {
+            // min = o;
+            // }
 
         }
     }
