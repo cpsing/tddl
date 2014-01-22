@@ -187,6 +187,10 @@ public class ConvertorHelper {
         repository.registerConvertor(Date.class, java.sql.Timestamp.class, dateToSql);
         repository.registerConvertor(java.sql.Timestamp.class, java.sql.Date.class, dateToSql);
         repository.registerConvertor(java.sql.Timestamp.class, java.sql.Time.class, dateToSql);
+        repository.registerConvertor(java.sql.Date.class, java.sql.Timestamp.class, dateToSql);
+        repository.registerConvertor(java.sql.Date.class, java.sql.Time.class, dateToSql);
+        repository.registerConvertor(java.sql.Time.class, java.sql.Timestamp.class, dateToSql);
+        repository.registerConvertor(java.sql.Time.class, java.sql.Date.class, dateToSql);
         repository.registerConvertor(Blob.class, byte[].class, blobToBytes);
         repository.registerConvertor(String.class, byte[].class, stringToBytes);
     }
