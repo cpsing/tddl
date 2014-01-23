@@ -43,7 +43,7 @@ public class Validator {
                     ps.setObject(i + 1, param.get(i));
                 }
                 rs = ps.executeQuery();
-                Thread.sleep(500);
+                // //Thread.sleep(500);
             }
         } catch (Exception ex) {
             throw new Exception(ex);
@@ -397,7 +397,7 @@ public class Validator {
                     ps.setObject(i + 1, param.get(i));
                 }
                 rs = ps.executeUpdate();
-                Thread.sleep(500);
+                // Thread.sleep(500);
             }
 
         } catch (Exception ex) {
