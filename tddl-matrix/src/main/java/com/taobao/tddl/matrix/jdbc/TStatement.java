@@ -1,7 +1,6 @@
 package com.taobao.tddl.matrix.jdbc;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
@@ -51,8 +50,6 @@ public class TStatement implements Statement {
      * 当前statment 是否是关闭的
      */
     protected boolean             closed;
-
-    protected PreparedStatement   proxyStatement;
 
     private int                   maxFieldSize;
 
@@ -219,10 +216,6 @@ public class TStatement implements Statement {
             return;
         }
         try {
-            if (this.proxyStatement != null) {
-                proxyStatement.close();
-            }
-
             if (currentResultSet != null) {
                 currentResultSet.close();
             }
@@ -335,10 +328,6 @@ public class TStatement implements Statement {
 
     public int getResultSetType() throws SQLException {
         return resultSetType;
-    }
-
-    public void setProxyStatement(PreparedStatement ps) {
-        this.proxyStatement = ps;
     }
 
     public int getResultSetHoldability() throws SQLException {

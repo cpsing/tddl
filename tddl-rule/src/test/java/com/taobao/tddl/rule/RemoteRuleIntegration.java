@@ -35,17 +35,6 @@ public class RemoteRuleIntegration extends BaseRuleTest {
     }
 
     @Test
-    public void testGetRules() {
-        List<String> versions = rule.getAllVersions();
-        for (String version : versions) {
-            VirtualTableRoot vtr = rule.getVersionRule(version);
-            for (VirtualTableRule table : vtr.getVirtualTableMap().values()) {
-                System.out.println(table.getActualTopology());
-            }
-        }
-    }
-
-    @Test
     public void testTddlRuleMuRulesAndCompare_Select() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String conditionStr = "message_id >=25:int and message_id<=26:int;gmt_create>=" + sdf.format(new Date())
