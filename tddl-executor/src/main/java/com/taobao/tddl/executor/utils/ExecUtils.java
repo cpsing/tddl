@@ -457,7 +457,7 @@ public class ExecUtils {
     public static List<ColumnMeta> getColumnMetaWithLogicTables(List<ISelectable> columns) {
         List<ColumnMeta> _columns = new ArrayList<ColumnMeta>(columns.size());
         for (ISelectable c : columns) {
-            ColumnMeta ic = new ColumnMeta(GeneralUtil.getLogicTableName(c.getTableName()),
+            ColumnMeta ic = new ColumnMeta(getLogicTableName(c.getTableName()),
                 c.getColumnName(),
                 c.getDataType(),
                 c.getAlias(),
@@ -699,7 +699,7 @@ public class ExecUtils {
 
     private static void addNewColumnMeta(List<ColumnMeta> columnMeta, List<ColumnMeta> columns) {
         for (ColumnMeta cm : columnMeta) {
-            ColumnMeta cmNew = new ColumnMeta(GeneralUtil.getLogicTableName(cm.getTableName()),
+            ColumnMeta cmNew = new ColumnMeta(getLogicTableName(cm.getTableName()),
                 cm.getName(),
                 cm.getDataType(),
                 cm.getAlias(),
