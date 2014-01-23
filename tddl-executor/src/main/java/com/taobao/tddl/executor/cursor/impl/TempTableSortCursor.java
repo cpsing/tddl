@@ -9,8 +9,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.common.utils.TStringUtil;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.codec.CodecFactory;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.KVPair;
@@ -33,6 +31,9 @@ import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * 用于临时表排序，需要依赖bdb
@@ -291,9 +292,9 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
             ISelectable iSelectable = ob.getColumn();
             String orderByTable = iSelectable.getTableName();
 
-            orderByTable = GeneralUtil.getLogicTableName(orderByTable);
+            orderByTable = ExecUtils.getLogicTableName(orderByTable);
 
-            if (cm != null && TStringUtil.equals(GeneralUtil.getLogicTableName(cm.getTableName()), orderByTable)) {
+            if (cm != null && TStringUtil.equals(ExecUtils.getLogicTableName(cm.getTableName()), orderByTable)) {
                 if (TStringUtil.equals(cm.getName(), iSelectable.getColumnName())) {
                     ColumnMeta cm2 = new ColumnMeta(cm.getTableName(),
                         cm.getTableName() + "." + cm.getName(),

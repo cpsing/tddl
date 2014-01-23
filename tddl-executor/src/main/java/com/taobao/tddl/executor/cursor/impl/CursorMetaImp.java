@@ -13,6 +13,7 @@ import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.common.IRowsValueScaner;
 import com.taobao.tddl.executor.common.RowsValueScanerImp;
 import com.taobao.tddl.executor.cursor.ICursorMeta;
+import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMessage;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
@@ -172,7 +173,7 @@ public class CursorMetaImp implements ICursorMeta {
 
     @Override
     public Integer getIndex(String tableName, String columnName) {
-        tableName = GeneralUtil.getLogicTableName(tableName);
+        tableName = ExecUtils.getLogicTableName(tableName);
         ColumnHolder ch = indexMap.get(columnName);
         if (ch == null) {
             return null;
@@ -242,7 +243,7 @@ public class CursorMetaImp implements ICursorMeta {
         // aliasIndexMap = new HashMap<String, CursorMetaImp.ColumnHolder>();
         // }
 
-        tableName = GeneralUtil.getLogicTableName(tableName);
+        tableName = ExecUtils.getLogicTableName(tableName);
         ColumnHolder ch = indexMap.get(colName);
         if (ch == null) {
             ch = new ColumnHolder(null, tableName, index);

@@ -173,10 +173,7 @@ public class BDBConfig extends RepositoryConfig {
     public BDBConfig(){
     }
 
-    ;
-
     public BDBConfig(String file) throws IOException{
-
         InputStream in = GeneralUtil.getInputStream(file);
         load(in);
     }

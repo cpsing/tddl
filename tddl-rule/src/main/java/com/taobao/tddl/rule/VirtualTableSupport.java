@@ -48,8 +48,8 @@ public abstract class VirtualTableSupport extends AbstractLifecycle implements L
     protected String[]                 tbRuleParames;
 
     /** ============ 运行时变量 ================= **/
-    protected DBType                   dbType               = DBType.MYSQL;                               // Oracle|MySql
-    protected String                   virtualTbName;                                                     // 逻辑表名
+    protected DBType                   dbType               = DBType.MYSQL;                            // Oracle|MySql
+    protected String                   virtualTbName;                                                  // 逻辑表名
     protected Map<String, Set<String>> actualTopology;
 
     // ==================== 参数处理方法 ====================

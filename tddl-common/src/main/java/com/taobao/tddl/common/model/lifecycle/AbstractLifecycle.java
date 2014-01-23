@@ -16,8 +16,15 @@ public class AbstractLifecycle implements Lifecycle {
             if (isInited()) {
                 return;
             }
-            isInited = true;
-            doInit();
+
+            try {
+                doInit();
+                isInited = true;
+            } catch (Exception e) {
+                // 出现异常调用destory方法，释放
+                doDestory();
+                throw new TddlException(e);
+            }
         }
     }
 

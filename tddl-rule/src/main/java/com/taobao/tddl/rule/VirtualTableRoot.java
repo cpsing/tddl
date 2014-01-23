@@ -91,18 +91,6 @@ public class VirtualTableRoot extends AbstractLifecycle implements Lifecycle {
         logger.warn("virtual table inited :" + tableNameKey);
     }
 
-    public Map<String, TableRule> getVirtualTableMap() {
-        return virtualTableMap;
-    }
-
-    public void setVirtualTableMap(Map<String, TableRule> virtualTableMap) {
-        this.virtualTableMap = virtualTableMap;
-    }
-
-    public Map<String, TableRule> getTableRules() {
-        return virtualTableMap;
-    }
-
     public String getDefaultDbIndex() {
         return defaultDbIndex;
     }

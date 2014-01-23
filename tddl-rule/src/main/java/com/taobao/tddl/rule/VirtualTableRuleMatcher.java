@@ -190,7 +190,8 @@ public class VirtualTableRuleMatcher {
         if (dbRule == null && tbRule == null) {
             // 若无库规则，静态拓扑里面只有一个库，则无论没表规则也好，全表扫也好，结果都和静态拓扑一样
             // 若有库规则，那么是全库扫，则无论没表规则也好，全表扫也好，结果仍然和静态拓扑一样！！
-            topology = new HashMap<String, Map<String, Field>>(rule.getActualTopology().size());
+            Map<String, Set<String>> actualTopology = rule.getActualTopology();
+            topology = new HashMap<String, Map<String, Field>>(actualTopology.size());
             for (Map.Entry<String, Set<String>> e : rule.getActualTopology().entrySet()) {
                 topology.put(e.getKey(), toMapField(e.getValue()));
             }
