@@ -7,6 +7,7 @@ import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.PlanVisitor;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
@@ -18,62 +19,72 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
  */
 public class Column implements IColumn {
 
-    protected String    alias;
-    protected String    columName;
-    protected String    tableName;
-    protected DATA_TYPE dataType;
-    protected boolean   distinct;
-    private boolean     isNot = false;
+    protected String   alias;
+    protected String   columName;
+    protected String   tableName;
+    protected DataType dataType;
+    protected boolean  distinct;
+    private boolean    isNot = false;
 
     public Column(){
     }
 
-    public Column(String columName, String alias, DATA_TYPE dataType){
+    public Column(String columName, String alias, DataType dataType){
         this.columName = columName;
         this.alias = alias;
         this.dataType = dataType;
     }
 
+    @Override
     public IColumn assignment(Map<Integer, ParameterContext> parameterSettings) {
         return this;
     }
 
-    public IColumn setDataType(com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE data_type) {
+    @Override
+    public IColumn setDataType(DataType data_type) {
         this.dataType = data_type;
         return this;
     }
 
-    public com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE getDataType() {
+    @Override
+    public DataType getDataType() {
         return dataType;
     }
 
+    @Override
     public String getAlias() {
         return alias;
     }
 
+    @Override
     public String getTableName() {
         return tableName;
     }
 
+    @Override
     public String getColumnName() {
         return columName;
     }
 
+    @Override
     public IColumn setAlias(String alias) {
         this.alias = alias;
         return this;
     }
 
+    @Override
     public IColumn setTableName(String tableName) {
         this.tableName = tableName;
         return this;
     }
 
+    @Override
     public IColumn setColumnName(String columnName) {
         this.columName = columnName;
         return this;
     }
 
+    @Override
     public boolean isSameName(ISelectable select) {
         String cn1 = this.getColumnName();
         String cn2 = select.getColumnName();
@@ -84,6 +95,7 @@ public class Column implements IColumn {
         return TStringUtil.equals(cn1, cn2);
     }
 
+    @Override
     public String getFullName() {
         if (this.tableName != null) {
             return tableName + "." + this.getColumnName();
@@ -92,24 +104,29 @@ public class Column implements IColumn {
         }
     }
 
+    @Override
     public boolean isDistinct() {
         return distinct;
     }
 
+    @Override
     public boolean isNot() {
         return isNot;
     }
 
+    @Override
     public IColumn setDistinct(boolean distinct) {
         this.distinct = distinct;
         return this;
     }
 
+    @Override
     public IColumn setIsNot(boolean isNot) {
         this.isNot = isNot;
         return this;
     }
 
+    @Override
     public IColumn copy() {
         IColumn newColumn = ASTNodeFactory.getInstance().createColumn();
         newColumn.setColumnName(columName)
@@ -121,10 +138,12 @@ public class Column implements IColumn {
         return newColumn;
     }
 
+    @Override
     public int compareTo(Object o) {
         throw new NotSupportException();
     }
 
+    @Override
     public void accept(PlanVisitor visitor) {
         visitor.visit(this);
     }
@@ -134,6 +153,7 @@ public class Column implements IColumn {
     /**
      * 这个方法不要被自动修改！ 在很多地方都有用到。
      */
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -146,6 +166,7 @@ public class Column implements IColumn {
     /**
      * 这个方法不要被自动修改！ 在很多地方都有用到。
      */
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -178,6 +199,7 @@ public class Column implements IColumn {
         return true;
     }
 
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         if (this.isDistinct()) {

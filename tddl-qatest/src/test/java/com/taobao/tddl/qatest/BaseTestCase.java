@@ -3,10 +3,10 @@ package com.taobao.tddl.qatest;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
 
@@ -58,7 +58,7 @@ public class BaseTestCase extends Validator {
     protected ResultSet               rs            = null;
 
     protected final NumberFormat      nf            = new DecimalFormat("#.#");
-    protected String                  timeString    = DateUtil.formatDate(new Date(), DateUtil.DATE_FULLHYPHEN);
+    protected String                  timeString    = DateUtil.formatDate(new Date(0), DateUtil.DATE_FULLHYPHEN);
     protected static final Logger     logger        = Logger.getLogger(BaseTestCase.class);
     protected static final Properties properties    = new Properties();
 

@@ -1,9 +1,10 @@
 package com.taobao.tddl.optimizer.core.function;
 
+import com.taobao.tddl.optimizer.core.datatype.DataType;
+import com.taobao.tddl.optimizer.core.datatype.DateType;
 import com.taobao.tddl.optimizer.core.expression.IExtraFunction;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IFunction.FunctionType;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.exceptions.FunctionException;
 
 /**
@@ -13,8 +14,8 @@ import com.taobao.tddl.optimizer.exceptions.FunctionException;
  */
 public class DummyTest implements IExtraFunction {
 
-    public DATA_TYPE getReturnType() {
-        return DATA_TYPE.LONG_VAL;
+    public DataType getReturnType() {
+        return DateType.LongType;
     }
 
     public void compute(Object[] args) throws FunctionException {
@@ -28,8 +29,8 @@ public class DummyTest implements IExtraFunction {
         return FunctionType.Scalar;
     }
 
-    public DATA_TYPE getMapReturnType() {
-        return DATA_TYPE.LONG_VAL;
+    public DataType getMapReturnType() {
+        return DateType.LongType;
     }
 
     public Object getResult() {

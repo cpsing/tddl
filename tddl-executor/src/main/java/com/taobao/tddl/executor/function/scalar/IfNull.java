@@ -1,15 +1,16 @@
 package com.taobao.tddl.executor.function.scalar;
 
 import com.taobao.tddl.executor.function.ScalarFunction;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 
 /**
  * @since 5.1.0
  */
 public class IfNull extends ScalarFunction {
 
+    @Override
     public void compute(Object[] args) {
         if (args == null) {
             this.result = null;
@@ -25,9 +26,10 @@ public class IfNull extends ScalarFunction {
 
     }
 
-    public DATA_TYPE getReturnType() {
+    @Override
+    public DataType getReturnType() {
         Object[] args = function.getArgs().toArray();
-        DATA_TYPE type = null;
+        DataType type = null;
         if (args[0] instanceof IColumn) {
             type = ((IColumn) args[0]).getDataType();
         }

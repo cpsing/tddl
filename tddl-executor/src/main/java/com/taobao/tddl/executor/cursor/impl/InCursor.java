@@ -2,7 +2,6 @@ package com.taobao.tddl.executor.cursor.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -16,13 +15,12 @@ import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.cursor.IInCursor;
 import com.taobao.tddl.executor.cursor.SchematicCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
-import com.taobao.tddl.executor.record.MapRecord;
+import com.taobao.tddl.executor.record.FixedLengthRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 
 /**
  * 专门处理 id in (xx,xx,xx,xx)的cursor 接受一大批的id in请求，然后分批，batch的方式，调用mget拿到具体的值。
@@ -68,13 +66,13 @@ public class InCursor extends SchematicCursor implements IInCursor {
             .getCodec(Arrays.asList(ExecUtils.getColumnMeta(c)));
         this.c = c;
 
-        if (c.getDataType() == DATA_TYPE.DATE_VAL) {
-            List<Object> vNew = new ArrayList<Object>(v.size());
-            for (Object comp : v) {
-                vNew.add(new Date((Long) comp));
-            }
-            v = vNew;
-        }
+        // if (c.getDataType() == DATA_TYPE.DATE_VAL) {
+        // List<Object> vNew = new ArrayList<Object>(v.size());
+        // for (Object comp : v) {
+        // vNew.add(new Date((Long) comp));
+        // }
+        // v = vNew;
+        // }
         this.valuesToFind = v;
         this.op = op;
     }
@@ -99,9 +97,12 @@ public class InCursor extends SchematicCursor implements IInCursor {
         throw new IllegalArgumentException("should not be here");
     }
 
-    public static MapRecord getCloneableRecordOfKey(String keyCol, Object keyVal, RecordCodec keyCodec) {
-        MapRecord record = new MapRecord();
-        record.put(keyCol, keyVal);
+    public CloneableRecord getCloneableRecordOfKey(Object keyVal, RecordCodec keyCodec) {
+        List cs = new ArrayList(1);
+        cs.add(c);
+
+        FixedLengthRecord record = new FixedLengthRecord(ExecUtils.convertISelectablesToColumnMeta(cs));
+        record.put(this.c.getColumnName(), keyVal);
         return record;
     }
 
@@ -121,7 +122,7 @@ public class InCursor extends SchematicCursor implements IInCursor {
             // 还未初始化
             List<CloneableRecord> list = new ArrayList<CloneableRecord>(valuesToFind.size());
             for (Object valOne : valuesToFind) {
-                list.add(getCloneableRecordOfKey(c.getColumnName(), valOne, keyCodec));
+                list.add(getCloneableRecordOfKey(valOne, keyCodec));
             }
             pairToReturn = cursor.mgetWithDuplicateList(list, false, true);
             pairToReturnIterator = pairToReturn.iterator();

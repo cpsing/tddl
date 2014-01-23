@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.taobao.tddl.executor.common.IRecord;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 
 /**
  * @author jianxing <jianxing.qx@taobao.com>
@@ -140,6 +141,16 @@ public class NamedRecord extends CloneableRecord {
         } else {
             return super.hashCode();
         }
+    }
+
+    @Override
+    public DataType getType(int index) {
+        return record.getType(index);
+    }
+
+    @Override
+    public DataType getType(String columnName) {
+        return record.getType(columnName);
     }
 
 }

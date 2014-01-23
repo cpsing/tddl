@@ -21,7 +21,7 @@ import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.config.table.IndexType;
 import com.taobao.tddl.optimizer.config.table.Relationship;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 
 /**
  * 基于xml定义{@linkplain TableMeta}，对应的解析器
@@ -228,33 +228,37 @@ public class TableMetaParser {
         return metas;
     }
 
-    private static DATA_TYPE getDataType(String type) {
+    private static DataType getDataType(String type) {
         if ("INT".equalsIgnoreCase(type) || "INTEGER".equalsIgnoreCase(type)) {
-            return DATA_TYPE.INT_VAL;
+            return DataType.IntegerType;
         } else if ("LONG".equalsIgnoreCase(type)) {
-            return DATA_TYPE.LONG_VAL;
+            return DataType.LongType;
+        } else if ("SHORT".equalsIgnoreCase(type)) {
+            return DataType.ShortType;
+        } else if ("BIGDECIMAL".equalsIgnoreCase(type)) {
+            return DataType.BigDecimalType;
         } else if ("FLOAT".equalsIgnoreCase(type)) {
-            return DATA_TYPE.FLOAT_VAL;
+            return DataType.FloatType;
         } else if ("DOUBLE".equalsIgnoreCase(type)) {
-            return DATA_TYPE.DOUBLE_VAL;
+            return DataType.DoubleType;
         } else if ("STRING".equalsIgnoreCase(type)) {
-            return DATA_TYPE.STRING_VAL;
+            return DataType.StringType;
         } else if ("BYTES".equalsIgnoreCase(type)) {
-            return DATA_TYPE.BYTES_VAL;
+            return DataType.BytesType;
         } else if ("BOOLEAN".equalsIgnoreCase(type)) {
-            return DATA_TYPE.BOOLEAN_VAL;
+            return DataType.BooleanType;
         } else if ("DATE".equalsIgnoreCase(type)) {
-            return DATA_TYPE.DATE_VAL;
+            return DataType.DateType;
         } else if ("TIMESTAMP".equalsIgnoreCase(type)) {
-            return DATA_TYPE.TIMESTAMP_VAL;
+            return DataType.TimestampType;
         } else if ("DATETIME".equalsIgnoreCase(type)) {
-            return DATA_TYPE.TIMESTAMP_VAL;
+            return DataType.DatetimeType;
         } else if ("TIME".equalsIgnoreCase(type)) {
-            return DATA_TYPE.TIME_VAL;
+            return DataType.TimeType;
         } else if ("BLOB".equalsIgnoreCase(type)) {
-            return DATA_TYPE.BLOB_VAL;
+            return DataType.BlobType;
         } else if ("BIT".equalsIgnoreCase(type)) {
-            return DATA_TYPE.BIT_VAL;
+            return DataType.BitType;
         }
 
         return null;
@@ -285,7 +289,7 @@ public class TableMetaParser {
         return Relationship.NONE;
     }
 
-    public static DATA_TYPE jdbcTypeToDataType(int jdbcType) {
+    public static DataType jdbcTypeToDataType(int jdbcType) {
         return getDataType(jdbcTypeToDataTypeString(jdbcType));
     }
 
@@ -297,7 +301,6 @@ public class TableMetaParser {
                 type = "LONG";
                 break;
             case Types.INTEGER:
-
             case Types.TINYINT:
             case Types.SMALLINT:
             case Types.NUMERIC:
@@ -322,6 +325,7 @@ public class TableMetaParser {
             case Types.NVARCHAR:
             case Types.LONGNVARCHAR:
             case Types.LONGVARCHAR:
+            case Types.CLOB:
                 type = "STRING";
                 break;
             case Types.BINARY:

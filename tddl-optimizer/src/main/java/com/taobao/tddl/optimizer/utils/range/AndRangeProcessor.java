@@ -15,18 +15,25 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
  */
 public class AndRangeProcessor extends AbstractRangeProcessor {
 
-    private Comparable    column;
-    private Range         wholeRange   = null;
-    private List<IFilter> otherFilters = new ArrayList();
-    boolean               emptySet     = false;
+    private final Comparable    column;
+    private Range               wholeRange   = null;
+    private final List<IFilter> otherFilters = new ArrayList();
+    boolean                     emptySet     = false;
 
     public AndRangeProcessor(Comparable c){
         this.column = c;
     }
 
+    @Override
     public boolean process(IFilter f) {
         if (f != null && ((IBooleanFilter) f).getValue() instanceof ISelectable) {
             // 不处理column = column的filter
+            otherFilters.add(f);
+            return true;
+        }
+
+        if (!(((IBooleanFilter) f).getColumn() instanceof ISelectable)) {
+            // 不处理value=value的filter
             otherFilters.add(f);
             return true;
         }

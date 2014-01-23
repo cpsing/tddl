@@ -13,6 +13,7 @@ import com.taobao.tddl.optimizer.core.ast.ASTNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.query.JoinNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
@@ -20,7 +21,6 @@ import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.exceptions.EmptyResultFilterException;
 import com.taobao.tddl.optimizer.exceptions.QueryException;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
@@ -51,57 +51,58 @@ public class FilterPreProcessor {
     /**
      * 处理逻辑见类描述 {@linkplain FilterPreProcessor}
      */
-    public static QueryTreeNode optimize(QueryTreeNode qtn) throws QueryException {
-        qtn = preProcess(qtn);
+    public static QueryTreeNode optimize(QueryTreeNode qtn, boolean typeConvert) throws QueryException {
+        qtn = preProcess(qtn, typeConvert);
         return qtn;
     }
 
-    private static QueryTreeNode preProcess(QueryTreeNode qtn) throws QueryException {
-        qtn.setOtherJoinOnFilter(processFilter(qtn.getOtherJoinOnFilter()));
-        qtn.having(processFilter(qtn.getHavingFilter()));
-        qtn.query(processFilter(qtn.getWhereFilter()));
-        qtn.setKeyFilter(processFilter(qtn.getKeyFilter()));
-        qtn.setResultFilter(processFilter(qtn.getResultFilter()));
+    private static QueryTreeNode preProcess(QueryTreeNode qtn, boolean typeConvert) throws QueryException {
+        qtn.setOtherJoinOnFilter(processFilter(qtn.getOtherJoinOnFilter(), typeConvert));
+        qtn.having(processFilter(qtn.getHavingFilter(), typeConvert));
+        qtn.query(processFilter(qtn.getWhereFilter(), typeConvert));
+        qtn.setKeyFilter(processFilter(qtn.getKeyFilter(), typeConvert));
+        qtn.setResultFilter(processFilter(qtn.getResultFilter(), typeConvert));
         if (qtn instanceof TableNode) {
-            ((TableNode) qtn).setIndexQueryValueFilter(processFilter(((TableNode) qtn).getIndexQueryValueFilter()));
+            ((TableNode) qtn).setIndexQueryValueFilter(processFilter(((TableNode) qtn).getIndexQueryValueFilter(),
+                typeConvert));
         }
 
         if (qtn instanceof JoinNode) {
             for (int i = 0; i < ((JoinNode) qtn).getJoinFilter().size(); i++) {
-                processFilter(((JoinNode) qtn).getJoinFilter().get(i));
+                processFilter(((JoinNode) qtn).getJoinFilter().get(i), typeConvert);
             }
         }
 
         for (ASTNode child : qtn.getChildren()) {
-            preProcess((QueryTreeNode) child);
+            preProcess((QueryTreeNode) child, typeConvert);
         }
 
         return qtn;
     }
 
-    private static IFilter processFilter(IFilter root) {
+    private static IFilter processFilter(IFilter root, boolean typeConvert) {
         if (root == null) {
             return null;
         }
 
         root = shortestFilter(root); // 短路一下
-        root = processOneFilter(root); // 做一下转换处理
+        root = processOneFilter(root, typeConvert); // 做一下转换处理
         root = FilterUtils.merge(root);// 合并一下flter
         return root;
     }
 
-    private static IFilter processOneFilter(IFilter root) {
+    private static IFilter processOneFilter(IFilter root, boolean typeConvert) {
         if (root == null) {
             return null;
         }
 
         if (root instanceof IBooleanFilter) {
-            return processBoolFilter(root);
+            return processBoolFilter(root, typeConvert);
         } else if (root instanceof ILogicalFilter) {
             ILogicalFilter lf = (ILogicalFilter) root;
             List<IFilter> children = new LinkedList<IFilter>();
             for (IFilter child : lf.getSubFilter()) {
-                IFilter childProcessed = processOneFilter(child);
+                IFilter childProcessed = processOneFilter(child, typeConvert);
                 if (childProcessed != null) {
                     children.add(childProcessed);
                 }
@@ -176,9 +177,10 @@ public class FilterPreProcessor {
         return FilterUtils.DNFToOrLogicTree(newDNFfilter);
     }
 
-    private static IFilter processBoolFilter(IFilter root) {
+    private static IFilter processBoolFilter(IFilter root, boolean typeConvert) {
         root = exchage(root);
-        root = typeConvert(root);
+
+        if (typeConvert) root = typeConvert(root);
         return root;
     }
 
@@ -224,7 +226,7 @@ public class FilterPreProcessor {
         } else {
             // 如果是 1 = id情况
             if (FilterUtils.isConstValue(bf.getColumn()) && !FilterUtils.isConstValue(bf.getValue())) {
-                DATA_TYPE type = null;
+                DataType type = null;
                 if (bf.getValue() instanceof IColumn) {
                     type = ((IColumn) bf.getValue()).getDataType();
                 }
@@ -238,7 +240,7 @@ public class FilterPreProcessor {
 
             // 如果是 id = 1情况
             if (FilterUtils.isConstValue(bf.getValue()) && !FilterUtils.isConstValue(bf.getColumn())) {
-                DATA_TYPE type = null;
+                DataType type = null;
                 if (bf.getColumn() instanceof IColumn) {
                     type = ((IColumn) bf.getColumn()).getDataType();
                 }
@@ -250,6 +252,7 @@ public class FilterPreProcessor {
                 bf.setValue(OptimizerUtils.convertType(bf.getValue(), type));
             }
         }
+        // ((Timestamp)bf.getValue()).getTime();
         return bf;
     }
 }

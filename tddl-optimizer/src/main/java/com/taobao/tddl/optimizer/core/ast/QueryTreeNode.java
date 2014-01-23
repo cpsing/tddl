@@ -12,6 +12,7 @@ import com.taobao.tddl.optimizer.core.ast.build.QueryTreeNodeBuilder;
 import com.taobao.tddl.optimizer.core.ast.query.JoinNode;
 import com.taobao.tddl.optimizer.core.ast.query.MergeNode;
 import com.taobao.tddl.optimizer.core.ast.query.TableNode;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IBindVal;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
@@ -19,7 +20,6 @@ import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree.LOCK_MODEL;
 import com.taobao.tddl.optimizer.core.plan.query.IParallelizableQueryTree.QUERY_CONCURRENCY;
@@ -186,12 +186,12 @@ public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
         this.otherJoinOnFilter = OptimizerUtils.assignment(this.otherJoinOnFilter, parameterSettings);
         if (this.limitFrom instanceof IBindVal) {
             Object value = ((IBindVal) limitFrom).assignment(parameterSettings);
-            limitFrom = (Comparable) OptimizerUtils.convertType(value, DATA_TYPE.LONG_VAL);
+            limitFrom = (Comparable) OptimizerUtils.convertType(value, DataType.LongType);
         }
 
         if (this.limitTo instanceof IBindVal) {
             Object value = ((IBindVal) limitTo).assignment(parameterSettings);
-            limitTo = (Comparable) OptimizerUtils.convertType(value, DATA_TYPE.LONG_VAL);
+            limitTo = (Comparable) OptimizerUtils.convertType(value, DataType.LongType);
         }
     }
 

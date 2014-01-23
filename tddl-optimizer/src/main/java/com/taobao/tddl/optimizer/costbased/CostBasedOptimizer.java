@@ -25,6 +25,8 @@ import com.taobao.tddl.common.jdbc.SqlTypeParser;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.SqlType;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.monitor.Monitor;
 import com.taobao.tddl.optimizer.Optimizer;
 import com.taobao.tddl.optimizer.OptimizerContext;
@@ -66,9 +68,6 @@ import com.taobao.tddl.optimizer.parse.hint.RouteCondition;
 import com.taobao.tddl.optimizer.parse.hint.RuleRouteCondition;
 import com.taobao.tddl.optimizer.parse.hint.SimpleHintParser;
 import com.taobao.tddl.rule.model.TargetDB;
-
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * <pre>
@@ -302,9 +301,10 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
             optimized.assignment(parameterSettings);
             // 绑定变量后，再做一次
             if (optimized instanceof DMLNode) {
-                ((DMLNode) optimized).setNode((TableNode) FilterPreProcessor.optimize(((DMLNode) optimized).getNode()));
+                ((DMLNode) optimized).setNode((TableNode) FilterPreProcessor.optimize(((DMLNode) optimized).getNode(),
+                    false));
             } else {
-                optimized = FilterPreProcessor.optimize(((QueryTreeNode) optimized));
+                optimized = FilterPreProcessor.optimize(((QueryTreeNode) optimized), false);
             }
         }
 
@@ -376,7 +376,7 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
         qn = JoinPreProcessor.optimize(qn);
 
         // 预处理filter，比如过滤永假式/永真式
-        qn = FilterPreProcessor.optimize(qn);
+        qn = FilterPreProcessor.optimize(qn, true);
 
         // 将约束条件推向叶节点
         qn = FilterPusher.optimize(qn);

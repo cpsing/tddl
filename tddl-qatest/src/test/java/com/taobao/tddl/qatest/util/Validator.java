@@ -43,7 +43,7 @@ public class Validator {
                     ps.setObject(i + 1, param.get(i));
                 }
                 rs = ps.executeQuery();
-                Thread.sleep(500);
+                // //Thread.sleep(500);
             }
         } catch (Exception ex) {
             throw new Exception(ex);
@@ -387,16 +387,17 @@ public class Validator {
             if (param == null) {
                 rs = ps.executeUpdate();
             } else {
-                for (int i = 0; i < param.size(); i++) {
-                    if (param.get(i) instanceof java.util.Date) {
-                        param.set(i, DateUtil.formatDate((java.util.Date) param.get(i), DateUtil.DATETIME_FULLHYPHEN));
-                    }
-                }
+                // for (int i = 0; i < param.size(); i++) {
+                // if (param.get(i) instanceof java.util.Date) {
+                // param.set(i, DateUtil.formatDate((java.util.Date)
+                // param.get(i), DateUtil.DATETIME_FULLHYPHEN));
+                // }
+                // }
                 for (int i = 0; i < param.size(); i++) {
                     ps.setObject(i + 1, param.get(i));
                 }
                 rs = ps.executeUpdate();
-                Thread.sleep(500);
+                // Thread.sleep(500);
             }
 
         } catch (Exception ex) {

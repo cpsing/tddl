@@ -1,7 +1,7 @@
 package com.taobao.tddl.optimizer.core.expression;
 
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IFunction.FunctionType;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 
 /**
  * 扩展函数实例，比如用于实现Merge的count/min等聚合函数
@@ -23,12 +23,12 @@ public interface IExtraFunction {
     /**
      * 获取Map函数的返回结果
      */
-    public abstract DATA_TYPE getMapReturnType();
+    public abstract DataType getMapReturnType();
 
     /**
      * 获取最后返回结果类型
      */
-    public abstract DATA_TYPE getReturnType();
+    public abstract DataType getReturnType();
 
     /**
      * 获取function的结果

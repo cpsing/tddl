@@ -2,7 +2,7 @@ package com.taobao.tddl.optimizer.config.table;
 
 import java.io.Serializable;
 
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 
 /**
  * 列信息
@@ -20,7 +20,7 @@ public class ColumnMessage implements Serializable {
     /**
      * 当前列的类型
      */
-    protected final DATA_TYPE dataType;
+    protected final DataType  dataType;
     /**
      * 当前列的别名
      */
@@ -32,15 +32,15 @@ public class ColumnMessage implements Serializable {
 
     protected final boolean   isAutoCreated;
 
-    public ColumnMessage(String name, DATA_TYPE dataType, String alias){
+    public ColumnMessage(String name, DataType dataType, String alias){
         this(name, dataType, alias, true, false);
     }
 
-    public ColumnMessage(String name, DATA_TYPE dataType, String alias, boolean isAutoCreated){
+    public ColumnMessage(String name, DataType dataType, String alias, boolean isAutoCreated){
         this(name, dataType, alias, true, isAutoCreated);
     }
 
-    public ColumnMessage(String name, DATA_TYPE dataType, String alias, boolean nullable, boolean isAutoCreated){
+    public ColumnMessage(String name, DataType dataType, String alias, boolean nullable, boolean isAutoCreated){
         this.name = name;
         this.dataType = dataType;
         this.alias = alias;
@@ -48,7 +48,7 @@ public class ColumnMessage implements Serializable {
         this.isAutoCreated = isAutoCreated;
     }
 
-    public ColumnMessage(String name, DATA_TYPE dataType){
+    public ColumnMessage(String name, DataType dataType){
         this(name, dataType, null);
     }
 
@@ -60,7 +60,7 @@ public class ColumnMessage implements Serializable {
         return alias;
     }
 
-    public DATA_TYPE getDataType() {
+    public DataType getDataType() {
         return dataType;
     }
 

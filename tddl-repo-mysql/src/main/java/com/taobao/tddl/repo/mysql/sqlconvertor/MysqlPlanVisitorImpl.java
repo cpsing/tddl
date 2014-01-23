@@ -308,7 +308,13 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
                 MysqlPlanVisitorImpl visitor = this.getNewVisitor(func.getArgs().get(0));
                 sqlBuilder.append(visitor.getString());// 常量，不太可能走到这一步
             } else if ((func instanceof IBooleanFilter)
-                       && (OPERATION.IS_NULL.equals(((IBooleanFilter) func).getOperation()) || OPERATION.IS_NOT_NULL.equals(((IBooleanFilter) func).getOperation()))) {
+                       && (OPERATION.IS_NULL.equals(((IBooleanFilter) func).getOperation())
+                           || OPERATION.IS_NOT_NULL.equals(((IBooleanFilter) func).getOperation())
+                           || OPERATION.IS_TRUE.equals(((IBooleanFilter) func).getOperation())
+                           || OPERATION.IS_NOT_TRUE.equals(((IBooleanFilter) func).getOperation())
+                           || OPERATION.IS_FALSE.equals(((IBooleanFilter) func).getOperation()) || OPERATION.IS_NOT_FALSE.equals(((IBooleanFilter) func).getOperation())
+
+                       )) {
                 MysqlPlanVisitorImpl visitor = this.getNewVisitor(func.getArgs().get(0));
                 sqlBuilder.append(visitor.getString());
                 sqlBuilder.append(" ").append(funcName);

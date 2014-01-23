@@ -1,10 +1,11 @@
 package com.taobao.tddl.executor.function.scalar;
 
 import com.taobao.tddl.executor.function.ScalarFunction;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 
 public class Round extends ScalarFunction {
 
+    @Override
     public void compute(Object[] args) {
         if (args.length == 1) {
             if (args[0] instanceof Float) {
@@ -20,8 +21,9 @@ public class Round extends ScalarFunction {
 
     }
 
-    public DATA_TYPE getReturnType() {
-        return DATA_TYPE.LONG_VAL;
+    @Override
+    public DataType getReturnType() {
+        return DataType.LongType;
     }
 
 }

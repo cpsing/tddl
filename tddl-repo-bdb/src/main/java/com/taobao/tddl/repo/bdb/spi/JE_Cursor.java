@@ -86,11 +86,11 @@ public class JE_Cursor implements Cursor {
             // if (current == null) {
             current = new KVPair();
             // }
-            current.setKey(key_codec.decode(key.getData(), reuse));
+            current.setKey(key_codec.decode(key.getData()));
             if (value.getSize() == 0) {
                 current.setValue(null);
             } else {
-                current.setValue(value_codec.decode(value.getData(), false));
+                current.setValue(value_codec.decode(value.getData()));
             }
         } else {
             current = null;
@@ -230,11 +230,11 @@ public class JE_Cursor implements Cursor {
     private void setKV() {
         current = new KVPair();
 
-        current.setKey(key_codec.decode(key.getData(), reuse));
+        current.setKey(key_codec.decode(key.getData()));
         if (value.getSize() == 0) {
             current.setValue(null);
         } else {
-            current.setValue(value_codec.decode(value.getData(), false));
+            current.setValue(value_codec.decode(value.getData()));
         }
     }
 

@@ -5,20 +5,32 @@ import java.math.BigInteger;
 
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.executor.function.ScalarFunction;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
+import com.taobao.tddl.optimizer.core.datatype.DataTypeUtil;
+import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
 /**
  * @since 5.1.0
  */
 public class Sub extends ScalarFunction {
 
+    @Override
     public void compute(Object[] args) {
         this.result = this.computeInner(args);
 
     }
 
-    public DATA_TYPE getReturnType() {
-        return DATA_TYPE.LONG_VAL;
+    @Override
+    public DataType getReturnType() {
+        Object[] args = function.getArgs().toArray();
+        DataType type = null;
+        if (args[0] instanceof ISelectable) {
+            type = ((ISelectable) args[0]).getDataType();
+        } else {
+            type = DataTypeUtil.getTypeOfObject(args[0]);
+        }
+
+        return type;
     }
 
     private Comparable computeInner(Object[] args) {

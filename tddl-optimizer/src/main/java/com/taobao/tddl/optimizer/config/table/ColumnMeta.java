@@ -5,7 +5,7 @@ import java.io.Serializable;
 import org.apache.commons.lang.StringUtils;
 
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 
 /**
  * Column 的元信息描述
@@ -29,7 +29,7 @@ public class ColumnMeta implements Serializable {
     /**
      * 当前列的类型
      */
-    protected final DATA_TYPE dataType;
+    protected final DataType  dataType;
 
     /**
      * 当前列的别名
@@ -41,7 +41,7 @@ public class ColumnMeta implements Serializable {
      */
     protected final boolean   nullable;
 
-    public ColumnMeta(String tableName, String name, DATA_TYPE dataType, String alias, boolean nullable){
+    public ColumnMeta(String tableName, String name, DataType dataType, String alias, boolean nullable){
         this.tableName = StringUtils.upperCase(tableName);
         this.name = StringUtils.upperCase(name);
         this.alias = StringUtils.upperCase(alias);
@@ -57,7 +57,7 @@ public class ColumnMeta implements Serializable {
         return name;
     }
 
-    public DATA_TYPE getDataType() {
+    public DataType getDataType() {
         return dataType;
     }
 
@@ -69,6 +69,7 @@ public class ColumnMeta implements Serializable {
         return nullable;
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -95,6 +96,7 @@ public class ColumnMeta implements Serializable {
         return true;
     }
 
+    @Override
     public int hashCode() {
         int hash = 5;
         hash = 23 * hash + (this.name != null ? this.name.hashCode() : 0);
@@ -116,6 +118,7 @@ public class ColumnMeta implements Serializable {
         return sb.toString();
     }
 
+    @Override
     public String toString() {
         return toStringWithInden(0);
     }

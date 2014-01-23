@@ -40,8 +40,8 @@ public class BaseMatrixTestCase extends PrepareData {
     protected static String                dbType                  = null;
 
     protected static boolean               needPerparedData        = true;
-    private static String                  machineTapologyFile     = "src/test/resources/matrix/server_topology.xml";
-    private static String                  machineTapologyAyncFile = "src/test/resources/matrix/server_async_topology.xml";
+    private static String                  machineTapologyFile     = "matrix/server_topology.xml";
+    private static String                  machineTapologyAyncFile = "matrix/server_async_topology.xml";
 
     private static String                  typeFile                = "db_type.properties";
 

@@ -9,6 +9,7 @@ import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.PlanVisitor;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.ExtraFunctionManager;
 import com.taobao.tddl.optimizer.core.expression.IBindVal;
 import com.taobao.tddl.optimizer.core.expression.IExtraFunction;
@@ -36,46 +37,56 @@ public class Function<RT extends IFunction> implements IFunction<RT> {
     private boolean              isNot;
     private boolean              needDistinctArg = false;
 
+    @Override
     public String getFunctionName() {
         return functionName;
     }
 
+    @Override
     public IFunction setFunctionName(String functionName) {
         this.functionName = functionName;
         return this;
     }
 
-    public RT setDataType(DATA_TYPE dataType) {
+    @Override
+    public RT setDataType(DataType dataType) {
         throw new NotSupportException();
     }
 
+    @Override
     public String getAlias() {
         return alias;
     }
 
+    @Override
     public String getTableName() {
         return tablename;
     }
 
+    @Override
     public String getColumnName() {
         return columnName;
     }
 
+    @Override
     public RT setAlias(String alias) {
         this.alias = alias;
         return (RT) this;
     }
 
+    @Override
     public RT setTableName(String tableName) {
         this.tablename = tableName;
         return (RT) this;
     }
 
+    @Override
     public RT setColumnName(String columnName) {
         this.columnName = columnName;
         return (RT) this;
     }
 
+    @Override
     public boolean isSameName(ISelectable select) {
         String cn1 = this.getColumnName();
         if (TStringUtil.isNotEmpty(this.getAlias())) {
@@ -90,46 +101,56 @@ public class Function<RT extends IFunction> implements IFunction<RT> {
         return TStringUtil.equals(cn1, cn2);
     }
 
+    @Override
     public String getFullName() {
         return this.getColumnName();
     }
 
+    @Override
     public boolean isDistinct() {
         return distinct;
     }
 
+    @Override
     public boolean isNot() {
         return isNot;
     }
 
+    @Override
     public RT setDistinct(boolean distinct) {
         this.distinct = distinct;
         return (RT) this;
     }
 
+    @Override
     public RT setIsNot(boolean isNot) {
         this.isNot = isNot;
         return (RT) this;
     }
 
+    @Override
     public List getArgs() {
         return args;
     }
 
+    @Override
     public RT setArgs(List args) {
         this.args = args;
         return (RT) this;
     }
 
+    @Override
     public boolean isNeedDistinctArg() {
         return needDistinctArg;
     }
 
+    @Override
     public RT setNeedDistinctArg(boolean b) {
         this.needDistinctArg = b;
         return (RT) this;
     }
 
+    @Override
     public RT copy() {
         IFunction funcNew = ASTNodeFactory.getInstance().createFunction();
         funcNew.setFunctionName(getFunctionName())
@@ -145,7 +166,7 @@ public class Function<RT extends IFunction> implements IFunction<RT> {
                 if (arg instanceof ISelectable) {
                     argsNew.add(((ISelectable) arg).copy());
                 } else if (arg instanceof IBindVal) {
-                    argsNew.add(((IBindVal) arg));
+                    argsNew.add((arg));
                 } else {
                     argsNew.add(arg);
                 }
@@ -173,7 +194,7 @@ public class Function<RT extends IFunction> implements IFunction<RT> {
                 if (arg instanceof ISelectable) {
                     argsNew.add(((ISelectable) arg).copy());
                 } else if (arg instanceof IBindVal) {
-                    argsNew.add(((IBindVal) arg));
+                    argsNew.add((arg));
                 } else {
                     argsNew.add(arg);
                 }
@@ -183,14 +204,17 @@ public class Function<RT extends IFunction> implements IFunction<RT> {
         }
     }
 
+    @Override
     public void accept(PlanVisitor visitor) {
         visitor.visit(this);
     }
 
+    @Override
     public int compareTo(Object o) {
         throw new NotSupportException();
     }
 
+    @Override
     public RT assignment(Map<Integer, ParameterContext> parameterSettings) {
         if (getArgs() != null) {
             List<Object> argsNew = getArgs();
@@ -211,6 +235,7 @@ public class Function<RT extends IFunction> implements IFunction<RT> {
         return (RT) this;
     }
 
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(this.getColumnName());
@@ -220,6 +245,7 @@ public class Function<RT extends IFunction> implements IFunction<RT> {
         return builder.toString();
     }
 
+    @Override
     public IExtraFunction getExtraFunction() {
         if (extraFunction == null) {
             extraFunction = ExtraFunctionManager.getExtraFunction(getFunctionName());
@@ -228,16 +254,19 @@ public class Function<RT extends IFunction> implements IFunction<RT> {
         return extraFunction;
     }
 
+    @Override
     public RT setExtraFunction(IExtraFunction function) {
         this.extraFunction = function;
         return (RT) this;
     }
 
+    @Override
     public FunctionType getFunctionType() {
         return getExtraFunction().getFunctionType();
     }
 
-    public DATA_TYPE getDataType() {
+    @Override
+    public DataType getDataType() {
         return getExtraFunction().getReturnType();
     }
 }

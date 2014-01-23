@@ -19,7 +19,7 @@ import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.impl.ColMetaAndIndex;
 import com.taobao.tddl.executor.cursor.impl.CursorMetaImp;
 import com.taobao.tddl.executor.record.CloneableRecord;
-import com.taobao.tddl.executor.record.MapRecord;
+import com.taobao.tddl.executor.record.FixedLengthRecord;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.rowset.ResultSetRowSet;
@@ -27,11 +27,12 @@ import com.taobao.tddl.executor.rowset.RowSetWrapper;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
+import com.taobao.tddl.optimizer.core.datatype.DataTypeUtil;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.expression.bean.Function;
 import com.taobao.tddl.optimizer.core.expression.bean.OrderBy;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
@@ -62,34 +63,6 @@ public class ExecUtils {
                 sb.append(orderBy.toStringWithInden(inden + 1)).append(" ");
             }
             sb.append("\n");
-        }
-    }
-
-    public static DATA_TYPE getTddlDataType(Object ob) {
-        if (ob instanceof Byte) {
-            return DATA_TYPE.BYTES_VAL;
-        } else if (ob instanceof Long) {
-            return DATA_TYPE.LONG_VAL;
-        } else if (ob instanceof Short) {
-            return DATA_TYPE.SHORT_VAL;
-        } else if (ob instanceof Boolean) {
-            return DATA_TYPE.BOOLEAN_VAL;
-        } else if (ob instanceof Character) {
-            return DATA_TYPE.CHAR_VAL;
-        } else if (ob instanceof String) {
-            return DATA_TYPE.STRING_VAL;
-        } else if (ob instanceof Float) {
-            return DATA_TYPE.FLOAT_VAL;
-        } else if (ob instanceof Double) {
-            return DATA_TYPE.DOUBLE_VAL;
-        } else if (ob instanceof Integer) {
-            return DATA_TYPE.INT_VAL;
-        } else if (ob instanceof java.sql.Date) {
-            return DATA_TYPE.DATE_VAL;
-        } else if (ob instanceof java.util.Date) {
-            return DATA_TYPE.DATE_VAL;
-        } else {
-            throw new RuntimeException("自行加转换 Object 2 DATA_TYPE");
         }
     }
 
@@ -264,7 +237,7 @@ public class ExecUtils {
         }
     }
 
-    public static IColumn.DATA_TYPE getDataType(Object column) {
+    public static DataType getDataType(Object column) {
         if (column instanceof IColumn) {
             return getIColumn(column).getDataType();
         } else if (column instanceof IFunction) {
@@ -484,7 +457,7 @@ public class ExecUtils {
     public static List<ColumnMeta> getColumnMetaWithLogicTables(List<ISelectable> columns) {
         List<ColumnMeta> _columns = new ArrayList<ColumnMeta>(columns.size());
         for (ISelectable c : columns) {
-            ColumnMeta ic = new ColumnMeta(GeneralUtil.getLogicTableName(c.getTableName()),
+            ColumnMeta ic = new ColumnMeta(getLogicTableName(c.getTableName()),
                 c.getColumnName(),
                 c.getDataType(),
                 c.getAlias(),
@@ -601,16 +574,12 @@ public class ExecUtils {
                     if (c1 == null && c2 == null) {
                         continue;
                     }
-                    int n = comp(c1, c2);
-                    if (n == 0) {
-                        continue;
-                    }
-                    boolean isAsc = orderBy.getDirection();
-                    if (isAsc) {
-                        return n;
-                    } else {
-                        return n < 0 ? 1 : -1;
-                    }
+                    int n = comp(c1, c2, orderBy);
+
+                    if (n == 0) continue;
+
+                    return n;
+
                 }
                 return 0;
             }
@@ -639,7 +608,7 @@ public class ExecUtils {
                 for (int i = 0; i < left_columns.size(); i++) {
                     Comparable c1 = (Comparable) leftIter.next();
                     Comparable c2 = (Comparable) rightIter.next();
-                    int n = comp(c1, c2);
+                    int n = comp(c1, c2, left_columns.get(i).getDataType(), right_columns.get(i).getDataType());
                     if (n != 0) {
                         return n;
                     }
@@ -649,14 +618,38 @@ public class ExecUtils {
         };
     }
 
-    public static int comp(Comparable c1, Comparable c2) {
-        if (c1 == null) {
-            return -1;
+    public static int comp(Object c1, Object c2, DataType type1, DataType type2) {
+
+        if (type1 == null) type1 = DataTypeUtil.getTypeOfObject(c1);
+
+        // 类型相同，直接比较
+        if (type1 == type2) {
+            return type1.compare(c1, c2);
         }
-        if (c2 == null) {
-            return 1;
+
+        // 类型不同，先进行类型转换
+        c2 = type1.convertFrom(c2);
+
+        return type1.compare(c1, c2);
+    }
+
+    public static int comp(Comparable c1, Comparable c2, IOrderBy order) {
+
+        DataType type = order.getColumn().getDataType();
+
+        if (type == null) type = DataTypeUtil.getTypeOfObject(c1);
+
+        int n = type.compare(c1, c2);
+
+        if (n == 0) {
+            return n;
         }
-        return c1.compareTo(c2);
+        boolean isAsc = order.getDirection();
+        if (isAsc) {
+            return n;
+        } else {
+            return n < 0 ? 1 : -1;
+        }
     }
 
     public static List<IOrderBy> copyOrderBys(List<IOrderBy> orders) {
@@ -672,9 +665,10 @@ public class ExecUtils {
 
     public static CloneableRecord convertToClonableRecord(IRowSet iRowSet) {
         Iterator<ColMetaAndIndex> columnIterator = iRowSet.getParentCursorMeta().indexIterator();
-        CloneableRecord cr = new MapRecord();
+        CloneableRecord cr = new FixedLengthRecord(iRowSet.getParentCursorMeta().getColumns());
         while (columnIterator.hasNext()) {
             ColMetaAndIndex cmAndIndex = columnIterator.next();
+
             cr.put(cmAndIndex.getName(), iRowSet.getObject(cmAndIndex.getIndex()));
         }
         return cr;
@@ -705,7 +699,7 @@ public class ExecUtils {
 
     private static void addNewColumnMeta(List<ColumnMeta> columnMeta, List<ColumnMeta> columns) {
         for (ColumnMeta cm : columnMeta) {
-            ColumnMeta cmNew = new ColumnMeta(GeneralUtil.getLogicTableName(cm.getTableName()),
+            ColumnMeta cmNew = new ColumnMeta(getLogicTableName(cm.getTableName()),
                 cm.getName(),
                 cm.getDataType(),
                 cm.getAlias(),

@@ -18,11 +18,11 @@ import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IFunction.FunctionType;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
@@ -272,6 +272,7 @@ public class AggregateCursor extends SchematicCursor implements IAggregateCursor
         return false;
     }
 
+    @Override
     public IRowSet first() throws TddlException {
         this.end = false;
         this.isFirstTime = true;
@@ -280,6 +281,7 @@ public class AggregateCursor extends SchematicCursor implements IAggregateCursor
 
     }
 
+    @Override
     public void beforeFirst() throws TddlException {
         schemaInited = false;
         this.end = false;
@@ -318,7 +320,7 @@ public class AggregateCursor extends SchematicCursor implements IAggregateCursor
         String columnName;
 
         columnName = column.getColumnName();
-        DATA_TYPE type = null;
+        DataType type = null;
 
         // 函数在Map和Reduce过程中的返回类型可以不同
         // 如Avg，map过程返回String
@@ -333,7 +335,7 @@ public class AggregateCursor extends SchematicCursor implements IAggregateCursor
             }
         }
 
-        ColumnMeta cm = new ColumnMeta(GeneralUtil.getLogicTableName(column.getTableName()),
+        ColumnMeta cm = new ColumnMeta(ExecUtils.getLogicTableName(column.getTableName()),
             columnName,
             type,
             column.getAlias(),
@@ -346,6 +348,7 @@ public class AggregateCursor extends SchematicCursor implements IAggregateCursor
         return toStringWithInden(0);
     }
 
+    @Override
     public String toStringWithInden(int inden) {
         try {
             initSchema();

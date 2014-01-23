@@ -26,10 +26,11 @@ import java.util.Map;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.jdbc.ParameterMethod;
 import com.taobao.tddl.common.model.SqlType;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.matrix.jdbc.utils.PreParser;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author mengshi.sunmengshi 2013-11-22 下午3:26:18
@@ -459,7 +460,7 @@ public class TPreparedStatement extends TStatement implements PreparedStatement 
 
     @Override
     public ParameterMetaData getParameterMetaData() throws SQLException {
-        throw new UnsupportedOperationException("getParameterMetaData");
+        throw new SQLException("getParameterMetaData");
     }
 
 }

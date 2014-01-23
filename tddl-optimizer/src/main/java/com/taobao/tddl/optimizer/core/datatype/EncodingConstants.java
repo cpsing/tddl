@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.taobao.tddl.executor.codec;
+package com.taobao.tddl.optimizer.core.datatype;
 
 import java.math.BigInteger;
 

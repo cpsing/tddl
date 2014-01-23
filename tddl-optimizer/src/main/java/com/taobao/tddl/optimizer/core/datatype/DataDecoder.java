@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-package com.taobao.tddl.executor.codec;
+package com.taobao.tddl.optimizer.core.datatype;
 
-import static com.taobao.tddl.executor.codec.EncodingConstants.EMPTY_BYTE_ARRAY;
-import static com.taobao.tddl.executor.codec.EncodingConstants.NULL_BYTE_HIGH;
-import static com.taobao.tddl.executor.codec.EncodingConstants.NULL_BYTE_LOW;
+import static com.taobao.tddl.optimizer.core.datatype.EncodingConstants.EMPTY_BYTE_ARRAY;
+import static com.taobao.tddl.optimizer.core.datatype.EncodingConstants.NULL_BYTE_HIGH;
+import static com.taobao.tddl.optimizer.core.datatype.EncodingConstants.NULL_BYTE_LOW;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -85,8 +85,8 @@ public class DataDecoder {
         try {
             return (((long) (((src[srcOffset]) << 24) | ((src[srcOffset + 1] & 0xff) << 16)
                              | ((src[srcOffset + 2] & 0xff) << 8) | ((src[srcOffset + 3] & 0xff))) ^ 0x80000000) << 32)
-                   | (((long) (((src[srcOffset + 4]) << 24) | ((src[srcOffset + 5] & 0xff) << 16)
-                               | ((src[srcOffset + 6] & 0xff) << 8) | ((src[srcOffset + 7] & 0xff))) & 0xffffffffL));
+                   | (((((src[srcOffset + 4]) << 24) | ((src[srcOffset + 5] & 0xff) << 16)
+                        | ((src[srcOffset + 6] & 0xff) << 8) | ((src[srcOffset + 7] & 0xff))) & 0xffffffffL));
         } catch (IndexOutOfBoundsException e) {
             throw new CorruptEncodingException(null, e);
         }
@@ -320,8 +320,8 @@ public class DataDecoder {
         try {
             return (((long) (((src[srcOffset]) << 24) | ((src[srcOffset + 1] & 0xff) << 16)
                              | ((src[srcOffset + 2] & 0xff) << 8) | ((src[srcOffset + 3] & 0xff)))) << 32)
-                   | (((long) (((src[srcOffset + 4]) << 24) | ((src[srcOffset + 5] & 0xff) << 16)
-                               | ((src[srcOffset + 6] & 0xff) << 8) | ((src[srcOffset + 7] & 0xff))) & 0xffffffffL));
+                   | (((((src[srcOffset + 4]) << 24) | ((src[srcOffset + 5] & 0xff) << 16)
+                        | ((src[srcOffset + 6] & 0xff) << 8) | ((src[srcOffset + 7] & 0xff))) & 0xffffffffL));
         } catch (IndexOutOfBoundsException e) {
             throw new CorruptEncodingException(null, e);
         }

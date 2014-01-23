@@ -1,8 +1,8 @@
 package com.taobao.tddl.executor.function;
 
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IExtraFunction;
 import com.taobao.tddl.optimizer.core.expression.IFunction.FunctionType;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.exceptions.FunctionException;
 
 /**
@@ -17,19 +17,23 @@ public abstract class ScalarFunction extends ExtraFunction implements IExtraFunc
 
     protected Object result;
 
+    @Override
     public FunctionType getFunctionType() {
         return FunctionType.Scalar;
     }
 
+    @Override
     public void serverMap(Object[] args) throws FunctionException {
         this.compute(args);
     }
 
+    @Override
     public void serverReduce(Object[] args) throws FunctionException {
         this.compute(args);
     }
 
-    public DATA_TYPE getMapReturnType() {
+    @Override
+    public DataType getMapReturnType() {
         return this.getReturnType();
     }
 
@@ -37,14 +41,17 @@ public abstract class ScalarFunction extends ExtraFunction implements IExtraFunc
         this.result = result;
     }
 
+    @Override
     public Object getResult() {
         return result;
     }
 
+    @Override
     public void clear() {
         result = null;
     }
 
+    @Override
     public String getDbFunction() {
         return function.getColumnName();
     }

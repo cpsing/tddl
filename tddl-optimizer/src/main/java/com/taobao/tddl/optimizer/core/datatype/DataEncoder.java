@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-package com.taobao.tddl.executor.codec;
+package com.taobao.tddl.optimizer.core.datatype;
 
-import static com.taobao.tddl.executor.codec.EncodingConstants.NOT_NULL_BYTE_HIGH;
-import static com.taobao.tddl.executor.codec.EncodingConstants.NULL_BYTE_HIGH;
+import static com.taobao.tddl.optimizer.core.datatype.EncodingConstants.NOT_NULL_BYTE_HIGH;
+import static com.taobao.tddl.optimizer.core.datatype.EncodingConstants.NULL_BYTE_HIGH;
 
 import java.io.IOException;
 import java.io.OutputStream;

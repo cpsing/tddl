@@ -58,7 +58,7 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
                 if (tableName == null || tableAlias.startsWith(tableName)) {
                     // 如果以tableName作为开始，那么认为认为是相同名字，因此也做截断处理，取alias的.之前的数据。
                     // 最好也让优化器协助，不允许在alias里面出现"."
-                    tableAlias = GeneralUtil.getLogicTableName(tableAlias);
+                    tableAlias = ExecUtils.getLogicTableName(tableAlias);
                 }
             }
             if (!TStringUtil.isBlank(col.getAlias())) {

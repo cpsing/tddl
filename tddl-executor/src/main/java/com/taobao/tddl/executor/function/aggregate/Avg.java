@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.taobao.tddl.executor.function.AggregateFunction;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.exceptions.FunctionException;
 
 /**
@@ -22,6 +22,7 @@ public class Avg extends AggregateFunction {
 
     Map<String, Object> result = new HashMap<String, Object>(2);
 
+    @Override
     public void serverMap(Object[] args) throws FunctionException {
         count++;
         if (args[0] == null) {
@@ -60,6 +61,7 @@ public class Avg extends AggregateFunction {
         this.result.put(function.getColumnName(), avgRes);
     }
 
+    @Override
     public void serverReduce(Object[] args) throws FunctionException {
         if (args[0] == null || args[1] == null) {
             return;
@@ -93,6 +95,7 @@ public class Avg extends AggregateFunction {
 
     }
 
+    @Override
     public String getDbFunction() {
         return bulidAvgSql(function);
     }
@@ -105,22 +108,26 @@ public class Avg extends AggregateFunction {
         return sb.toString();
     }
 
+    @Override
     public Map<String, Object> getResult() {
         return result;
     }
 
+    @Override
     public void clear() {
         this.total = null;
         this.count = 0L;
         this.result.clear();
     }
 
-    public DATA_TYPE getReturnType() {
-        return DATA_TYPE.DOUBLE_VAL;
+    @Override
+    public DataType getReturnType() {
+        return DataType.DoubleType;
     }
 
-    public DATA_TYPE getMapReturnType() {
-        return DATA_TYPE.STRING_VAL;
+    @Override
+    public DataType getMapReturnType() {
+        return DataType.StringType;
     }
 
 }

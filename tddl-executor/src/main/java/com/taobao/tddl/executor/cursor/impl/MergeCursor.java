@@ -36,7 +36,6 @@ import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
@@ -170,6 +169,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
             ibf.setValues(new ArrayList<Object>());
             String colName = null;
             for (CloneableRecord record : keys) {
+
                 Map<String, Object> recordMap = record.getMap();
                 if (recordMap.size() == 1) {
                     // 单字段in
@@ -179,7 +179,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
                     IColumn col = ASTNodeFactory.getInstance()
                         .createColumn()
                         .setColumnName(colName)
-                        .setDataType(DATA_TYPE.LONG_VAL);
+                        .setDataType(record.getType(0));
 
                     col.setTableName(iquery.getAlias());
                     ibf.setColumn(col);
@@ -187,10 +187,11 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
                 } else {
                     // 多字段in
                     if (ibf.getColumn() == null) {
-                        ibf.setColumn(buildRowFunction(recordMap.keySet(), true));
-                    } else {
-                        ibf.getValues().add(buildRowFunction(recordMap.values(), false));
+                        ibf.setColumn(buildRowFunction(recordMap.keySet(), true, record));
                     }
+
+                    ibf.getValues().add(buildRowFunction(recordMap.values(), false, record));
+
                 }
             }
 
@@ -254,7 +255,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
         }
     }
 
-    private IFunction buildRowFunction(Collection values, boolean isColumn) {
+    private IFunction buildRowFunction(Collection values, boolean isColumn, CloneableRecord record) {
         IFunction func = ASTNodeFactory.getInstance().createFunction();
         func.setFunctionName("ROW");
         StringBuilder columnName = new StringBuilder();
@@ -266,7 +267,7 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
                 IColumn col = ASTNodeFactory.getInstance()
                     .createColumn()
                     .setColumnName((String) value)
-                    .setDataType(DATA_TYPE.LONG_VAL);
+                    .setDataType(record.getType((String) value));
                 columns.add(col);
             }
 

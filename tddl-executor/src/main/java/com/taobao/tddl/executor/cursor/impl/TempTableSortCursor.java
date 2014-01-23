@@ -28,7 +28,7 @@ import com.taobao.tddl.optimizer.config.table.IndexMeta;
 import com.taobao.tddl.optimizer.config.table.IndexType;
 import com.taobao.tddl.optimizer.config.table.Relationship;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
-import com.taobao.tddl.optimizer.core.expression.IColumn;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
@@ -59,7 +59,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
     ITable                      targetTable      = null;
 
     protected ICursorMeta       returnMeta       = null;
-    private long                requestID;
+    private final long          requestID;
     ExecutionContext            executionContext = null;
 
     /**
@@ -282,7 +282,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
                     }
                 }
             }
-            values.add(new ColumnMeta(columns.get(0).getTableName(), identity, IColumn.DATA_TYPE.INT_VAL, null, true));
+            values.add(new ColumnMeta(columns.get(0).getTableName(), identity, DataType.IntegerType, null, true));
         }
     }
 
@@ -292,9 +292,9 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
             ISelectable iSelectable = ob.getColumn();
             String orderByTable = iSelectable.getTableName();
 
-            orderByTable = GeneralUtil.getLogicTableName(orderByTable);
+            orderByTable = ExecUtils.getLogicTableName(orderByTable);
 
-            if (cm != null && TStringUtil.equals(GeneralUtil.getLogicTableName(cm.getTableName()), orderByTable)) {
+            if (cm != null && TStringUtil.equals(ExecUtils.getLogicTableName(cm.getTableName()), orderByTable)) {
                 if (TStringUtil.equals(cm.getName(), iSelectable.getColumnName())) {
                     ColumnMeta cm2 = new ColumnMeta(cm.getTableName(),
                         cm.getTableName() + "." + cm.getName(),
@@ -396,6 +396,7 @@ public class TempTableSortCursor extends SortCursor implements ITempTableSortCur
         return toStringWithInden(0);
     }
 
+    @Override
     public String toStringWithInden(int inden) {
         String tabTittle = GeneralUtil.getTab(inden);
         String tabContent = GeneralUtil.getTab(inden + 1);

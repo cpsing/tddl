@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
+import com.taobao.tddl.optimizer.core.datatype.DataTypeUtil;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
+import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
 /**
  * @author jianghang 2013-11-13 下午4:11:25
@@ -26,17 +29,23 @@ public abstract class AbstractRangeProcessor {
      * @return
      */
     protected Range getRange(IBooleanFilter f) {
+        DataType type = getColumn(f).getDataType();
+
+        if (type == null) {
+            type = DataTypeUtil.getTypeOfObject(f.getValue());
+        }
+
         switch (f.getOperation()) {
             case EQ:
-                return new Range(null, getValue(f), getValue(f));
+                return new Range(null, type, getValue(f), getValue(f));
             case GT:
-                return new Range(null, getValue(f), false, null, true);
+                return new Range(null, type, getValue(f), false, null, true);
             case GT_EQ:
-                return new Range(null, getValue(f), true, null, true);
+                return new Range(null, type, getValue(f), true, null, true);
             case LT:
-                return new Range(null, null, true, getValue(f), false);
+                return new Range(null, type, null, true, getValue(f), false);
             case LT_EQ:
-                return new Range(null, null, true, getValue(f), true);
+                return new Range(null, type, null, true, getValue(f), true);
             default:
                 return null;
         }
@@ -45,6 +54,10 @@ public abstract class AbstractRangeProcessor {
 
     protected Comparable getValue(IBooleanFilter f) {
         return (Comparable) f.getValue();
+    }
+
+    protected ISelectable getColumn(IBooleanFilter f) {
+        return (ISelectable) f.getColumn();
     }
 
     /**

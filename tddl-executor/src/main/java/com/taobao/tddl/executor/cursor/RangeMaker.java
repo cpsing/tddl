@@ -1,7 +1,6 @@
 package com.taobao.tddl.executor.cursor;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,6 +11,7 @@ import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
+import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
@@ -19,7 +19,6 @@ import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
-import com.taobao.tddl.optimizer.core.expression.ISelectable.DATA_TYPE;
 
 public class RangeMaker {
 
@@ -85,7 +84,7 @@ public class RangeMaker {
                 setIntoRowSet(cursorMetaNew, bf, range.from, new ColumnEQProcessor() {
 
                     @Override
-                    public Object process(Object c, DATA_TYPE type) {
+                    public Object process(Object c, DataType type) {
                         return c;
                     }
                 });
@@ -94,7 +93,7 @@ public class RangeMaker {
                 setIntoRowSet(cursorMetaNew, bf, range.from, new ColumnEQProcessor() {
 
                     @Override
-                    public Object process(Object c, DATA_TYPE type) {
+                    public Object process(Object c, DataType type) {
                         return incr(c, type);
                     }
                 });
@@ -103,7 +102,7 @@ public class RangeMaker {
                 setIntoRowSet(cursorMetaNew, bf, range.to, new ColumnEQProcessor() {
 
                     @Override
-                    public Object process(Object c, DATA_TYPE type) {
+                    public Object process(Object c, DataType type) {
                         return decr(c, type);
                     }
                 });
@@ -112,7 +111,7 @@ public class RangeMaker {
                 setIntoRowSet(cursorMetaNew, bf, range.to, new ColumnEQProcessor() {
 
                     @Override
-                    public Object process(Object c, DATA_TYPE type) {
+                    public Object process(Object c, DataType type) {
                         return c;
                     }
                 });
@@ -121,14 +120,14 @@ public class RangeMaker {
                 setIntoRowSet(cursorMetaNew, bf, range.from, new ColumnEQProcessor() {
 
                     @Override
-                    public Object process(Object c, DATA_TYPE type) {
+                    public Object process(Object c, DataType type) {
                         return c;
                     }
                 });
                 setIntoRowSet(cursorMetaNew, bf, range.to, new ColumnEQProcessor() {
 
                     @Override
-                    public Object process(Object c, DATA_TYPE type) {
+                    public Object process(Object c, DataType type) {
                         return c;
                     }
                 });
@@ -142,11 +141,11 @@ public class RangeMaker {
                                ColumnEQProcessor columnProcessor) {
         IColumn col = ExecUtils.getIColumn(bf.getColumn());
         Object val = bf.getValue();
-        if (col.getDataType() == DATA_TYPE.DATE_VAL) {
-            if (val instanceof Long) {
-                val = new Date((Long) val);
-            }
-        }
+        // if (col.getDataType() == DATA_TYPE.DATE_VAL) {
+        // if (val instanceof Long) {
+        // val = new Date((Long) val);
+        // }
+        // }
         val = processFunction(val);
         val = columnProcessor.process(val, col.getDataType());
         Integer inte = cursorMetaNew.getIndex(col.getTableName(), col.getColumnName());
@@ -155,39 +154,43 @@ public class RangeMaker {
         rowSet.setObject(inte, val);
     }
 
-    public Object decr(Object c, DATA_TYPE type) {
-        switch (type) {
-            case INT_VAL:
-                c = ((Integer) c) - 1;
-                break;
-            case LONG_VAL:
-                c = ((Long) c) - 1;
-                break;
-            case SHORT_VAL:
-                c = ((Long) c) - 1;
-                break;
-            case FLOAT_VAL:
-                c = ((Long) c) - 0.000001f;
-                break;
-            case DOUBLE_VAL:
-                c = ((Double) c) - 0.000001d;
-                break;
-            case DATE_VAL:
-                c = new Date(((Date) c).getTime() - 1l);
-                break;
-            case TIMESTAMP_VAL:
-                c = new Date(((Date) c).getTime() - 1l);
-                break;
-            case STRING_VAL:
-                StringBuilder newStr = new StringBuilder();
-                newStr.append(c);
-                newStr.setCharAt(newStr.length() - 1, (char) (newStr.charAt(newStr.length() - 1) - 1));
-                c = newStr.toString();
-                break;
-            default:
-                throw new IllegalArgumentException("not supported yet");
-        }
-        return c;
+    public Object decr(Object c, DataType type) {
+
+        return type.decr(c);
+
+        // switch (type) {
+        // case INT_VAL:
+        // c = ((Integer) c) - 1;
+        // break;
+        // case LONG_VAL:
+        // c = ((Long) c) - 1;
+        // break;
+        // case SHORT_VAL:
+        // c = ((Long) c) - 1;
+        // break;
+        // case FLOAT_VAL:
+        // c = ((Long) c) - 0.000001f;
+        // break;
+        // case DOUBLE_VAL:
+        // c = ((Double) c) - 0.000001d;
+        // break;
+        // case DATE_VAL:
+        // c = new Date(((Date) c).getTime() - 1l);
+        // break;
+        // case TIMESTAMP_VAL:
+        // c = new Date(((Date) c).getTime() - 1l);
+        // break;
+        // case STRING_VAL:
+        // StringBuilder newStr = new StringBuilder();
+        // newStr.append(c);
+        // newStr.setCharAt(newStr.length() - 1, (char)
+        // (newStr.charAt(newStr.length() - 1) - 1));
+        // c = newStr.toString();
+        // break;
+        // default:
+        // throw new IllegalArgumentException("not supported yet");
+        // }
+        // return c;
     }
 
     /**
@@ -197,51 +200,55 @@ public class RangeMaker {
      */
     public static interface ColumnEQProcessor {
 
-        public Object process(Object c, DATA_TYPE type);
+        public Object process(Object c, DataType type);
     }
 
-    public Object incr(Object c, DATA_TYPE type) {
-        switch (type) {
-            case INT_VAL: {
-                if (c instanceof String) {// fix
-                    c = Integer.valueOf(c.toString());
-                }
-                c = ((Integer) c) + 1;
-                break;
-            }
+    public Object incr(Object c, DataType type) {
 
-            case SHORT_VAL: {
-                if (c instanceof String) {// fix
-                    c = Short.valueOf(c.toString());
-                }
-                c = ((Short) c) + 1;
-                break;
-            }
-            case LONG_VAL:
-                c = ((Long) c) + 1;
-                break;
-            case FLOAT_VAL:
-                c = ((Float) c) + 0.000001f;
-                break;
-            case DOUBLE_VAL:
-                c = ((Double) c) + 0.000001d;
-                break;
-            case DATE_VAL:
-                c = new Date(((Date) c).getTime() + 1l);
-                break;
-            case TIMESTAMP_VAL:
-                c = new Date(((Date) c).getTime() + 1l);
-                break;
-            case STRING_VAL:
-                StringBuilder newStr = new StringBuilder();
-                newStr.append(c);
-                newStr.setCharAt(newStr.length() - 1, (char) (newStr.charAt(newStr.length() - 1) + 1));
-                c = newStr.toString();
-                break;
-            default:
-                throw new IllegalArgumentException("not supported yet");
-        }
-        return c;
+        return type.incr(c);
+
+        // switch (type) {
+        // case INT_VAL: {
+        // if (c instanceof String) {// fix
+        // c = Integer.valueOf(c.toString());
+        // }
+        // c = ((Integer) c) + 1;
+        // break;
+        // }
+        //
+        // case SHORT_VAL: {
+        // if (c instanceof String) {// fix
+        // c = Short.valueOf(c.toString());
+        // }
+        // c = ((Short) c) + 1;
+        // break;
+        // }
+        // case LONG_VAL:
+        // c = ((Long) c) + 1;
+        // break;
+        // case FLOAT_VAL:
+        // c = ((Float) c) + 0.000001f;
+        // break;
+        // case DOUBLE_VAL:
+        // c = ((Double) c) + 0.000001d;
+        // break;
+        // case DATE_VAL:
+        // c = new Date(((Date) c).getTime() + 1l);
+        // break;
+        // case TIMESTAMP_VAL:
+        // c = new Date(((Date) c).getTime() + 1l);
+        // break;
+        // case STRING_VAL:
+        // StringBuilder newStr = new StringBuilder();
+        // newStr.append(c);
+        // newStr.setCharAt(newStr.length() - 1, (char)
+        // (newStr.charAt(newStr.length() - 1) + 1));
+        // c = newStr.toString();
+        // break;
+        // default:
+        // throw new IllegalArgumentException("not supported yet");
+        // }
+        // return c;
     }
 
     @SuppressWarnings("rawtypes")
@@ -293,35 +300,37 @@ public class RangeMaker {
         }
     }
 
-    public Object getExtremum(boolean max, DATA_TYPE type) {
+    public Object getExtremum(boolean max, DataType type) {
         if (max) {
-            switch (type) {
-                case INT_VAL:
-                    return Integer.MAX_VALUE;
-                case LONG_VAL:
-                    return Long.MAX_VALUE;
-                case SHORT_VAL:
-                    return Short.MAX_VALUE;
-                case FLOAT_VAL:
-                    return Float.MAX_VALUE;
-                case DOUBLE_VAL:
-                    return Double.MAX_VALUE;
-                case DATE_VAL:
-                    return new Date(Long.MAX_VALUE);
-                case STRING_VAL:
-                    return Character.MAX_VALUE + "";
-                case TIMESTAMP_VAL:
-                    return new Date(Long.MAX_VALUE);
-                case BOOLEAN_VAL:
-                    return new Boolean(true);
-                case CHAR_VAL:
-                    return Character.MAX_VALUE + "";
-                default:
-                    throw new IllegalArgumentException("not supported yet");
-            }
+
+            return type.getMaxValue();
+            // switch (type) {
+            // case INT_VAL:
+            // return Integer.MAX_VALUE;
+            // case LONG_VAL:
+            // return Long.MAX_VALUE;
+            // case SHORT_VAL:
+            // return Short.MAX_VALUE;
+            // case FLOAT_VAL:
+            // return Float.MAX_VALUE;
+            // case DOUBLE_VAL:
+            // return Double.MAX_VALUE;
+            // case DATE_VAL:
+            // return new Date(Long.MAX_VALUE);
+            // case STRING_VAL:
+            // return Character.MAX_VALUE + "";
+            // case TIMESTAMP_VAL:
+            // return new Date(Long.MAX_VALUE);
+            // case BOOLEAN_VAL:
+            // return new Boolean(true);
+            // case CHAR_VAL:
+            // return Character.MAX_VALUE + "";
+            // default:
+            // throw new IllegalArgumentException("not supported yet");
+            // }
         } else {
             // 任何类型的最小值都是null;
-            return null;
+            return type.getMinValue();
         }
         // return null;
     }

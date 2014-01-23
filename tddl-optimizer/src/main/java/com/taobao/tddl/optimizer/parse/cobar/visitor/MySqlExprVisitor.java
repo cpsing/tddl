@@ -156,19 +156,23 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
             // ibf.setIsNot(true);
             ibf.setIsNot(false);
         } else if (node.getMode() == ComparisionIsExpression.IS_FALSE) {
-            ibf.setOperation(OPERATION.IS);
-            ibf.setValue(false);
+            ibf.setOperation(OPERATION.IS_FALSE);
+            // ibf.setValue(false);
+            ibf.setIsNot(false);
         } else if (node.getMode() == ComparisionIsExpression.IS_NOT_FALSE) {
-            ibf.setOperation(OPERATION.IS);
-            ibf.setValue(new Boolean(false));
-            ibf.setIsNot(true);
+            ibf.setOperation(OPERATION.IS_NOT_FALSE);
+            // ibf.setValue(new Boolean(false));
+            // ibf.setIsNot(true);
+            ibf.setIsNot(false);
         } else if (node.getMode() == ComparisionIsExpression.IS_TRUE) {
-            ibf.setOperation(OPERATION.IS);
-            ibf.setValue(new Boolean(true));
+            ibf.setOperation(OPERATION.IS_TRUE);
+            // ibf.setValue(new Boolean(true));
+            ibf.setIsNot(false);
         } else if (node.getMode() == ComparisionIsExpression.IS_NOT_TRUE) {
-            ibf.setOperation(OPERATION.IS);
-            ibf.setValue(new Boolean(true));
-            ibf.setIsNot(true);
+            ibf.setOperation(OPERATION.IS_NOT_TRUE);
+            // ibf.setValue(new Boolean(true));
+            // ibf.setIsNot(true);
+            ibf.setIsNot(false);
         } else if (node.getMode() == ComparisionIsExpression.IS_UNKNOWN) {
             throw new NotSupportException("not support IS_UNKNOWN");
         } else if (node.getMode() == ComparisionIsExpression.IS_NOT_UNKNOWN) {
@@ -176,6 +180,8 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         }
 
         this.filter = ibf;
+
+        ibf.getFunctionName();
     }
 
     @Override
