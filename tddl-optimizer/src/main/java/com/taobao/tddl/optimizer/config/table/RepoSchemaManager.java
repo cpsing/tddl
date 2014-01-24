@@ -117,7 +117,6 @@ public class RepoSchemaManager extends AbstractLifecycle implements SchemaManage
 
         if (!isDelegate) {
             delegate.destory();
-
         }
     }
 

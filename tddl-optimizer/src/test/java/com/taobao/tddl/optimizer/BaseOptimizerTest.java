@@ -18,7 +18,7 @@ import com.taobao.tddl.optimizer.config.table.StaticSchemaManager;
 import com.taobao.tddl.optimizer.config.table.parse.MatrixParser;
 import com.taobao.tddl.optimizer.costbased.CostBasedOptimizer;
 import com.taobao.tddl.optimizer.costbased.esitimater.stat.LocalStatManager;
-import com.taobao.tddl.optimizer.costbased.esitimater.stat.RepoStatManager;
+import com.taobao.tddl.optimizer.costbased.esitimater.stat.StatManager;
 import com.taobao.tddl.optimizer.parse.SqlParseManager;
 import com.taobao.tddl.optimizer.parse.cobar.CobarSqlParseManager;
 import com.taobao.tddl.optimizer.rule.OptimizerRule;
@@ -39,7 +39,7 @@ public class BaseOptimizerTest {
     protected static OptimizerRule      rule;
     protected static RepoSchemaManager  schemaManager;
     protected static CostBasedOptimizer optimizer;
-    protected static RepoStatManager    statManager;
+    protected static StatManager        statManager;
 
     @BeforeClass
     public static void initial() throws TddlException {
@@ -66,16 +66,16 @@ public class BaseOptimizerTest {
         schemaManager.setGroup(matrix.getGroup("andor_group_0"));
         schemaManager.init();
 
-        LocalStatManager local = LocalStatManager.parseConfig(Thread.currentThread()
+        statManager = LocalStatManager.parseConfig(Thread.currentThread()
             .getContextClassLoader()
             .getResourceAsStream(table_stat_file),
             Thread.currentThread().getContextClassLoader().getResourceAsStream(table_index_stat_file));
 
-        statManager = new RepoStatManager();
-        statManager.setLocal(local);
-        statManager.setUseCache(true);
-        statManager.setGroup(matrix.getGroup("andor_group_0"));
-        statManager.init();
+        // statManager = new RepoStatManager();
+        // statManager.setLocal(local);
+        // statManager.setUseCache(true);
+        // statManager.setGroup(matrix.getGroup("andor_group_0"));
+        // statManager.init();
 
         context.setMatrix(matrix);
         context.setRule(rule);
