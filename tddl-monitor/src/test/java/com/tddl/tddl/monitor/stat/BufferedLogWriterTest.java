@@ -5,12 +5,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.LockSupport;
 
+import org.junit.Ignore;
+
 import com.taobao.tddl.monitor.stat.BufferedLogWriter;
 import com.taobao.tddl.monitor.stat.LoggerLogWriter;
 
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
+@Ignore
 public class BufferedLogWriterTest {
 
     private static final Logger            TDDL_Test_Statistic_LOG = LoggerFactory.getLogger("TDDL_Test_Statistic_LOG");

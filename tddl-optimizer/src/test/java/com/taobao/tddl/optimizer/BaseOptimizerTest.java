@@ -13,7 +13,6 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.jdbc.ParameterMethod;
 import com.taobao.tddl.common.model.Matrix;
-import com.taobao.tddl.optimizer.config.MockRepoIndexManager;
 import com.taobao.tddl.optimizer.config.table.RepoSchemaManager;
 import com.taobao.tddl.optimizer.config.table.StaticSchemaManager;
 import com.taobao.tddl.optimizer.config.table.parse.MatrixParser;
@@ -23,6 +22,7 @@ import com.taobao.tddl.optimizer.costbased.esitimater.stat.RepoStatManager;
 import com.taobao.tddl.optimizer.parse.SqlParseManager;
 import com.taobao.tddl.optimizer.parse.cobar.CobarSqlParseManager;
 import com.taobao.tddl.optimizer.rule.OptimizerRule;
+import com.taobao.tddl.optimizer.rule.RuleIndexManager;
 import com.taobao.tddl.rule.TddlRule;
 
 @Ignore
@@ -81,7 +81,7 @@ public class BaseOptimizerTest {
         context.setRule(rule);
         context.setSchemaManager(schemaManager);
         context.setStatManager(statManager);
-        context.setIndexManager(new MockRepoIndexManager(schemaManager));
+        context.setIndexManager(new RuleIndexManager(schemaManager));
 
         OptimizerContext.setContext(context);
 

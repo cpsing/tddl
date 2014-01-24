@@ -31,6 +31,6 @@ public class ComparativeOR extends ComparativeBaseList {
     }
 
     protected String getRelation() {
-        return " or ";
+        return " OR ";
     }
 }
