@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
@@ -24,6 +25,7 @@ import com.taobao.tddl.optimizer.parse.cobar.CobarSqlParseManager;
 import com.taobao.tddl.optimizer.rule.OptimizerRule;
 import com.taobao.tddl.rule.TddlRule;
 
+@Ignore
 public class BaseOptimizerTest {
 
     protected static final String       APPNAME               = "tddl";
@@ -98,7 +100,7 @@ public class BaseOptimizerTest {
 
     protected Map<Integer, ParameterContext> convert(List<Object> args) {
         Map<Integer, ParameterContext> map = new HashMap<Integer, ParameterContext>(args.size());
-        int index = 0;
+        int index = 1;
         for (Object obj : args) {
             ParameterContext context = new ParameterContext(ParameterMethod.setObject1, new Object[] { index, obj });
             map.put(index, context);

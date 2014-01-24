@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.junit.Ignore;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -16,6 +17,7 @@ import com.taobao.tddl.qatest.util.DateUtil;
 import com.taobao.tddl.qatest.util.FixDataSource;
 import com.taobao.tddl.qatest.util.LoadPropsUtil;
 
+@Ignore(value = "提供初始化环境的实际方法")
 public class BaseAtomGroupTestCase extends BaseTestCase {
 
     protected static final String     QATEST_DATASOURCE_PATH               = "classpath:atom/tddl_qatest_db.xml";

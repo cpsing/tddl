@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
+import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.utils.range.AndRangeProcessor;
@@ -18,7 +19,7 @@ import com.taobao.tddl.optimizer.utils.range.OrRangeProcessor;
  */
 public class RangeTest {
 
-    private static final String COLUMN = "A";
+    private static final IColumn COLUMN = ASTNodeFactory.getInstance().createColumn().setColumnName("A");
 
     @Test
     public void testAnd() {

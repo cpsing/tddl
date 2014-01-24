@@ -149,6 +149,10 @@ public class OrderByPusher {
 
                 return merge;
             }
+        } else if (qtn instanceof JoinNode) {
+            // TODO:
+        } else if (qtn instanceof QueryNode) {
+            // TODO:
         }
 
         return qtn;

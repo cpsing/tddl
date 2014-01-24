@@ -2,6 +2,7 @@ package com.taobao.tddl.qatest;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -9,6 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * <p/>
  * Author By: zhuoxue.yll Created Date: 2013-4-11 下午1:57:19
  */
+@Ignore(value = "提供初始化环境的实际方法")
 public class BaseTemplateTestCase extends BaseMatrixTestCase {
 
     protected static JdbcTemplate andorJT                    = null;

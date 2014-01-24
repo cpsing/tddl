@@ -1,5 +1,7 @@
 package com.taobao.tddl.optimizer.core.function;
 
+import org.junit.Ignore;
+
 import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.datatype.DateType;
 import com.taobao.tddl.optimizer.core.expression.IExtraFunction;
@@ -12,6 +14,7 @@ import com.taobao.tddl.optimizer.exceptions.FunctionException;
  * 
  * @author Whisper
  */
+@Ignore
 public class DummyTest implements IExtraFunction {
 
     public DataType getReturnType() {

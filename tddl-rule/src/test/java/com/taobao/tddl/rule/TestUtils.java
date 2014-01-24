@@ -15,14 +15,12 @@ import com.taobao.tddl.rule.model.sqljep.ComparativeOR;
 
 public class TestUtils {
 
-    public static final int GreaterThan        = 1;
-    public static final int GreaterThanOrEqual = 2;
-    public static final int Equivalent         = 3;
-    public static final int Like               = 4;
-    public static final int NotLike            = 5;
-    public static final int NotEquivalent      = 6;
-    public static final int LessThan           = 7;
-    public static final int LessThanOrEqual    = 8;
+    public static final int GreaterThan        = Comparative.GreaterThan;
+    public static final int GreaterThanOrEqual = Comparative.GreaterThanOrEqual;
+    public static final int Equivalent         = Comparative.Equivalent;
+    public static final int NotEquivalent      = Comparative.NotEquivalent;
+    public static final int LessThan           = Comparative.LessThan;
+    public static final int LessThanOrEqual    = Comparative.LessThanOrEqual;
 
     public static Comparative gor(Comparative parent, Comparative target) {
         if (parent == null) {
