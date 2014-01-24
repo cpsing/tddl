@@ -1,4 +1,4 @@
-package com.taobao.tddl.atom.common;
+package com.taobao.tddl.qatest.util;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;

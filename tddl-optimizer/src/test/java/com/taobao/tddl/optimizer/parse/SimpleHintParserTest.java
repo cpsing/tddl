@@ -55,7 +55,7 @@ public class SimpleHintParserTest {
         RuleRouteCondition route = (RuleRouteCondition) SimpleHintParser.convertHint2RouteCondition(sql, null);
         System.out.println(route);
         Assert.assertEquals("vtabxxx", route.getVirtualTableName());
-        Assert.assertEquals("(>4) and (<10)", route.getParameters().get("PK").toString());
+        Assert.assertEquals("(>4) AND (<10)", route.getParameters().get("PK").toString());
     }
 
     @Test

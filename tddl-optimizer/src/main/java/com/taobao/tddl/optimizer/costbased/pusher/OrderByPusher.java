@@ -212,13 +212,6 @@ public class OrderByPusher {
                     ((QueryTreeNode) child).build();
                 }
             } else {
-                // 正常的shard生成的MergeNode
-                List<IOrderBy> standardOrder = merge.getImplicitOrderBys();
-                // order by不是一个group by的子集，优先使用group by
-                if (!containAllOrderBys(standardOrder, merge.getGroupBys())) {
-                    standardOrder = merge.getGroupBys();
-                }
-
                 for (ASTNode child : merge.getChildren()) {
                     if (!(child instanceof QueryTreeNode)) {
                         continue;
@@ -230,9 +223,17 @@ public class OrderByPusher {
                     QueryTreeNode qn = (QueryTreeNode) child;
                     if (qn.getOrderBys() != null && !qn.getOrderBys().isEmpty() && qn.getGroupBys() != null
                         && !qn.getGroupBys().isEmpty()) {
-                        ((QueryTreeNode) child).setOrderBys(standardOrder);
-                        ((QueryTreeNode) child).setGroupBys(new ArrayList(0));
-                        ((QueryTreeNode) child).having("");
+                        // 正常的shard生成的MergeNode
+                        List<IOrderBy> standardOrder = qn.getImplicitOrderBys();
+                        // order by不是一个group by的子集，优先使用group by
+                        if (!containAllOrderBys(standardOrder, qn.getGroupBys())) {
+                            standardOrder = qn.getGroupBys();
+                        }
+
+                        qn.setOrderBys(standardOrder);
+                        qn.setGroupBys(new ArrayList(0));
+                        qn.having("");
+                        qn.build();
                     }
                 }
             }

@@ -9,9 +9,11 @@ import com.taobao.tddl.optimizer.core.ast.ASTNode;
 import com.taobao.tddl.optimizer.core.ast.QueryTreeNode;
 import com.taobao.tddl.optimizer.core.ast.query.MergeNode;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
+import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
+import com.taobao.tddl.optimizer.utils.OptimizerUtils;
 
 /**
  * @since 5.1.0
@@ -143,7 +145,8 @@ public class MergeNodeBuilder extends QueryTreeNodeBuilder {
     public void buildHaving() {
         if (this.getNode().getChild() instanceof QueryTreeNode) {
             // 干掉子节点查询的having条件，转移到父节点中
-            this.getNode().having(((QueryTreeNode) this.getNode().getChild()).getHavingFilter());
+            IFilter havingFilter = ((QueryTreeNode) this.getNode().getChild()).getHavingFilter();
+            this.getNode().having(OptimizerUtils.copyFilter(havingFilter));
             for (ASTNode child : this.getNode().getChildren()) {
                 if (child instanceof QueryTreeNode) {
                     ((QueryTreeNode) child).having("");
