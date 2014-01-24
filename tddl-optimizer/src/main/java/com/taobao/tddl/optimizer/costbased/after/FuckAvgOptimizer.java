@@ -54,8 +54,8 @@ public class FuckAvgOptimizer implements QueryPlanOptimizer {
             }
 
             // 递归处理子节点
-            this.optimize(join, parameterSettings, extraCmd);
-            this.optimize(join, parameterSettings, extraCmd);
+            this.optimize(join.getLeftNode(), parameterSettings, extraCmd);
+            this.optimize(join.getRightNode(), parameterSettings, extraCmd);
         } else if (dne instanceof IQuery) {
             IQuery query = (IQuery) dne;
             // 如果是子查询暂时不考虑下推avg

@@ -150,9 +150,38 @@ public class OrderByPusher {
                 return merge;
             }
         } else if (qtn instanceof JoinNode) {
-            // TODO:
+            if (containsDistinctColumns(qtn)) {
+                // 将查询所有字段进行order by，保证每个child返回的数据顺序都是一致的
+                List<IOrderBy> distinctOrderbys = new LinkedList<IOrderBy>();
+                for (ISelectable s : qtn.getColumnsSelected()) {
+                    IOrderBy order = ASTNodeFactory.getInstance().createOrderBy();
+                    order.setColumn(s).setDirection(true);
+                    distinctOrderbys.add(order);
+                }
+
+                List<IOrderBy> orderbys = getPushOrderBysCombileOrderbyColumns(distinctOrderbys, qtn.getOrderBys());
+                if (!orderbys.isEmpty()) {
+                    // 尝试合并order by和distinct成功，则设置当前order by
+                    qtn.setOrderBys(orderbys);
+                }
+
+            }
         } else if (qtn instanceof QueryNode) {
-            // TODO:
+            if (containsDistinctColumns(qtn)) {
+                // 将查询所有字段进行order by，保证每个child返回的数据顺序都是一致的
+                List<IOrderBy> distinctOrderbys = new LinkedList<IOrderBy>();
+                for (ISelectable s : qtn.getColumnsSelected()) {
+                    IOrderBy order = ASTNodeFactory.getInstance().createOrderBy();
+                    order.setColumn(s).setDirection(true);
+                    distinctOrderbys.add(order);
+                }
+
+                List<IOrderBy> orderbys = getPushOrderBysCombileOrderbyColumns(distinctOrderbys, qtn.getOrderBys());
+                if (!orderbys.isEmpty()) {
+                    // 尝试合并order by和distinct成功，则设置当前order by
+                    qtn.setOrderBys(orderbys);
+                }
+            }
         }
 
         return qtn;
@@ -181,6 +210,30 @@ public class OrderByPusher {
                 for (ASTNode child : merge.getChildren()) {
                     ((QueryTreeNode) child).setOrderBys(standardOrder);
                     ((QueryTreeNode) child).build();
+                }
+            } else {
+                // 正常的shard生成的MergeNode
+                List<IOrderBy> standardOrder = merge.getImplicitOrderBys();
+                // order by不是一个group by的子集，优先使用group by
+                if (!containAllOrderBys(standardOrder, merge.getGroupBys())) {
+                    standardOrder = merge.getGroupBys();
+                }
+
+                for (ASTNode child : merge.getChildren()) {
+                    if (!(child instanceof QueryTreeNode)) {
+                        continue;
+                    }
+
+                    // 比如merge节点同时存在order by/group by
+                    // 1. 优先下推父节点的group by到子节点
+                    // 2. 然后去掉子节点的group by
+                    QueryTreeNode qn = (QueryTreeNode) child;
+                    if (qn.getOrderBys() != null && !qn.getOrderBys().isEmpty() && qn.getGroupBys() != null
+                        && !qn.getGroupBys().isEmpty()) {
+                        ((QueryTreeNode) child).setOrderBys(standardOrder);
+                        ((QueryTreeNode) child).setGroupBys(new ArrayList(0));
+                        ((QueryTreeNode) child).having("");
+                    }
                 }
             }
         } else if (qtn instanceof JoinNode) {
