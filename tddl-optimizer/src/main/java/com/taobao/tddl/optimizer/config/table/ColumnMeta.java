@@ -128,7 +128,8 @@ public class ColumnMeta implements Serializable {
     public String getFullName() {
         if (this.fullName == null) {
             String cn = this.getAlias() != null ? this.getAlias() : this.getName();
-            StringBuilder sb = new StringBuilder(this.getTableName().length() + 1 + cn.length());
+            String tableName = this.getTableName() == null ? "" : this.getTableName();
+            StringBuilder sb = new StringBuilder(tableName.length() + 1 + cn.length());
             sb.append(this.getTableName());
             sb.append('.');
             sb.append(cn);
