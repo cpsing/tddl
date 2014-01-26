@@ -16,6 +16,7 @@ public interface IFunction<RT extends IFunction> extends ISelectable<RT> {
         final static String SUB           = "-";
         final static String MULTIPLY      = "*";
         final static String DIVISION      = "/";
+        final static String MOD           = "%";
         final static String AVG           = "AVG";
         final static String SUM           = "SUM";
         final static String COUNT         = "COUNT";

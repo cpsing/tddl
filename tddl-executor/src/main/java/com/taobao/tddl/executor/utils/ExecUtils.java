@@ -30,10 +30,10 @@ import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.datatype.DataTypeUtil;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
+import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-import com.taobao.tddl.optimizer.core.expression.bean.Function;
 import com.taobao.tddl.optimizer.core.expression.bean.OrderBy;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 
@@ -125,9 +125,8 @@ public class ExecUtils {
                 return colName;
             }
 
-        } else if (column instanceof Function) {
-            // modify by delin, IFunction 换成了 Function
-            Function func = ((Function) column);
+        } else if (column instanceof IFunction && !(column instanceof IFilter)) {
+            IFunction func = ((IFunction) column);
             StringBuilder sb = new StringBuilder();
             sb.append(func.getFunctionName());
             sb.append("(");

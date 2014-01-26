@@ -1,8 +1,5 @@
 package com.taobao.tddl.executor.function.aggregate;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.taobao.tddl.executor.function.AggregateFunction;
 import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.exceptions.FunctionException;
@@ -21,15 +18,16 @@ public class Count extends AggregateFunction {
 
     @Override
     public void serverReduce(Object[] args) throws FunctionException {
-        count += ((Long) args[0]);
-
+        DataType type = this.getReturnType();
+        Object o = args[0];
+        if (o != null) {
+            count += (Long) type.convertFrom(o);
+        }
     }
 
     @Override
-    public Map<String, Object> getResult() {
-        Map<String, Object> resMap = new HashMap<String, Object>();
-        resMap.put(function.getColumnName(), count);
-        return resMap;
+    public Object getResult() {
+        return count;
     }
 
     @Override

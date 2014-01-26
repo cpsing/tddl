@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
@@ -194,8 +193,7 @@ public class SelectWithConditionTest extends BaseMatrixTestCase {
             Arrays.asList(new Object[] { RANDOM_ID, newName }));
         String sql = "select count(pk),name from " + normaltblTableName + " group by name asc";
 
-        IRowSet pair = null;
-        rc = andorQueryData(sql, null);
+        selectOrderAssert(sql, new String[] {}, Collections.EMPTY_LIST);
     }
 
     @Test
@@ -203,8 +201,7 @@ public class SelectWithConditionTest extends BaseMatrixTestCase {
         andorUpdateData("insert into " + normaltblTableName + " (pk,name) values(?,?)",
             Arrays.asList(new Object[] { RANDOM_ID, newName }));
         String sql = "select count(pk),name from " + normaltblTableName + " group by name desc";
-
-        IRowSet pair = null;
+        selectOrderAssert(sql, new String[] {}, Collections.EMPTY_LIST);
     }
 
     @Test
@@ -432,7 +429,6 @@ public class SelectWithConditionTest extends BaseMatrixTestCase {
     public void limitWithStart() throws Exception {
         int start = 5;
         int limit = 6;
-        IRowSet pair = null;
         String sql = "SELECT * FROM " + normaltblTableName + " order by pk LIMIT " + start + "," + limit;
         String[] columnParam = { "name", "pk", "id" };
         selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
@@ -456,7 +452,6 @@ public class SelectWithConditionTest extends BaseMatrixTestCase {
     @Test
     public void limitWithoutStart() throws Exception {
         int limit = 50;
-        int length = limit > MAX_DATA_SIZE ? MAX_DATA_SIZE : limit;
         String sql = "SELECT * FROM " + normaltblTableName + " LIMIT " + limit;
         String[] columnParam = { "name", "pk", "id" };
         selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
@@ -465,8 +460,6 @@ public class SelectWithConditionTest extends BaseMatrixTestCase {
     // 狄龙项目的
     @Test
     public void groupByScalarFunction() throws Exception {
-        int limit = 50;
-        int length = limit > MAX_DATA_SIZE ? MAX_DATA_SIZE : limit;
         String sql = "SELECT  COUNT(1) daily_illegal,DATE_FORMAT(gmt_create, '%Y-%m-%d') d ,name FROM "
                      + normaltblTableName + " group by DATE_FORMAT(gmt_create, '%Y-%m-%d'),name";
         String[] columnParam = { "daily_illegal", "d", "name" };
@@ -592,7 +585,6 @@ public class SelectWithConditionTest extends BaseMatrixTestCase {
         List<Object> param = new ArrayList<Object>();
         param.add(limit);
         String sql = "SELECT * FROM " + normaltblTableName + " LIMIT ";
-        String error = "";
         try {
             rc = andorQueryData(sql, param);
             Assert.fail();

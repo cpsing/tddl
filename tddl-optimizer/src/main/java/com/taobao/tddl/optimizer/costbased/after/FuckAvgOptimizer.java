@@ -8,7 +8,6 @@ import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IFunction.FunctionType;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-import com.taobao.tddl.optimizer.core.expression.bean.Function;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin;
@@ -32,15 +31,8 @@ public class FuckAvgOptimizer implements QueryPlanOptimizer {
     public IDataNodeExecutor optimize(IDataNodeExecutor dne, Map<Integer, ParameterContext> parameterSettings,
                                       Map<String, Object> extraCmd) {
         if (dne instanceof IMerge && ((IMerge) dne).getSubNode().size() > 1) {
-            boolean hasAvg = false;
             for (IDataNodeExecutor sub : ((IMerge) dne).getSubNode()) {
-                hasAvg = hasAvg(sub);
-            }
-
-            if (hasAvg) {
-                for (IDataNodeExecutor sub : ((IMerge) dne).getSubNode()) {
-                    expendAvgFunction(sub);
-                }
+                expendAvgFunction(sub);
             }
 
             for (IDataNodeExecutor sub : ((IMerge) dne).getSubNode()) {
@@ -48,22 +40,13 @@ public class FuckAvgOptimizer implements QueryPlanOptimizer {
             }
         } else if (dne instanceof IJoin) {
             IJoin join = (IJoin) dne;
-            // 如果存在join函数，并且左右子节点的dataNode不同(即是跨机操作)，需要自己处理avg函数
-            if (hasAvg(dne) && !join.getLeftNode().getDataNode().equals(join.getRightNode().getDataNode())) {
-                expendAvgFunction(dne); // 展开join自己
-            }
-
+            // join函数，采取map模式，不需要处理avg展开
             // 递归处理子节点
             this.optimize(join.getLeftNode(), parameterSettings, extraCmd);
             this.optimize(join.getRightNode(), parameterSettings, extraCmd);
         } else if (dne instanceof IQuery) {
             IQuery query = (IQuery) dne;
-            // 如果是子查询暂时不考虑下推avg
-            // 子查询下推avg的条件：当前query节点无where条件/having条件
-            if (hasAvg(dne) && query.isSubQuery()) {
-                expendAvgFunction(dne); // 展开query自己
-            }
-
+            // 如果是子查询,采取map模式，不需要处理avg展开
             if (query.isSubQuery()) {
                 this.optimize(query.getSubQuery(), parameterSettings, extraCmd);// 递归处理子节点
             }
@@ -72,20 +55,13 @@ public class FuckAvgOptimizer implements QueryPlanOptimizer {
         return dne;
     }
 
-    /**
-     * 判断是否有avg函数
-     */
-    private boolean hasAvg(IDataNodeExecutor sub) {
-        if (sub instanceof IQuery || sub instanceof IJoin) {
-            for (Object s : ((IQueryTree) sub).getColumns()) {
-                if (s instanceof IFunction) {
-                    if (((IFunction) s).getFunctionName().startsWith("AVG")) {
-                        return true;
-                    }
-                }
+    private boolean hasArgsAvgFunction(IFunction func) {
+        for (Object args : func.getArgs()) {
+            if (args instanceof IFunction && ((IFunction) args).getColumnName().startsWith("AVG(")) {
+                return true;
             }
-
         }
+
         return false;
     }
 
@@ -99,22 +75,34 @@ public class FuckAvgOptimizer implements QueryPlanOptimizer {
             for (Object sel : ((IQueryTree) sub).getColumns()) {
                 ISelectable s = (ISelectable) sel;
                 if (s instanceof IFunction) {
-                    if (FunctionType.Scalar.equals(((IFunction) s).getFunctionType())) {
-                        remove.add(s);
-                    } else if (s.getColumnName().startsWith("AVG(")) {
-                        Function count = (Function) s.copy();
+                    if (s.getColumnName().startsWith("AVG(")) {
+                        IFunction count = (IFunction) s.copy();
                         count.setExtraFunction(null);
                         count.setFunctionName("COUNT");
                         count.setColumnName(s.getColumnName().replace("AVG(", "COUNT("));
+                        if (count.getAlias() != null) {
+                            count.setAlias(count.getAlias() + "1");// 加个后缀1
+                        }
 
-                        Function sum = (Function) s.copy();
+                        IFunction sum = (IFunction) s.copy();
                         sum.setExtraFunction(null);
                         sum.setFunctionName("SUM");
                         sum.setColumnName(s.getColumnName().replace("AVG(", "SUM("));
+                        if (sum.getAlias() != null) {
+                            sum.setAlias(sum.getAlias() + "2");// 加个后缀2
+                        }
                         add.add(count);
                         add.add(sum);
 
                         remove.add(s);
+                    } else {
+                        // 删除底下AVG的相关函数，比如 1 + AVG(ID)
+                        // 目前这个只能上层来进行计算
+                        // 可能的风险：还未支持的Function计算
+                        if (FunctionType.Scalar.equals(((IFunction) s).getFunctionType())
+                            && hasArgsAvgFunction((IFunction) s)) {
+                            remove.add(s);
+                        }
                     }
                 }
             }

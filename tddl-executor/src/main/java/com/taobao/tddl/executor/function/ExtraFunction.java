@@ -2,7 +2,6 @@ package com.taobao.tddl.executor.function;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.executor.rowset.IRowSet;
@@ -17,6 +16,7 @@ import com.taobao.tddl.optimizer.exceptions.FunctionException;
 public abstract class ExtraFunction implements IExtraFunction {
 
     protected IFunction function;
+    protected Object    result;
 
     @Override
     public void setFunction(IFunction function) {
@@ -100,11 +100,8 @@ public abstract class ExtraFunction implements IExtraFunction {
             if (funcArg instanceof IFunction) {
                 if (((IFunction) funcArg).getExtraFunction().getFunctionType().equals(FunctionType.Aggregate)) {
                     // aggregate function
-                    Map<String, Object> resMap = ((AggregateFunction) ((IFunction) funcArg).getExtraFunction()).getResult();
-                    for (Object ob : resMap.values()) {
-                        inputArg[index] = ob;
-                        index++;
-                    }
+                    inputArg[index] = ((AggregateFunction) ((IFunction) funcArg).getExtraFunction()).getResult();
+                    index++;
                 } else {
                     // scalar function
                     ((ScalarFunction) ((IFunction) funcArg).getExtraFunction()).serverMap(kvPair);
@@ -170,6 +167,20 @@ public abstract class ExtraFunction implements IExtraFunction {
 
             serverReduce(inputArg);
         }
+    }
+
+    public void setResult(Object result) {
+        this.result = result;
+    }
+
+    @Override
+    public Object getResult() {
+        return result;
+    }
+
+    @Override
+    public void clear() {
+        result = null;
     }
 
 }

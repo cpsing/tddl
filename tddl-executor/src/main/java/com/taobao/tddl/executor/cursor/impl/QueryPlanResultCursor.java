@@ -10,10 +10,10 @@ import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
+import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.datatype.StringType;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
-import com.taobao.tddl.optimizer.core.expression.bean.Column;
 
 /**
  * 用于返回执行计划
@@ -26,7 +26,7 @@ public class QueryPlanResultCursor extends ResultCursor {
     static List<Object>     columns = new ArrayList();
     static List<ColumnMeta> cms     = new ArrayList();
     static {
-        IColumn c = new Column();
+        IColumn c = ASTNodeFactory.getInstance().createColumn();
         c.setColumnName("EXPLAIN");
         c.setDataType(DataType.StringType);
         columns.add(c);

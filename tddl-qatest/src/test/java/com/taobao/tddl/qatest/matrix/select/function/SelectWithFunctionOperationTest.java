@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
@@ -91,7 +90,6 @@ public class SelectWithFunctionOperationTest extends BaseMatrixTestCase {
         selectOrderAssert(sql, columnParamm, Collections.EMPTY_LIST);
     }
 
-    @Ignore("暂时不支持mod的merge实现")
     @Test
     public void testFunctionModTest() throws Exception {
         String sql = "SELECT sum(pk)%count(*) sd FROM " + normaltblTableName;

@@ -1,13 +1,10 @@
 package com.taobao.tddl.executor.function.aggregate;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.taobao.tddl.executor.function.AggregateFunction;
 import com.taobao.tddl.optimizer.core.datatype.DataType;
+import com.taobao.tddl.optimizer.core.datatype.DataTypeUtil;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
+import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.exceptions.FunctionException;
 
 /**
@@ -17,48 +14,21 @@ import com.taobao.tddl.optimizer.exceptions.FunctionException;
  */
 public class Avg extends AggregateFunction {
 
-    private Long        count  = 0L;
-    private Number      total  = null;
-
-    Map<String, Object> result = new HashMap<String, Object>(2);
+    private Long   count = 0L;
+    private Object total = null;
 
     @Override
     public void serverMap(Object[] args) throws FunctionException {
         count++;
-        if (args[0] == null) {
-            return;
-        }
         Object o = args[0];
-        Object avgRes = null;
+        DataType type = getSumType();
         if (o != null) {
-            if (o instanceof BigDecimal) {
-                if (total == null) {
-                    total = new BigDecimal(0);
-                }
-                total = ((BigDecimal) total).add((BigDecimal) o);
-                avgRes = ((BigDecimal) total).divide(new BigDecimal(count));
-            }
-
-            if (o instanceof Integer || o instanceof Long) {
-                if (o instanceof Integer) o = new BigDecimal((Integer) o);
-                if (total == null) {
-                    total = new BigDecimal(0);
-                }
-                total = ((BigDecimal) total).add(new BigDecimal((Long) o));
-                avgRes = ((BigDecimal) total).divide(new BigDecimal(count), 4, RoundingMode.HALF_DOWN);
-            } else if (o instanceof Float || o instanceof Double) {
-                if (o instanceof Float) {
-                    o = new Double((Float) o);
-                }
-                if (total == null) {
-                    total = new BigDecimal(0);
-                }
-
-                total = ((BigDecimal) total).add(new BigDecimal((Double) o));
-                avgRes = ((BigDecimal) total).divide(new BigDecimal(count));
+            if (total == null) {
+                total = type.convertFrom(o);
+            } else {
+                total = type.getCalculator().add(total, o);
             }
         }
-        this.result.put(function.getColumnName(), avgRes);
     }
 
     @Override
@@ -66,33 +36,15 @@ public class Avg extends AggregateFunction {
         if (args[0] == null || args[1] == null) {
             return;
         }
-        String totalString = args[0].toString();
-        String countString = args[1].toString();
 
-        Number total = null;
-        Long count = Long.parseLong(countString);
-        this.count += count;
-
-        try {
-            total = Long.parseLong(totalString);
-            if (this.total == null) {
-                this.total = 0L;
-            }
-
-            this.total = ((Long) (this.total)) + (Long) total;
-            result.put(function.getColumnName(), new BigDecimal(((Long) this.total) / (this.count + 0.0)));
-        } catch (NumberFormatException ex) {
-            try {
-                total = Double.parseDouble(totalString);
-                if (this.total == null) this.total = 0.0;
-
-                this.total = ((Double) (this.total)) + (Double) total;
-                result.put(function.getColumnName(), new BigDecimal(((Double) this.total) / (this.count + 0.0)));
-            } catch (NumberFormatException ex2) {
-                throw new FunctionException("不支持的Total类型：" + totalString);
-            }
+        count += DataType.LongType.convertFrom(args[1]);
+        Object o = args[0];
+        DataType type = getSumType();
+        if (total == null) {
+            total = type.convertFrom(o);
+        } else {
+            total = type.getCalculator().add(total, o);
         }
-
     }
 
     @Override
@@ -103,31 +55,71 @@ public class Avg extends AggregateFunction {
     private String bulidAvgSql(IFunction func) {
         String colName = func.getColumnName();
         StringBuilder sb = new StringBuilder();
-        sb.append(colName.replace("AVG", "SUM"));
-        sb.append(",").append(colName.replace("AVG", "COUNT"));
+        if (func.getAlias() != null) {// 如果有别名，需要和FuckAvgOptimizer中保持一致
+            sb.append(func.getAlias() + "1").append(",").append(func.getAlias() + "2");
+        } else {
+            sb.append(colName.replace("AVG", "SUM"));
+            sb.append(",").append(colName.replace("AVG", "COUNT"));
+        }
         return sb.toString();
     }
 
     @Override
-    public Map<String, Object> getResult() {
-        return result;
+    public Object getResult() {
+        DataType type = this.getReturnType();
+        if (total == null) {
+            return type.getCalculator().divide(0L, count);
+        } else {
+            return type.getCalculator().divide(total, count);
+        }
     }
 
     @Override
     public void clear() {
         this.total = null;
         this.count = 0L;
-        this.result.clear();
     }
 
     @Override
     public DataType getReturnType() {
-        return DataType.DoubleType;
+        return getMapReturnType();
     }
 
     @Override
     public DataType getMapReturnType() {
-        return DataType.StringType;
+        Object[] args = function.getArgs().toArray();
+        DataType type = null;
+        if (args[0] instanceof ISelectable) {
+            type = ((ISelectable) args[0]).getDataType();
+        } else {
+            type = DataTypeUtil.getTypeOfObject(args[0]);
+        }
+
+        if (type == DataType.BigIntegerType) {
+            // 如果是大整数，返回bigDecimal
+            return DataType.BigDecimalType;
+        } else {
+            // 尽可能都返回为BigDecimalType，double类型容易出现精度问题，会和mysql出现误差
+            // [zhuoxue.yll, 2516885.8000]
+            // [zhuoxue.yll, 2516885.799999999813735485076904296875]
+            // return DataType.DoubleType;
+            return DataType.BigDecimalType;
+        }
     }
 
+    public DataType getSumType() {
+        Object[] args = function.getArgs().toArray();
+        DataType type = null;
+        if (args[0] instanceof ISelectable) {
+            type = ((ISelectable) args[0]).getDataType();
+        } else {
+            type = DataTypeUtil.getTypeOfObject(args[0]);
+        }
+
+        if (type == DataType.IntegerType || type == DataType.ShortType) {
+            return DataType.LongType;
+        } else {
+            return type;
+        }
+    }
 }

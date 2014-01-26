@@ -6,6 +6,7 @@ import java.lang.reflect.Type;
 
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.utils.convertor.Convertor;
+import com.taobao.tddl.common.utils.convertor.ConvertorException;
 import com.taobao.tddl.common.utils.convertor.ConvertorHelper;
 
 /**
@@ -51,7 +52,17 @@ public abstract class AbstractDataType<DATA> implements DataType<DATA> {
      * 获取convertor接口
      */
     protected Convertor getConvertor(Class clazz) {
-        return ConvertorHelper.getInstance().getConvertor(clazz, getDataClass());
+        if (clazz.equals(getDataClass())) {
+            return null;
+        }
+
+        Convertor convertor = ConvertorHelper.getInstance().getConvertor(clazz, getDataClass());
+        if (convertor == null) {
+            throw new ConvertorException("Unsupported convert: [" + clazz.getName() + "," + getDataClass().getName()
+                                         + "]");
+        } else {
+            return convertor;
+        }
     }
 
     /**
