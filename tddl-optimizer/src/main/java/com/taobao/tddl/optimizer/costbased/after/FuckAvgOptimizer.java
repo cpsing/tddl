@@ -76,21 +76,22 @@ public class FuckAvgOptimizer implements QueryPlanOptimizer {
                 ISelectable s = (ISelectable) sel;
                 if (s instanceof IFunction) {
                     if (s.getColumnName().startsWith("AVG(")) {
-                        IFunction count = (IFunction) s.copy();
-                        count.setExtraFunction(null);
-                        count.setFunctionName("COUNT");
-                        count.setColumnName(s.getColumnName().replace("AVG(", "COUNT("));
-                        if (count.getAlias() != null) {
-                            count.setAlias(count.getAlias() + "1");// 加个后缀1
-                        }
-
                         IFunction sum = (IFunction) s.copy();
                         sum.setExtraFunction(null);
                         sum.setFunctionName("SUM");
                         sum.setColumnName(s.getColumnName().replace("AVG(", "SUM("));
                         if (sum.getAlias() != null) {
-                            sum.setAlias(sum.getAlias() + "2");// 加个后缀2
+                            sum.setAlias(sum.getAlias() + "1");// 加个后缀1
                         }
+
+                        IFunction count = (IFunction) s.copy();
+                        count.setExtraFunction(null);
+                        count.setFunctionName("COUNT");
+                        count.setColumnName(s.getColumnName().replace("AVG(", "COUNT("));
+                        if (count.getAlias() != null) {
+                            count.setAlias(count.getAlias() + "2");// 加个后缀2
+                        }
+
                         add.add(count);
                         add.add(sum);
 
