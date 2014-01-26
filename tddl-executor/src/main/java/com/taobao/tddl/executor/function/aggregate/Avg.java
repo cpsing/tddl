@@ -30,6 +30,7 @@ public class Avg extends AggregateFunction {
         }
         Object o = args[0];
         Object avgRes = null;
+
         if (o != null) {
             if (o instanceof BigDecimal) {
                 if (total == null) {

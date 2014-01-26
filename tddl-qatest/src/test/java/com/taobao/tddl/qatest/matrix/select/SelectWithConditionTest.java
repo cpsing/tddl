@@ -378,9 +378,24 @@ public class SelectWithConditionTest extends BaseMatrixTestCase {
 
     @Test
     public void distinctWithCountDistinctTest() throws Exception {
-        String sql = "select count(distinct id) from " + normaltblTableName + " where pk>1";
-        String[] columnParam = { "count(distinct id)" };
-        selectContentSameAssert(sql, columnParam, null);
+        {
+            String sql = "select count(distinct id) from " + normaltblTableName + " as t1 where pk>1";
+            String[] columnParam = { "count(distinct id)" };
+            selectContentSameAssert(sql, columnParam, null);
+        }
+
+        {
+            String sql = "select count(distinct id) from " + normaltblTableName + " where pk>1";
+            String[] columnParam = { "count(distinct id)" };
+            selectContentSameAssert(sql, columnParam, null);
+        }
+
+        {
+            String sql = "select count(distinct id) k from " + normaltblTableName + " as t1 where pk>1";
+            String[] columnParam = { "k" };
+            selectContentSameAssert(sql, columnParam, null);
+        }
+
     }
 
     @Test

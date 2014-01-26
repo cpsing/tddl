@@ -15,7 +15,7 @@ public class FilterPreProcessorTest extends BaseOptimizerTest {
         TableNode table = new TableNode("TABLE1");
         table.query("1=1 AND ID = 1");
         table.build();
-        FilterPreProcessor.optimize(table);
+        FilterPreProcessor.optimize(table, true);
         Assert.assertEquals(table.getWhereFilter().toString(), "TABLE1.ID = 1");
     }
 

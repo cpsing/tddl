@@ -23,6 +23,7 @@ import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IOrderBy;
+import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IPut;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
@@ -167,12 +168,23 @@ public class MergeHandler extends QueryHandlerCommon {
 
                 if (aggregate.isNeedDistinctArg()) {
                     IQueryTree sub = (IQueryTree) ((IMerge) executor).getSubNode().get(0);
+
+                    // 这时候的order by是sub对外的order by，要做好别名替换
+                    List<ISelectable> columns = ExecUtils.copySelectables(sub.getColumns());
+                    for (ISelectable c : columns) {
+                        c.setTableName(sub.getAlias());
+                        if (c.getAlias() != null) {
+                            c.setColumnName(c.getAlias());
+                            c.setAlias(null);
+                        }
+                    }
+
                     cursor = this.processOrderBy(cursor,
-                        getOrderBy(sub.getColumns()),
+                        getOrderBy(columns),
                         executionContext,
                         (IQueryTree) executor,
                         true);
-                    cursor = new DistinctCursor(cursor, getOrderBy(sub.getColumns()));
+                    cursor = new DistinctCursor(cursor, getOrderBy(columns));
                     break;
                 }
             }
