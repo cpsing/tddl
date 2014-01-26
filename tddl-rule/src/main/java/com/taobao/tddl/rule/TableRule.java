@@ -66,7 +66,7 @@ public class TableRule extends VirtualTableSupport implements VirtualTableRule {
     protected List<String>       extraPackages;               // 自定义用户包
 
     protected boolean            allowReverseOutput;          // 是否允许反向输出
-    protected boolean            allowFullTableScan;          // 是否允许全表扫描
+    protected boolean            allowFullTableScan   = false; // 是否允许全表扫描
     protected boolean            disableFullTableScan = true; // 是否关闭全表扫描
 
     /**

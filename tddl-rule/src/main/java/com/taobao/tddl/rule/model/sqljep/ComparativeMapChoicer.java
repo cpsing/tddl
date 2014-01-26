@@ -15,10 +15,10 @@ public interface ComparativeMapChoicer {
      * 根据PartinationSet 获取列名和他对应值的map.
      * 
      * @param arguments PrepareStatement设置的参数
-     * @param partnationSet 指定的column set
+     * @param colNameSet 指定的column set
      * @return
      */
-    Map<String, Comparative> getColumnsMap(List<Object> arguments, Set<String> partnationSet);
+    Map<String, Comparative> getColumnsMap(List<Object> arguments, Set<String> colNameSet);
 
     /**
      * @param arguments PrepareStatement设置的参数
