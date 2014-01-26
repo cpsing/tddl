@@ -1,4 +1,4 @@
-package com.taobao.tddl.atom.common;
+package com.taobao.tddl.qatest.util;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -13,7 +13,6 @@ import com.taobao.tddl.common.utils.extension.Activate;
 @Activate(order = 1)
 public class StaticPasswordCoder implements TPasswordCoder {
 
-    @Override
     public String encode(String encKey, String secret) throws NoSuchAlgorithmException, NoSuchPaddingException,
                                                       InvalidKeyException, IllegalBlockSizeException,
                                                       BadPaddingException {
@@ -28,13 +27,11 @@ public class StaticPasswordCoder implements TPasswordCoder {
         }
     }
 
-    @Override
     public String encode(String secret) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
                                        BadPaddingException, IllegalBlockSizeException {
         return encode(secret, null);
     }
 
-    @Override
     public String decode(String encKey, String secret) throws NoSuchPaddingException, NoSuchAlgorithmException,
                                                       InvalidKeyException, BadPaddingException,
                                                       IllegalBlockSizeException {
@@ -49,7 +46,6 @@ public class StaticPasswordCoder implements TPasswordCoder {
         }
     }
 
-    @Override
     public char[] decode(String secret) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
                                        BadPaddingException, IllegalBlockSizeException {
         return decode(secret, null).toCharArray();

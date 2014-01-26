@@ -61,7 +61,7 @@ public class FilterUtilsTest {
         try {
             // A > 1 or A < 3
             IFilter filter = or(filter("A", 1, OPERATION.GT), filter("A", 3, OPERATION.LT));
-            Assert.assertEquals(null, FilterUtils.merge(filter));
+            Assert.assertEquals("1", FilterUtils.merge(filter).toString());
 
             // A > 1 or A > 3
             filter = or(filter("A", 1, OPERATION.GT), filter("A", 3, OPERATION.GT));
@@ -110,7 +110,9 @@ public class FilterUtilsTest {
 
     private IFilter filter(Comparable column, Comparable value, OPERATION op) {
         IBooleanFilter booleanFilter = ASTNodeFactory.getInstance().createBooleanFilter();
-        booleanFilter.setColumn(column).setValue(value).setOperation(op);
+        booleanFilter.setColumn(ASTNodeFactory.getInstance().createColumn().setColumnName((String) column))
+            .setValue(value)
+            .setOperation(op);
         return booleanFilter;
     }
 

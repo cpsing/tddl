@@ -56,43 +56,43 @@ public class ComparativeStringAnalyserUnitTest {
     public void testDecodeComparative_string() {
         String conditionStr = "message in(hi:hi,hi:hi2,hi:hi3):s";
         Comparative comp = ComparativeStringAnalyser.decodeComparative(conditionStr, null);
-        Assert.assertEquals("(=hi:hi) or (=hi:hi2) or (=hi:hi3)", comp.toString());
+        Assert.assertEquals("(=HI:HI) OR (=HI:HI2) OR (=HI:HI3)", comp.toString());
 
         String conditionStr2 = "message in (hi:hi,hi:hi2,hi:hi3):string";
         Comparative comp2 = ComparativeStringAnalyser.decodeComparative(conditionStr2, null);
-        Assert.assertEquals("(=hi:hi) or (=hi:hi2) or (=hi:hi3)", comp2.toString());
+        Assert.assertEquals("(=HI:HI) OR (=HI:HI2) OR (=HI:HI3)", comp2.toString());
     }
 
     @Test
     public void testDecodeComparative_int() {
         String conditionStr = "message_id in(1,2,3):int";
         Comparative comp = ComparativeStringAnalyser.decodeComparative(conditionStr, null);
-        Assert.assertEquals("(=1) or (=2) or (=3)", comp.toString());
+        Assert.assertEquals("(=1) OR (=2) OR (=3)", comp.toString());
 
         String conditionStr2 = "message_id in(1,2,3):i";
         Comparative comp2 = ComparativeStringAnalyser.decodeComparative(conditionStr2, null);
-        Assert.assertEquals("(=1) or (=2) or (=3)", comp2.toString());
+        Assert.assertEquals("(=1) OR (=2) OR (=3)", comp2.toString());
     }
 
     @Test
     public void testDecodeComparative_long() {
         String conditionStr = "message_id in(1,2,3):long";
         Comparative comp = ComparativeStringAnalyser.decodeComparative(conditionStr, null);
-        Assert.assertEquals("(=1) or (=2) or (=3)", comp.toString());
+        Assert.assertEquals("(=1) OR (=2) OR (=3)", comp.toString());
 
         String conditionStr2 = "message_id in(1,2,3):l";
         Comparative comp2 = ComparativeStringAnalyser.decodeComparative(conditionStr2, null);
-        Assert.assertEquals("(=1) or (=2) or (=3)", comp2.toString());
+        Assert.assertEquals("(=1) OR (=2) OR (=3)", comp2.toString());
     }
 
     @Test
     public void testDecodeComparative_null() {
         String conditionStr = "message_id in(1,2,3)";
         Comparative comp = ComparativeStringAnalyser.decodeComparative(conditionStr, null);
-        Assert.assertEquals("(=1) or (=2) or (=3)", comp.toString());
+        Assert.assertEquals("(=1) OR (=2) OR (=3)", comp.toString());
 
         String conditionStr2 = "message_id in(1,2,3)";
         Comparative comp2 = ComparativeStringAnalyser.decodeComparative(conditionStr2, null);
-        Assert.assertEquals("(=1) or (=2) or (=3)", comp2.toString());
+        Assert.assertEquals("(=1) OR (=2) OR (=3)", comp2.toString());
     }
 }

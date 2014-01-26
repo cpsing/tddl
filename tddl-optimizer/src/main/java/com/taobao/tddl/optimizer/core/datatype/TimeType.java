@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 
+import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.BaseRowSet;
 import com.taobao.tddl.common.utils.convertor.Convertor;
@@ -107,7 +108,7 @@ public class TimeType extends AbstractDataType<java.sql.Time> {
 
     @Override
     public Calculator getCalculator() {
-        return null;
+        throw new NotSupportException("时间类型不支持算术符操作");
     }
 
 }

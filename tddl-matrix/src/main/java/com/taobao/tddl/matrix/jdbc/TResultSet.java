@@ -34,7 +34,6 @@ import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
-import com.taobao.tddl.optimizer.core.datatype.DataType;
 
 /**
  * @author mengshi.sunmengshi 2013-11-22 下午3:26:23
@@ -132,9 +131,10 @@ public class TResultSet implements ResultSet {
         }
     }
 
-    private DataType getColumnLabelDataType(String columnLabel) throws SQLException {
-        return this.getMetaData().getColumnDataType(columnLabel);
-    }
+    // private DataType getColumnLabelDataType(String columnLabel) throws
+    // SQLException {
+    // return this.getMetaData().getColumnDataType(columnLabel);
+    // }
 
     private void validateColumnIndex(int columnIndex) throws SQLException {
         if (columnIndex < 0 || columnIndex > this.getMetaData().getColumnCount()) {
@@ -640,7 +640,7 @@ public class TResultSet implements ResultSet {
     @Override
     public Object getObject(String columnLabel) throws SQLException {
         validateColumnLabel(columnLabel);
-        DataType a = getColumnLabelDataType(columnLabel);
+        // DataType a = getColumnLabelDataType(columnLabel);
         // boolean dataFlag = false;
         // if (a != null) {
         // dataFlag = (a == DataType.DatetimeType);

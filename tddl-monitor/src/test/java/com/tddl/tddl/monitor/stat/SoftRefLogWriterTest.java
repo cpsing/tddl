@@ -5,12 +5,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.LockSupport;
 
+import org.junit.Ignore;
+
 import com.taobao.tddl.monitor.stat.MinMaxAvgLogWriter;
 import com.taobao.tddl.monitor.stat.SoftRefLogWriter;
 
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
+@Ignore
 public class SoftRefLogWriterTest {
 
     private static final Logger           TDDL_Test_Statistic_LOG = LoggerFactory.getLogger("TDDL_Test_Statistic_LOG");

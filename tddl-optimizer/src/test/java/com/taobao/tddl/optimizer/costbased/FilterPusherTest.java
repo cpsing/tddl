@@ -24,7 +24,7 @@ public class FilterPusherTest extends BaseOptimizerTest {
         JoinNode join = table1.join(table2);
         join.query("(TABLE1.ID>5 OR TABLE2.ID<10) AND TABLE1.NAME = TABLE2.NAME");
         join.build();
-        FilterPreProcessor.optimize(join);
+        FilterPreProcessor.optimize(join, true);
         FilterPusher.optimize(join);
 
         Assert.assertEquals(null, join.getLeftNode().getWhereFilter());

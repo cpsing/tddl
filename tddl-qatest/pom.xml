@@ -30,7 +30,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-
 		<!-- test libs -->
 		<dependency>
 			<groupId>${project.groupId}</groupId>

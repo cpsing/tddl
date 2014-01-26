@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 
+import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.BaseRowSet;
 import com.taobao.tddl.common.utils.convertor.Convertor;
@@ -108,7 +109,7 @@ public class TimestampType extends AbstractDataType<java.sql.Timestamp> {
 
     @Override
     public Calculator getCalculator() {
-        return null;
+        throw new NotSupportException("时间类型不支持算术符操作");
     }
 
 }

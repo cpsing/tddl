@@ -13,6 +13,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.taobao.diamond.mockserver.MockServer;
@@ -28,6 +29,7 @@ import com.taobao.tddl.qatest.util.PrepareData;
  * <p/>
  * Author By: zhuoxue.yll Created Date: 2012-2-16 下午2:05:24
  */
+@Ignore(value = "提供初始化环境的实际方法")
 public class BaseMatrixTestCase extends PrepareData {
 
     protected static final ExecutorService pool                    = Executors.newCachedThreadPool();

@@ -33,7 +33,7 @@ public class SchemaManagerTest {
         s.init();
 
         Assert.assertTrue(s.getTable("BMW_USERS") != null);
-        Assert.assertEquals(8, s.getAllTables().size());
+        Assert.assertEquals(9, s.getAllTables().size());
     }
 
     @Test

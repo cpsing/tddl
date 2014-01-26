@@ -45,7 +45,7 @@ public class TddlVirtualRuleTest {
             sb.append(" ");
         }
 
-        Assert.assertEquals("目标库:NSEARCH_GROUP_2 所要执行的表:nserch_4 ", sb.toString());
+        Assert.assertEquals("目标库:NSEARCH_GROUP_2 所要执行的表:NSERCH_4 ", sb.toString());
     }
 
     @Test

@@ -117,6 +117,8 @@ public class ExtraFunctionManager {
             return "MULTIPLY";
         } else if (IFunction.BuiltInFunction.DIVISION.equals(name)) {
             return "DIVISION";
+        } else if (IFunction.BuiltInFunction.MOD.equals(name)) {
+            return "MOD";
         }
 
         return name;// 默认语法树中所有节点均为大写

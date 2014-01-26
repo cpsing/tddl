@@ -26,7 +26,7 @@ public class ComparativeAND extends ComparativeBaseList {
     }
 
     protected String getRelation() {
-        return " and ";
+        return " AND ";
     }
 
 }

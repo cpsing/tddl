@@ -5,11 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Ignore;
+
 import com.taobao.tddl.rule.model.sqljep.Comparative;
 import com.taobao.tddl.rule.model.sqljep.ComparativeAND;
 import com.taobao.tddl.rule.model.sqljep.ComparativeMapChoicer;
 import com.taobao.tddl.rule.model.sqljep.ComparativeOR;
 
+@Ignore
 public class BaseRuleTest {
 
     protected Comparative or(Comparable... values) {

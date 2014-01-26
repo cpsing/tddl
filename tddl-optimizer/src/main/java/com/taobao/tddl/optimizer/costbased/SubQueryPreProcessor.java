@@ -10,7 +10,6 @@ import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
-import com.taobao.tddl.optimizer.core.expression.bean.LogicalFilter;
 import com.taobao.tddl.optimizer.exceptions.OptimizerException;
 import com.taobao.tddl.optimizer.exceptions.QueryException;
 import com.taobao.tddl.optimizer.utils.FilterUtils;
@@ -138,8 +137,8 @@ public class SubQueryPreProcessor {
                 qtn.filter = filter;
                 return qtn; // 没有子查询
             }
-        } else if (filter instanceof LogicalFilter) {
-            LogicalFilter logical = (LogicalFilter) filter;
+        } else if (filter instanceof ILogicalFilter) {
+            ILogicalFilter logical = (ILogicalFilter) filter;
             for (int i = 0; i < logical.getSubFilter().size(); i++) {
                 SubQueryAndFilter result = buildSubQuery(qtn, logical.getSubFilter().get(i), existOr);
                 if (result != qtn) {

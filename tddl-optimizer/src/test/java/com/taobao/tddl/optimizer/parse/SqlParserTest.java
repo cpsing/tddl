@@ -756,7 +756,7 @@ public class SqlParserTest extends BaseOptimizerTest {
 
         Assert.assertTrue(qn.getLimitFrom() instanceof BindVal);
         BindVal bv = (BindVal) qn.getLimitFrom();
-        Assert.assertEquals(0, bv.getBindVal());
+        Assert.assertEquals(1, bv.getBindVal());
         Assert.assertEquals(10L, qn.getLimitTo());
     }
 
@@ -767,7 +767,7 @@ public class SqlParserTest extends BaseOptimizerTest {
         qn.build();
         Assert.assertTrue(qn.getLimitTo() instanceof BindVal);
         BindVal bv = (BindVal) qn.getLimitTo();
-        Assert.assertEquals(0, bv.getBindVal());
+        Assert.assertEquals(1, bv.getBindVal());
         Assert.assertEquals(1L, qn.getLimitFrom());
     }
 
@@ -778,10 +778,10 @@ public class SqlParserTest extends BaseOptimizerTest {
         qn.build();
         Assert.assertTrue(qn.getLimitFrom() instanceof BindVal);
         BindVal bv = (BindVal) qn.getLimitFrom();
-        Assert.assertEquals(0, bv.getBindVal());
+        Assert.assertEquals(1, bv.getBindVal());
         Assert.assertTrue(qn.getLimitTo() instanceof BindVal);
         bv = (BindVal) qn.getLimitTo();
-        Assert.assertEquals(1, bv.getBindVal());
+        Assert.assertEquals(2, bv.getBindVal());
 
     }
 
@@ -794,9 +794,9 @@ public class SqlParserTest extends BaseOptimizerTest {
         ParameterContext p1 = new ParameterContext(ParameterMethod.setObject1, new Object[] { 0, 2 });
         ParameterContext p2 = new ParameterContext(ParameterMethod.setObject1, new Object[] { 1, "sun" });
         ParameterContext p3 = new ParameterContext(ParameterMethod.setObject1, new Object[] { 2, "sysu" });
-        parameterSettings.put(0, p1);
-        parameterSettings.put(1, p2);
-        parameterSettings.put(2, p3);
+        parameterSettings.put(1, p1);
+        parameterSettings.put(2, p2);
+        parameterSettings.put(3, p3);
 
         in.assignment(parameterSettings);
         in.build();
@@ -817,9 +817,9 @@ public class SqlParserTest extends BaseOptimizerTest {
         ParameterContext p1 = new ParameterContext(ParameterMethod.setObject1, new Object[] { 0, 2 });
         ParameterContext p2 = new ParameterContext(ParameterMethod.setObject1, new Object[] { 1, 3 });
         ParameterContext p3 = new ParameterContext(ParameterMethod.setObject1, new Object[] { 2, 5 });
-        parameterSettings.put(0, p1);
-        parameterSettings.put(1, p2);
-        parameterSettings.put(2, p3);
+        parameterSettings.put(1, p1);
+        parameterSettings.put(2, p2);
+        parameterSettings.put(3, p3);
 
         un.assignment(parameterSettings);
         un.build();
@@ -841,8 +841,8 @@ public class SqlParserTest extends BaseOptimizerTest {
         parameterSettings = new TreeMap<Integer, ParameterContext>();
         ParameterContext p1 = new ParameterContext(ParameterMethod.setObject1, new Object[] { 0, 3 });
         ParameterContext p2 = new ParameterContext(ParameterMethod.setObject1, new Object[] { 1, 5 });
-        parameterSettings.put(0, p1);
-        parameterSettings.put(1, p2);
+        parameterSettings.put(1, p1);
+        parameterSettings.put(2, p2);
 
         dn.assignment(parameterSettings);
         dn.build();
@@ -999,7 +999,7 @@ public class SqlParserTest extends BaseOptimizerTest {
 
     @Test
     public void testWhere_表子查询() throws QueryException, SqlParserException {
-        String sql = "SELECT NAME FROM (SELECT * FROM TABLE1 A WHERE A.ID=1) B ORDER BY NAME LIMIT 10";
+        String sql = "SELECT NAME FROM (SELECT * FROM TABLE1 A WHERE A.ID=1) B";
         QueryTreeNode qn = query(sql);
         qn.build();
 

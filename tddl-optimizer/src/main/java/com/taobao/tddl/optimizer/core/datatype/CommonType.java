@@ -19,10 +19,12 @@ import com.taobao.tddl.common.utils.convertor.ConvertorHelper;
  */
 public abstract class CommonType<DATA> extends AbstractDataType<DATA> {
 
-    private Convertor convertor = null;
+    private Convertor convertor       = null;
+    private Convertor stringConvertor = null;
 
     public CommonType(){
         convertor = ConvertorHelper.commonToCommon;
+        stringConvertor = ConvertorHelper.stringToCommon;
     }
 
     @Override
@@ -88,14 +90,19 @@ public abstract class CommonType<DATA> extends AbstractDataType<DATA> {
             return null;
         } else {
             try {
-                return (DATA) convertor.convert(value, getDataClass());
-            } catch (ConvertorException e) {
-                Convertor cv = getConvertor(value.getClass());
-                if (cv != null) {
-                    return (DATA) cv.convert(value, getDataClass());
-                } else {
-                    return (DATA) value;
+                try {
+                    return (DATA) convertor.convert(value, getDataClass());
+                } catch (ConvertorException e) {
+                    Convertor cv = getConvertor(value.getClass());
+                    if (cv != null) {
+                        return (DATA) cv.convert(value, getDataClass());
+                    } else {
+                        return (DATA) value;
+                    }
                 }
+            } catch (NumberFormatException e) {
+                // mysql中针对不可识别的字符，返回数字0
+                return (DATA) stringConvertor.convert("0", getDataClass());
             }
         }
     }

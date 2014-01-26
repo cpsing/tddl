@@ -1,7 +1,5 @@
 package com.taobao.tddl.executor.function;
 
-import java.util.Map;
-
 import com.taobao.tddl.optimizer.core.expression.IExtraFunction;
 import com.taobao.tddl.optimizer.core.expression.IFunction.FunctionType;
 
@@ -21,5 +19,4 @@ public abstract class AggregateFunction extends ExtraFunction implements IExtraF
         return function.getColumnName();
     }
 
-    public abstract Map<String, Object> getResult();
 }

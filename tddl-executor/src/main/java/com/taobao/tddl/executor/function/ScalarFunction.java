@@ -15,8 +15,6 @@ import com.taobao.tddl.optimizer.exceptions.FunctionException;
  */
 public abstract class ScalarFunction extends ExtraFunction implements IExtraFunction {
 
-    protected Object result;
-
     @Override
     public FunctionType getFunctionType() {
         return FunctionType.Scalar;
@@ -35,20 +33,6 @@ public abstract class ScalarFunction extends ExtraFunction implements IExtraFunc
     @Override
     public DataType getMapReturnType() {
         return this.getReturnType();
-    }
-
-    public void setResult(Object result) {
-        this.result = result;
-    }
-
-    @Override
-    public Object getResult() {
-        return result;
-    }
-
-    @Override
-    public void clear() {
-        result = null;
     }
 
     @Override

@@ -103,6 +103,7 @@ public class ComparativeStringAnalyser {
      * @return
      */
     public static Comparative decodeComparative(String compValue, String globalType) {
+        compValue = compValue.toUpperCase();
         boolean containsIn = TStringUtil.contains(compValue, " IN");
         Comparative comparative = null;
         if (!containsIn) {

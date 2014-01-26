@@ -3,6 +3,7 @@ package com.taobao.tddl.optimizer.rule;
 import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.optimizer.config.table.IndexManager;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
+import com.taobao.tddl.optimizer.config.table.SchemaManager;
 
 /**
  * 基于{@linkplain RuleSchemaManager}完成index的获取
@@ -11,9 +12,9 @@ import com.taobao.tddl.optimizer.config.table.IndexMeta;
  */
 public class RuleIndexManager extends AbstractLifecycle implements IndexManager {
 
-    private RuleSchemaManager schemaManager;
+    private SchemaManager schemaManager;
 
-    public RuleIndexManager(RuleSchemaManager schemaManager){
+    public RuleIndexManager(SchemaManager schemaManager){
         this.schemaManager = schemaManager;
     }
 
