@@ -24,6 +24,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
@@ -42,15 +43,27 @@ import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 public class TResultSet implements ResultSet {
 
     /** Has this result set been closed? */
-    protected boolean             isClosed                  = false;
+    protected boolean             isClosed                   = false;
 
     private final ResultCursor    resultCursor;
     private IRowSet               currentKVPair;
-    private IRowSet               cacheRowSetToBuildMeta    = null;
-    private TResultSetMetaData    resultSetMetaData         = null;
+    private IRowSet               cacheRowSetToBuildMeta     = null;
+    private TResultSetMetaData    resultSetMetaData          = null;
     private boolean               wasNull;
     private boolean               isLoigcalIndexEqualActualIndex;
-    private Map<Integer, Integer> logicalIndexToActualIndex = null;
+    private Map<Integer, Integer> logicalIndexToActualIndex  = null;
+
+    private Map                   columnLabelToIndex;
+
+    private Map                   fullColumnNameToIndex;
+
+    private Map                   columnNameToIndex;
+
+    private boolean               hasBuiltIndexMapping       = false;
+
+    private final Map             columnToIndexCache         = new HashMap();
+
+    private final boolean         useColumnNamesInFindColumn = false;
 
     public TResultSet(ResultCursor resultCursor){
         this.resultCursor = resultCursor;
@@ -58,6 +71,98 @@ public class TResultSet implements ResultSet {
             && !this.resultCursor.getOriginalSelectColumns().isEmpty()) {
             this.resultSetMetaData = new TResultSetMetaData(ExecUtils.convertIColumnsToColumnMeta(this.resultCursor.getOriginalSelectColumns()));
         }
+
+    }
+
+    public void buildIndexMapping() throws SQLException {
+        int numFields = this.getMetaData().getColumnCount();
+        this.columnLabelToIndex = new TreeMap(String.CASE_INSENSITIVE_ORDER);
+        this.fullColumnNameToIndex = new TreeMap(String.CASE_INSENSITIVE_ORDER);
+        this.columnNameToIndex = new TreeMap(String.CASE_INSENSITIVE_ORDER);
+
+        // We do this in reverse order, so that the 'first' column
+        // with a given name ends up as the final mapping in the
+        // hashtable...
+        //
+        // Quoting the JDBC Spec:
+        //
+        // "Column names used as input to getter
+        // methods are case insensitive. When a getter method is called with a
+        // column
+        // name and several columns have the same name, the value of the first
+        // matching column will be returned. "
+        //
+
+        List<ColumnMeta> cms = this.getMetaData().getColumnMetas();
+        for (int i = numFields - 1; i >= 0; i--) {
+            Integer index = i;
+            String columnName = cms.get(i).getName();
+            String columnLabel = cms.get(i).getAlias() == null ? columnName : cms.get(i).getAlias();
+
+            String fullColumnName = cms.get(i).getFullName();
+
+            if (columnLabel != null) {
+                this.columnLabelToIndex.put(columnLabel, index);
+            }
+
+            if (fullColumnName != null) {
+                this.fullColumnNameToIndex.put(fullColumnName, index);
+            }
+
+            if (columnName != null) {
+                this.columnNameToIndex.put(columnName, index);
+            }
+        }
+
+        // set the flag to prevent rebuilding...
+        this.hasBuiltIndexMapping = true;
+    }
+
+    @Override
+    public synchronized int findColumn(String columnName) throws SQLException {
+        Integer index;
+
+        checkClosed();
+
+        if (!this.hasBuiltIndexMapping) {
+            buildIndexMapping();
+        }
+
+        index = (Integer) this.columnToIndexCache.get(columnName);
+
+        if (index != null) {
+            return index.intValue() + 1;
+        }
+
+        index = (Integer) this.columnLabelToIndex.get(columnName);
+
+        if (index == null && this.useColumnNamesInFindColumn) {
+            index = (Integer) this.columnNameToIndex.get(columnName);
+        }
+
+        if (index == null) {
+            index = (Integer) this.fullColumnNameToIndex.get(columnName);
+        }
+
+        if (index != null) {
+            this.columnToIndexCache.put(columnName, index);
+
+            return index.intValue() + 1;
+        }
+
+        // Try this inefficient way, now
+
+        List<ColumnMeta> cms = this.getMetaData().getColumnMetas();
+        for (int i = 0; i < cms.size(); i++) {
+            String cn = cms.get(i).getAlias() == null ? cms.get(i).getName() : cms.get(i).getAlias();
+            if (columnName.equalsIgnoreCase(cn)) {
+                return i + 1;
+            } else if (columnName.equalsIgnoreCase(cms.get(i).getFullName())) {
+                return i + 1;
+            }
+        }
+
+        throw new SQLException("column " + columnName + " doesn't exist!, " + this.getMetaData().getColumnMetas());
 
     }
 
@@ -125,11 +230,13 @@ public class TResultSet implements ResultSet {
         return this.isClosed;
     }
 
-    private void validateColumnLabel(String columnLabel) throws SQLException {
-        if (!this.getMetaData().columnIsExist(columnLabel)) {
-            throw new SQLException("column " + columnLabel + " doesn't exist!, " + this.getMetaData().getColumnMetas());
-        }
-    }
+    // private void validateColumnLabel(String columnLabel) throws SQLException
+    // {
+    // if (!this.getMetaData().columnIsExist(columnLabel)) {
+    // throw new SQLException("column " + columnLabel + " doesn't exist!, " +
+    // this.getMetaData().getColumnMetas());
+    // }
+    // }
 
     // private DataType getColumnLabelDataType(String columnLabel) throws
     // SQLException {
@@ -217,10 +324,7 @@ public class TResultSet implements ResultSet {
         }
 
         Integer index = currentKVPair.getParentCursorMeta().getIndex(table, columnLabel);
-        // if (index == null) {
-        // throw new SQLException("can't find index by table " + table +
-        // " . column " + name);
-        // }
+
         return index;
     }
 
@@ -253,16 +357,7 @@ public class TResultSet implements ResultSet {
 
     @Override
     public boolean getBoolean(String columnLabel) throws SQLException {
-        validateColumnLabel(columnLabel);
-        Integer index = getIndexByColumnLabel(columnLabel);
-        Boolean bool = currentKVPair.getBoolean(index);
-        if (null == bool) {
-            wasNull = true;
-            return false;
-        } else {
-            wasNull = false;
-            return bool;
-        }
+        return getBoolean(findColumn(columnLabel));
     }
 
     @Override
@@ -281,16 +376,7 @@ public class TResultSet implements ResultSet {
 
     @Override
     public short getShort(String columnLabel) throws SQLException {
-        validateColumnLabel(columnLabel);
-        Integer index = getIndexByColumnLabel(columnLabel);
-        Short st = currentKVPair.getShort(index);
-        if (st == null) {
-            wasNull = true;
-            return 0;
-        } else {
-            wasNull = false;
-            return st;
-        }
+        return getShort(findColumn(columnLabel));
     }
 
     @Override
@@ -309,21 +395,7 @@ public class TResultSet implements ResultSet {
 
     @Override
     public int getInt(String columnLabel) throws SQLException {
-        validateColumnLabel(columnLabel);
-        Integer index = getIndexByColumnLabel(columnLabel);
-        if (index == null) {
-            wasNull = true;
-            return 0;
-        }
-
-        Integer inte = currentKVPair.getInteger(index);
-        if (inte == null) {
-            wasNull = true;
-            return 0;
-        } else {
-            wasNull = false;
-            return inte;
-        }
+        return getInt(findColumn(columnLabel));
     }
 
     @Override
@@ -342,21 +414,7 @@ public class TResultSet implements ResultSet {
 
     @Override
     public long getLong(String columnLabel) throws SQLException {
-        validateColumnLabel(columnLabel);
-        Integer index = getIndexByColumnLabel(columnLabel);
-        if (index == null) {
-            wasNull = true;
-            return 0l;
-        }
-
-        Long l = currentKVPair.getLong(index);
-        if (l == null) {
-            wasNull = true;
-            return 0l;
-        } else {
-            wasNull = false;
-            return l;
-        }
+        return getLong(findColumn(columnLabel));
     }
 
     @Override
@@ -375,21 +433,8 @@ public class TResultSet implements ResultSet {
 
     @Override
     public float getFloat(String columnLabel) throws SQLException {
-        validateColumnLabel(columnLabel);
-        Integer index = getIndexByColumnLabel(columnLabel);
-        if (index == null) {
-            wasNull = true;
-            return (float) 0.0;
-        }
+        return getFloat(findColumn(columnLabel));
 
-        Float fl = currentKVPair.getFloat(index);
-        if (fl == null) {
-            wasNull = true;
-            return 0;
-        } else {
-            wasNull = false;
-            return fl;
-        }
     }
 
     @Override
@@ -408,21 +453,7 @@ public class TResultSet implements ResultSet {
 
     @Override
     public double getDouble(String columnLabel) throws SQLException {
-        validateColumnLabel(columnLabel);
-        Integer index = getIndexByColumnLabel(columnLabel);
-        if (index == null) {
-            wasNull = true;
-            return 0.0;
-        }
-
-        Double doub = currentKVPair.getDouble(index);
-        if (doub == null) {
-            wasNull = true;
-            return 0;
-        } else {
-            wasNull = false;
-            return doub;
-        }
+        return getDouble(findColumn(columnLabel));
     }
 
     @Override
@@ -441,21 +472,7 @@ public class TResultSet implements ResultSet {
 
     @Override
     public byte[] getBytes(String columnLabel) throws SQLException {
-        validateColumnLabel(columnLabel);
-        Integer index = getIndexByColumnLabel(columnLabel);
-        if (index == null) {
-            wasNull = true;
-            return null;
-        }
-
-        byte[] bytes = currentKVPair.getBytes(index);
-        if (bytes == null) {
-            wasNull = true;
-            return null;
-        } else {
-            wasNull = false;
-            return bytes;
-        }
+        return getBytes(findColumn(columnLabel));
     }
 
     @Override
@@ -489,36 +506,12 @@ public class TResultSet implements ResultSet {
 
     @Override
     public Date getDate(String columnLabel) throws SQLException {
-        validateColumnLabel(columnLabel);
-        Integer index = getIndexByColumnLabel(columnLabel);
-        if (index == null) {
-            wasNull = true;
-            return null;
-        }
-        Date date = currentKVPair.getDate(index);
-        if (date == null) {
-            wasNull = true;
-            return null;
-        } else {
-            wasNull = false;
-            return date;
-        }
+        return getDate(findColumn(columnLabel));
     }
 
     @Override
     public byte getByte(String columnLabel) throws SQLException {
-        validateColumnLabel(columnLabel);
-        Integer index = getIndexByColumnLabel(columnLabel);
-        if (index == null) {
-            return 0;
-        }
-
-        byte[] bytes = currentKVPair.getBytes(index);
-        if (bytes == null || bytes.length == 0) {
-            return 0;
-        } else {
-            return bytes[0];
-        }
+        return getByte(findColumn(columnLabel));
     }
 
     @Override
@@ -537,20 +530,7 @@ public class TResultSet implements ResultSet {
 
     @Override
     public Timestamp getTimestamp(String columnLabel) throws SQLException {
-        validateColumnLabel(columnLabel);
-        Integer index = getIndexByColumnLabel(columnLabel);
-        if (index == null) {
-            wasNull = true;
-            return null;
-        }
-        Timestamp ts = currentKVPair.getTimestamp(index);
-        if (ts == null) {
-            wasNull = true;
-            return null;
-        } else {
-            wasNull = false;
-            return ts;
-        }
+        return getTimestamp(findColumn(columnLabel));
     }
 
     @Override
@@ -639,33 +619,7 @@ public class TResultSet implements ResultSet {
 
     @Override
     public Object getObject(String columnLabel) throws SQLException {
-        validateColumnLabel(columnLabel);
-        // DataType a = getColumnLabelDataType(columnLabel);
-        // boolean dataFlag = false;
-        // if (a != null) {
-        // dataFlag = (a == DataType.DatetimeType);
-        // } else {
-        // dataFlag = false;
-        // }
-
-        try {
-            Integer index = getIndexByColumnLabel(columnLabel);
-            if (index == null) {
-                wasNull = true;
-                return null;
-            }
-
-            Object result = currentKVPair.getObject(index);
-            if (null == result) {
-                wasNull = true;
-                return null;
-            } else {
-                wasNull = false;
-                return result;
-            }
-        } catch (Exception e) {
-            throw new SQLException(e);
-        }
+        return getObject(findColumn(columnLabel));
     }
 
     @Override
@@ -684,15 +638,7 @@ public class TResultSet implements ResultSet {
 
     @Override
     public BigDecimal getBigDecimal(String columnLabel) throws SQLException {
-        validateColumnLabel(columnLabel);
-        Object value = getObject(columnLabel);
-        if (value == null) {
-            wasNull = true;
-            return null;
-        }
-
-        wasNull = false;
-        return this.validBigDecimal(value);
+        return getBigDecimal(findColumn(columnLabel));
     }
 
     @Override
@@ -883,11 +829,6 @@ public class TResultSet implements ResultSet {
 
     @Override
     public String getCursorName() throws SQLException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int findColumn(String columnLabel) throws SQLException {
         throw new UnsupportedOperationException();
     }
 

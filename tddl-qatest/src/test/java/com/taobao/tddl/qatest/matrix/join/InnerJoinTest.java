@@ -286,13 +286,11 @@ public class InnerJoinTest extends BaseMatrixTestCase {
 
     @Test
     public void InnerJoinWithAvgTest() throws Exception {
-        String sql = "select t1.avg as avg1,t2.avg as avg2,avg(t1.station_id) from (select avg(host_id) as avg,station_id from "
-                     + host_info
-                     + " group by station_id) t1 "
-                     + "join (select avg(hostgroup_id) as avg,station_id from "
-                     + hostgroup
+        String sql = "select t1.avg,t2.avg,avg(t1.station_id) from (select avg(host_id) as avg,station_id from "
+                     + host_info + " group by station_id) t1 "
+                     + "join (select avg(hostgroup_id) as avg,station_id from " + hostgroup
                      + " group by station_id) t2 on t1.station_id=t2.station_id";
-        String[] columnParam = { "avg1", "avg2", "avg(t1.station_id)" };
+        String[] columnParam = { "t1.avg", "t2.avg", "avg(t1.station_id)" };
         selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
     }
 

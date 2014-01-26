@@ -41,6 +41,8 @@ public class ColumnMeta implements Serializable {
      */
     protected final boolean   nullable;
 
+    private String            fullName;
+
     public ColumnMeta(String tableName, String name, DataType dataType, String alias, boolean nullable){
         this.tableName = StringUtils.upperCase(tableName);
         this.name = StringUtils.upperCase(name);
@@ -121,6 +123,19 @@ public class ColumnMeta implements Serializable {
     @Override
     public String toString() {
         return toStringWithInden(0);
+    }
+
+    public String getFullName() {
+        if (this.fullName == null) {
+            String cn = this.getAlias() != null ? this.getAlias() : this.getName();
+            StringBuilder sb = new StringBuilder(this.getTableName().length() + 1 + cn.length());
+            sb.append(this.getTableName());
+            sb.append('.');
+            sb.append(cn);
+
+            this.fullName = sb.toString();
+        }
+        return this.fullName;
     }
 
 }
