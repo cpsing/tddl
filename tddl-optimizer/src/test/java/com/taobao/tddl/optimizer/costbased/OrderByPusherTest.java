@@ -422,4 +422,34 @@ public class OrderByPusherTest extends BaseOptimizerTest {
         Assert.assertEquals(3, table1.getOrderBys().size());
         Assert.assertEquals("TABLE1.NAME", table1.getOrderBys().get(0).getColumn().toString());
     }
+
+    @Test
+    public void test_join的distinct下推() {
+        TableNode table1 = new TableNode("TABLE1");
+        TableNode table2 = new TableNode("TABLE2");
+
+        IColumn id = ASTNodeFactory.getInstance().createColumn();
+        id.setColumnName("ID");
+        id.setTableName("TABLE1");
+        id.setDistinct(true);
+
+        IColumn name = ASTNodeFactory.getInstance().createColumn();
+        name.setColumnName("NAME");
+        name.setTableName("TABLE1");
+        name.setDistinct(true);
+
+        IColumn school = ASTNodeFactory.getInstance().createColumn();
+        school.setColumnName("SCHOOL");
+        school.setTableName("TABLE1");
+        school.setDistinct(true);
+
+        JoinNode join = table1.join(table2);
+        join.select(id, name, school);
+        join.orderBy("NAME");
+        join.build();
+
+        OrderByPusher.optimize(join);
+        Assert.assertEquals(3, table1.getOrderBys().size());
+        Assert.assertEquals("TABLE1.NAME", table1.getOrderBys().get(0).getColumn().toString());
+    }
 }

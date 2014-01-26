@@ -149,24 +149,11 @@ public class OrderByPusher {
 
                 return merge;
             }
-        } else if (qtn instanceof JoinNode) {
-            if (containsDistinctColumns(qtn)) {
-                // 将查询所有字段进行order by，保证每个child返回的数据顺序都是一致的
-                List<IOrderBy> distinctOrderbys = new LinkedList<IOrderBy>();
-                for (ISelectable s : qtn.getColumnsSelected()) {
-                    IOrderBy order = ASTNodeFactory.getInstance().createOrderBy();
-                    order.setColumn(s).setDirection(true);
-                    distinctOrderbys.add(order);
-                }
-
-                List<IOrderBy> orderbys = getPushOrderBysCombileOrderbyColumns(distinctOrderbys, qtn.getOrderBys());
-                if (!orderbys.isEmpty()) {
-                    // 尝试合并order by和distinct成功，则设置当前order by
-                    qtn.setOrderBys(orderbys);
-                }
-
+        } else if (qtn instanceof JoinNode || qtn instanceof QueryNode) {
+            if (qtn.getGroupBys() != null && !qtn.getGroupBys().isEmpty()) {
+                // 如果存在group by + distinct，暂时无法做优化
+                return qtn;
             }
-        } else if (qtn instanceof QueryNode) {
             if (containsDistinctColumns(qtn)) {
                 // 将查询所有字段进行order by，保证每个child返回的数据顺序都是一致的
                 List<IOrderBy> distinctOrderbys = new LinkedList<IOrderBy>();
@@ -230,8 +217,11 @@ public class OrderByPusher {
                             standardOrder = qn.getGroupBys();
                         }
 
+                        // 需要考虑，如果子节点的列中存在聚合函数，则不能去除子节点的group by，否则语义不正确
+                        // order by中可能有desc的倒排语法
+                        // 目前的做法是设置orderby/groupby使用相同的列
                         qn.setOrderBys(standardOrder);
-                        qn.setGroupBys(new ArrayList(0));
+                        qn.setGroupBys(standardOrder);
                         qn.having("");
                         qn.build();
                     }
