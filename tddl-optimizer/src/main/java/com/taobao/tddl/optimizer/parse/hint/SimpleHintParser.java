@@ -127,7 +127,9 @@ public class SimpleHintParser {
         String extraCmd = containsKvNotBlank(jsonObject, EXTRACMD);
         if (StringUtils.isNotEmpty(extraCmd)) {
             JSONObject extraCmds = JSON.parseObject(extraCmd);
-            rc.getExtraCmds().putAll(extraCmds);
+            for (Map.Entry<String, Object> entry : extraCmds.entrySet()) {
+                rc.getExtraCmds().put(StringUtils.upperCase(entry.getKey()), entry.getValue());
+            }
         }
         return rc;
     }

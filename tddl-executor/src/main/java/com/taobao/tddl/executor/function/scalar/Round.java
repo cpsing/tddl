@@ -18,7 +18,6 @@ public class Round extends ScalarFunction {
         } else {
             this.result = args[0];
         }
-
     }
 
     @Override

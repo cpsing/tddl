@@ -18,7 +18,6 @@ import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
-import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.ILogicalFilter;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 import com.taobao.tddl.optimizer.exceptions.EmptyResultFilterException;
@@ -218,10 +217,10 @@ public class FilterPreProcessor {
     private static IFilter typeConvert(IFilter root) {
         IBooleanFilter bf = (IBooleanFilter) root;
         // 如果是id in (xx)
-        if (bf.getValues() != null && bf.getColumn() instanceof ISelectable) {
+        if (bf.getValues() != null && bf.getColumn() instanceof IColumn) {
             for (int i = 0; i < bf.getValues().size(); i++) {
                 bf.getValues().set(i,
-                    OptimizerUtils.convertType(bf.getValues().get(i), ((ISelectable) bf.getColumn()).getDataType()));
+                    OptimizerUtils.convertType(bf.getValues().get(i), ((IColumn) bf.getColumn()).getDataType()));
             }
         } else {
             // 如果是 1 = id情况
@@ -231,9 +230,9 @@ public class FilterPreProcessor {
                     type = ((IColumn) bf.getValue()).getDataType();
                 }
 
-                if (bf.getValue() instanceof IFunction) {
-                    type = ((IFunction) bf.getValue()).getDataType();
-                }
+                // if (bf.getValue() instanceof IFunction) {
+                // type = ((IFunction) bf.getValue()).getDataType();
+                // }
 
                 bf.setColumn(OptimizerUtils.convertType(bf.getColumn(), type));
             }
@@ -245,14 +244,13 @@ public class FilterPreProcessor {
                     type = ((IColumn) bf.getColumn()).getDataType();
                 }
 
-                if (bf.getColumn() instanceof IFunction) {
-                    type = ((IFunction) bf.getColumn()).getDataType();
-                }
+                // if (bf.getColumn() instanceof IFunction) {
+                // type = ((IFunction) bf.getColumn()).getDataType();
+                // }
 
                 bf.setValue(OptimizerUtils.convertType(bf.getValue(), type));
             }
         }
-        // ((Timestamp)bf.getValue()).getTime();
         return bf;
     }
 }

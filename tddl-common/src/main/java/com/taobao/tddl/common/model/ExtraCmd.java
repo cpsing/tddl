@@ -12,37 +12,37 @@ public class ExtraCmd {
         /**
          * 为true时，选取索引，
          */
-        public final static String ChooseIndex              = "ChooseIndex";
+        public final static String ChooseIndex              = "CHOOSE_INDEX";
 
         /**
          * 为true时，最优join策略选择
          */
-        public final static String ChooseJoin               = "ChooseJoin";
+        public final static String ChooseJoin               = "CHOOSE_JOIN";
 
         /**
          * 为true时，会将or条件转化为index merge
          */
-        public final static String ChooseIndexMerge         = "ChooseIndexMerge";
+        public final static String ChooseIndexMerge         = "CHOOSE_INDEX_MERGE";
 
         /**
          * 智能优化join merge join
          */
-        public final static String JoinMergeJoinJudgeByRule = "JoinMergeJoinJudgeByRule";
+        public final static String JoinMergeJoinJudgeByRule = "JOIN_MERGE_JOIN_JUDGE_BY_RULE";
 
         /**
          * 强制优化成join merge join
          */
-        public final static String JoinMergeJoin            = "JoinMergeJoin";
+        public final static String JoinMergeJoin            = "JOIN_MERGE_JOIN";
 
         /**
          * 为true时，Merge Join Merge将会展开
          */
-        public final static String MergeExpand              = "MergeExpand";
+        public final static String MergeExpand              = "MERGE_EXPAND";
 
         /**
          * 为true时，Merge将并行执行
          */
-        public final static String MergeConcurrent          = "MergeConcurrent";
+        public final static String MergeConcurrent          = "MERGE_CONCURRENT";
     }
 
     public static class ExecutionExtraCmd {

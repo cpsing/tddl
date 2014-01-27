@@ -3,10 +3,10 @@ package com.taobao.tddl.qatest;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
 
@@ -65,7 +65,6 @@ public class BaseTestCase extends Validator {
     @BeforeClass
     public static void diamondSetUp() {
         MockServer.setUpMockServer();
-        // TAtomDataSource.cleanAllDataSource();
     }
 
     @AfterClass

@@ -1,11 +1,9 @@
 package com.taobao.tddl.executor.function.scalar;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
-import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.executor.function.ScalarFunction;
 import com.taobao.tddl.optimizer.core.datatype.DataType;
+import com.taobao.tddl.optimizer.core.datatype.DataTypeUtil;
+import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
 /**
  * @since 5.0.0
@@ -17,25 +15,31 @@ public class Division extends ScalarFunction {
         this.result = computeInner(args);
     }
 
-    private Comparable computeInner(Object[] args) {
-        if (args[0] instanceof Long || args[0] instanceof Integer) {
-            return ((Number) args[0]).longValue() * 1.0 / ((Number) args[1]).longValue() * 1.0;
-        } else if (args[0] instanceof Double || args[0] instanceof Float) {
-            return ((Number) args[0]).doubleValue() / ((Number) args[1]).doubleValue();
-        } else if (args[0] instanceof String || args[1] instanceof String) {
-            return Double.parseDouble(args[0].toString()) / Double.parseDouble(args[1].toString());
-        } else if (args[0] instanceof BigDecimal) {
-            BigDecimal o = new BigDecimal(args[0].toString());
-            BigDecimal o2 = new BigDecimal(args[1].toString());
-            return o.divide(o2, 4, RoundingMode.HALF_DOWN);
-        } else {
-            throw new NotSupportException("Division Type");
-        }
+    private Object computeInner(Object[] args) {
+        DataType type = this.getReturnType();
+        return type.getCalculator().divide(args[0], args[1]);
     }
 
     @Override
     public DataType getReturnType() {
-        return DataType.DoubleType;
+        Object[] args = function.getArgs().toArray();
+        DataType type = null;
+        if (args[0] instanceof ISelectable) {
+            type = ((ISelectable) args[0]).getDataType();
+        } else {
+            type = DataTypeUtil.getTypeOfObject(args[0]);
+        }
+
+        if (type == DataType.BigIntegerType) {
+            // 如果是大整数，返回bigDecimal
+            return DataType.BigDecimalType;
+        } else {
+            // 尽可能都返回为BigDecimalType，double类型容易出现精度问题，会和mysql出现误差
+            // [zhuoxue.yll, 2516885.8000]
+            // [zhuoxue.yll, 2516885.799999999813735485076904296875]
+            // return DataType.DoubleType;
+            return DataType.BigDecimalType;
+        }
     }
 
 }

@@ -13,7 +13,7 @@ public class Dummy extends ScalarFunction implements IExtraFunction {
 
     @Override
     public DataType getReturnType() {
-        return null;
+        return DataType.NullType;
     }
 
     @Override

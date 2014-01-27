@@ -6,10 +6,13 @@ import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.taobao.tddl.atom.TAtomDataSource;
 import com.taobao.tddl.atom.common.TAtomConstants;
 import com.taobao.tddl.atom.config.TAtomConfParser;
 import com.taobao.tddl.atom.config.TAtomDsConfDO;
@@ -20,7 +23,7 @@ import com.taobao.tddl.qatest.util.LoadPropsUtil;
 @Ignore(value = "提供初始化环境的实际方法")
 public class BaseAtomGroupTestCase extends BaseTestCase {
 
-    protected static final String     QATEST_DATASOURCE_PATH               = "classpath:atom/tddl_qatest_db.xml";
+    protected static final String     QATEST_DATASOURCE_PATH           = "classpath:atom/tddl_qatest_db.xml";
     protected static FixDataSource    fixDataSource;
 
     static {
@@ -30,85 +33,92 @@ public class BaseAtomGroupTestCase extends BaseTestCase {
         }
     }
 
-    public static final int           INTERVAL_TIME                        = 2;
-    public static final int           SLEEP_TIME                           = INTERVAL_TIME * 3;
-    public static final String        PASSWD_PATH_FULL                     = "atom/passwd.properties";
-    public static final String        GLOBAL_PATH_SUFFIX                   = "/global.properties";
-    public static final String        APP_PATH_SUFFIX                      = "/app.properties";
-    public static Map<String, String> dataMap                              = null;
+    public static final int           INTERVAL_TIME                    = 2;
+    public static final int           SLEEP_TIME                       = INTERVAL_TIME * 3;
+    public static final String        PASSWD_PATH_FULL                 = "atom/passwd.properties";
+    public static final String        GLOBAL_PATH_SUFFIX               = "/global.properties";
+    public static final String        APP_PATH_SUFFIX                  = "/app.properties";
+    public static Map<String, String> dataMap                          = null;
     // --------------------mysql orcle共用
-    public static final String        APPNAME                              = "tddl_qatest";
-    public static final String        APPNAME_UTE                          = "UTE";
-    public static final String        TDDL_DBGROUPS                        = "tddl_dbgroups";
-    public static final String        PROPERTIES_FILE                      = ".properties";
+    public static final String        APPNAME                          = "tddl_qatest";
+    public static final String        APPNAME_UTE                      = "UTE";
+    public static final String        TDDL_DBGROUPS                    = "tddl_dbgroups";
+    public static final String        PROPERTIES_FILE                  = ".properties";
 
     // ---------------------mysql
-    public static final String        ATOM_PATH                            = "atom/";
-    public static final String        GROUP_PATH                           = "group/";
-    public static final String        MATRIX_PATH                          = "matrix/";
-    public static final String        ATOM_NORMAL_0_PATH                   = "atom/qatest_normal_0";
-    public static final String        ATOM_NORMAL_1_PATH                   = "atom/qatest_normal_1";
-    public static final String        ATOM_NORMAL_2_PATH                   = "atom/qatest_normal_2";
-    public static final String        ATOM_NORMAL_0_BAC_PATH               = "atom/qatest_normal_0_bac";
-    public static final String        ATOM_NORMAL_1_BAC_PATH               = "atom/qatest_normal_1_bac";
-    public static final String        ATOM_NORMAL_2_BAC_PATH               = "atom/qatest_normal_2_bac";
-    public static final String        GROUP_NORMAL_0_PATH                  = "group/tddl_group_0.properties";
-    public static final String        GROUP_NORMAL_1_PATH                  = "group/tddl_group_1.properties";
-    public static final String        GROUP_NORMAL_2_PATH                  = "group/tddl_group_2.properties";
-    public static final String        GROUP_NORMAL_COMPLEX_PATH            = "group/tddl_group_complex.properties";
+    public static final String        ATOM_PATH                        = "atom/";
+    public static final String        GROUP_PATH                       = "group/";
+    public static final String        MATRIX_PATH                      = "matrix/";
+    public static final String        ATOM_NORMAL_0_PATH               = "atom/qatest_normal_0";
+    public static final String        ATOM_NORMAL_1_PATH               = "atom/qatest_normal_1";
+    public static final String        ATOM_NORMAL_2_PATH               = "atom/qatest_normal_2";
+    public static final String        ATOM_NORMAL_0_BAC_PATH           = "atom/qatest_normal_0_bac";
+    public static final String        ATOM_NORMAL_1_BAC_PATH           = "atom/qatest_normal_1_bac";
+    public static final String        ATOM_NORMAL_2_BAC_PATH           = "atom/qatest_normal_2_bac";
+    public static final String        GROUP_NORMAL_0_PATH              = "group/tddl_group_0.properties";
+    public static final String        GROUP_NORMAL_1_PATH              = "group/tddl_group_1.properties";
+    public static final String        GROUP_NORMAL_2_PATH              = "group/tddl_group_2.properties";
+    public static final String        GROUP_NORMAL_COMPLEX_PATH        = "group/tddl_group_complex.properties";
 
-    public static final String        MATRIX_DBGROUPS_PATH                 = "matrix/tddl_dbgroups.properties";
-    public static final String        MATRIX_SQLEXECUTOR_PATH              = "matrix/rules/tddl_sqlexecutor.properties";
-    public static final String        MATRIX_RULE_PROPS_PATH               = "matrix/rules/tddl_rule.properties";
-    public static final String        MATRIX_RULE_XML_PATH                 = "classpath:matrix/rules/tddl_rule.xml";
-    public static final String        MATRIX_IBATIS_CONTEXT_PATH           = "classpath:matrix/ibatis/spring_context.xml";
-    public static final String        MATRIX_IBATIS_RULE_PATH              = "classpath:matrix/ibatis/tddl_rule_complex.xml";
-    public static final String        MATRIX_RULE_FULLTBLSCAN_PATH         = "matrix/rules/tddl_rule_fulltblscan.properties";
-    public static final String        DBKEY_0                              = "qatest_normal_0";
-    public static final String        DBKEY_1                              = "qatest_normal_1";
-    public static final String        DBKEY_2                              = "qatest_normal_2";
-    public static final String        DBKEY_0_BAC                          = "qatest_normal_0_bac";
-    public static final String        DBKEY_1_BAC                          = "qatest_normal_1_bac";
-    public static final String        DBKEY_2_BAC                          = "qatest_normal_2_bac";
-    public static final String        GROUPKEY_0                           = "tddl_group_0";
-    public static final String        GROUPKEY_1                           = "tddl_group_1";
-    public static final String        GROUPKEY_2                           = "tddl_group_2";
-    public static final String        GROUPKEY_COMPLEX                     = "tddl_group_complex";
-    public static final String        DBTYPE_MYSQL                         = "mysql";
+    public static final String        MATRIX_DBGROUPS_PATH             = "matrix/tddl_dbgroups.properties";
+    public static final String        MATRIX_SQLEXECUTOR_PATH          = "matrix/rules/tddl_sqlexecutor.properties";
+    public static final String        MATRIX_RULE_PROPS_PATH           = "matrix/rules/tddl_rule.properties";
+    public static final String        MATRIX_RULE_XML_PATH             = "classpath:matrix/rules/tddl_rule.xml";
+    public static final String        MATRIX_IBATIS_CONTEXT_PATH       = "classpath:matrix/ibatis/spring_context.xml";
+    public static final String        MATRIX_IBATIS_RULE_PATH          = "classpath:matrix/ibatis/tddl_rule_complex.xml";
+    public static final String        MATRIX_RULE_FULLTBLSCAN_PATH     = "matrix/rules/tddl_rule_fulltblscan.properties";
+    public static final String        DBKEY_0                          = "qatest_normal_0";
+    public static final String        DBKEY_1                          = "qatest_normal_1";
+    public static final String        DBKEY_2                          = "qatest_normal_2";
+    public static final String        DBKEY_0_BAC                      = "qatest_normal_0_bac";
+    public static final String        DBKEY_1_BAC                      = "qatest_normal_1_bac";
+    public static final String        DBKEY_2_BAC                      = "qatest_normal_2_bac";
+    public static final String        GROUPKEY_0                       = "tddl_group_0";
+    public static final String        GROUPKEY_1                       = "tddl_group_1";
+    public static final String        GROUPKEY_2                       = "tddl_group_2";
+    public static final String        GROUPKEY_COMPLEX                 = "tddl_group_complex";
+    public static final String        DBTYPE_MYSQL                     = "mysql";
 
     // ----------------------------oracle
-    protected static final String     DBTYPE_ORACLE                        = "oracle";
-    protected static final String     DBKEY_ORA_0                          = "qatest_normal_ora_0";
-    protected static final String     DBKEY_ORA_1                          = "qatest_normal_ora_1";
-    protected static final String     DBKEY_ORA_0_BAC                      = "qatest_normal_ora_0_bac";
-    protected static final String     DBKEY_ORA_1_BAC                      = "qatest_normal_ora_1_bac";
-    protected static final String     GROUPKEY_ORA_0                       = "tddl_group_ora_0";
-    protected static final String     GROUPKEY_ORA_1                       = "tddl_group_ora_1";
-    protected static final String     ATOM_ORA_PATH                        = "atom/oracle/";
-    protected static final String     GROUP_ORA_PATH                       = "group/oracle/";
-    protected static final String     MATRIX_DBGROUPS_ORA_PATH             = "matrix/groups/tddl_dbgroups_ora.properties";
-    protected static final String     MATRIX_RULE_ORA_XML_PATH             = "classpath:matrix/rules/tddl_rule_ora.xml";
-    protected static final String     MATRIX_RULE_ORA_FULLTBLSCAN_PATH     = "matrix/rules/tddl_rule_fulltblscan_ora.properties";
+    protected static final String     DBTYPE_ORACLE                    = "oracle";
+    protected static final String     DBKEY_ORA_0                      = "qatest_normal_ora_0";
+    protected static final String     DBKEY_ORA_1                      = "qatest_normal_ora_1";
+    protected static final String     DBKEY_ORA_0_BAC                  = "qatest_normal_ora_0_bac";
+    protected static final String     DBKEY_ORA_1_BAC                  = "qatest_normal_ora_1_bac";
+    protected static final String     GROUPKEY_ORA_0                   = "tddl_group_ora_0";
+    protected static final String     GROUPKEY_ORA_1                   = "tddl_group_ora_1";
+    protected static final String     ATOM_ORA_PATH                    = "atom/oracle/";
+    protected static final String     GROUP_ORA_PATH                   = "group/oracle/";
+    protected static final String     MATRIX_DBGROUPS_ORA_PATH         = "matrix/groups/tddl_dbgroups_ora.properties";
+    protected static final String     MATRIX_RULE_ORA_XML_PATH         = "classpath:matrix/rules/tddl_rule_ora.xml";
+    protected static final String     MATRIX_RULE_ORA_FULLTBLSCAN_PATH = "matrix/rules/tddl_rule_fulltblscan_ora.properties";
 
     // -----------------------------公共变量
-    protected static final int        RANDOM_ID                            = Integer.valueOf(RandomStringUtils.randomNumeric(8));
-    protected static String           time                                 = DateUtil.formatDate(new Date(),
-                                                                               DateUtil.DATE_FULLHYPHEN);
-    protected static String           nextDay                              = DateUtil.getDiffDate(1,
-                                                                               DateUtil.DATE_FULLHYPHEN);
-    protected static int              resultSetType                        = ResultSet.TYPE_FORWARD_ONLY;                              ;
-    protected static int              resultSetConcurrency                 = ResultSet.CONCUR_READ_ONLY;
-    protected static int              holdablity                           = -1;
-    protected static boolean          SOME_SHOULD_NOT_BE_TEST              = false;
-    protected static boolean          EASYMOCK_SHOULD_NOT_BE_TEST          = false;
-    protected static boolean          ASTATICISM_TEST                      = false;
-    protected static boolean          CANCEL_ORACLE_TEST_WITH_HUDSON       = false;
-    protected static boolean          CHECK_TABLE_EXIST_SHOULD_NOT_BE_TEST = true;
+    protected static final int        RANDOM_ID                        = Integer.valueOf(RandomStringUtils.randomNumeric(8));
+    protected static String           time                             = DateUtil.formatDate(new Date(),
+                                                                           DateUtil.DATE_FULLHYPHEN);
+    protected static String           nextDay                          = DateUtil.getDiffDate(1,
+                                                                           DateUtil.DATE_FULLHYPHEN);
+    protected static int              resultSetType                    = ResultSet.TYPE_FORWARD_ONLY;                              ;
+    protected static int              resultSetConcurrency             = ResultSet.CONCUR_READ_ONLY;
+    protected static int              holdablity                       = -1;
+    protected static boolean          SOME_SHOULD_NOT_BE_TEST          = true;
+    protected static boolean          ASTATICISM_TEST                  = true;
 
     // 新规则
-    protected static final String     NEW_NUMBER_MOD_RULES_PATH            = "classpath:matrix/rules/newrules/number_mod_rules.xml";
-    protected static final String     NEW_DATE_MOD_RULES_PATH              = "classpath:matrix/rules/newrules/date_mod_rule.xml";
-    protected static final String     NEW_GROOVY_SCRIPT_RULES_PATH         = "classpath:matrix/rules/newrules/groovy_script_rule.xml";
+    protected static final String     NEW_NUMBER_MOD_RULES_PATH        = "classpath:matrix/rules/newrules/number_mod_rules.xml";
+    protected static final String     NEW_DATE_MOD_RULES_PATH          = "classpath:matrix/rules/newrules/date_mod_rule.xml";
+    protected static final String     NEW_GROOVY_SCRIPT_RULES_PATH     = "classpath:matrix/rules/newrules/groovy_script_rule.xml";
+
+    @BeforeClass
+    public static void atomSetUp() {
+        TAtomDataSource.cleanAllDataSource();
+    }
+
+    @AfterClass
+    public static void atomTearDown() {
+        TAtomDataSource.cleanAllDataSource();
+    }
 
     protected static void initAtomConfig(String path, String appName, String dbKey) throws Exception {
         String globaStr = LoadPropsUtil.loadProps2Str(path + GLOBAL_PATH_SUFFIX);

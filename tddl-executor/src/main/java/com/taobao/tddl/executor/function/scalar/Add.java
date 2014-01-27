@@ -11,11 +11,8 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
 public class Add extends ScalarFunction {
 
     private Object computeInner(Object[] args) {
-
         DataType type = this.getReturnType();
-
         return type.getCalculator().add(args[0], args[1]);
-
     }
 
     @Override
