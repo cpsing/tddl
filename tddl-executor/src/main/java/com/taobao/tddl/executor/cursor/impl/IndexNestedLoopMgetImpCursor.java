@@ -9,6 +9,7 @@ import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.common.KVPair;
+import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.IIndexNestLoopCursor;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
@@ -58,6 +59,8 @@ public class IndexNestedLoopMgetImpCursor extends IndexNestLoopCursor implements
     boolean                               isLeftJoin                    = false;
     boolean                               useProxyResult                = true;
 
+    protected ICursorMeta                 rightCursorMeta               = null;
+
     public IndexNestedLoopMgetImpCursor(ISchematicCursor leftCursor, ISchematicCursor rightCursor, List leftColumns,
                                         List rightColumns, List columns, List leftRetColumns, List rightRetColumns,
                                         IJoin join) throws TddlException{
@@ -72,6 +75,7 @@ public class IndexNestedLoopMgetImpCursor extends IndexNestLoopCursor implements
         setLeftRightJoin(join);
     }
 
+    @Override
     protected IRowSet proecessJoinOneWithNoneProfix(boolean forward) throws TddlException {
         //
         isLeftJoin = isLeftOutJoin() & !isRightOutJoin();
@@ -128,35 +132,50 @@ public class IndexNestedLoopMgetImpCursor extends IndexNestLoopCursor implements
                 if (rightDuplicateCache != null) {
                     // 匹配，找到了
                     right = rightDuplicateCache.currentKey;
-                    current = joinRecord(left, (IRowSet) right);
+                    current = joinRecord(left, right);
                     // 如果有重复，那么指针下移，让下次可以直接去选择。
                     rightDuplicateCache = rightDuplicateCache.next;
                     return current;
                 } else if (isLeftJoin) {
                     // 如果是left join
-                    // ICursorMeta rightCursorMeta = CursorMetaImp.buildEmpty();
-                    // buildSchemaInJoin(left.getParentCursorMeta(),
-                    // right.getParentCursorMeta());
 
                     try {
                         List<ColumnMeta> rightColumns = this.right_cursor.getReturnColumns();
                         List<ColumnMeta> leftColumns = this.left_cursor.getReturnColumns();
-                        this.buildSchemaFromReturnColumns(leftColumns, rightColumns);
 
-                        Object[] row = new Object[leftColumns.size() + rightColumns.size()];
+                        if (this.rightCursorMeta == null) {
+                            // 都是按照返回列构建的，一致
+                            this.buildSchemaFromReturnColumns(leftColumns, rightColumns);
+                            this.rightCursorMeta = CursorMetaImp.buildNew(rightColumns);
 
-                        for (int i = 0; i < leftColumns.size(); i++) {
-                            ColumnMeta cm = leftColumns.get(i);
-                            Integer index = left.getParentCursorMeta().getIndex(cm.getTableName(), cm.getName());
-                            if (index == null) index = left.getParentCursorMeta().getIndex(cm.getTableName(),
-                                cm.getAlias());
-                            row[i] = left.getObject(index);
-                        }
-                        for (int i = leftColumns.size(); i < row.length; i++) {
-                            row[i] = null;
+                        } else {
+                            buildSchemaInJoin(left.getParentCursorMeta(), rightCursorMeta);
                         }
 
-                        current = new ArrayRowSet(this.joinCursorMeta, row);
+                        // 建一个都为null的rouset
+                        IRowSet rightRowSet = new ArrayRowSet(rightCursorMeta, new Object[rightCursorMeta.getColumns()
+                            .size()]);
+                        current = joinRecord(left, rightRowSet);
+
+                        // Object[] row = new Object[leftColumns.size() +
+                        // rightColumns.size()];
+                        //
+                        // for (int i = 0; i < leftColumns.size(); i++) {
+                        // ColumnMeta cm = leftColumns.get(i);
+                        // Integer index =
+                        // left.getParentCursorMeta().getIndex(cm.getTableName(),
+                        // cm.getName());
+                        // if (index == null) index =
+                        // left.getParentCursorMeta().getIndex(cm.getTableName(),
+                        // cm.getAlias());
+                        // row[i] = left.getObject(index);
+                        // }
+                        // for (int i = leftColumns.size(); i < row.length; i++)
+                        // {
+                        // row[i] = null;
+                        // }
+
+                        // current = new ArrayRowSet(this.joinCursorMeta, row);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }

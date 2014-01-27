@@ -35,7 +35,7 @@ public class LimitFromToCursor extends SchematicCursor implements ILimitFromToCu
             return;
         }
         if (limitFrom != null && limitFrom != 0l) {
-            long n = (Long) limitFrom;
+            long n = limitFrom;
             while (n != 0 && n-- > 0) {
                 GeneralUtil.checkInterrupted();
                 if (cursor.next() == null) {
@@ -78,6 +78,12 @@ public class LimitFromToCursor extends SchematicCursor implements ILimitFromToCu
         ExecUtils.printOrderBy(orderBys, inden, sb);
         sb.append(super.toStringWithInden(inden));
         return sb.toString();
+    }
+
+    @Override
+    public void beforeFirst() {
+        inited = false;
+        count = 0;
     }
 
 }

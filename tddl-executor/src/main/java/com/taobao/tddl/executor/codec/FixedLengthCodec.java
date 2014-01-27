@@ -38,6 +38,7 @@ public class FixedLengthCodec implements RecordCodec<byte[]> {
         for (ColumnMeta c : columns) {
             Object v = record.get(c.getName());
             DataType t = c.getDataType();
+
             if (v == null && !c.isNullable()) {
                 throw new RuntimeException(c + " is not nullable.");
             }
