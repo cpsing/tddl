@@ -16,7 +16,7 @@ import com.taobao.tddl.optimizer.exceptions.QueryException;
  *      由于分库后，一个Query节点可能会变成一个Merge节点，需要对包含这样子节点的Join节点进行调整，详细见splitJoinAfterChooseDataNode的注释
  * </pre>
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface QueryPlanOptimizer {
 

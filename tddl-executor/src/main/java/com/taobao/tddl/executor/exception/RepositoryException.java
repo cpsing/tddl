@@ -4,7 +4,7 @@ import com.taobao.tddl.common.exception.TddlException;
 
 /**
  * @author mengshi.sunmengshi 2013-11-27 下午3:58:58
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class RepositoryException extends TddlException {
 

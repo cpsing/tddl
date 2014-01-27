@@ -27,7 +27,7 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
 /**
  * select表达式的解析
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class MySqlSelectVisitor extends EmptySQLASTVisitor {
 

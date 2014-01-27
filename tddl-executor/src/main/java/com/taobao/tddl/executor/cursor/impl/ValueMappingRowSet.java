@@ -10,7 +10,7 @@ import com.taobao.tddl.executor.rowset.RowSetWrapper;
  * 两个rowset内容相同，但是列顺序不同，可以用此转换
  * 
  * @author mengshi.sunmengshi 2013-12-19 上午11:09:09
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class ValueMappingRowSet extends RowSetWrapper {
 

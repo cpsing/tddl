@@ -10,7 +10,7 @@ import com.taobao.tddl.common.utils.TStringUtil;
  * 简单解析sql类型
  * 
  * @author jianghang 2013-10-24 下午4:18:42
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class SqlTypeParser {
 

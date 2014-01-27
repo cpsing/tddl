@@ -14,7 +14,7 @@ import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 
 /**
  * @author mengshi.sunmengshi 2013-11-29 下午2:39:33
- * @since 5.1.0
+ * @since 5.0.0
  */
 public abstract class AbstractCursor implements Cursor {
 

@@ -13,7 +13,7 @@ import com.taobao.tddl.common.utils.convertor.Convertor;
  * {@link Time}类型
  * 
  * @author jianghang 2014-1-21 下午5:33:07
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TimeType extends AbstractDataType<java.sql.Time> {
 

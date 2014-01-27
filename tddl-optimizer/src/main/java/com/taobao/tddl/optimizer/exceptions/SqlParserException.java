@@ -3,7 +3,7 @@ package com.taobao.tddl.optimizer.exceptions;
 
 /**
  * @author jianghang 2013-11-12 下午2:25:55
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class SqlParserException extends OptimizerException {
 

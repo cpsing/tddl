@@ -23,7 +23,7 @@ import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
  * 因为TGroupDatasource中已经做了主备切换等功能，所以TddlGroupExecutor只是简单的执行sql
  * 
  * @author mengshi.sunmengshi 2013-12-6 下午2:39:18
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TddlGroupExecutor extends AbstractLifecycle implements IGroupExecutor {
 

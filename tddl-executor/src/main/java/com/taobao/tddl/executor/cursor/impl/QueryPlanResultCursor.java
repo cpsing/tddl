@@ -19,7 +19,7 @@ import com.taobao.tddl.optimizer.core.expression.IColumn;
  * 用于返回执行计划
  * 
  * @author mengshi.sunmengshi 2013-12-3 下午5:41:36
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class QueryPlanResultCursor extends ResultCursor {
 

@@ -13,7 +13,7 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
 /**
  * @author jianghang 2013-11-13 下午4:11:25
- * @since 5.1.0
+ * @since 5.0.0
  */
 public abstract class AbstractRangeProcessor {
 

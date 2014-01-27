@@ -36,7 +36,7 @@ import com.taobao.tddl.rule.model.sqljep.ComparativeOR;
  * </pre>
  * 
  * @author jianghang 2013-11-6 下午5:23:02
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class ComparativeStringAnalyser {
 

@@ -11,7 +11,7 @@ import com.googlecode.concurrentlinkedhashmap.Weighers;
  * 基于google concurrent的LinkedHashMap实现LRU cache
  * 
  * @author jianghang 2013-10-23 下午5:02:50
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class GoogleConcurrentLruCache<K, V> {
 

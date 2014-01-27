@@ -39,7 +39,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  * 用于临时表排序，需要依赖bdb
  * 
  * @author mengshi.sunmengshi 2013-12-3 上午11:01:15
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TempTableSortCursor extends SortCursor implements ITempTableSortCursor {
 

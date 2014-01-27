@@ -22,7 +22,7 @@ import com.taobao.tddl.repo.mysql.spi.My_Transaction;
 
 /**
  * @author mengshi.sunmengshi 2013-12-5 下午6:08:32
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class MysqlRepoUtils {
 

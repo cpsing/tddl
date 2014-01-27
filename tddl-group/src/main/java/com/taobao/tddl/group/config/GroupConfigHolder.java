@@ -14,7 +14,7 @@ import com.taobao.tddl.group.jdbc.TGroupDataSource;
 
 /**
  * @author mengshi.sunmengshi 2013-11-12 下午5:16:38
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class GroupConfigHolder extends AbstractConfigDataHolder {
 

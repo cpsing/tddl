@@ -59,7 +59,7 @@ import com.taobao.tddl.optimizer.exceptions.OptimizerException;
  *  优化：不下推
  * 
  * @author jianghang 2013-12-10 下午5:33:16
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class OrderByPusher {
 

@@ -12,7 +12,7 @@ import com.taobao.tddl.common.model.BaseRowSet;
  * {@link Bytes} 类型
  * 
  * @author mengshi.sunmengshi 2014年1月21日 下午5:16:00
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class BytesType extends AbstractDataType<byte[]> {
 

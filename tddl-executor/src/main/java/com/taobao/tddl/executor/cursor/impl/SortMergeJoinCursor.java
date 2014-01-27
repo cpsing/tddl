@@ -51,7 +51,7 @@ import com.taobao.tddl.executor.utils.ExecUtils;
  * </pre>
  * 
  * @author mengshi.sunmengshi 2013-12-18 下午2:13:29
- * @since 5.1.0
+ * @since 5.0.0
  */
 @SuppressWarnings("rawtypes")
 public class SortMergeJoinCursor extends JoinSchematicCursor implements IMergeSortJoinCursor {

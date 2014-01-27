@@ -11,7 +11,7 @@ import com.taobao.tddl.executor.cursor.ICursorMeta;
 
 /**
  * @author mengshi.sunmengshi 2013-12-3 上午11:06:10
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class ResultSetRowSet extends AbstractRowSet implements IRowSet {
 

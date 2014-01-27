@@ -8,7 +8,7 @@ import com.taobao.tddl.common.utils.extension.ExtensionLoader;
 
 /**
  * @author mengshi.sunmengshi 2013-11-13 下午4:41:53
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class UnitDeployProtect {
 

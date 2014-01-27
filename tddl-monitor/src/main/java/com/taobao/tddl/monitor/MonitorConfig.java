@@ -26,7 +26,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  * 维护Monitor需要的参数
  * 
  * @author jianghang 2013-10-30 下午5:49:16
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class MonitorConfig {
 

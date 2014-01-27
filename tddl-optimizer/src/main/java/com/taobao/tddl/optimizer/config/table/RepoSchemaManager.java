@@ -13,7 +13,7 @@ import com.taobao.tddl.optimizer.rule.OptimizerRule;
  * 基于repo的{@linkplain SchemaManager}的委托实现
  * 
  * @author jianghang 2013-11-19 下午4:53:08
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class RepoSchemaManager extends AbstractLifecycle implements SchemaManager {
 

@@ -24,7 +24,7 @@ import com.taobao.tddl.optimizer.exceptions.OptimizerException;
  * 将cobar parser的语法树直接生成sql，允许替换表名
  * 
  * @author jianghang 2014-1-13 下午3:27:56
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class MysqlOutputVisitor extends MySQLOutputASTVisitor {
 

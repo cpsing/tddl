@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * mysql中将string转化为date的代码
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class DateUtils {
 

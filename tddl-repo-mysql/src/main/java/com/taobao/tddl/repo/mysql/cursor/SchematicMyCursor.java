@@ -9,7 +9,7 @@ import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 
 /**
  * @author mengshi.sunmengshi 2013-12-5 下午6:18:24
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class SchematicMyCursor extends SchematicCursor {
 

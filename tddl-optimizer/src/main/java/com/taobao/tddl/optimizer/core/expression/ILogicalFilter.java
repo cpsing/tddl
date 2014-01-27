@@ -7,7 +7,7 @@ import java.util.List;
  * 
  * @author whisper
  * @author jianghang 2013-11-8 下午2:04:20
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface ILogicalFilter extends IFilter<ILogicalFilter> {
 

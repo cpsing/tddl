@@ -4,7 +4,7 @@ import com.taobao.tddl.common.exception.TddlException;
 
 /**
  * @author jianghang 2013-10-23 下午5:19:38
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class AbstractLifecycle implements Lifecycle {
 

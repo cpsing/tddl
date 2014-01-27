@@ -10,7 +10,7 @@ import com.taobao.tddl.executor.repo.RepositoryConfig;
 
 /**
  * @author mengshi.sunmengshi 2013-12-19 下午3:08:18
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class BDBConfig extends RepositoryConfig {
 

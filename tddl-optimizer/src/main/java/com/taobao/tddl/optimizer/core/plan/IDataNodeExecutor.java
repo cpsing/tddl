@@ -8,7 +8,7 @@ import com.taobao.tddl.optimizer.core.CanVisit;
 /**
  * 描述执行计划
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface IDataNodeExecutor<RT extends IDataNodeExecutor> extends CanVisit {
 

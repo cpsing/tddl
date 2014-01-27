@@ -5,7 +5,7 @@ import com.taobao.tddl.common.model.lifecycle.Lifecycle;
 /**
  * 获取索引信息
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface IndexManager extends Lifecycle {
 

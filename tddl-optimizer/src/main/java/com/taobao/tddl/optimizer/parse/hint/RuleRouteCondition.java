@@ -12,7 +12,7 @@ import com.taobao.tddl.rule.model.sqljep.ComparativeMapChoicer;
  * 基于tddl-rule的hint条件
  * 
  * @author jianghang 2014-1-13 下午5:09:34
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class RuleRouteCondition extends ExtraCmdRouteCondition implements RouteCondition, ComparativeMapChoicer {
 

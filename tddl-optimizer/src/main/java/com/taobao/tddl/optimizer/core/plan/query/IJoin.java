@@ -10,7 +10,7 @@ import com.taobao.tddl.optimizer.core.plan.IQueryTree;
  * Join node of the execute plan easy to understand
  * 
  * @author Dreamond
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface IJoin extends IParallelizableQueryTree<IQueryTree> {
 

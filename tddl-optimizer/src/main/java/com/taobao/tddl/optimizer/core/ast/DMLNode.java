@@ -19,7 +19,7 @@ import com.taobao.tddl.optimizer.utils.OptimizerUtils;
 /**
  * DML操作树
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public abstract class DMLNode<RT extends DMLNode> extends ASTNode<RT> {
 

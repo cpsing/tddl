@@ -7,7 +7,7 @@ import java.util.Set;
 
 /**
  * @author mengshi.sunmengshi 2013-11-12 下午5:16:49
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class GroupExtraConfig {
 

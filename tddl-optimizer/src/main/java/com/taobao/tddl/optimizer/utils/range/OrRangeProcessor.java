@@ -11,7 +11,7 @@ import com.taobao.tddl.optimizer.core.expression.IFilter;
  * 比如条件 a>10 || a=5 ||a < 1 min=1 max=10 equalList=[5]
  * 
  * @author jianghang 2013-11-13 下午4:23:29
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class OrRangeProcessor extends AbstractRangeProcessor {
 

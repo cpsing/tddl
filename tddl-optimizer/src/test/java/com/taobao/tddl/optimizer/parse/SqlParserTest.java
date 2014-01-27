@@ -37,7 +37,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author jianghang 2013-11-15 下午3:55:47
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class SqlParserTest extends BaseOptimizerTest {
 

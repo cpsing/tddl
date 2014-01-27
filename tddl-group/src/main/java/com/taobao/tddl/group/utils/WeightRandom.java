@@ -20,7 +20,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  * </pre>
  * 
  * @author jianghang 2013-10-25 下午6:01:26
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class WeightRandom {
 

@@ -22,7 +22,7 @@ import com.taobao.tddl.optimizer.exceptions.StatisticsUnavailableException;
 /**
  * 计算结构树的cost
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class CostEsitimaterFactory {
 

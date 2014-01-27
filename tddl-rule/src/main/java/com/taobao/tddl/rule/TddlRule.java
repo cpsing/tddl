@@ -37,7 +37,7 @@ import com.taobao.tddl.rule.utils.MatchResultCompare;
  * </pre>
  * 
  * @author jianghang 2013-11-5 下午8:11:43
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TddlRule extends TddlRuleConfig implements TddlTableRule {
 

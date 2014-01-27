@@ -31,7 +31,7 @@ import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 
 /**
  * @author mengshi.sunmengshi 2013-12-5 上午11:06:01
- * @since 5.1.0
+ * @since 5.0.0
  */
 public abstract class QueryHandlerCommon extends HandlerCommon {
 

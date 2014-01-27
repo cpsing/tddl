@@ -14,7 +14,7 @@ import com.taobao.tddl.optimizer.core.plan.query.IQuery;
  * 表操作
  * 
  * @author mengshi.sunmengshi 2013-11-27 下午3:59:42
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface ITable {
 

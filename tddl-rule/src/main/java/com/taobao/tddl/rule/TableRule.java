@@ -52,7 +52,7 @@ import com.taobao.tddl.rule.virtualnode.TableSlotMap;
  * 
  * @author linxuan
  * @author jianghang 2013-11-4 下午5:33:51
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TableRule extends VirtualTableSupport implements VirtualTableRule {
 

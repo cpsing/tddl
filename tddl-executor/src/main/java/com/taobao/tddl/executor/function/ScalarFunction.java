@@ -11,7 +11,7 @@ import com.taobao.tddl.optimizer.exceptions.FunctionException;
  * 
  * @author Whisper
  * @author jianghang 2013-11-8 下午3:42:52
- * @since 5.1.0
+ * @since 5.0.0
  */
 public abstract class ScalarFunction extends ExtraFunction implements IExtraFunction {
 

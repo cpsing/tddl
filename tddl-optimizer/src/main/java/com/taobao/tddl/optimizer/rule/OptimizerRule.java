@@ -36,7 +36,7 @@ import com.taobao.tddl.rule.model.sqljep.ComparativeOR;
 /**
  * 优化器中使用Tddl Rule的一些工具方法，需要依赖{@linkplain TddlRule}自己先做好初始化
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class OptimizerRule extends AbstractLifecycle {
 

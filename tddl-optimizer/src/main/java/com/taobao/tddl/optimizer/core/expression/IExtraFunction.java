@@ -6,7 +6,7 @@ import com.taobao.tddl.optimizer.core.expression.IFunction.FunctionType;
 /**
  * 扩展函数实例，比如用于实现Merge的count/min等聚合函数
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface IExtraFunction {
 

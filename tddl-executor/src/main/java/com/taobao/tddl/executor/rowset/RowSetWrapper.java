@@ -10,7 +10,7 @@ import com.taobao.tddl.executor.cursor.ICursorMeta;
  * 可以用来给列改名，去除一个列
  * 
  * @author mengshi.sunmengshi 2013-12-3 上午11:05:57
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class RowSetWrapper extends AbstractRowSet implements IRowSet {
 

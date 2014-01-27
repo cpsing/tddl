@@ -8,7 +8,7 @@ import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 
 /**
  * @author mengshi.sunmengshi 2013-12-3 上午11:05:48
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class JoinRowSet extends AbstractRowSet implements IRowSet {
 

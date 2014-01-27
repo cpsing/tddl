@@ -6,7 +6,7 @@ package com.taobao.tddl.optimizer.core.expression;
  * @author jianxing <jianxing.qx@taobao.com>
  * @author whisper
  * @author <a href="jianghang.loujh@taobao.com">jianghang</a>
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface IColumn extends ISelectable<IColumn> {
 

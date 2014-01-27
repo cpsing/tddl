@@ -12,7 +12,7 @@ import com.taobao.tddl.repo.mysql.spi.My_JdbcHandler;
 
 /**
  * @author mengshi.sunmengshi 2013-12-6 上午11:25:53
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class DeleteMyHandler extends PutMyHandlerCommon {
 

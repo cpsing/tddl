@@ -17,7 +17,7 @@ import com.taobao.tddl.optimizer.exceptions.OptimizerException;
  * 基于repo的{@linkplain StatManager}的委托实现
  * 
  * @author jianghang 2013-12-6 下午3:41:29
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class RepoStatManager extends AbstractLifecycle implements StatManager {
 

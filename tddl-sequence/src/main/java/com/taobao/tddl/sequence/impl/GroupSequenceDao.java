@@ -36,7 +36,7 @@ import com.taobao.tddl.sequence.util.RandomSequence;
 
 /**
  * @author JIECHEN 2013-10-31 下午5:48:48
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class GroupSequenceDao implements SequenceDao {
 

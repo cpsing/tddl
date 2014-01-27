@@ -27,7 +27,7 @@ import com.taobao.tddl.rule.model.sqljep.ComparativeOR;
  * 的enumerateRange方法已经能搞定
  * 
  * @author jianghang 2013-10-29 下午5:57:27
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class EnumeratorImp implements Enumerator {
 

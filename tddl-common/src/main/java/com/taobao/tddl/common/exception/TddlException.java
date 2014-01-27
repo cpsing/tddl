@@ -6,7 +6,7 @@ import org.apache.commons.lang.exception.NestableException;
  * Tddl nestabled {@link Exception}
  * 
  * @author jianghang 2013-10-24 下午2:55:38
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TddlException extends NestableException {
 

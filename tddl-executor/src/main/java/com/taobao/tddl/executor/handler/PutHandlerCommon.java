@@ -24,7 +24,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
 /**
  * CUD操作基类
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public abstract class PutHandlerCommon extends HandlerCommon {
 

@@ -6,7 +6,7 @@ import org.apache.commons.lang.exception.NestableRuntimeException;
  * Tddl nestabled {@link RuntimeException}
  * 
  * @author jianghang 2013-10-24 下午2:55:22
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TddlRuntimeException extends NestableRuntimeException {
 

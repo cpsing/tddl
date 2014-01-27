@@ -14,7 +14,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
  * </pre>
  * 
  * @author jianghang 2013-10-24 下午2:25:55
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TddlToStringStyle extends ToStringStyle {
 

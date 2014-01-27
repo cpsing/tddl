@@ -12,7 +12,7 @@
 //
 ///**
 // * @author mengshi.sunmengshi 2013-12-3 下午1:51:18
-// * @since 5.1.0
+// * @since 5.0.0
 // */
 //public class FixedLengthBaseRecord extends NamedRecord {
 //

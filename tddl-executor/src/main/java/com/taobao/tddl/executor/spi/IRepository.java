@@ -12,7 +12,7 @@ import com.taobao.tddl.optimizer.config.table.TableMeta;
  * 每个存储一个，主入口
  * 
  * @author mengshi.sunmengshi 2013-11-27 下午3:59:13
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface IRepository extends Lifecycle {
 

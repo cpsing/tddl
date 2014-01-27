@@ -7,7 +7,7 @@ import com.taobao.tddl.optimizer.core.datatype.DataType;
 
 /**
  * @author mengshi.sunmengshi 2013-12-2 下午4:22:43
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface IRecord extends Comparable<IRecord> {
 

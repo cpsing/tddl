@@ -22,7 +22,7 @@ import com.taobao.tddl.optimizer.core.plan.query.IJoin;
  * 批量到右边去取数据的index nested loop实现
  * 
  * @author mengshi.sunmengshi 2013-12-3 上午10:55:29
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class IndexNestedLoopMgetImpCursor extends IndexNestLoopCursor implements IIndexNestLoopCursor {
 

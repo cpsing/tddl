@@ -1,7 +1,7 @@
 package com.taobao.tddl.optimizer.core.expression.bean;
 
 /**
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class LobVal implements Comparable<String> {
 

@@ -34,7 +34,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author mengshi.sunmengshi 2013-11-22 下午3:26:18
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TPreparedStatement extends TStatement implements PreparedStatement {
 

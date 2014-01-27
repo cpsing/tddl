@@ -11,7 +11,7 @@ import com.taobao.tddl.rule.model.sqljep.ComparativeMapChoicer;
  * 基于tddl管理体系的table rule实现
  * 
  * @author jianghang 2013-11-5 上午11:04:35
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface TddlTableRule extends Lifecycle {
 

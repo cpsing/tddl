@@ -5,7 +5,7 @@
 	<artifactId>tddl</artifactId>
 	<packaging>pom</packaging>
 	<name>root module for tddl ${project.version}</name>
-	<version>5.1.0-SNAPSHOT</version>
+	<version>5.0.0-SNAPSHOT</version>
 	<url>https://github.com/tddl/tddl</url>
 	<!-- 
 	<parent>

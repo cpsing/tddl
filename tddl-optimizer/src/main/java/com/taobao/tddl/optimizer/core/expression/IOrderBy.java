@@ -7,7 +7,7 @@ import com.taobao.tddl.optimizer.core.CanVisit;
 import com.taobao.tddl.optimizer.core.datatype.DataType;
 
 /**
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface IOrderBy extends CanVisit {
 

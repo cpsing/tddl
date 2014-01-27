@@ -7,7 +7,7 @@ import java.sql.SQLException;
  * Blob <-> bytes类型之间的转化
  * 
  * @author jianghang 2014-1-21 下午6:15:01
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class BlobAndBytesConvertor {
 

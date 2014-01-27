@@ -4,7 +4,7 @@ import com.taobao.tddl.optimizer.core.expression.IFilter;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 
 /**
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface IQuery extends IParallelizableQueryTree<IQueryTree> {
 

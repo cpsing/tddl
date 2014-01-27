@@ -13,7 +13,7 @@ import com.taobao.tddl.optimizer.core.expression.IOrderBy;
  * 去重操作
  * 
  * @author mengshi.sunmengshi 2013-12-3 上午10:54:54
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class DistinctCursor extends MergeSortedCursors {
 

@@ -39,7 +39,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  * tddl rule config管理
  * 
  * @author jianghang 2013-11-5 下午3:34:36
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TddlRuleConfig extends AbstractLifecycle implements Lifecycle {
 

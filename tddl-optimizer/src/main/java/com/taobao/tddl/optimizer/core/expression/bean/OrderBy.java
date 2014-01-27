@@ -10,7 +10,7 @@ import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
 /**
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class OrderBy implements IOrderBy {
 

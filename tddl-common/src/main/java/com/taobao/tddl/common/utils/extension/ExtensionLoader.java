@@ -24,7 +24,7 @@ import com.google.common.collect.Maps;
  * @see <a
  * href="http://java.sun.com/j2se/1.5.0/docs/guide/jar/jar.html#Service%20Provider">JDK5.0的自动发现机制实现</a>
  * @author jianghang 2013-9-13 下午3:38:30
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class ExtensionLoader<S> {
 

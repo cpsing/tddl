@@ -28,7 +28,7 @@ import com.taobao.tddl.optimizer.utils.FilterUtils;
  * </pre>
  * 
  * @author jianghang 2013-12-19 下午6:44:55
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class SubQueryPreProcessor {
 
