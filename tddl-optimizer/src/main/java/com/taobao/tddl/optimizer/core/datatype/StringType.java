@@ -145,10 +145,8 @@ public class StringType extends AbstractDataType<String> {
         if (value == null) {
             return 1;
         } else {
-            if (!(value instanceof String)) {
-                System.out.println("ok");
-            }
-            return KeyEncoder.calculateEncodedStringLength((String) value);
+
+            return KeyEncoder.calculateEncodedStringLength(this.convertFrom(value));
         }
     }
 

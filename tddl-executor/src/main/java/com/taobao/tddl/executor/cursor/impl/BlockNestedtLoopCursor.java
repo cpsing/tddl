@@ -11,11 +11,9 @@ import com.taobao.tddl.executor.codec.RecordCodec;
 import com.taobao.tddl.executor.common.DuplicateKVPair;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.IBlockNestedLoopCursor;
-import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.cursor.IValueFilterCursor;
 import com.taobao.tddl.executor.record.CloneableRecord;
-import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.spi.ICursorFactory;
 import com.taobao.tddl.executor.utils.ExecUtils;
@@ -32,7 +30,7 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor impleme
 
     ICursorFactory      cursorFactory    = null;
     ExecutionContext    executionContext = null;
-    ICursorMeta         rightCursorMeta  = null;
+    // ICursorMeta rightCursorMeta = null;
     private final IJoin join;
     private RecordCodec leftCodec;
 
@@ -46,9 +44,10 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor impleme
             .getCodec(ExecUtils.getColumnMetas(rightColumns));
         this.left_key = leftCodec.newEmptyRecord();
         this.executionContext = executionContext;
-        rightCursorMeta = CursorMetaImp.buildNew(ExecUtils.convertISelectablesToColumnMeta(rightRetColumns,
-            join.getRightNode().getAlias(),
-            join.isSubQuery()));
+        // rightCursorMeta =
+        // CursorMetaImp.buildNew(ExecUtils.convertISelectablesToColumnMeta(rightRetColumns,
+        // join.getRightNode().getAlias(),
+        // join.isSubQuery()));
         this.join = join;
     }
 
@@ -70,7 +69,19 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor impleme
 
     protected Map<CloneableRecord, DuplicateKVPair> getRecordFromRightByValueFilter(List<CloneableRecord> leftJoinOnColumnCache)
                                                                                                                                 throws TddlException {
+
         right_cursor.beforeFirst();
+        if (isLeftOutJoin() && this.rightCursorMeta == null) {
+            IRowSet kv = right_cursor.next();
+            if (kv != null) {
+                this.rightCursorMeta = kv.getParentCursorMeta();
+            } else {
+                rightCursorMeta = CursorMetaImp.buildNew(right_cursor.getReturnColumns());
+            }
+
+            right_cursor.beforeFirst();
+        }
+
         IBooleanFilter filter = ASTNodeFactory.getInstance().createBooleanFilter();
 
         List<Object> values = new ArrayList<Object>();
@@ -92,7 +103,7 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor impleme
         Map<CloneableRecord, DuplicateKVPair> records = new HashMap();
 
         if (isLeftOutJoin() && !isRightOutJoin()) {
-            leftOutJoin(leftJoinOnColumnCache, rightColumn, vfc, records);
+            blockNestedLoopJoin(leftJoinOnColumnCache, rightColumn, vfc, records);
         } else if (!isLeftOutJoin() && !isRightOutJoin()) {
             // inner join
             blockNestedLoopJoin(leftJoinOnColumnCache, rightColumn, vfc, records);
@@ -115,42 +126,48 @@ public class BlockNestedtLoopCursor extends IndexNestedLoopMgetImpCursor impleme
         }
     }
 
-    private void leftOutJoin(List<CloneableRecord> leftJoinOnColumnCache, IColumn rightColumn, IValueFilterCursor vfc,
-                             Map<CloneableRecord, DuplicateKVPair> records) throws TddlException {
-        Map<Comparable, CloneableRecord> leftMap = new HashMap<Comparable, CloneableRecord>();
-        Map<Comparable, CloneableRecord> tempMap = new HashMap<Comparable, CloneableRecord>();
-        for (CloneableRecord record : leftJoinOnColumnCache) {
-            // 去重
-            Comparable comp = (Comparable) record.getMap().values().iterator().next();
-            leftMap.put(comp, record);
-            tempMap.put(comp, record);
-        }
-
-        IRowSet kv = ExecUtils.fromIRowSetToArrayRowSet(vfc.next());
-        if (kv != null) {
-            do {
-                kv = ExecUtils.fromIRowSetToArrayRowSet(kv);
-                Object rightValue = ExecUtils.getValueByIColumn(kv, rightColumn);
-                if (leftMap.containsKey(rightValue)) {
-                    tempMap.remove(rightValue);
-                    CloneableRecord record = leftMap.get(rightValue);
-                    buildDuplicate(records, kv, record);
-                }
-            } while ((kv = vfc.next()) != null);
-        }
-        if (!tempMap.isEmpty() && !leftJoinOnColumnCache.isEmpty()) {
-            kv = new ArrayRowSet(rightCursorMeta, new Object[rightCursorMeta.getColumns().size()]);
-            for (CloneableRecord record : tempMap.values()) {
-                buildDuplicate(records, kv, record);
-            }
-        }
-    }
+    // private void leftOutJoin(List<CloneableRecord> leftJoinOnColumnCache,
+    // IColumn rightColumn, IValueFilterCursor vfc,
+    // Map<CloneableRecord, DuplicateKVPair> records) throws TddlException {
+    // Map<Comparable, CloneableRecord> leftMap = new HashMap<Comparable,
+    // CloneableRecord>();
+    // Map<Comparable, CloneableRecord> tempMap = new HashMap<Comparable,
+    // CloneableRecord>();
+    // for (CloneableRecord record : leftJoinOnColumnCache) {
+    // // 去重
+    // Comparable comp = (Comparable)
+    // record.getMap().values().iterator().next();
+    // leftMap.put(comp, record);
+    // tempMap.put(comp, record);
+    // }
+    //
+    // IRowSet kv = ExecUtils.fromIRowSetToArrayRowSet(vfc.next());
+    // if (kv != null) {
+    // do {
+    // kv = ExecUtils.fromIRowSetToArrayRowSet(kv);
+    // Object rightValue = ExecUtils.getValueByIColumn(kv, rightColumn);
+    // if (leftMap.containsKey(rightValue)) {
+    // tempMap.remove(rightValue);
+    // CloneableRecord record = leftMap.get(rightValue);
+    // buildDuplicate(records, kv, record);
+    // }
+    // } while ((kv = vfc.next()) != null);
+    // }
+    // if (!tempMap.isEmpty() && !leftJoinOnColumnCache.isEmpty()) {
+    // kv = new ArrayRowSet(rightCursorMeta, new
+    // Object[rightCursorMeta.getColumns().size()]);
+    // for (CloneableRecord record : tempMap.values()) {
+    // buildDuplicate(records, kv, record);
+    // }
+    // }
+    // }
 
     private void blockNestedLoopJoin(List<CloneableRecord> leftJoinOnColumnCache, IColumn rightColumn,
                                      IValueFilterCursor vfc, Map<CloneableRecord, DuplicateKVPair> records)
                                                                                                            throws TddlException {
         IRowSet kv = null;
         while ((kv = vfc.next()) != null) {
+
             kv = ExecUtils.fromIRowSetToArrayRowSet(kv);
             Object rightValue = ExecUtils.getValueByIColumn(kv, rightColumn);
             for (CloneableRecord record : leftJoinOnColumnCache) {

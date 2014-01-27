@@ -30,12 +30,12 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
  */
 public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCursor {
 
-    private String            tableAlias;
-    private List<ISelectable> retColumns;
-    private List<ColumnMeta>  colMessages;
-    private boolean           schemaInited = false;
-    private ICursorMeta       newMeta;
-    private List<ColumnMeta>  returnColumnMetas;
+    private final String            tableAlias;
+    private final List<ISelectable> retColumns;
+    private List<ColumnMeta>        colMessages;
+    private boolean                 schemaInited = false;
+    private ICursorMeta             newMeta;
+    private List<ColumnMeta>        returnColumnMetas;
 
     public ColumnAliasCursor(ISchematicCursor cursor, List<ISelectable> retColumns, String tableAlias){
         super(cursor);
@@ -92,7 +92,7 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
                 List<IOrderBy> obNew = new ArrayList<IOrderBy>(obOld.size());
                 for (IOrderBy orderBy : obOld) {
                     IColumn icol = ExecUtils.getIColumn(orderBy.getColumn());
-                    IColumn icolNew = (IColumn) icol.copy();
+                    IColumn icolNew = icol.copy();
                     obNew.add(ASTNodeFactory.getInstance()
                         .createOrderBy()
                         .setColumn(icolNew.setTableName(tableAlias).setAlias(null))
@@ -146,6 +146,7 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
         return ret;
     }
 
+    @Override
     public Map<CloneableRecord, DuplicateKVPair> mgetWithDuplicate(List<CloneableRecord> keys, boolean prefixMatch,
                                                                    boolean keyFilterOrValueFilter) throws TddlException {
         Map<CloneableRecord, DuplicateKVPair> res = super.mgetWithDuplicate(keys, prefixMatch, keyFilterOrValueFilter);
@@ -181,7 +182,7 @@ public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCu
             return this.returnColumnMetas;
         }
         returnColumnMetas = new ArrayList();
-        for (ISelectable cm : this.retColumns) {
+        for (ISelectable<ISelectable> cm : retColumns) {
             String tableName = tableAlias;
             if (tableName == null) {
                 tableName = cm.getTableName();

@@ -135,21 +135,39 @@ public class RightJoinTest extends BaseMatrixTestCase {
 
     @Test
     public void rightJoinWithSubQueryTest() throws Exception {
-        String sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */SELECT sumId ,host_name , a.hostgroup_id as aid ,b.hostgroup_id  as bid from "
-                     + "( select  sum(host_id) as sumId,host_name,hostgroup_id from "
-                     + host_info
-                     + " where host_id BETWEEN ? and ? GROUP BY host_name ORDER BY hostgroup_id LIMIT ?) as a "
-                     + "RIGHT JOIN (SELECT SUM(hostgroup_id) , hostgroup_name,hostgroup_id  from "
-                     + hostgroup
-                     + " where hostgroup_id "
-                     + "BETWEEN ? and ? GROUP BY hostgroup_name ) as b ON a.hostgroup_id=b.hostgroup_id ORDER BY sumId DESC";
-        List<Object> param = new ArrayList<Object>();
-        param.add(0);
-        param.add(100);
-        param.add(10);
-        param.add(1);
-        param.add(20);
-        String[] columnParam = { "sumId", "host_name", "aid", "bid" };
-        selectContentSameAssert(sql, columnParam, param);
+        // {
+        // String sql =
+        // "/* ANDOR ALLOW_TEMPORARY_TABLE=True */select  sum(host_id) as sumId,host_name,hostgroup_id from "
+        // + host_info
+        // +
+        // " where host_id BETWEEN ? and ? GROUP BY host_name ORDER BY hostgroup_id LIMIT ?";
+        // List<Object> param = new ArrayList<Object>();
+        // param.add(0);
+        // param.add(100);
+        // param.add(10);
+        // // param.add(1);
+        // // param.add(20);
+        // String[] columnParam = { "sumId", "host_name", "hostgroup_id" };
+        // selectContentSameAssert(sql, columnParam, param);
+        // }
+
+        {
+            String sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */SELECT sumId ,host_name , a.hostgroup_id as aid ,b.hostgroup_id  as bid from "
+                         + "( select  sum(host_id) as sumId,host_name,hostgroup_id from "
+                         + host_info
+                         + " where host_id BETWEEN ? and ? GROUP BY host_name ORDER BY hostgroup_id LIMIT ?) as a "
+                         + "RIGHT JOIN (SELECT SUM(hostgroup_id) , hostgroup_name,hostgroup_id  from "
+                         + hostgroup
+                         + " where hostgroup_id "
+                         + "BETWEEN ? and ? GROUP BY hostgroup_name ) as b ON a.hostgroup_id=b.hostgroup_id ORDER BY sumId DESC";
+            List<Object> param = new ArrayList<Object>();
+            param.add(0);
+            param.add(100);
+            param.add(10);
+            param.add(1);
+            param.add(20);
+            String[] columnParam = { "sumId", "host_name", "aid", "bid" };
+            selectContentSameAssert(sql, columnParam, param);
+        }
     }
 }

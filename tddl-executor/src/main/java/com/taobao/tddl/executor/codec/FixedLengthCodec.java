@@ -39,9 +39,6 @@ public class FixedLengthCodec implements RecordCodec<byte[]> {
             Object v = record.get(c.getName());
             DataType t = c.getDataType();
 
-            if (t == DataType.StringType && !(v instanceof String)) {
-                System.out.println("ok");
-            }
             if (v == null && !c.isNullable()) {
                 throw new RuntimeException(c + " is not nullable.");
             }
