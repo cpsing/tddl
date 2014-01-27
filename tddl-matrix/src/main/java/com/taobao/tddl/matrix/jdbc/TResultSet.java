@@ -29,7 +29,6 @@ import java.util.TreeMap;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.rowset.IRowSet;
@@ -193,7 +192,8 @@ public class TResultSet implements ResultSet {
 
     public int getAffectRows() throws SQLException {
         if (next()) {
-            Integer index = getIndexByColumnLabel(ResultCursor.AFFECT_ROW);
+            Integer index = currentKVPair.getParentCursorMeta().getIndex(null, ResultCursor.AFFECT_ROW);
+
             return currentKVPair.getInteger(index);
         } else {
             return 0;
@@ -300,45 +300,9 @@ public class TResultSet implements ResultSet {
         }
     }
 
-    /**
-     * 获取index，columnLabel可能是table.columnName的结构
-     */
-    protected Integer getIndexByColumnLabel(String columnLabel) throws SQLException {
-        columnLabel = TStringUtil.upperCase(columnLabel);
-        String table = null;
-        // String name = null;
-        boolean contains = TStringUtil.contains(columnLabel, ".")
-                           & !(TStringUtil.contains(columnLabel, "(") & TStringUtil.contains(columnLabel, ")"));
-        if (contains) {
-            String[] ss = TStringUtil.split(columnLabel, ".");
-            if (ss.length != 2) {
-                throw new SQLException("lab can only has one dot ");
-            }
-            table = ss[0];
-            // name = ss[1];
-        } else {
-            // name = columnLabel;
-        }
-        if (currentKVPair == null) {
-            throw new IllegalStateException("确定调用了rs.next并返回true了么？");
-        }
-
-        Integer index = currentKVPair.getParentCursorMeta().getIndex(table, columnLabel);
-
-        return index;
-    }
-
     @Override
     public String getString(String columnLabel) throws SQLException {
-        Integer index = getIndexByColumnLabel(columnLabel);
-        String str = currentKVPair.getString(index);
-        if (str == null) {
-            wasNull = true;
-            return str;
-        } else {
-            wasNull = false;
-            return str;
-        }
+        return getString(findColumn(columnLabel));
     }
 
     @Override
