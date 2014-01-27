@@ -34,7 +34,7 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
  * 用于做没法走索引的条件过滤
  * 
  * @author mengshi.sunmengshi 2013-12-3 上午11:01:53
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class ValueFilterCursor extends SchematicCursor implements IValueFilterCursor {
 

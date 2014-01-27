@@ -7,7 +7,7 @@ import com.taobao.tddl.optimizer.config.table.TableMeta;
  * 临时表
  * 
  * @author mengshi.sunmengshi 2013-11-27 下午4:00:11
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface ITempTable {
 

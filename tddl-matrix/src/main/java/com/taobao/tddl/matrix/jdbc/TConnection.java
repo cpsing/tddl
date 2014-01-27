@@ -41,7 +41,7 @@ import com.taobao.tddl.optimizer.OptimizerContext;
 
 /**
  * @author mengshi.sunmengshi 2013-11-22 下午3:26:06
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TConnection implements Connection {
 

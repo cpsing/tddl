@@ -9,7 +9,7 @@ import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 
 /**
  * @author mengshi.sunmengshi 2013-12-3 上午11:06:04
- * @since 5.1.0
+ * @since 5.0.0
  */
 public abstract class AbstractRowSet implements IRowSet {
 

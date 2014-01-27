@@ -28,7 +28,7 @@ import com.taobao.tddl.common.exception.TddlRuntimeException;
  * xml处理的一些简单包装
  * 
  * @author jianghang 2013-11-28 下午1:59:37
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class XmlHelper {
 

@@ -6,7 +6,7 @@ import com.taobao.tddl.common.exception.TddlRuntimeException;
  * {@link Double}类型
  * 
  * @author jianghang 2014-1-21 下午3:28:33
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class DoubleType extends CommonType<Double> {
 

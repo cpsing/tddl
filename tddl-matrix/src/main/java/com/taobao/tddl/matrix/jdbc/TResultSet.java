@@ -37,7 +37,7 @@ import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 
 /**
  * @author mengshi.sunmengshi 2013-11-22 下午3:26:23
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TResultSet implements ResultSet {
 

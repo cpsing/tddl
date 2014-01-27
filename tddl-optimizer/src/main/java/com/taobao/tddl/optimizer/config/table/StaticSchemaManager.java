@@ -27,7 +27,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
 /**
  * 有schema文件的schemamanager实现
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class StaticSchemaManager extends AbstractLifecycle implements SchemaManager {
 

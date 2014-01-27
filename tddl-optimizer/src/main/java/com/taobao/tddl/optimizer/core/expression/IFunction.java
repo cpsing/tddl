@@ -6,7 +6,7 @@ import java.util.List;
  * 代表一个函数列，比如max(id)
  * 
  * @author jianghang 2013-11-8 下午1:29:03
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface IFunction<RT extends IFunction> extends ISelectable<RT> {
 

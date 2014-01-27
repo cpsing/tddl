@@ -5,7 +5,7 @@ import com.taobao.tddl.config.ConfigDataListener;
 
 /**
  * @author mengshi.sunmengshi 2013-12-5 下午5:55:44
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface DbPasswdManager {
 

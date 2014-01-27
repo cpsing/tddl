@@ -32,7 +32,7 @@ import com.taobao.tddl.optimizer.utils.OptimizerUtils;
  * 
  * @author Dreamond
  * @author jianghang 2013-11-8 下午2:33:51
- * @since 5.1.0
+ * @since 5.0.0
  */
 public abstract class QueryTreeNode extends ASTNode<QueryTreeNode> {
 

@@ -7,7 +7,7 @@ import com.taobao.tddl.executor.common.IRecord;
 
 /**
  * @author mengshi.sunmengshi 2013-11-29 下午2:41:09
- * @since 5.1.0
+ * @since 5.0.0
  */
 public abstract class CloneableRecord implements IRecord, Cloneable {
 

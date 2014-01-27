@@ -11,7 +11,7 @@ import com.taobao.tddl.common.utils.TddlToStringStyle;
  * 扩展参数
  * 
  * @author jianghang 2014-1-13 下午6:08:14
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class ExtraCmdRouteCondition implements RouteCondition {
 

@@ -42,7 +42,7 @@ import com.taobao.tddl.optimizer.utils.FilterUtils;
 
 /**
  * @author mengshi.sunmengshi 2013-12-19 下午12:18:29
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class MergeCursor extends SchematicCursor implements IMergeCursor {
 

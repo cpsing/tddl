@@ -26,7 +26,7 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
  * 用于做别名替换和select操作
  * 
  * @author mengshi.sunmengshi 2013-12-3 上午10:54:30
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class ColumnAliasCursor extends SchematicCursor implements IColumnAliasCursor {
 

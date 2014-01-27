@@ -19,7 +19,7 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
 /**
  * 采取代理模式，将function处理转移到执行器中进行处理，比如处理分库的count/max等
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class Function<RT extends IFunction> implements IFunction<RT> {
 

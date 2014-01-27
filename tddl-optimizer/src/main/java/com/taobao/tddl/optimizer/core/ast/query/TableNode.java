@@ -43,7 +43,7 @@ import com.taobao.tddl.optimizer.utils.OptimizerUtils;
  * @author Dreamond
  * @author whisper
  * @author <a href="jianghang.loujh@taobao.com">jianghang</a>
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TableNode extends QueryTreeNode {
 

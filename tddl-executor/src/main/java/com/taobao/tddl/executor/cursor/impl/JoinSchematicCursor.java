@@ -20,7 +20,7 @@ import com.taobao.tddl.optimizer.core.plan.query.IJoin;
  * join的结果
  * 
  * @author mengshi.sunmengshi 2013-12-3 上午10:56:08
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class JoinSchematicCursor extends SchematicCursor {
 

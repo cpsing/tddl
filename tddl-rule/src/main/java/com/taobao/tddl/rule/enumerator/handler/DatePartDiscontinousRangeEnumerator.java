@@ -12,7 +12,7 @@ import com.taobao.tddl.rule.model.sqljep.Comparative;
  * 基于时间类型的枚举器
  * 
  * @author jianghang 2013-10-29 下午5:23:01
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class DatePartDiscontinousRangeEnumerator extends PartDiscontinousRangeEnumerator {
 

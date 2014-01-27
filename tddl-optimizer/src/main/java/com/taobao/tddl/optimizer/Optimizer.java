@@ -12,7 +12,7 @@ import com.taobao.tddl.optimizer.exceptions.SqlParserException;
 /**
  * 优化器执行接口
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface Optimizer extends Lifecycle {
 

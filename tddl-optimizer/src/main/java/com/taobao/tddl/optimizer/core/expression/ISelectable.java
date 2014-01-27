@@ -10,7 +10,7 @@ import com.taobao.tddl.optimizer.core.datatype.DataType;
  * 描述一个列信息，可能会是字段列，函数列，常量列<br>
  * 使用RT泛型解决子类流式API需要的返回结果为子类
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface ISelectable<RT extends ISelectable> extends CanVisit, Comparable {
 

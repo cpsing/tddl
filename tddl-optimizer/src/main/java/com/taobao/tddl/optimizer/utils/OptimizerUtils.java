@@ -25,7 +25,7 @@ import com.taobao.tddl.optimizer.core.expression.bean.NullValue;
 import com.taobao.tddl.optimizer.parse.cobar.visitor.MySqlExprVisitor;
 
 /**
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class OptimizerUtils {
 

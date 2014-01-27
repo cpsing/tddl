@@ -14,7 +14,7 @@ import com.taobao.tddl.common.utils.convertor.Convertor;
  * {@link Timestamp}类型
  * 
  * @author jianghang 2014-1-21 下午5:36:26
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TimestampType extends AbstractDataType<java.sql.Timestamp> {
 

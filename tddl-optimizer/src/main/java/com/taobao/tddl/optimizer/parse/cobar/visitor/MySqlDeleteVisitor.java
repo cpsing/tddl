@@ -10,7 +10,7 @@ import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 /**
  * delete处理
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class MySqlDeleteVisitor extends EmptySQLASTVisitor {
 

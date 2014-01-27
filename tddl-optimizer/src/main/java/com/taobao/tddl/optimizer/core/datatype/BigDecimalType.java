@@ -8,7 +8,7 @@ import com.taobao.tddl.common.exception.TddlRuntimeException;
  * {@link BigDecimal}类型
  * 
  * @author jianghang 2014-1-21 下午1:54:11
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class BigDecimalType extends CommonType<BigDecimal> {
 

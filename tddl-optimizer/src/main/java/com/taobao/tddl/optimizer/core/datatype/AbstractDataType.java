@@ -10,7 +10,7 @@ import com.taobao.tddl.common.utils.convertor.ConvertorException;
 import com.taobao.tddl.common.utils.convertor.ConvertorHelper;
 
 /**
- * @since 5.1.0
+ * @since 5.0.0
  */
 public abstract class AbstractDataType<DATA> implements DataType<DATA> {
 

@@ -17,7 +17,7 @@ import com.taobao.tddl.optimizer.core.ast.query.TableNode;
 /**
  * update类型处理
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class MySqlUpdateVisitor extends EmptySQLASTVisitor {
 

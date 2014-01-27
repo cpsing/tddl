@@ -6,7 +6,7 @@ import com.taobao.tddl.repo.mysql.spi.My_Transaction;
 
 /**
  * @author dreamond 2014年1月9日 下午4:58:58
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class Ob_Transaction extends My_Transaction {
 

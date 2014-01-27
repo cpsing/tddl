@@ -6,7 +6,7 @@ import com.taobao.tddl.common.exception.TddlException;
  * 事务对象
  * 
  * @author mengshi.sunmengshi 2013-11-27 下午4:00:49
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface ITransaction {
 

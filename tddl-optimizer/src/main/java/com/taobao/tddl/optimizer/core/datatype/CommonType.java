@@ -15,7 +15,7 @@ import com.taobao.tddl.common.utils.convertor.ConvertorHelper;
  * 常见类型的转化处理
  * 
  * @author jianghang 2014-1-21 上午12:39:45
- * @since 5.1.0
+ * @since 5.0.0
  */
 public abstract class CommonType<DATA> extends AbstractDataType<DATA> {
 

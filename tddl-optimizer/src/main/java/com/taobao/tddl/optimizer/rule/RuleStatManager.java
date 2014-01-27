@@ -20,7 +20,7 @@ import com.taobao.tddl.rule.model.TargetDB;
 /**
  * 基于Rule获取到物理的group进行查找
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class RuleStatManager extends AbstractLifecycle implements StatManager {
 

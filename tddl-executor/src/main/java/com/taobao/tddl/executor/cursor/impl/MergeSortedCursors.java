@@ -17,7 +17,7 @@ import com.taobao.tddl.executor.utils.ExecUtils;
  * n个cursor的归并排序，假设子cursor都是有序的
  * 
  * @author mengshi.sunmengshi 2013-12-3 上午10:57:02
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class MergeSortedCursors extends SortCursor {
 

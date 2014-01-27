@@ -8,7 +8,7 @@ import com.taobao.tddl.optimizer.core.expression.IExtraFunction;
 
 /**
  * @author jianghang 2013-11-8 下午7:44:27
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class ExtraFunctionManagerTest {
 

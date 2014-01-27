@@ -14,7 +14,7 @@ import com.taobao.tddl.optimizer.exceptions.EmptyResultFilterException;
 
 /**
  * @author jianghang 2013-11-13 下午4:57:52
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class FilterUtilsTest {
 

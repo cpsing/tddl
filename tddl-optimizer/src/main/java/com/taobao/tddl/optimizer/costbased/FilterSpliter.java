@@ -31,7 +31,7 @@ import com.taobao.tddl.optimizer.utils.OptimizerUtils;
  * 在这里进行分离 key filter就是能走索引的那些filter，post filter就是必须遍历结果集的那些filter
  * 
  * @author Dreamond
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class FilterSpliter {
 

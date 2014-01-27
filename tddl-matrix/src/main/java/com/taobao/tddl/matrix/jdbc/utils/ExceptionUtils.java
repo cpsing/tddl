@@ -12,7 +12,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author mengshi.sunmengshi 2013-12-6 下午3:38:43
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class ExceptionUtils {
 

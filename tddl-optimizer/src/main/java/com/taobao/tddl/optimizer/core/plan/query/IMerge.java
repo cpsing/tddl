@@ -6,7 +6,7 @@ import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 
 /**
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface IMerge extends IParallelizableQueryTree<IQueryTree> {
 

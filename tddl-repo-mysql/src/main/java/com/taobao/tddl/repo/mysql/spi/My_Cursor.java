@@ -34,7 +34,7 @@ import com.taobao.tddl.optimizer.utils.FilterUtils;
 
 /**
  * @author mengshi.sunmengshi 2013-12-6 下午6:13:21
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class My_Cursor implements Cursor {
 

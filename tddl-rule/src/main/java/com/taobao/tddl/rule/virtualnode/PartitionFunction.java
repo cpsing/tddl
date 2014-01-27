@@ -21,7 +21,7 @@ package com.taobao.tddl.rule.virtualnode;
  * </pre>
  * 
  * @author jianghang 2013-11-4 上午11:43:07
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class PartitionFunction {
 

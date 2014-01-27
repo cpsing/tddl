@@ -9,7 +9,7 @@ import com.taobao.tddl.repo.oceanbase.spi.ObDatasourceGetter;
 
 /**
  * @author mengshi.sunmengshi 2013-12-5 下午6:18:14
- * @since 5.1.0
+ * @since 5.0.0
  */
 @Activate(name = "OCEANBASE_JDBC", order = 2)
 public class ObTableMetaManager extends MysqlTableMetaManager {

@@ -5,7 +5,7 @@ import java.io.PrintStream;
 
 /**
  * @author mengshi.sunmengshi 2013-12-3 上午10:41:51
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class ExceptionErrorCodeUtils {
 

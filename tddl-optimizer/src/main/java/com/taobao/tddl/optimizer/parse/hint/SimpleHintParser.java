@@ -47,7 +47,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  * </pre>
  * 
  * @author jianghang 2014-1-13 下午6:16:31
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class SimpleHintParser {
 

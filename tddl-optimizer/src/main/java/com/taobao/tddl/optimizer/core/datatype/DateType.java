@@ -12,7 +12,7 @@ import com.taobao.tddl.common.utils.convertor.Convertor;
  * {@link Date}类型
  * 
  * @author jianghang 2014-1-21 下午5:20:32
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class DateType extends AbstractDataType<java.sql.Date> {
 

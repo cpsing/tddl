@@ -58,7 +58,7 @@ import com.taobao.tddl.rule.model.TargetDB;
  * 
  * </pre>
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class DataNodeChooser {
 

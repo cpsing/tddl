@@ -20,7 +20,7 @@ import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 /**
  * 如果设置了OptimizerExtraCmd.MergeConcurrent 并且值为True，则将所有的Merge变为并行
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class MergeJoinMergeOptimizer implements QueryPlanOptimizer {
 

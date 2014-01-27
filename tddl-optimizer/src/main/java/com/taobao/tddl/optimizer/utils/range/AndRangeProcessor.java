@@ -11,7 +11,7 @@ import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
 /**
  * @author jianghang 2013-11-13 下午4:08:47
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class AndRangeProcessor extends AbstractRangeProcessor {
 

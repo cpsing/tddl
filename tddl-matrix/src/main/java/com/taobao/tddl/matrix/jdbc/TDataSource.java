@@ -27,7 +27,7 @@ import com.taobao.tddl.matrix.config.TDefaultConfig;
  * matrix的jdbc datasource实现
  * 
  * @author mengshi.sunmengshi 2013-11-22 下午3:26:14
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TDataSource extends AbstractLifecycle implements DataSource {
 

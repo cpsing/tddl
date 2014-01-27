@@ -30,7 +30,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  * 2. 抽取一些不常用的配置以及一些遗留的配置
  * 
  * @author jianghang 2013-11-4 下午8:04:59
- * @since 5.1.0
+ * @since 5.0.0
  */
 public abstract class VirtualTableSupport extends AbstractLifecycle implements Lifecycle, VirtualTableRule {
 

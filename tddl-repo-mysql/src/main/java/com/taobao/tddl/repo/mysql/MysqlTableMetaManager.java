@@ -31,7 +31,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author mengshi.sunmengshi 2013-12-5 下午6:18:14
- * @since 5.1.0
+ * @since 5.0.0
  */
 @Activate(name = "MYSQL_JDBC", order = 2)
 public class MysqlTableMetaManager extends RepoSchemaManager {

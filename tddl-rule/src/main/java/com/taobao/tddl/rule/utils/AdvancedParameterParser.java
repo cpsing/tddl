@@ -12,7 +12,7 @@ import com.taobao.tddl.rule.model.DateEnumerationParameter;
  * {@linkplain AdvancedParameter}解析器
  * 
  * @author jianghang 2013-10-29 下午5:18:27
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class AdvancedParameterParser {
 

@@ -11,7 +11,7 @@ import com.taobao.tddl.executor.rowset.IRowSet;
 
 /**
  * @author mengshi.sunmengshi 2013-11-29 下午1:38:39
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class ResultCursor extends SchematicCursor {
 

@@ -4,7 +4,7 @@ import com.taobao.tddl.optimizer.core.datatype.DataType;
 
 /**
  * @author mengshi.sunmengshi 2013-11-21 下午5:19:16
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface HBaseColumnCoder {
 

@@ -24,7 +24,7 @@ import com.taobao.tddl.common.utils.XmlHelper;
  * 解析matrix配置
  * 
  * @author jianghang 2013-11-28 下午6:08:57
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class MatrixParser {
 

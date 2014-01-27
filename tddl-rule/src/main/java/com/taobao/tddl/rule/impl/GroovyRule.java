@@ -17,7 +17,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  * 基于groovy实现
  * 
  * @author jianghang 2013-11-4 下午3:50:29
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class GroovyRule<T> extends EnumerativeRule<T> {
 

@@ -31,7 +31,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  * 用来计算聚合函数，group by
  * 
  * @author mengshi.sunmengshi 2013-12-3 上午10:53:31
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class AggregateCursor extends SchematicCursor implements IAggregateCursor {
 

@@ -26,7 +26,7 @@ import com.taobao.tddl.rule.utils.MatchResultCompare;
  * 一些常见的本地rule测试
  * 
  * @author jianghang 2013-11-6 下午9:22:54
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class LocalRuleTest {
 

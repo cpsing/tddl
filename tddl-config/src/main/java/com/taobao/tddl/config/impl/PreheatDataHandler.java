@@ -15,7 +15,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  * 使用delegate模式，引入Preheat机制，允许预先构建cache，加速请求处理
  * 
  * @author jianghang 2013-10-28 下午7:36:03
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class PreheatDataHandler extends UnitConfigDataHandler {
 

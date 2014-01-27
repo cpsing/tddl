@@ -3,7 +3,7 @@ package com.taobao.tddl.optimizer.core.plan.query;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 
 /**
- * @since 5.1.0
+ * @since 5.0.0
  */
 public interface IParallelizableQueryTree<RT extends IQueryTree> extends IQueryTree<RT> {
 

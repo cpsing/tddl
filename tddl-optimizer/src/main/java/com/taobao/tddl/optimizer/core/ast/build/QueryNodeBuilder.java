@@ -14,7 +14,7 @@ import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
 /**
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class QueryNodeBuilder extends QueryTreeNodeBuilder {
 

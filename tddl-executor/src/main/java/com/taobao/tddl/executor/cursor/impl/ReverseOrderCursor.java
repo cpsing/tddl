@@ -15,7 +15,7 @@ import com.taobao.tddl.optimizer.core.expression.IOrderBy;
  * 逆序遍历一个cursor
  * 
  * @author mengshi.sunmengshi 2013-12-3 上午10:57:45
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class ReverseOrderCursor extends SchematicCursor implements IReverseOrderCursor {
 

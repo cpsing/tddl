@@ -18,7 +18,7 @@ import com.taobao.tddl.optimizer.costbased.esitimater.stat.parse.TableStatParser
 /**
  * 本地文件的schema manager实现
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class LocalStatManager extends AbstractLifecycle implements StatManager {
 

@@ -12,7 +12,7 @@ import com.taobao.tddl.rule.model.sqljep.Comparative;
  * 匹配结果对象
  * 
  * @author jianghang 2013-10-29 下午4:10:52
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class MatcherResult {
 

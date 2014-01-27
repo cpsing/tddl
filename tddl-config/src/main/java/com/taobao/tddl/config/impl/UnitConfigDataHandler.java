@@ -13,7 +13,7 @@ import com.taobao.tddl.config.ConfigDataListener;
  * 基于unit的{@linkplain ConfigDataHandler}的delagate实现
  * 
  * @author jianghang 2013-10-28 下午7:00:35
- * @since 5.1.0
+ * @since 5.0.0
  */
 public abstract class UnitConfigDataHandler extends AbstractLifecycle implements ConfigDataHandler {
 

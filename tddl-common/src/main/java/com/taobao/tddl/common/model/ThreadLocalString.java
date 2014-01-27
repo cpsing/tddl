@@ -4,7 +4,7 @@ package com.taobao.tddl.common.model;
  * 基于hint的thread local相关变量定义
  * 
  * @author jianghang 2013-10-23 下午5:38:42
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class ThreadLocalString {
 

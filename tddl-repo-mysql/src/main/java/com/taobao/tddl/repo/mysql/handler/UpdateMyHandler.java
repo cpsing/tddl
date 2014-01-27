@@ -14,7 +14,7 @@ import com.taobao.tddl.repo.mysql.spi.My_JdbcHandler;
 
 /**
  * @author mengshi.sunmengshi 2013-12-5 下午6:28:28
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class UpdateMyHandler extends PutMyHandlerCommon {
 

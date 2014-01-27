@@ -14,7 +14,7 @@ import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
  * rpc的，暂未实现
  * 
  * @author mengshi.sunmengshi 2013-12-6 下午2:21:36
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class RpcCommunicateExecutor extends AbstractLifecycle implements CommunicateExecutor {
 

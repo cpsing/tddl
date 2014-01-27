@@ -11,7 +11,7 @@ import org.apache.commons.lang.exception.NestableDelegate;
  * Tddl nestabled {@link SQLException}
  * 
  * @author jianghang 2013-10-24 下午2:54:56
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TddlSQLException extends SQLException implements Nestable {
 

@@ -6,7 +6,7 @@ import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 
 /**
  * @author mengshi.sunmengshi 2013-12-2 下午6:24:37
- * @since 5.1.0
+ * @since 5.0.0
  */
 public abstract class CodecFactory {
 

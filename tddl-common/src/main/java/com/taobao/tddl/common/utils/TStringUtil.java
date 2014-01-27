@@ -12,7 +12,7 @@ import org.apache.commons.lang.StringUtils;
  * 
  * @author linxuan
  * @author jianghang 2013-10-24 下午4:02:24
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TStringUtil extends StringUtils {
 

@@ -36,7 +36,7 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  * group以及其对应的执行器
  * 
  * @author mengshi.sunmengshi 2013-11-27 下午4:00:33
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class TopologyHandler extends AbstractLifecycle {
 

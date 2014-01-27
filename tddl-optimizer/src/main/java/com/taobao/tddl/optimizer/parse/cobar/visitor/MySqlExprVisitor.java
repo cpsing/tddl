@@ -103,7 +103,7 @@ import com.taobao.tddl.optimizer.exceptions.OptimizerException;
 /**
  * 解析mysql表达式
  * 
- * @since 5.1.0
+ * @since 5.0.0
  */
 public class MySqlExprVisitor extends EmptySQLASTVisitor {
 

@@ -56,7 +56,7 @@ import com.taobao.tddl.optimizer.core.plan.query.IJoin;
  * 默认的cursor工厂
  * 
  * @author mengshi.sunmengshi 2013-11-27 下午3:56:20
- * @since 5.1.0
+ * @since 5.0.0
  */
 @SuppressWarnings("rawtypes")
 public class CursorFactoryDefaultImpl implements ICursorFactory {
