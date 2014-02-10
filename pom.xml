@@ -239,13 +239,9 @@
 					</includes>
 					<excludes>
 						<exclude>**/*NoRunTest.java</exclude>
+						<exclude>**/qatest/*.java</exclude>
 					</excludes>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.5</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
