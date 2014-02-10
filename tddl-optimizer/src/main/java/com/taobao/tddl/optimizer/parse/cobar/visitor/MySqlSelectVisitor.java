@@ -172,6 +172,10 @@ public class MySqlSelectVisitor extends EmptySQLASTVisitor {
             this.tableNode = tableNode.groupBy((ISelectable) v.getColumnOrValue(),
                 sorder == SortOrder.ASC ? true : false);
         }
+
+        if (groupBy.isWithRollup()) {
+            throw new NotSupportException("with rollup is not supported yet!");
+        }
     }
 
     private void handleHavingCondition(Expression havingExpr) {

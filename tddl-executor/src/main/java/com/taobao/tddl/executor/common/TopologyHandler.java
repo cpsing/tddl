@@ -43,7 +43,10 @@ public class TopologyHandler extends AbstractLifecycle {
     public final static Logger                               logger            = LoggerFactory.getLogger(TopologyHandler.class);
     public final static String                               xmlHead           = "<matrix xmlns=\"https://github.com/tddl/tddl/schema/matrix\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://github.com/tddl/tddl/schema/matrix https://raw.github.com/tddl/tddl/master/tddl-common/src/main/resources/META-INF/matrix.xsd\">";
     public final static MessageFormat                        topologyNullError = new MessageFormat("get topology info error, appName is:{0}, unitName is:{1}, filePath is: {2}, dataId is: {3}");
-    public final static MessageFormat                        TOPOLOGY          = new MessageFormat("com.taobao.and_orV0.{0}_MACHINE_TAPOLOGY");
+    // public final static MessageFormat TOPOLOGY = new
+    // MessageFormat("com.taobao.and_orV0.{0}_MACHINE_TAPOLOGY");
+    public final static MessageFormat                        TOPOLOGY          = new MessageFormat("com.taobao.tddl.v1_{0}_topology");
+    public final static MessageFormat                        GROUP_TOPOLOGY    = new MessageFormat("com.taobao.tddl.v1_{0}_dbgroups");
     private final Map<String/* group key */, IGroupExecutor> executorMap       = new HashMap<String, IGroupExecutor>();
     private String                                           appName;
     private String                                           unitName;
@@ -130,10 +133,10 @@ public class TopologyHandler extends AbstractLifecycle {
     }
 
     private String generateTopologyXML(String appName, String unitName) {
+        ConfigDataHandler groupHanlder = null;
         try {
-            String matrixKey = "com.taobao.tddl.v1_" + appName + "_dbgroups";
-            ConfigDataHandler groupHanlder = ConfigDataHandlerCity.getFactory(appName, unitName)
-                .getConfigDataHandler(matrixKey);
+            String matrixKey = GROUP_TOPOLOGY.format(new Object[] { appName });
+            groupHanlder = ConfigDataHandlerCity.getFactory(appName, unitName).getConfigDataHandler(matrixKey);
             String keys = groupHanlder.getData(ConfigDataHandler.GET_DATA_TIMEOUT,
                 ConfigDataHandler.FIRST_SERVER_STRATEGY);
             if (keys == null) {
@@ -165,6 +168,12 @@ public class TopologyHandler extends AbstractLifecycle {
             throw new TddlRuntimeException(e);
         } catch (ParserConfigurationException e) {
             throw new TddlRuntimeException(e);
+        } finally {
+            try {
+                groupHanlder.destory();
+            } catch (TddlException e) {
+                throw new TddlRuntimeException(e);
+            }
         }
     }
 

@@ -22,7 +22,11 @@ public class AbstractLifecycle implements Lifecycle {
                 isInited = true;
             } catch (Exception e) {
                 // 出现异常调用destory方法，释放
-                doDestory();
+                try {
+                    doDestory();
+                } catch (Exception e1) {
+                    // ignore
+                }
                 throw new TddlException(e);
             }
         }

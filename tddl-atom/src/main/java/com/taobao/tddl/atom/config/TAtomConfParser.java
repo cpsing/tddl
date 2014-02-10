@@ -30,6 +30,7 @@ public class TAtomConfParser {
     public static final String GLOBA_DB_TYPE_KEY                     = "dbType";
     public static final String GLOBA_DB_STATUS_KEY                   = "dbStatus";
     public static final String APP_USER_NAME_KEY                     = "userName";
+    public static final String APP_INIT_POOL_SIZE_KEY                = "initPoolSize";
     public static final String APP_MIN_POOL_SIZE_KEY                 = "minPoolSize";
     public static final String APP_MAX_POOL_SIZE_KEY                 = "maxPoolSize";
     public static final String APP_IDLE_TIMEOUT_KEY                  = "idleTimeout";
@@ -98,6 +99,10 @@ public class TAtomConfParser {
                 String oracleConType = TStringUtil.trim(appProp.getProperty(TAtomConfParser.APP_ORACLE_CON_TYPE_KEY));
                 if (TStringUtil.isNotBlank(oracleConType)) {
                     pasObj.setOracleConType(oracleConType);
+                }
+                String initPoolSize = TStringUtil.trim(appProp.getProperty(TAtomConfParser.APP_INIT_POOL_SIZE_KEY));
+                if (TStringUtil.isNotBlank(initPoolSize) && TStringUtil.isNumeric(initPoolSize)) {
+                    pasObj.setInitPoolSize(Integer.valueOf(initPoolSize));
                 }
                 String minPoolSize = TStringUtil.trim(appProp.getProperty(TAtomConfParser.APP_MIN_POOL_SIZE_KEY));
                 if (TStringUtil.isNotBlank(minPoolSize) && TStringUtil.isNumeric(minPoolSize)) {

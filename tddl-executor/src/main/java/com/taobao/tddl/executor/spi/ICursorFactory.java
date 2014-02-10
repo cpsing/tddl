@@ -146,8 +146,8 @@ public interface ICursorFactory {
      * @throws TddlException
      */
     IMergeSortJoinCursor sortMergeJoinCursor(ExecutionContext context, ISchematicCursor left_cursor,
-                                             ISchematicCursor right_cursor, List left_columns, List right_columns)
-                                                                                                                  throws TddlException;
+                                             ISchematicCursor right_cursor, List left_columns, List right_columns,
+                                             IJoin join) throws TddlException;
 
     /**
      * join的Block Nested Loop实现

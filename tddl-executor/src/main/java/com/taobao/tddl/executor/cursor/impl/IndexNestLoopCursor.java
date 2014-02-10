@@ -65,6 +65,11 @@ public class IndexNestLoopCursor extends JoinSchematicCursor implements IIndexNe
         left_cursor.beforeFirst();
     }
 
+    @Override
+    public IRowSet current() throws TddlException {
+        return current;
+    }
+
     protected IRowSet getOneLeftCursor(boolean forward) throws TddlException {
         if (forward) {
             left = ExecUtils.fromIRowSetToArrayRowSet(left_cursor.next());

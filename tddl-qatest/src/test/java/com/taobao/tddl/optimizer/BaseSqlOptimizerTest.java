@@ -10,7 +10,7 @@ import com.taobao.tddl.optimizer.config.table.StaticSchemaManager;
 import com.taobao.tddl.optimizer.config.table.parse.MatrixParser;
 import com.taobao.tddl.optimizer.costbased.CostBasedOptimizer;
 import com.taobao.tddl.optimizer.costbased.esitimater.stat.LocalStatManager;
-import com.taobao.tddl.optimizer.costbased.esitimater.stat.RepoStatManager;
+import com.taobao.tddl.optimizer.costbased.esitimater.stat.StatManager;
 import com.taobao.tddl.optimizer.parse.SqlParseManager;
 import com.taobao.tddl.optimizer.parse.cobar.CobarSqlParseManager;
 import com.taobao.tddl.optimizer.rule.OptimizerRule;
@@ -30,7 +30,7 @@ public class BaseSqlOptimizerTest {
     protected static OptimizerRule      rule;
     protected static RepoSchemaManager  schemaManager;
     protected static CostBasedOptimizer optimizer;
-    protected static RepoStatManager    statManager;
+    protected static StatManager        statManager;
     protected static SqlConvertor       sqlConvert  = new SqlConvertor();
 
     @BeforeClass
@@ -58,13 +58,7 @@ public class BaseSqlOptimizerTest {
         schemaManager.setGroup(matrix.getGroup("andor_mysql_group_0"));
         schemaManager.init();
 
-        LocalStatManager local = new LocalStatManager();
-        local.init();
-
-        statManager = new RepoStatManager();
-        statManager.setLocal(local);
-        statManager.setUseCache(true);
-        statManager.setGroup(matrix.getGroup("andor_mysql_group_0"));
+        statManager = new LocalStatManager();
         statManager.init();
 
         context.setMatrix(matrix);

@@ -93,8 +93,6 @@ public class BaseMatrixTestCase extends PrepareData {
 
         us.setRuleFile(ruleFile + dbTypeStack + "_" + rule);
 
-        if ("tddl".equalsIgnoreCase(dbTypeStack)) {
-        }
         if ((!"tddl".equalsIgnoreCase(dbTypeStack)) && (!"tdhs".equalsIgnoreCase(dbTypeStack))) {
             us.setTopologyFile(machineTapologyFile);
             us.setSchemaFile(schemaFile + dbTypeStack + "_" + schema);

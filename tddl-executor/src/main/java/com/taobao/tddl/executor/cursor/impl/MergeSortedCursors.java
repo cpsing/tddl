@@ -113,7 +113,7 @@ public class MergeSortedCursors extends SortCursor {
                 if (!this.allowDuplicated) {
                     // 去重
                     // 把其他cursor中重复的记录消耗光
-                    IRowSet rowToRemoveDuplicate = null;
+                    IRowSet rowToRemoveDuplicate = currentMaxOrMin;
                     while (true) {
                         rowToRemoveDuplicate = this.cursors.get(i).next();
                         if (rowToRemoveDuplicate == null) {
@@ -131,9 +131,8 @@ public class MergeSortedCursors extends SortCursor {
         }
 
         if (currentMaxOrMin != null) {
-            IRowSet rowToRemoveDuplicate = null;
             currentMaxOrMin = ExecUtils.fromIRowSetToArrayRowSet(currentMaxOrMin);
-
+            IRowSet rowToRemoveDuplicate = currentMaxOrMin;
             // 选中的cursor消费一行记录，往前移动，如果有需要，还要去重
             while (true) {
                 rowToRemoveDuplicate = this.cursors.get(indexOfCurrentMaxOrMin).next();
@@ -180,6 +179,11 @@ public class MergeSortedCursors extends SortCursor {
 
     private void setCurrent(IRowSet current) {
         this.current = current;
+    }
+
+    @Override
+    public IRowSet current() throws TddlException {
+        return current;
     }
 
     @Override

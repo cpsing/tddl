@@ -179,7 +179,9 @@ public class FilterPreProcessor {
     private static IFilter processBoolFilter(IFilter root, boolean typeConvert) {
         root = exchage(root);
 
-        if (typeConvert) root = typeConvert(root);
+        if (typeConvert) {
+            root = typeConvert(root);
+        }
         return root;
     }
 
@@ -217,10 +219,12 @@ public class FilterPreProcessor {
     private static IFilter typeConvert(IFilter root) {
         IBooleanFilter bf = (IBooleanFilter) root;
         // 如果是id in (xx)
-        if (bf.getValues() != null && bf.getColumn() instanceof IColumn) {
-            for (int i = 0; i < bf.getValues().size(); i++) {
-                bf.getValues().set(i,
-                    OptimizerUtils.convertType(bf.getValues().get(i), ((IColumn) bf.getColumn()).getDataType()));
+        if (bf.getValues() != null) {
+            if (bf.getColumn() instanceof IColumn) {
+                for (int i = 0; i < bf.getValues().size(); i++) {
+                    bf.getValues().set(i,
+                        OptimizerUtils.convertType(bf.getValues().get(i), ((IColumn) bf.getColumn()).getDataType()));
+                }
             }
         } else {
             // 如果是 1 = id情况

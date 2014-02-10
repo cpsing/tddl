@@ -1,4 +1,7 @@
 package com.taobao.tddl.matrix.test;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.taobao.tddl.common.exception.TddlException;
@@ -18,7 +21,7 @@ public class TopologyHandlerTest {
         try {
             topology.init();
         } catch (TddlException e) {
-            e.printStackTrace();
+            Assert.fail(ExceptionUtils.getFullStackTrace(e));
         }
 
     }
@@ -34,14 +37,13 @@ public class TopologyHandlerTest {
         try {
             topology.init();
         } catch (TddlException e) {
-            e.printStackTrace();
+            Assert.fail(ExceptionUtils.getFullStackTrace(e));
         }
 
     }
 
     @Test
     public void initTestWithAppName() {
-
         ExecutorContext executorContext = new ExecutorContext();
         ExecutorContext.setContext(executorContext);
         TopologyHandler topology = new TopologyHandler("andor_show", null, null);
@@ -50,8 +52,7 @@ public class TopologyHandlerTest {
         try {
             topology.init();
         } catch (TddlException e) {
-            e.printStackTrace();
+            Assert.fail(ExceptionUtils.getFullStackTrace(e));
         }
-
     }
 }

@@ -134,7 +134,29 @@ public class LeftJoinTest extends BaseMatrixTestCase {
 
     @Test
     public void leftJoinWithOrderByTest() throws Exception {
-        String sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */ select a.host_id,a.host_name,a.hostgroup_id,b.hostgroup_name from "
+        // 左表有序，可下推
+        String sql = "select a.host_id,a.host_name,a.hostgroup_id,b.hostgroup_name from "
+                     + hostgroup
+                     + " as b left join "
+                     + host_info
+                     + " as a "
+                     + "on b.hostgroup_id=a.hostgroup_id where b.hostgroup_name='hostgroupname0' order by b.hostgroup_id";
+        selectOrderAssert(sql, columnParam, Collections.EMPTY_LIST);
+
+        sql = "select a.host_id,a.host_name,a.hostgroup_id,b.hostgroup_name from " + hostgroup + " as b left join "
+              + host_info + " as a "
+              + "on b.hostgroup_id=a.hostgroup_id where b.hostgroup_name='hostgroupname0' order by b.hostgroup_id asc";
+        selectOrderAssert(sql, columnParam, Collections.EMPTY_LIST);
+
+        sql = "select a.host_id,a.host_name,a.hostgroup_id,b.hostgroup_name from " + hostgroup + " as b left join "
+              + host_info + " as a "
+              + "on b.hostgroup_id=a.hostgroup_id where b.hostgroup_name='hostgroupname0' order by b.hostgroup_id desc";
+        selectOrderAssert(sql, columnParam, Collections.EMPTY_LIST);
+    }
+
+    @Test
+    public void leftJoinWithOrderByRightOutterTest() throws Exception {
+        String sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */select a.host_id,a.host_name,a.hostgroup_id,b.hostgroup_name from "
                      + hostgroup
                      + " as b left join "
                      + host_info
@@ -142,20 +164,15 @@ public class LeftJoinTest extends BaseMatrixTestCase {
                      + "on b.hostgroup_id=a.hostgroup_id where b.hostgroup_name='hostgroupname0' order by a.host_id";
         selectOrderAssert(sql, columnParam, Collections.EMPTY_LIST);
 
-        sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */ select a.host_id,a.host_name,a.hostgroup_id,b.hostgroup_name from "
-              + hostgroup
-              + " as b left join "
-              + host_info
-              + " as a "
-              + "on b.hostgroup_id=a.hostgroup_id where  b.hostgroup_name='hostgroupname0' order by a.host_id asc";
+        // 使用sort merge join，不需要临时表排序
+        sql = "select a.host_id,a.host_name,a.hostgroup_id,b.hostgroup_name from " + hostgroup + " as b left join "
+              + host_info + " as a " + "on b.hostgroup_id=a.hostgroup_id order by a.hostgroup_id asc , a.host_id asc";
         selectOrderAssert(sql, columnParam, Collections.EMPTY_LIST);
 
-        sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */ select a.host_id,a.host_name,a.hostgroup_id,b.hostgroup_name from "
-              + hostgroup
-              + " as b left join "
-              + host_info
-              + " as a "
-              + "on b.hostgroup_id=a.hostgroup_id where  b.hostgroup_name='hostgroupname0' order by a.host_id desc";
+        // 使用sort merge join，不需要临时表排序
+        sql = "select a.host_id,a.host_name,a.hostgroup_id,b.hostgroup_name from " + hostgroup + " as b left join "
+              + host_info + " as a "
+              + "on b.hostgroup_id=a.hostgroup_id where b.hostgroup_name='hostgroupname0' order by a.hostgroup_id desc";
         selectOrderAssert(sql, columnParam, Collections.EMPTY_LIST);
     }
 

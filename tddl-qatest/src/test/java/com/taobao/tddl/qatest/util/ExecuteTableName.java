@@ -145,18 +145,6 @@ public class ExecuteTableName {
             };
 
             return object;
-        } else if (db.equals("tddl")) {
-            String[][] object = {
-                    // [0]bdb单裤单表 （一个group，对应一个atom）
-                    { "mysql_normaltbl_oneGroup_oneAtom" },
-
-                    { "mysql_normaltbl_oneGroup_mutilAtom" },
-
-                    { "mysql_normaltbl_mutilGroup" }
-
-            };
-
-            return object;
         } else if (db.equals("hbase")) {
             String[][] object = {
             // 单库单表 （一个group，对应一个atom）
@@ -216,102 +204,6 @@ public class ExecuteTableName {
             // { "mysql_normaltbl_mutilGroup_Index" },
             // [20]mysql多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是两个字段组成
             // { "mysql_normaltbl_mutilGroup_twoIndex" }
-            };
-            return object;
-        }
-
-    }
-
-    /**
-     * 单个表，表名为normaltbl
-     */
-    public static String[][] normaltblMysqlTable(String db) {
-        if (db.equals("bdb")) {
-            String[][] object = {
-                    // [0]bdb单裤单表 （一个group，对应一个atom）
-                    { "normaltbl_oneGroup_oneAtom" },
-                    // [1]bdb单裤单表 二级索引是一个字段组成
-                    // { "normaltbl_oneGroup_oneAtom_Index" },
-                    // [2]bdb单裤单表 二级索引是二个字段组成
-                    // { "normaltbl_oneGroup_oneAtom_twoIndex" },
-                    // [3]bdb单裤单表 二级索引是三个字段组成
-                    // { "normaltbl_oneGroup_oneAtom_threeIndex" },
-
-                    // [4]bdb单裤多表（有分表情况，一个group对应多个atom）
-                    { "normaltbl_oneGroup_mutilAtom" },
-                    // [5]bdb单裤多表（有分表情况，一个group对应多个atom）二级索引是一个字段组成
-                    // { "normaltbl_oneGroup_mutilAtom_Index" },
-                    // [6]bdb单裤多表（有分表情况，一个group对应多个atom）二级索引是二个字段组成
-                    // { "normaltbl_oneGroup_mutilAtom_twoIndex" },
-                    // [7]bdb单裤多表（有分表情况，一个group对应多个atom）二级索引是两个字段组成 二级索引是
-                    // strongConsistent
-                    // { "normaltbl_oneGroup_mutilAtom_twoIndex_Consistent" },
-                    // [8]bdb单裤多表（有分表情况，一个group对应多个atom）二级索引是三个字段组成
-                    // { "normaltbl_oneGroup_mutilAtom_threeIndex" },
-
-                    // [9]bdb多裤多表（有分库分表情况，一个group对应多个atom）
-                    { "normaltbl_mutilGroup" },
-            // [10]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是一个字段组成
-            // { "normaltbl_mutilGroup_Index" },
-            // [11]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是一个字段组成 二级索引是
-            // strongConsistent
-            // { "normaltbl_mutilGroup_Index_Consistent" },
-            // [12]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是二个字段组成
-            // { "normaltbl_mutilGroup_twoIndex" },
-            // [13]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是二个字段组成 二级索引是
-            // strongConsistent
-            // { "normaltbl_mutilGroup_twoIndex_Consistent" },
-            // [14]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是二个字段组成
-            // 分库采用复杂分库规则
-            // { "normaltbl_mutilGroup_twoIndex_complexRule" },
-            // [15]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是三个字段组成
-            // { "normaltbl_mutilGroup_threeIndex" }
-            };
-            return object;
-        } else if (db.equals("mysql")) {
-            String[][] object = {};
-
-            return object;
-        } else {
-            String[][] object = {
-                    // [0]bdb单裤单表 （一个group，对应一个atom）
-                    { "normaltbl_oneGroup_oneAtom" },
-                    // [1]bdb单裤单表 二级索引是一个字段组成
-                    // { "normaltbl_oneGroup_oneAtom_Index" },
-                    // [2]bdb单裤单表 二级索引是二个字段组成
-                    // { "normaltbl_oneGroup_oneAtom_twoIndex" },
-                    // [3]bdb单裤单表 二级索引是三个字段组成
-                    // { "normaltbl_oneGroup_oneAtom_threeIndex" },
-
-                    // [4]bdb单裤多表（有分表情况，一个group对应多个atom）
-                    { "normaltbl_oneGroup_mutilAtom" },
-                    // [5]bdb单裤多表（有分表情况，一个group对应多个atom）二级索引是一个字段组成
-                    // { "normaltbl_oneGroup_mutilAtom_Index" },
-                    // [6]bdb单裤多表（有分表情况，一个group对应多个atom）二级索引是二个字段组成
-                    // { "normaltbl_oneGroup_mutilAtom_twoIndex" },
-                    // [7]bdb单裤多表（有分表情况，一个group对应多个atom）二级索引是两个字段组成 二级索引是
-                    // strongConsistent
-                    // { "normaltbl_oneGroup_mutilAtom_twoIndex_Consistent" },
-                    // [8]bdb单裤多表（有分表情况，一个group对应多个atom）二级索引是三个字段组成
-                    // { "normaltbl_oneGroup_mutilAtom_threeIndex" },
-
-                    // [9]bdb多裤多表（有分库分表情况，一个group对应多个atom）
-                    { "normaltbl_mutilGroup" },
-            // [10]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是一个字段组成
-            // { "normaltbl_mutilGroup_Index" },
-            // [11]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是一个字段组成 二级索引是
-            // strongConsistent
-            // { "normaltbl_mutilGroup_Index_Consistent" },
-            // [12]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是二个字段组成
-            // { "normaltbl_mutilGroup_twoIndex" },
-            // [13]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是二个字段组成 二级索引是
-            // strongConsistent
-            // { "normaltbl_mutilGroup_twoIndex_Consistent" },
-            // [14]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是二个字段组成
-            // 分库采用复杂分库规则
-            // { "normaltbl_mutilGroup_twoIndex_complexRule" },
-            // [15]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是三个字段组成
-            // { "normaltbl_mutilGroup_threeIndex" }
             };
             return object;
         }
@@ -627,122 +519,6 @@ public class ExecuteTableName {
     }
 
     /**
-     * 两个表，表名分表为normaltbl，student
-     * 
-     * @return
-     */
-    public static String[][] normaltblStudentMysqlTable(String db) {
-        if (db.equals("bdb")) {
-            String[][] object = {
-                    // [0]bdb单裤多表（有分表情况，一个group对应多个atom）
-                    { "normaltbl_oneGroup_oneAtom", "student_oneGroup_oneAtom" },
-                    // [1]bdb单裤单表 二级索引是一个字段组成
-                    // { "normaltbl_oneGroup_oneAtom_Index",
-                    // "student_oneGroup_oneAtom" },
-                    // [2]bdb单裤单表 二级索引是二个字段组成
-                    // { "normaltbl_oneGroup_oneAtom_twoIndex",
-                    // "student_oneGroup_oneAtom" },
-                    // [3]bdb单裤单表 二级索引是三个字段组成
-                    // { "normaltbl_oneGroup_oneAtom_threeIndex",
-                    // "student_oneGroup_oneAtom" },
-
-                    // [4]bdb单裤多表（有分表情况，一个group对应多个atom）
-                    { "normaltbl_oneGroup_mutilAtom", "student_oneGroup_mutilAtom" },
-                    // [5]bdb单裤多表（有分表情况，一个group对应多个atom）二级索引是一个字段组成
-                    // { "normaltbl_oneGroup_mutilAtom_Index",
-                    // "student_oneGroup_mutilAtom" },
-                    // [6]bdb单裤多表（有分表情况，一个group对应多个atom）二级索引是二个字段组成
-                    // { "normaltbl_oneGroup_mutilAtom_twoIndex",
-                    // "student_oneGroup_mutilAtom" },
-                    // [7]bdb单裤多表（有分表情况，一个group对应多个atom）二级索引是两个字段组成 二级索引是
-                    // strongConsistent
-                    // { "normaltbl_oneGroup_mutilAtom_twoIndex_Consistent",
-                    // "student_oneGroup_mutilAtom" },
-                    // [8]bdb单裤多表（有分表情况，一个group对应多个atom）二级索引是三个字段组成
-                    // { "normaltbl_oneGroup_mutilAtom_threeIndex",
-                    // "student_oneGroup_mutilAtom" },
-
-                    // [9]bdb多裤多表（有分库分表情况，一个group对应多个atom）
-                    { "normaltbl_mutilGroup", "student_mutilGroup" },
-            // [10]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是一个字段组成
-            // { "normaltbl_mutilGroup_Index", "student_mutilGroup" },
-            // [11]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是一个字段组成 二级索引是
-            // strongConsistent
-            // { "normaltbl_mutilGroup_Index_Consistent",
-            // "student_mutilGroup" },
-            // [12]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是二个字段组成
-            // { "normaltbl_mutilGroup_twoIndex", "student_mutilGroup" },
-            // [13]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是二个字段组成
-            // 分库采用复杂分库规则
-            // { "normaltbl_mutilGroup_twoIndex_complexRule",
-            // "student_mutilGroup" },
-            // [14]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是二个字段组成 二级索引是
-            // strongConsistent
-            // { "normaltbl_mutilGroup_twoIndex_Consistent",
-            // "student_mutilGroup" },
-            // [15]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是三个字段组成
-            // { "normaltbl_mutilGroup_threeIndex", "student_mutilGroup" }
-            };
-            return object;
-        } else if (db.equals("mysql")) {
-            String[][] object = {};
-            return object;
-        } else {
-            String[][] object = {
-                    // [0]bdb单裤多表（有分表情况，一个group对应多个atom）
-                    { "normaltbl_oneGroup_oneAtom", "student_oneGroup_oneAtom" },
-                    // [1]bdb单裤单表 二级索引是一个字段组成
-                    // { "normaltbl_oneGroup_oneAtom_Index",
-                    // "student_oneGroup_oneAtom" },
-                    // [2]bdb单裤单表 二级索引是二个字段组成
-                    // { "normaltbl_oneGroup_oneAtom_twoIndex",
-                    // "student_oneGroup_oneAtom" },
-                    // [3]bdb单裤单表 二级索引是三个字段组成
-                    // { "normaltbl_oneGroup_oneAtom_threeIndex",
-                    // "student_oneGroup_oneAtom" },
-
-                    // [4]bdb单裤多表（有分表情况，一个group对应多个atom）
-                    { "normaltbl_oneGroup_mutilAtom", "student_oneGroup_mutilAtom" },
-                    // [5]bdb单裤多表（有分表情况，一个group对应多个atom）二级索引是一个字段组成
-                    // { "normaltbl_oneGroup_mutilAtom_Index",
-                    // "student_oneGroup_mutilAtom" },
-                    // [6]bdb单裤多表（有分表情况，一个group对应多个atom）二级索引是二个字段组成
-                    // { "normaltbl_oneGroup_mutilAtom_twoIndex",
-                    // "student_oneGroup_mutilAtom" },
-                    // [7]bdb单裤多表（有分表情况，一个group对应多个atom）二级索引是两个字段组成 二级索引是
-                    // strongConsistent
-                    // { "normaltbl_oneGroup_mutilAtom_twoIndex_Consistent",
-                    // "student_oneGroup_mutilAtom" },
-                    // [8]bdb单裤多表（有分表情况，一个group对应多个atom）二级索引是三个字段组成
-                    // { "normaltbl_oneGroup_mutilAtom_threeIndex",
-                    // "student_oneGroup_mutilAtom" },
-
-                    // [9]bdb多裤多表（有分库分表情况，一个group对应多个atom）
-                    { "normaltbl_mutilGroup", "student_mutilGroup" },
-            // [10]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是一个字段组成
-            // { "normaltbl_mutilGroup_Index", "student_mutilGroup" },
-            // [11]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是一个字段组成 二级索引是
-            // strongConsistent
-            // { "normaltbl_mutilGroup_Index_Consistent",
-            // "student_mutilGroup" },
-            // [12]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是二个字段组成
-            // { "normaltbl_mutilGroup_twoIndex", "student_mutilGroup" },
-            // [13]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是二个字段组成
-            // 分库采用复杂分库规则
-            // { "normaltbl_mutilGroup_twoIndex_complexRule",
-            // "student_mutilGroup" },
-            // [14]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是二个字段组成 二级索引是
-            // strongConsistent
-            // { "normaltbl_mutilGroup_twoIndex_Consistent",
-            // "student_mutilGroup" },
-            // [15]bdb多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是三个字段组成
-            // { "normaltbl_mutilGroup_threeIndex", "student_mutilGroup" }
-            };
-            return object;
-        }
-    }
-
-    /**
      * mysql两个表，表名分表为host_info，hostgroup_info
      * 
      * @return
@@ -794,18 +570,6 @@ public class ExecuteTableName {
             // { "mysql_host_info_mutilGroup_threeIndex_difgroup",
             // "mysql_hostgroup_info_mutilGroup_threeIndex_difgroup" },
             };
-
-            return object;
-        } else if (db.equals("tddl")) {
-            String[][] object = {
-                    // [0]mysql单裤单表 （一个group，对应一个atom）
-                    { "mysql_host_info_oneGroup_oneAtom", "mysql_hostgroup_info_oneGroup_oneAtom" },
-
-                    // [4]mysql单裤多表（有分表情况，一个group对应多个atom）
-                    { "mysql_host_info_oneGroup_mutilAtom", "mysql_hostgroup_info_oneGroup_mutilAtom" },
-
-                    // [5]mysql多裤多表（有分库分表情况，一个group对应多个atom）
-                    { "mysql_host_info_mutilGroup", "mysql_hostgroup_info_mutilGroup" } };
 
             return object;
         } else {
@@ -1017,33 +781,6 @@ public class ExecuteTableName {
                     // "mysql_module_host_oneGroup_mutilAtom" },
                     // [15]mysql多裤多表（有分库分表情况，一个group对应多个atom） 二级索引是二个字段组成
                     // 其中mysql_host_info_mutilGroup不带索引，mysql_hostgroup_info_mutilGroup带索引
-                    { "mysql_host_info_oneGroup_mutilAtom", "mysql_hostgroup_info_mutilGroup",
-                            "mysql_student_mutilGroup", "mysql_module_info_mutilGroup",
-                            "mysql_module_host_oneGroup_mutilAtom" }
-
-            };
-
-            return object;
-        } else if (db.equals("tddl")) {
-            String[][] object = {
-                    // [0]mysql单裤单表 （一个group，对应一个atom）
-                    { "mysql_host_info_oneGroup_oneAtom", "mysql_hostgroup_info_oneGroup_oneAtom",
-                            "mysql_student_oneGroup_oneAtom", "mysql_module_info_oneGroup_oneAtom",
-                            "mysql_module_host_oneGroup_oneAtom" },
-                    // [1]mysql单裤单表
-                    // （一个group，对应一个atom,其中mysql_mysql_hostgroup_info_oneGroup_oneAtom_otherDb在不同的数据库中）
-                    { "mysql_host_info_oneGroup_oneAtom", "mysql_hostgroup_info_oneGroup_oneAtom_otherDb",
-                            "mysql_student_oneGroup_oneAtom", "mysql_module_info_oneGroup_oneAtom",
-                            "mysql_module_host_oneGroup_oneAtom" },
-
-                    // [5]mysql单裤多表（有分表情况，一个group对应多个atom）
-                    { "mysql_host_info_oneGroup_mutilAtom", "mysql_hostgroup_info_oneGroup_mutilAtom",
-                            "mysql_student_oneGroup_mutilAtom", "mysql_module_info_oneGroup_mutilAtom",
-                            "mysql_module_host_oneGroup_mutilAtom" },
-                    // [6]mysql多裤多表（有分库分表情况，一个group对应多个atom）
-                    { "mysql_host_info_mutilGroup", "mysql_hostgroup_info_mutilGroup", "mysql_student_mutilGroup",
-                            "mysql_module_info_mutilGroup", "mysql_module_host_oneGroup_mutilAtom" },
-
                     { "mysql_host_info_oneGroup_mutilAtom", "mysql_hostgroup_info_mutilGroup",
                             "mysql_student_mutilGroup", "mysql_module_info_mutilGroup",
                             "mysql_module_host_oneGroup_mutilAtom" }

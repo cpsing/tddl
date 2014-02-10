@@ -5,10 +5,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.utils.TStringUtil;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ExecutorContext;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -28,6 +28,9 @@ import com.taobao.tddl.optimizer.core.plan.IQueryTree;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin;
 import com.taobao.tddl.optimizer.core.plan.query.IMerge;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author mengshi.sunmengshi 2013-12-5 上午11:06:01
@@ -144,7 +147,8 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
     protected boolean equalsIOrderBy(IOrderBy o1, IOrderBy o2) {
         IColumn c1 = ExecUtils.getColumn(o1.getColumn());
         IColumn c2 = ExecUtils.getColumn(o2.getColumn());
-        return c1.getColumnName().equals(c2.getColumnName()) && o1.getDirection() == o2.getDirection();
+        return StringUtils.equalsIgnoreCase(c1.getTableName(), c2.getTableName())
+               && c1.getColumnName().equals(c2.getColumnName()) && o1.getDirection() == o2.getDirection();
     }
 
     protected List<IFunction> getMergeAggregates(List retColumns) {
@@ -315,15 +319,23 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
         return true;
     }
 
+    /**
+     * 比较两个排序，排序可不相同
+     * 
+     * @param o1
+     * @param o2
+     * @return
+     */
     protected static boolean isTwoOrderByMatched(IOrderBy o1, IOrderBy o2) {
         IColumn c1 = ExecUtils.getIColumn(o1.getColumn());
         IColumn c2 = ExecUtils.getIColumn(o2.getColumn());
-        boolean columnNotMatch = c1 == null
-                                 || c2 == null
-                                 || (!c1.getColumnName().equals(c2.getColumnName()) && !(c1.getAlias() != null && c1.getAlias()
-                                     .equals(c2.getColumnName())));
+        boolean columnMatch = c1 != null
+                              && c2 != null
+                              && (StringUtils.equals(c1.getTableName(), c2.getTableName()))
+                              && (c1.getColumnName().equals(c2.getColumnName()) || (c1.getAlias() != null && c1.getAlias()
+                                  .equals(c2.getColumnName())));
 
-        return !columnNotMatch;
+        return columnMatch;
     }
 
     /**
@@ -592,7 +604,7 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
             return NOT_MATCH;
         }
         for (int i = 0; i < o2.size(); i++) {
-            if (!equalsIOrderBy(o1.get(i), o2.get(i))) {
+            if (!isTwoOrderByMatched(o1.get(i), o2.get(i))) {
                 return NOT_MATCH;
             }
             if (i == o2.size() - 1) {

@@ -13,6 +13,7 @@ import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.utils.ExecUtils;
+import com.taobao.tddl.optimizer.core.plan.query.IJoin;
 
 /**
  * <pre>
@@ -72,13 +73,20 @@ public class SortMergeJoinCursor extends JoinSchematicCursor implements IMergeSo
 
     private List      rightSubSet;
 
-    @SuppressWarnings("unchecked")
     public SortMergeJoinCursor(ISchematicCursor left_cursor, ISchematicCursor right_cursor, List leftJoinOnColumns,
                                List rightJoinOnColumns) throws TddlException{
         super(left_cursor, right_cursor, leftJoinOnColumns, rightJoinOnColumns);
         this.left_cursor = left_cursor;
         this.right_cursor = right_cursor;
+        // 暂时以右表的顺序为准，因为目前选择sort merge join主要是针对outter右表存在排序字段
+        // 后续需要优化orderbys信息，针对sort merge join，左右表的顺序字段都是正确的
+        this.orderBys = right_cursor.getOrderBy();
+    }
 
+    public SortMergeJoinCursor(ISchematicCursor left_cursor, ISchematicCursor right_cursor, List leftJoinOnColumns,
+                               List rightJoinOnColumns, IJoin join) throws TddlException{
+        this(left_cursor, right_cursor, leftJoinOnColumns, rightJoinOnColumns);
+        setLeftRightJoin(join);
     }
 
     @Override

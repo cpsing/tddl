@@ -1,5 +1,6 @@
 package com.taobao.tddl.group.jdbc;
 
+import java.lang.reflect.Method;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -23,8 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
-import org.apache.commons.lang.reflect.MethodUtils;
 
 import com.taobao.tddl.atom.jdbc.TConnectionWrapper;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
@@ -596,6 +595,7 @@ public class TGroupConnection implements Connection {
             if (atomConnection == null) {
                 return -1;
             }
+
             TConnectionWrapper conn = (TConnectionWrapper) atomConnection;
             Connection delegate = conn.getTargetConnection();
             if (delegate instanceof Wrapper) {
@@ -604,7 +604,19 @@ public class TGroupConnection implements Connection {
             // DruidPooledConnection druidConnection = (DruidPooledConnection)
             // conn.getTargetConnection();
             // Connection delegateConn = druidConnection.getConnection();
-            return (Long) MethodUtils.invokeMethod(delegate, "getId", new Object[] {});
+            Method method = null;
+            Class clazz = delegate.getClass();
+            do {
+                try {
+                    method = clazz.getDeclaredMethod("getId", new Class[] {});
+                } catch (NoSuchMethodException e) {
+                    clazz = clazz.getSuperclass();
+                }
+            } while (method == null);
+            if (!method.isAccessible()) {
+                method.setAccessible(true);
+            }
+            return (Long) method.invoke(delegate, new Object[] {});
         } catch (Exception ex) {
             throw new TddlRuntimeException("connection get thread id fail !", ex);
         }

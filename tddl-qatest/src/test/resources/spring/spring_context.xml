@@ -16,15 +16,15 @@
     <!-- andorÊý¾ÝÔ´ -->
 	<bean id="andords" class="com.taobao.tddl.matrix.jdbc.TDataSource" init-method="init">
 		<property name="appName" value="andor_mysql_qatest" />
-		<property name="ruleFile"  value="V0#classpath:client/mysql_rule.xml" />
-		<property name="topologyFile" value="src/test/resources/client/server_topology.xml" />
-		<property name="schemaFile" value="src/test/resources/client/mysql_schema.xml" />
+		<property name="ruleFile"  value="V0#classpath:matrix/mysql_rule.xml" />
+		<property name="topologyFile" value="matrix/server_topology.xml" />
+		<property name="schemaFile" value="matrix/mysql_schema.xml" />
 	</bean> 
 	<!-- 
 	<bean id="andorTDHSds" class="com.taobao.tddl.matrix.jdbc.TDataSource" init-method="init">
-		<property name="ruleFilePath"  value="V0#classpath:client/tdhs_rule.xml" />
-		<property name="machineTopologyFile" value="src/test/resources/client/server_topology.xml" />
-		<property name="schemaFile" value="src/test/resources/client/tdhs_schema.xml" />
+		<property name="ruleFilePath"  value="V0#classpath:matrix/tdhs_rule.xml" />
+		<property name="machineTopologyFile" value="matrix/server_topology.xml" />
+		<property name="schemaFile" value="matrix/tdhs_schema.xml" />
 	</bean>
 	<bean id="ibatis_tdhs_ds" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
 		<property name="configLocation" value="ibatis/sqlmap_config.xml" />

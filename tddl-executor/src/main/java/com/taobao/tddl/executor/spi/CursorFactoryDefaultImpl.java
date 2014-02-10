@@ -210,11 +210,11 @@ public class CursorFactoryDefaultImpl implements ICursorFactory {
 
     @Override
     public IMergeSortJoinCursor sortMergeJoinCursor(ExecutionContext executionContext, ISchematicCursor left_cursor,
-                                                    ISchematicCursor right_cursor, List left_columns, List right_columns)
-                                                                                                                         throws TddlException {
+                                                    ISchematicCursor right_cursor, List left_columns,
+                                                    List right_columns, IJoin join) throws TddlException {
         try {
 
-            return new SortMergeJoinCursor(left_cursor, right_cursor, left_columns, right_columns);
+            return new SortMergeJoinCursor(left_cursor, right_cursor, left_columns, right_columns, join);
         } catch (Exception e) {
             closeParentCursor(left_cursor);
             closeParentCursor(right_cursor);

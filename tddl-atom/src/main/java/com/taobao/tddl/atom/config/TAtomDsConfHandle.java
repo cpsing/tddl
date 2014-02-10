@@ -658,38 +658,36 @@ public class TAtomDsConfHandle {
                 tAtomDsConfDO.getConnectionProperties());
             localDruidDataSource.setUrl(conUlr);
             // 如果可以找到mysqlDriver中的Valid就使用，否则不设置valid
+            String validConnnectionCheckerClassName = TAtomConstants.DEFAULT_DRUID_MYSQL_VALID_CONNECTION_CHECKERCLASS;
             try {
-                Class validClass = Class.forName(TAtomConstants.DEFAULT_DRUID_MYSQL_VALID_CONNECTION_CHECKERCLASS);
-                if (null != validClass) {
-                    localDruidDataSource.setValidConnectionCheckerClassName(TAtomConstants.DEFAULT_DRUID_MYSQL_VALID_CONNECTION_CHECKERCLASS);
-                } else {
-                    logger.warn("MYSQL Driver is Not Suport "
-                                + TAtomConstants.DEFAULT_DRUID_MYSQL_VALID_CONNECTION_CHECKERCLASS);
-                }
+                Class.forName(validConnnectionCheckerClassName);
+                localDruidDataSource.setValidConnectionCheckerClassName(validConnnectionCheckerClassName);
             } catch (ClassNotFoundException e) {
-                logger.warn("MYSQL Driver is Not Suport "
-                            + TAtomConstants.DEFAULT_DRUID_MYSQL_VALID_CONNECTION_CHECKERCLASS);
+                logger.warn("MYSQL Driver is Not Suport " + validConnnectionCheckerClassName);
             } catch (NoClassDefFoundError e) {
-                logger.warn("MYSQL Driver is Not Suport "
-                            + TAtomConstants.DEFAULT_DRUID_MYSQL_VALID_CONNECTION_CHECKERCLASS);
+                logger.warn("MYSQL Driver is Not Suport " + validConnnectionCheckerClassName);
             }
 
             // 如果可以找到mysqlDriver中的integrationSorter就使用否则使用默认的
+            String integrationSorterCalssName = TAtomConstants.DRUID_MYSQL_INTEGRATION_SORTER_CLASS;
+            String defaultIntegrationSorterCalssName = TAtomConstants.DEFAULT_DRUID_MYSQL_SORTER_CLASS;
             try {
-                Class integrationSorterCalss = Class.forName(TAtomConstants.DRUID_MYSQL_INTEGRATION_SORTER_CLASS);
+                Class integrationSorterCalss = Class.forName(integrationSorterCalssName);
                 if (null != integrationSorterCalss) {
-                    localDruidDataSource.setExceptionSorterClassName(TAtomConstants.DRUID_MYSQL_INTEGRATION_SORTER_CLASS);
+                    localDruidDataSource.setExceptionSorterClassName(integrationSorterCalssName);
                 } else {
-                    localDruidDataSource.setExceptionSorterClassName(TAtomConstants.DEFAULT_DRUID_MYSQL_SORTER_CLASS);
-                    logger.warn("MYSQL Driver is Not Suport " + TAtomConstants.DRUID_MYSQL_INTEGRATION_SORTER_CLASS
-                                + " use default sorter " + TAtomConstants.DEFAULT_DRUID_MYSQL_SORTER_CLASS);
+                    localDruidDataSource.setExceptionSorterClassName(defaultIntegrationSorterCalssName);
+                    logger.warn("MYSQL Driver is Not Suport " + integrationSorterCalssName + " use default sorter "
+                                + defaultIntegrationSorterCalssName);
                 }
             } catch (ClassNotFoundException e) {
-                logger.warn("MYSQL Driver is Not Suport " + TAtomConstants.DRUID_MYSQL_INTEGRATION_SORTER_CLASS
-                            + " use default sorter " + TAtomConstants.DEFAULT_DRUID_MYSQL_SORTER_CLASS);
+                logger.warn("MYSQL Driver is Not Suport " + integrationSorterCalssName + " use default sorter "
+                            + defaultIntegrationSorterCalssName);
+                localDruidDataSource.setExceptionSorterClassName(defaultIntegrationSorterCalssName);
             } catch (NoClassDefFoundError e) {
-                logger.warn("MYSQL Driver is Not Suport " + TAtomConstants.DRUID_MYSQL_INTEGRATION_SORTER_CLASS
-                            + " use default sorter " + TAtomConstants.DEFAULT_DRUID_MYSQL_SORTER_CLASS);
+                logger.warn("MYSQL Driver is Not Suport " + integrationSorterCalssName + " use default sorter "
+                            + defaultIntegrationSorterCalssName);
+                localDruidDataSource.setExceptionSorterClassName(defaultIntegrationSorterCalssName);
             }
             localDruidDataSource.setValidationQuery(TAtomConstants.DEFAULT_DRUID_MYSQL_VALIDATION_QUERY);
         }

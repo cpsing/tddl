@@ -47,10 +47,10 @@ public class ibatisTypeTest {
         Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("pk", 1);
         // andor的mysql
-        List list = andorSqlMapClient.queryForList("select_test", map);
-        row = (NormalTblRow) list.get(0);
         List listMysql = mysqlSqlMapClient.queryForList("select_test", map);
         rowMysql = (NormalTblRow) listMysql.get(0);
+        List list = andorSqlMapClient.queryForList("select_test", map);
+        row = (NormalTblRow) list.get(0);
         rowEquals(row, rowMysql);
         // andor的tdhs
         // List listTdhs =

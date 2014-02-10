@@ -243,7 +243,6 @@ public class My_JdbcHandler implements GeneralQueryHandler {
              * http://jira.taobao.ali.com/browse/ANDOR-149
              * http://gitlab.alibaba-inc.com/andor/issues/1835
              */
-            // 这一期不做这个了
             if (!isStreaming) {
                 if (resultSet != null && !resultSet.isClosed()) {
                     resultSet.close();
@@ -273,7 +272,11 @@ public class My_JdbcHandler implements GeneralQueryHandler {
             } finally {
                 // 针对自动提交的事务,链接不会进行重用，各自关闭
                 if (connection != null && myTransaction.isAutoCommit()) {
-                    connection.close();
+                    if (!isStreaming) {
+                        connection.close();
+                    } else {
+                        My_Transaction.closeStreaming(connection);
+                    }
                 }
             }
         }

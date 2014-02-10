@@ -31,14 +31,15 @@ import com.taobao.tddl.common.utils.logger.LoggerFactory;
  */
 public class StaticSchemaManager extends AbstractLifecycle implements SchemaManager {
 
-    private final static Logger       logger          = LoggerFactory.getLogger(StaticSchemaManager.class);
-    public final static MessageFormat schemaNullError = new MessageFormat("get schema null, appName is:{0}, unitName is:{1}, filePath is: {2}, dataId is: {3}");
-    public final static MessageFormat SCHEMA_DATA_ID  = new MessageFormat("com.taobao.and_orV0.{0}_SCHEMA_DATAID");
+    private final static Logger       logger               = LoggerFactory.getLogger(StaticSchemaManager.class);
+    public final static MessageFormat schemaNullError      = new MessageFormat("get schema null, appName is:{0}, unitName is:{1}, filePath is: {2}, dataId is: {3}");
+    public final static MessageFormat TDDL5_SCHEMA_DATA_ID = new MessageFormat("com.taobao.tddl.v1_{0}_schema");
+    public final static MessageFormat ANDOR_SCHEMA_DATA_ID = new MessageFormat("com.taobao.and_orV0.{0}_SCHEMA_DATAID");
 
     private ConfigDataHandler         schemaCdh;
-    private String                    schemaFilePath  = null;
-    private String                    appName         = null;
-    private String                    unitName        = null;
+    private String                    schemaFilePath       = null;
+    private String                    appName              = null;
+    private String                    unitName             = null;
 
     public StaticSchemaManager(String schemaFilePath, String appName, String unitName){
         super();
@@ -73,7 +74,7 @@ public class StaticSchemaManager extends AbstractLifecycle implements SchemaMana
 
         // 优先从文件获取
         if (schemaFilePath == null) {
-            dataId = SCHEMA_DATA_ID.format(new Object[] { appName });
+            dataId = TDDL5_SCHEMA_DATA_ID.format(new Object[] { appName });
             factory = ConfigDataHandlerCity.getFactory(appName, unitName);
         } else {
             factory = ConfigDataHandlerCity.getFileFactory(appName);
@@ -84,6 +85,16 @@ public class StaticSchemaManager extends AbstractLifecycle implements SchemaMana
 
         String data = schemaCdh.getData(ConfigDataHandler.GET_DATA_TIMEOUT,
             ConfigDataHandler.FIRST_CACHE_THEN_SERVER_STRATEGY);
+
+        if (data == null) {
+            schemaCdh.destory();
+            // 尝试找一下andor的版本配置
+            dataId = ANDOR_SCHEMA_DATA_ID.format(new Object[] { appName });
+            schemaCdh = factory.getConfigDataHandler(dataId, new SchemaConfigDataListener(this));
+            data = schemaCdh.getData(ConfigDataHandler.GET_DATA_TIMEOUT,
+                ConfigDataHandler.FIRST_CACHE_THEN_SERVER_STRATEGY);
+
+        }
 
         if (data == null) {
             logger.warn(schemaNullError.format(new Object[] { appName, unitName, schemaFilePath, dataId }));
@@ -103,7 +114,6 @@ public class StaticSchemaManager extends AbstractLifecycle implements SchemaMana
 
             logger.warn("table fetched:");
             logger.warn(this.ss.keySet().toString());
-
         } catch (Exception e) {
             logger.error("table parser error, schema file is:\n" + data, e);
             throw new TddlRuntimeException(e);
@@ -155,6 +165,9 @@ public class StaticSchemaManager extends AbstractLifecycle implements SchemaMana
     protected void doDestory() throws TddlException {
         super.doDestory();
         ss.clear();
+        if (schemaCdh != null) {
+            schemaCdh.destory();
+        }
     }
 
     public TableMeta getTable(String tableName) {
