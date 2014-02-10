@@ -1,8 +1,5 @@
 package com.taobao.tddl.qatest;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -71,25 +68,6 @@ public class BaseTestCase extends Validator {
     public static void diamondTearDown() {
         MockServer.tearDownMockServer();
         // TAtomDataSource.cleanAllDataSource();
-    }
-
-    // 获取配置
-    static {
-        InputStream is = null;
-        try {
-            is = new FileInputStream("src/test/resources/global.properties");
-            properties.load(is);
-        } catch (Exception e) {
-            logger.error("获取配置信息异常1：", e);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    logger.error("获取配置信息异常2：", e);
-                }
-            }
-        }
     }
 
 }
