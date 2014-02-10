@@ -239,7 +239,6 @@
 					</includes>
 					<excludes>
 						<exclude>**/*NoRunTest.java</exclude>
-						<exclude>**/qatest/*.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

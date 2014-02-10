@@ -79,7 +79,7 @@
 				<version>2.5</version>
 				<configuration>
 					<includes>
-						<include>**/qatest/matrix/*Test.java</include>
+						<include>**/qatest/matrix/**/*Test.java</include>
 					</includes>
 					<excludes>
 						<exclude>**/*NoRunTest.java</exclude>
