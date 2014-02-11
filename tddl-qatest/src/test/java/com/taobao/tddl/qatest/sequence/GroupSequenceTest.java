@@ -172,7 +172,7 @@ public class GroupSequenceTest extends BaseMatrixTestCase {
         con.close();
 
         Long value = seque.nextValue();
-
+        System.out.println(value);
         GroupSequenceDao sequeDao = (GroupSequenceDao) context.getBean("sequenceDao");
         GroupSequence seque = new GroupSequence();
         seque.setName("ni");
@@ -219,7 +219,7 @@ public class GroupSequenceTest extends BaseMatrixTestCase {
             value = seque.nextValue();
         }
         value = seque.nextValue();
-
+        System.out.println(value);
         GroupSequenceDao sequeDao = (GroupSequenceDao) context.getBean("sequenceDao");
         GroupSequence seque = new GroupSequence();
         seque.setName("ni");

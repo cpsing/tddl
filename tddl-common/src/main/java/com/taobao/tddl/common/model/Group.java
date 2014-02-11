@@ -80,17 +80,17 @@ public class Group {
         this.properties = properties;
     }
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this, TddlToStringStyle.DEFAULT_STYLE);
-    }
-
     public String getAppName() {
         return appName;
     }
 
     public void setAppName(String appName) {
         this.appName = appName;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, TddlToStringStyle.DEFAULT_STYLE);
     }
 
 }

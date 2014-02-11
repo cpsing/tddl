@@ -60,10 +60,6 @@ public class TopologyHandler extends AbstractLifecycle {
         this.topologyFilePath = topologyFilePath;
     }
 
-    public Map<String, IGroupExecutor> getExecutorMap() {
-        return executorMap;
-    }
-
     @Override
     protected void doInit() {
         if (topologyFilePath != null) {
@@ -96,15 +92,6 @@ public class TopologyHandler extends AbstractLifecycle {
             throw new TddlRuntimeException(ex);
         }
 
-        for (Group group : matrix.getGroups()) {
-            group.setAppName(this.appName);
-            IRepository repo = ExecutorContext.getContext()
-                .getRepositoryHolder()
-                .getOrCreateRepository(group.getType().toString(), matrix.getProperties());
-
-            IGroupExecutor groupExecutor = repo.getGroupExecutor(group);
-            executorMap.put(group.getName(), groupExecutor);
-        }
     }
 
     protected void doDestory() throws TddlException {
@@ -116,6 +103,30 @@ public class TopologyHandler extends AbstractLifecycle {
         cdh.destory();
     }
 
+    /**
+     * 指定Group配置，创建一个GroupExecutor
+     * 
+     * @param group
+     * @return
+     */
+    public IGroupExecutor createOne(Group group) {
+        group.setAppName(this.appName);
+        IRepository repo = ExecutorContext.getContext()
+            .getRepositoryHolder()
+            .getOrCreateRepository(group.getType().toString(), matrix.getProperties());
+
+        IGroupExecutor groupExecutor = repo.getGroupExecutor(group);
+        putOne(group.getName(), groupExecutor);
+        return groupExecutor;
+    }
+
+    /**
+     * 添加指定groupKey的GroupExecutor，返回之前已有的
+     * 
+     * @param groupKey
+     * @param groupExecutor
+     * @return
+     */
     public IGroupExecutor putOne(String groupKey, IGroupExecutor groupExecutor) {
         return putOne(groupKey, groupExecutor, true);
     }
@@ -128,8 +139,24 @@ public class TopologyHandler extends AbstractLifecycle {
         return executorMap.put(groupKey, groupExecutor);
     }
 
-    public IGroupExecutor get(Object key) {
-        return executorMap.get(key);
+    public IGroupExecutor get(String key) {
+        IGroupExecutor groupExecutor = executorMap.get(key);
+        if (groupExecutor == null) {
+            Group group = matrix.getGroup(key);
+            if (group != null) {
+                synchronized (executorMap) {
+                    // double-check，避免并发创建
+                    groupExecutor = executorMap.get(key);
+                    if (groupExecutor == null) {
+                        return createOne(group);
+                    } else {
+                        return executorMap.get(key);
+                    }
+                }
+            }
+        }
+
+        return groupExecutor;
     }
 
     private String generateTopologyXML(String appName, String unitName) {
@@ -150,7 +177,11 @@ public class TopologyHandler extends AbstractLifecycle {
 
             Element matrix = doc.createElement("matrix");
             // matrix.setAttribute("name", appName);
+
             doc.appendChild(matrix); // 将根元素添加到文档上
+            Element appNameNode = doc.createElement("appName");
+            appNameNode.appendChild(doc.createTextNode(appName));
+            doc.appendChild(appNameNode);
 
             for (String str : keysArray) {
                 Element group = doc.createElement("group");

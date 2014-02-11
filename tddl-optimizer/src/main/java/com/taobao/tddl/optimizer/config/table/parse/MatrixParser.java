@@ -43,33 +43,35 @@ public class MatrixParser {
     }
 
     private static Matrix parseMatrix(Element root) {
-        NodeList groupList = root.getElementsByTagName("group");
-        List<Group> groups = Lists.newArrayList();
         Map<String, String> props = new HashMap<String, String>();
-
-        Node nameNode = root.getAttributes().getNamedItem("name");
-        for (int i = 0; i < groupList.getLength(); i++) {
-            groups.add(parseGroup(groupList.item(i)));
-        }
-
         NodeList childNodes = root.getChildNodes();
+        Matrix matrix = new Matrix();
+
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node item = childNodes.item(i);
             if ("properties".equals(item.getNodeName())) {
                 props = parseProperties(item);
+            } else if ("appName".equals(item.getNodeName())) {
+                Node nameNode = item.getFirstChild();
+                if (nameNode != null) {
+                    matrix.setName(nameNode.getNodeValue());
+                }
             }
         }
 
-        Matrix matrix = new Matrix();
-        if (nameNode != null) {
-            matrix.setName(nameNode.getNodeValue());
+        NodeList groupList = root.getElementsByTagName("group");
+        List<Group> groups = Lists.newArrayList();
+
+        for (int i = 0; i < groupList.getLength(); i++) {
+            groups.add(parseGroup(groupList.item(i), matrix.getName()));
         }
+
         matrix.setGroups(groups);
         matrix.setProperties(props);
         return matrix;
     }
 
-    private static Group parseGroup(Node node) {
+    private static Group parseGroup(Node node, String appName) {
         Node nameNode = node.getAttributes().getNamedItem("name");
         Node typeNode = node.getAttributes().getNamedItem("type");
         Map<String, String> props = new HashMap<String, String>();
@@ -93,6 +95,7 @@ public class MatrixParser {
             group.setType(getGroupType(typeNode.getNodeValue()));
         }
 
+        group.setAppName(appName);
         group.setProperties(props);
         group.setAtoms(atoms);
         return group;
@@ -105,7 +108,7 @@ public class MatrixParser {
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node item = childNodes.item(i);
             if ("properties".equals(item.getNodeName())) {
-                props = parseProperties(node);
+                props = parseProperties(item);
             }
 
         }

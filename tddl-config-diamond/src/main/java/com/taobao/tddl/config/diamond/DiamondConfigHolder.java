@@ -11,16 +11,15 @@ import com.taobao.diamond.client.impl.DiamondUnitSite;
 import com.taobao.diamond.domain.ConfigInfoEx;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.extension.Activate;
+import com.taobao.tddl.config.impl.holder.AbstractConfigDataHolder;
+
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
-import com.taobao.tddl.config.impl.holder.AbstractConfigDataHolder;
 
 @Activate(order = 1)
 public class DiamondConfigHolder extends AbstractConfigDataHolder {
 
-    private static final Logger   log         = LoggerFactory.getLogger(DiamondConfigHolder.class);
-
-    protected Map<String, String> configHouse = new HashMap<String, String>();
+    private static final Logger log = LoggerFactory.getLogger(DiamondConfigHolder.class);
 
     public void doInit() {
 
@@ -50,10 +49,6 @@ public class DiamondConfigHolder extends AbstractConfigDataHolder {
         return result;
     }
 
-    protected void addDatas(Map<String, String> confMap) {
-        configHouse.putAll(confMap);
-    }
-
     @Override
     public Map<String, String> getData(List<String> dataIds) {
         Map<String, String> result = new HashMap<String, String>();
@@ -66,10 +61,6 @@ public class DiamondConfigHolder extends AbstractConfigDataHolder {
     @Override
     public String getData(String dataId) {
         return configHouse.containsKey(dataId) ? configHouse.get(dataId) : getDataFromSonHolder(dataId);
-    }
-
-    protected String getDataFromSonHolder(String dataId) {
-        return sonConfigDataHolder == null ? null : sonConfigDataHolder.getData(dataId);
     }
 
 }

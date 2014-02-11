@@ -20,7 +20,7 @@ import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.common.utils.thread.NamedThreadFactory;
 import com.taobao.tddl.executor.MatrixExecutor;
-import com.taobao.tddl.matrix.config.ConfigHolder;
+import com.taobao.tddl.matrix.config.MatrixConfigHolder;
 import com.taobao.tddl.matrix.config.TDefaultConfig;
 
 /**
@@ -38,7 +38,7 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
     private boolean                              dynamicRule           = true;          // 是否使用动态规则
     private MatrixExecutor                       executor              = null;
     private Map<String, Object>                  connectionProperties  = new HashMap(2);
-    private ConfigHolder                         configHolder;
+    private MatrixConfigHolder                   configHolder;
     /**
      * 用于并行查询的线程池
      */
@@ -50,7 +50,7 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
         this.executor = new MatrixExecutor();
         executor.init();
 
-        ConfigHolder configHolder = new ConfigHolder();
+        MatrixConfigHolder configHolder = new MatrixConfigHolder();
         configHolder.setAppName(appName);
         configHolder.setTopologyFilePath(this.machineTopologyFile);
         configHolder.setSchemaFilePath(this.schemaFile);
@@ -204,7 +204,7 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
 
     }
 
-    public ConfigHolder getConfigHolder() {
+    public MatrixConfigHolder getConfigHolder() {
         return this.configHolder;
     }
 

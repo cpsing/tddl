@@ -126,7 +126,6 @@ public class My_Repository extends AbstractLifecycle implements IRepository {
                 @Override
                 public IGroupExecutor call() throws Exception {
                     TGroupDataSource groupDS = new TGroupDataSource(group.getName(), group.getAppName());
-                    groupDS.setGroup(group);
                     groupDS.init();
 
                     TddlGroupExecutor executor = new TddlGroupExecutor(repo);

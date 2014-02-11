@@ -8,13 +8,13 @@ import java.util.concurrent.Executors;
 
 import com.taobao.tddl.atom.common.TAtomConstants;
 import com.taobao.tddl.common.exception.TddlException;
-import com.taobao.tddl.common.model.Atom;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.config.ConfigDataHandler;
 import com.taobao.tddl.config.ConfigDataHandlerFactory;
 import com.taobao.tddl.config.ConfigDataListener;
 import com.taobao.tddl.config.impl.ConfigDataHandlerCity;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * 全局和应用的配置管理Diamond实现
@@ -32,14 +32,9 @@ public class AtomConfigManager implements DbConfManager {
     private ConfigDataHandler                 appDBHandler;
     private volatile List<ConfigDataListener> globalDbConfListener = new ArrayList<ConfigDataListener>();
     private volatile List<ConfigDataListener> appDbConfListener    = new ArrayList<ConfigDataListener>();
-    private Atom                              atom;
 
     public void init(String appName) {
-        Map<String, String> localValues = null;
-        if (this.atom != null) {
-            localValues = atom.getProperties();
-        }
-        configFactory = ConfigDataHandlerCity.getFactory(appName, unitName, localValues);
+        configFactory = ConfigDataHandlerCity.getFactory(appName, unitName);
 
         Map<String, Object> config = new HashMap<String, Object>();
         config.put("group", TAtomConstants.DEFAULT_DIAMOND_GROUP);
@@ -120,8 +115,4 @@ public class AtomConfigManager implements DbConfManager {
         }
     }
 
-    public void setAtom(Atom atom) {
-        this.atom = atom;
-
-    }
 }

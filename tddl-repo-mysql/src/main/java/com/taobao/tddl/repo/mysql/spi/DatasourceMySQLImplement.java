@@ -1,7 +1,5 @@
 package com.taobao.tddl.repo.mysql.spi;
 
-import java.util.Map;
-
 import javax.sql.DataSource;
 
 import com.taobao.tddl.common.model.Group;
@@ -13,12 +11,10 @@ import com.taobao.tddl.executor.spi.IGroupExecutor;
 public class DatasourceMySQLImplement implements IDataSourceGetter {
 
     public DataSource getDatasourceByGroupNode(TopologyHandler topology, String groupNode) {
-
-        Map<String, IGroupExecutor> executorMap = topology.getExecutorMap();
         if ("undecided".equals(groupNode)) {
             return null;
         }
-        IGroupExecutor matrixExecutor = executorMap.get(groupNode);
+        IGroupExecutor matrixExecutor = topology.get(groupNode);
 
         if (matrixExecutor == null) return null;
         /*

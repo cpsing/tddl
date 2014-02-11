@@ -1,19 +1,190 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<matrix name="test_matrix" xmlns="https://github.com/tddl/tddl/schema/matrix"
+<matrix xmlns="https://github.com/tddl/tddl/schema/matrix"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="https://github.com/tddl/tddl/schema/matrix https://raw.github.com/tddl/tddl/master/tddl-common/src/main/resources/META-INF/matrix.xsd">
-
+	
+	<properties>
+		<property name="com.taobao.tddl.v1_andor_mysql_qatest_tddlconfig" value="" />
+	</properties>
+	
 	<!-- mysql group -->
-	<group name="andor_mysql_group_0" type="MYSQL_JDBC"  >
+	<group name="andor_mysql_group_0" type="MYSQL_JDBC">
+		<properties>
+			<property name="com.taobao.tddl.jdbc.group_V2.4.1_andor_mysql_group_0">
+				<value>andor_mysql_group_0_atom0:r10w10p0</value>
+			</property>
+			<property name="com.taobao.tddl.jdbc.extra_config.group_V2.4.1_andor_mysql_group_0.andor_mysql_qatest">
+				<value>
+					{"sqlForbid":[],"sqlDsIndex":{},"tabDsIndex":{},"defaultMain":"true"}
+				</value>
+			</property>
+		</properties>
+		
+		<atom name="andor_mysql_group_0_atom0">
+			<properties>
+				<property name="com.taobao.tddl.atom.global.andor_mysql_group_0_atom0">
+					<value>
+					ip=10.232.24.104
+					port=3306
+					dbName=andor_mysql_group_0_atom0
+					dbType=mysql
+					dbStatus=RW
+					</value>
+				</property>
+				<property name="com.taobao.tddl.atom.app.andor_mysql_qatest.andor_mysql_group_0_atom0">
+					<value>
+					userName=diamond
+					minPoolSize=20
+					maxPoolSize=40
+					idleTimeout=20
+					blockingTimeout=10000
+					preparedStatementCacheSize=1000
+					connectionProperties=characterEncoding=gbk;autoReconnect=true
+					readRestrictTimes=0
+					writeRestrictTimes=0
+					timeSliceInMillis=0
+					</value>
+				</property>
+
+				<property name="com.taobao.tddl.atom.passwd.andor_mysql_group_0_atom0.mysql.diamond">
+					<value>encPasswd=diamond</value>
+				</property>
+			</properties>
+		</atom>
 	</group>
 
 	<group name="andor_mysql_group_1" type="MYSQL_JDBC" >
+		<properties>
+			<property name="com.taobao.tddl.jdbc.group_V2.4.1_andor_mysql_group_1">
+				<value>andor_mysql_group_1_atom0:r10w10p0</value>
+			</property>
+			<property name="com.taobao.tddl.jdbc.extra_config.group_V2.4.1_andor_mysql_group_1.andor_mysql_qatest">
+				<value>
+					{"sqlForbid":[],"sqlDsIndex":{},"tabDsIndex":{},"defaultMain":"true"}
+				</value>
+			</property>
+		</properties>
+		
+		<atom name="andor_mysql_group_1_atom0">
+			<properties>
+				<property name="com.taobao.tddl.atom.global.andor_mysql_group_1_atom0">
+					<value>
+					ip=10.232.24.104
+					port=3306
+					dbName=andor_mysql_group_1_atom0
+					dbType=mysql
+					dbStatus=RW
+					</value>
+				</property>
+				<property name="com.taobao.tddl.atom.app.andor_mysql_qatest.andor_mysql_group_1_atom0">
+					<value>
+					userName=diamond
+					minPoolSize=20
+					maxPoolSize=40
+					idleTimeout=20
+					blockingTimeout=10000
+					preparedStatementCacheSize=1000
+					connectionProperties=characterEncoding=gbk;autoReconnect=true
+					readRestrictTimes=0
+					writeRestrictTimes=0
+					timeSliceInMillis=0
+					</value>
+				</property>
+				<property name="com.taobao.tddl.atom.passwd.andor_mysql_group_1_atom0.mysql.diamond">
+					<value>encPasswd=diamond</value>
+				</property>
+			</properties>
+		</atom>
 	</group>
 
 	<group name="andor_mysql_group_2" type="MYSQL_JDBC">
+		<properties>
+			<property name="com.taobao.tddl.jdbc.group_V2.4.1_andor_mysql_group_2">
+				<value>andor_mysql_group_2_atom0:r10w10p0</value>
+			</property>
+			<property name="com.taobao.tddl.jdbc.extra_config.group_V2.4.1_andor_mysql_group_2.andor_mysql_qatest">
+				<value>
+					{"sqlForbid":[],"sqlDsIndex":{},"tabDsIndex":{},"defaultMain":"true"}
+				</value>
+			</property>
+		</properties>
+		
+		<atom name="andor_mysql_group_2_atom0">
+			<properties>
+				<property name="com.taobao.tddl.atom.global.andor_mysql_group_2_atom0">
+					<value>
+					ip=10.232.24.104
+					port=3306
+					dbName=andor_mysql_group_2_atom0
+					dbType=mysql
+					dbStatus=RW
+					</value>
+				</property>
+				<property name="com.taobao.tddl.atom.app.andor_mysql_qatest.andor_mysql_group_2_atom0">
+					<value>
+					userName=diamond
+					minPoolSize=20
+					maxPoolSize=40
+					idleTimeout=20
+					blockingTimeout=10000
+					preparedStatementCacheSize=1000
+					connectionProperties=characterEncoding=gbk;autoReconnect=true
+					readRestrictTimes=0
+					writeRestrictTimes=0
+					timeSliceInMillis=0
+					</value>
+				</property>
+
+				<property name="com.taobao.tddl.atom.passwd.andor_mysql_group_2_atom0.mysql.diamond">
+					<value>encPasswd=diamond</value>
+				</property>
+			</properties>
+		</atom>
 	</group>
 	
 	<group name="andor_mysql_group_oneAtom" type="MYSQL_JDBC">
+		<properties>
+			<property name="com.taobao.tddl.jdbc.group_V2.4.1_andor_mysql_group_oneAtom">
+				<value>andor_mysql_group_atom:r10w10p0</value>
+			</property>
+			<property name="com.taobao.tddl.jdbc.extra_config.group_V2.4.1_andor_mysql_group_oneAtom.andor_mysql_qatest">
+				<value>
+					{"sqlForbid":[],"sqlDsIndex":{},"tabDsIndex":{},"defaultMain":"true"}
+				</value>
+			</property>
+		</properties>
+		
+		<atom name="andor_mysql_group_atom">
+			<properties>
+				<property name="com.taobao.tddl.atom.global.andor_mysql_group_atom">
+					<value>
+					ip=10.232.24.104
+					port=3306
+					dbName=andor_mysql_group_atom
+					dbType=mysql
+					dbStatus=RW
+					</value>
+				</property>
+				<property name="com.taobao.tddl.atom.app.andor_mysql_qatest.andor_mysql_group_atom">
+					<value>
+					userName=diamond
+					minPoolSize=20
+					maxPoolSize=40
+					idleTimeout=20
+					blockingTimeout=10000
+					preparedStatementCacheSize=1000
+					connectionProperties=characterEncoding=gbk;autoReconnect=true
+					readRestrictTimes=0
+					writeRestrictTimes=0
+					timeSliceInMillis=0
+					</value>
+				</property>
+
+				<property name="com.taobao.tddl.atom.passwd.andor_mysql_group_atom.mysql.diamond">
+					<value>encPasswd=diamond</value>
+				</property>
+			</properties>
+		</atom>
 	</group>
 
 	<!-- hbase group 

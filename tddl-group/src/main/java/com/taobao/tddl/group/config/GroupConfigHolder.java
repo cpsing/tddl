@@ -2,13 +2,13 @@ package com.taobao.tddl.group.config;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.taobao.tddl.config.ConfigServerHelper;
+import com.taobao.tddl.common.model.Atom;
+import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.config.impl.holder.AbstractConfigDataHolder;
 import com.taobao.tddl.group.jdbc.TGroupDataSource;
 
@@ -18,44 +18,51 @@ import com.taobao.tddl.group.jdbc.TGroupDataSource;
  */
 public class GroupConfigHolder extends AbstractConfigDataHolder {
 
+    private static final String ATOM_CONFIG_HOLDER_NAME = "com.taobao.tddl.atom.config.AtomConfigHolder";
     private final String        appName;
-
-    private final List<String>  groups;
-
+    private final List<Group>   groups;
     private final String        unitName;
 
-    private static final String ATOM_CONFIG_HOLDER_NAME = "com.taobao.tddl.atom.config.AtomConfigHolder";
-
-    public GroupConfigHolder(String appName, List<String> groups, String unitName){
+    public GroupConfigHolder(String appName, List<Group> groups, String unitName){
         this.appName = appName;
         this.groups = groups;
         this.unitName = unitName;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected void initSonHolder(List<String> atomKeys) throws Exception {
+    protected void initSonHolder(List<Atom> atomKeys) throws Exception {
         Class sonHolderClass = Class.forName(ATOM_CONFIG_HOLDER_NAME);
         Constructor constructor = sonHolderClass.getConstructor(String.class, List.class, String.class);
         sonConfigDataHolder = (AbstractConfigDataHolder) constructor.newInstance(this.appName, atomKeys, this.unitName);
         sonConfigDataHolder.init();
+        delegateDataHolder.setSonConfigDataHolder(sonConfigDataHolder);// 传递给deletegate，由它进行son传递
     }
 
     public void init() {
         loadDelegateExtension();
 
+        // 添加到当前holder配置，拦截对diamond的请求
+        for (Group group : groups) {
+            addDatas(group.getProperties());
+        }
+
         List<String> fullGroupKeys = getFullDbGroupKeys(groups);
         Map<String, String> queryResults = queryAndHold(fullGroupKeys, unitName);
         initExtraConfigs();
 
-        List<String> atomKeys = new ArrayList<String>();
-        for (Map.Entry<String, String> entry : queryResults.entrySet()) {
-            if (StringUtils.isEmpty(entry.getValue())) {
+        queryResults.putAll(configHouse);
+        List<Atom> atomKeys = new ArrayList<Atom>();
+        for (Group group : groups) {
+            String groupKey = group.getName();
+            String atomConfig = queryResults.get(getFullDbGroupKey(groupKey));
+            if (StringUtils.isEmpty(atomConfig)) {
                 throw new IllegalArgumentException("Group Config Is Null, AppName >> " + appName + " ## UnitName >> "
-                                                   + unitName + " ## GroupKey >> " + entry.getKey());
+                                                   + unitName + " ## GroupKey >> " + groupKey);
             }
-            String[] dsWeightArray = entry.getValue().split(",");
+
+            String[] dsWeightArray = atomConfig.split(",");
             for (String inValue : dsWeightArray) {
-                atomKeys.add(inValue.split(":")[0]);
+                String atomKey = inValue.split(":")[0];
+                atomKeys.add(getOrCreateAtom(atomKey));
             }
         }
 
@@ -68,14 +75,18 @@ public class GroupConfigHolder extends AbstractConfigDataHolder {
 
     private void initExtraConfigs() {
         List<String> extraConfKeys = getExtraConfKeys(groups);
-        extraConfKeys.add(ConfigServerHelper.getTddlConfigDataId(appName));
+        // extraConfKeys.add(ConfigServerHelper.getTddlConfigDataId(appName));
         queryAndHold(extraConfKeys, unitName);
     }
 
-    private List<String> getExtraConfKeys(List<String> groupKeys) {
+    private List<String> getExtraConfKeys(List<Group> groupKeys) {
         List<String> result = new ArrayList<String>();
-        for (String key : groupKeys) {
-            result.add(getExtraConfKey(key));
+        for (Group group : groupKeys) {
+            String groupExtraConfKey = getExtraConfKey(group.getName());
+            if (!configHouse.containsKey(groupExtraConfKey)) {
+                // 没有的配置才向远程取
+                result.add(groupExtraConfKey);
+            }
         }
         return result;
     }
@@ -84,10 +95,14 @@ public class GroupConfigHolder extends AbstractConfigDataHolder {
         return TGroupDataSource.EXTRA_PREFIX + groupKey + "." + appName;
     }
 
-    private List<String> getFullDbGroupKeys(List<String> groupKeys) {
+    private List<String> getFullDbGroupKeys(List<Group> groupKeys) {
         List<String> result = new ArrayList<String>();
-        for (String key : groupKeys) {
-            result.add(getFullDbGroupKey(key));
+        for (Group group : groupKeys) {
+            String groupKey = getFullDbGroupKey(group.getName());
+            if (!configHouse.containsKey(groupKey)) {
+                // 没有的配置才向远程取
+                result.add(groupKey);
+            }
         }
         return result;
     }
@@ -96,10 +111,17 @@ public class GroupConfigHolder extends AbstractConfigDataHolder {
         return TGroupDataSource.PREFIX + groupKey;
     }
 
-    public static void main(String[] args) {
-        GroupConfigHolder holder = new GroupConfigHolder("JIECHEN_YUGONG_APP", Arrays.asList("YUGONG_TEST_APP_GROUP_1",
-            "YUGONG_TEST_APP_GROUP_2"), null);
-        holder.init();
-        System.out.println("OUT");
+    private Atom getOrCreateAtom(String name) {
+        for (Group group : groups) {
+            Atom atom = group.getAtom(name);
+            if (atom != null) {
+                return atom;
+            }
+        }
+
+        Atom atom = new Atom();
+        atom.setName(name);
+        return atom;
     }
+
 }

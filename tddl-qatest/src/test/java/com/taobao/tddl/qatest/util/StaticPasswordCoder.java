@@ -35,11 +35,11 @@ public class StaticPasswordCoder implements TPasswordCoder {
     public String decode(String encKey, String secret) throws NoSuchPaddingException, NoSuchAlgorithmException,
                                                       InvalidKeyException, BadPaddingException,
                                                       IllegalBlockSizeException {
-        if (secret.equals("4485f91c9426e4d8")) {
+        if (secret.equals("4485f91c9426e4d8") || secret.equals("tddl")) {
             return "tddl";
-        } else if (secret.equals("-6e3251280f47bc7d")) {
+        } else if (secret.equals("-6e3251280f47bc7d") || secret.equals("diamond")) {
             return "diamond";
-        } else if (secret.equals("364e198e1cfa74ef")) {
+        } else if (secret.equals("364e198e1cfa74ef") || secret.equals("andor")) {
             return "andor";
         } else {
             return "tddl";

@@ -12,7 +12,6 @@ import javax.sql.DataSource;
 import com.taobao.tddl.common.TddlConstants;
 import com.taobao.tddl.common.model.DBType;
 import com.taobao.tddl.common.model.DataSourceType;
-import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.common.utils.mbean.TddlMBeanServer;
 import com.taobao.tddl.group.config.GroupConfigManager;
 import com.taobao.tddl.group.dbselector.DBSelector;
@@ -53,7 +52,6 @@ public class TGroupDataSource implements DataSource {
     private String                                dsKeyAndWeightCommaArray;
     private DataSourceFetcher                     dataSourceFetcher;
     private DBType                                dbType                    = DBType.MYSQL;
-    private Group                                 group                     = new Group();                           // matrix上层可mock的配置
     private String                                appName;                                                           // app名字
     private String                                unitName;                                                          // 单元化名字
     private String                                dbGroupKey;
@@ -157,9 +155,6 @@ public class TGroupDataSource implements DataSource {
             throw new TGroupDataSourceException("dbGroupKey的长度要大于0，前导空白和尾部空白不算在内");
         }
 
-        if (appName == null) {
-            if (group != null) appName = group.getAppName();
-        }
         if (appName == null) {
             throw new TGroupDataSourceException("appName不能为null");
         }
@@ -401,11 +396,4 @@ public class TGroupDataSource implements DataSource {
         }
     }
 
-    public void setGroup(Group group) {
-        this.group = group;
-    }
-
-    public Group getGroup() {
-        return this.group;
-    }
 }

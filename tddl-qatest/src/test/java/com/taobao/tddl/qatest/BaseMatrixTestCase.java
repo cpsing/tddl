@@ -83,13 +83,14 @@ public class BaseMatrixTestCase extends PrepareData {
 
     public static void JDBCClient(String dbTypeStack, boolean async) throws Exception {
         us = new TDataSource();
-        if ("tddl".equalsIgnoreCase(dbTypeStack) || "mysql".equalsIgnoreCase(dbTypeStack)) {
-            us.setAppName("andor_mysql_qatest");
-        } else if ("tdhs".equalsIgnoreCase(dbTypeStack)) {
-            us.setAppName("andor_tdhs_qatest");
-        } else if ("hbase".equalsIgnoreCase(dbTypeStack)) {
-            us.setAppName("andor_hbase_qatest");
-        }
+        // if ("tddl".equalsIgnoreCase(dbTypeStack) ||
+        // "mysql".equalsIgnoreCase(dbTypeStack)) {
+        us.setAppName("andor_mysql_qatest");
+        // } else if ("tdhs".equalsIgnoreCase(dbTypeStack)) {
+        // us.setAppName("andor_tdhs_qatest");
+        // } else if ("hbase".equalsIgnoreCase(dbTypeStack)) {
+        // us.setAppName("andor_hbase_qatest");
+        // }
 
         us.setRuleFile(ruleFile + dbTypeStack + "_" + rule);
 

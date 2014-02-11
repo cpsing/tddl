@@ -1,7 +1,6 @@
 package com.taobao.tddl.atom.config;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,42 +9,54 @@ import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
 
 import com.taobao.tddl.atom.common.TAtomConstants;
+import com.taobao.tddl.common.model.Atom;
+import com.taobao.tddl.common.utils.extension.Activate;
 import com.taobao.tddl.config.impl.holder.AbstractConfigDataHolder;
 
+@Activate(name = "ATOM_CONFIG_HOLDER", order = 1)
 public class AtomConfigHolder extends AbstractConfigDataHolder {
 
-    private final String       appName;
+    private final String     appName;
 
-    private final List<String> atomKeys;
+    private final List<Atom> atoms;
 
-    private final String       unitName;
+    private final String     unitName;
 
-    public AtomConfigHolder(String appName, List<String> atomKeys, String unitName){
+    public AtomConfigHolder(String appName, List<Atom> atoms, String unitName){
         this.appName = appName;
-        this.atomKeys = atomKeys;
+        this.atoms = atoms;
         this.unitName = unitName;
     }
 
     public void init() {
-        this.loadDelegateExtension();
-        Map<String, String> fullGlobalKeys = getFullGlobalKeyMap(atomKeys);
-        Map<String, String> globalResults = queryAndHold(values2List(fullGlobalKeys), unitName);
+        loadDelegateExtension();
 
-        Map<String, String> fullAppKeys = getFullAppKeyMap(atomKeys);
+        // 添加到当前holder配置，拦截对diamond的请求
+        for (Atom atom : atoms) {
+            addDatas(atom.getProperties());
+        }
+
+        Map<String, String> fullGlobalKeys = getFullGlobalKeyMap(atoms);
+        Map<String, String> globalResults = queryAndHold(values2List(fullGlobalKeys), unitName);
+        globalResults.putAll(configHouse);
+
+        Map<String, String> fullAppKeys = getFullAppKeyMap(atoms);
         Map<String, String> appKeyResults = queryAndHold(values2List(fullAppKeys), unitName);
+        appKeyResults.putAll(configHouse);
 
         List<String> passWdKeys = new ArrayList<String>();
-        for (String atomKey : atomKeys) {
-            String globalValue = globalResults.get(fullGlobalKeys.get(atomKey));
+        for (Atom atom : atoms) {
+            String atomKey = atom.getName();
+            String globalValue = globalResults.get(TAtomConstants.getGlobalDataId(atomKey));
             if (StringUtils.isEmpty(globalValue)) {
                 throw new IllegalArgumentException("Global Config Is Null, AppName >> " + appName + " ## UnitName >> "
                                                    + unitName + " ## AtomKey >> " + atomKey);
             }
-            Properties globalProperties = TAtomConfParser.parserConfStr2Properties(globalResults.get(fullGlobalKeys.get(atomKey)));
+            Properties globalProperties = TAtomConfParser.parserConfStr2Properties(globalValue);
             String dbName = globalProperties.getProperty(TAtomConfParser.GLOBA_DB_NAME_KEY);
             String dbType = globalProperties.getProperty(TAtomConfParser.GLOBA_DB_TYPE_KEY);
 
-            String appValue = appKeyResults.get(fullAppKeys.get(atomKey));
+            String appValue = appKeyResults.get(TAtomConstants.getAppDataId(appName, atomKey));
             if (StringUtils.isEmpty(appValue)) {
                 throw new IllegalArgumentException("App Config Is Null, AppName >> " + appName + " ## UnitName >> "
                                                    + unitName + " ## AtomKey >> " + atomKey);
@@ -53,7 +64,10 @@ public class AtomConfigHolder extends AbstractConfigDataHolder {
             Properties dbKeyProperties = TAtomConfParser.parserConfStr2Properties(appValue);
             String userName = dbKeyProperties.getProperty(TAtomConfParser.APP_USER_NAME_KEY);
 
-            passWdKeys.add(getPassWdKey(dbName, dbType, userName));
+            String passwdKeyDataId = getPassWdKey(dbName, dbType, userName);
+            if (!configHouse.containsKey(passwdKeyDataId)) {
+                passWdKeys.add(getPassWdKey(dbName, dbType, userName));
+            }
         }
         queryAndHold(passWdKeys, unitName);
     }
@@ -65,18 +79,24 @@ public class AtomConfigHolder extends AbstractConfigDataHolder {
         return result;
     }
 
-    private Map<String, String> getFullGlobalKeyMap(List<String> atomKeys) {
+    private Map<String, String> getFullGlobalKeyMap(List<Atom> atoms) {
         Map<String, String> result = new HashMap<String, String>();
-        for (String atomKey : atomKeys) {
-            result.put(atomKey, TAtomConstants.getGlobalDataId(atomKey));
+        for (Atom atom : atoms) {
+            String globalDataId = TAtomConstants.getGlobalDataId(atom.getName());
+            if (!configHouse.containsKey(globalDataId)) {
+                result.put(atom.getName(), globalDataId);
+            }
         }
         return result;
     }
 
-    private Map<String, String> getFullAppKeyMap(List<String> atomKeys) {
+    private Map<String, String> getFullAppKeyMap(List<Atom> atoms) {
         Map<String, String> result = new HashMap<String, String>();
-        for (String atomKey : atomKeys) {
-            result.put(atomKey, TAtomConstants.getAppDataId(appName, atomKey));
+        for (Atom atom : atoms) {
+            String appDataId = TAtomConstants.getAppDataId(appName, atom.getName());
+            if (!configHouse.containsKey(appDataId)) {
+                result.put(atom.getName(), appDataId);
+            }
         }
         return result;
     }
@@ -85,10 +105,4 @@ public class AtomConfigHolder extends AbstractConfigDataHolder {
         return TAtomConstants.getPasswdDataId(dbName, dbType, userName);
     }
 
-    public static void main(String[] args) {
-        AtomConfigHolder holder = new AtomConfigHolder("JIECHEN_YUGONG_APP", Arrays.asList("yugong_test_1",
-            "yugong_test_2"), null);
-        holder.init();
-        System.out.println("OUT");
-    }
 }

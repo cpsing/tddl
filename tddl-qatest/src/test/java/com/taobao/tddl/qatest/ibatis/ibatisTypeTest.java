@@ -30,7 +30,6 @@ public class ibatisTypeTest {
     protected static SqlMapClient mysqlSqlMapClient          = null;
     protected static final String MATRIX_IBATIS_CONTEXT_PATH = "classpath:spring/spring_context.xml";
     private NormalTblRow          row                        = null;
-    private NormalTblRow          rowTdhs                    = null;
     private NormalTblRow          rowMysql                   = null;
 
     @BeforeClass

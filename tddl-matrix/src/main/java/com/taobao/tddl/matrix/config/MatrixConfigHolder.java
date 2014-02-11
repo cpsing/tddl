@@ -1,12 +1,17 @@
 package com.taobao.tddl.matrix.config;
 
+import java.lang.reflect.Constructor;
+import java.util.List;
 import java.util.Map;
 
 import com.taobao.tddl.common.TddlConstants;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.ExtraCmd;
-import com.taobao.tddl.common.model.lifecycle.AbstractLifecycle;
+import com.taobao.tddl.common.model.Group;
+import com.taobao.tddl.common.model.Matrix;
 import com.taobao.tddl.common.utils.GeneralUtil;
+import com.taobao.tddl.config.impl.holder.AbstractConfigDataHolder;
+import com.taobao.tddl.config.impl.holder.ConfigHolderFactory;
 import com.taobao.tddl.executor.TopologyExecutor;
 import com.taobao.tddl.executor.common.ExecutorContext;
 import com.taobao.tddl.executor.common.TopologyHandler;
@@ -23,17 +28,14 @@ import com.taobao.tddl.optimizer.rule.RuleIndexManager;
 import com.taobao.tddl.optimizer.rule.RuleSchemaManager;
 import com.taobao.tddl.rule.TddlRule;
 
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
-
 /**
  * 依赖的组件
  * 
  * @since 5.0.0
  */
-public class ConfigHolder extends AbstractLifecycle {
+public class MatrixConfigHolder extends AbstractConfigDataHolder {
 
-    final static Logger         logger = LoggerFactory.getLogger(ConfigHolder.class);
+    private static final String GROUP_CONFIG_HOLDER_NAME = "com.taobao.tddl.group.config.GroupConfigHolder";
     private String              appName;
     private String              ruleFilePath;
     private boolean             dynamicRule;
@@ -49,10 +51,14 @@ public class ConfigHolder extends AbstractLifecycle {
     private OptimizerContext    optimizerContext;
     private ExecutorContext     executorContext;
     private StatManager         statManager;
+    private Matrix              matrix;
     private Map<String, Object> connectionProperties;
+    private boolean             createGroupExecutor      = true;
 
     @Override
     public void doInit() throws TddlException {
+        loadDelegateExtension();
+
         ExecutorContext executorContext = new ExecutorContext();
         this.executorContext = executorContext;
         ExecutorContext.setContext(executorContext);
@@ -75,6 +81,16 @@ public class ConfigHolder extends AbstractLifecycle {
         oc.setRule(optimizerRule);
         oc.setOptimizer(this.optimizer);
         oc.setStatManager(this.statManager);
+
+        matrix = topologyHandler.getMatrix();
+        // 添加matrix参数
+        addDatas(matrix.getProperties());
+        initSonHolder();
+        // 将自己做为config holder
+        ConfigHolderFactory.addConfigDataHolder(appName, this);
+        if (createGroupExecutor) {
+            initGroups();
+        }
     }
 
     @Override
@@ -106,7 +122,6 @@ public class ConfigHolder extends AbstractLifecycle {
     }
 
     public void schemaInit() throws TddlException {
-
         RuleSchemaManager ruleSchemaManager = new RuleSchemaManager(optimizerRule,
             topologyHandler.getMatrix(),
             GeneralUtil.getExtraCmdLong(this.connectionProperties,
@@ -138,6 +153,33 @@ public class ConfigHolder extends AbstractLifecycle {
         statManager.init();
 
         this.statManager = statManager;
+    }
+
+    protected void initSonHolder() throws TddlException {
+        Class sonHolderClass = null;
+        try {
+            sonHolderClass = Class.forName(GROUP_CONFIG_HOLDER_NAME);
+        } catch (ClassNotFoundException e1) {
+            // ignore , 可能不需要使用group层
+            return;
+        }
+
+        try {
+            Constructor constructor = sonHolderClass.getConstructor(String.class, List.class, String.class);
+            sonConfigDataHolder = (AbstractConfigDataHolder) constructor.newInstance(this.appName,
+                matrix.getGroups(),
+                this.unitName);
+            sonConfigDataHolder.init();
+            delegateDataHolder.setSonConfigDataHolder(sonConfigDataHolder);// 传递给deletegate，由它进行son传递
+        } catch (Exception e) {
+            throw new TddlException(e);
+        }
+    }
+
+    protected void initGroups() throws TddlException {
+        for (Group group : matrix.getGroups()) {
+            topologyHandler.createOne(group);
+        }
     }
 
     public String getAppName() {

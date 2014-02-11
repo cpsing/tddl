@@ -21,7 +21,6 @@ public class PreheatDataHandler extends UnitConfigDataHandler {
 
     private static final Logger   logger = LoggerFactory.getLogger(PreheatDataHandler.class);
     private UnitConfigDataHandler delagate;
-    private String                dataId;
 
     @Override
     public void doInit() throws TddlException {

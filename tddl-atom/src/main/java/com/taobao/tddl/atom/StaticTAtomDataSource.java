@@ -9,7 +9,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.taobao.tddl.atom.config.TAtomDsConfDO;
 import com.taobao.tddl.atom.config.TAtomDsConfHandle;
 import com.taobao.tddl.atom.exception.AtomAlreadyInitException;
-import com.taobao.tddl.common.model.Atom;
+
 import com.taobao.tddl.common.utils.logger.Logger;
 import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
@@ -32,7 +32,6 @@ public class StaticTAtomDataSource extends AbstractTAtomDataSource {
     private DruidDataSource  druidDataSource;
 
     private volatile boolean init;
-    private Atom             atom;
 
     @Override
     public void init(String appName, String dsKey, String unitName) throws Exception {
@@ -204,16 +203,5 @@ public class StaticTAtomDataSource extends AbstractTAtomDataSource {
     @Override
     public TAtomDbTypeEnum getDbType() {
         return confDO.getDbTypeEnum();
-    }
-
-    @Override
-    public void setAtom(Atom atom) {
-        this.atom = atom;
-
-    }
-
-    @Override
-    public Atom getAtom() {
-        return this.atom;
     }
 }

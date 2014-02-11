@@ -23,10 +23,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.tddl.atom.TAtomDataSource;
 import com.taobao.tddl.atom.TAtomDbStatusEnum;
 import com.taobao.tddl.atom.TAtomDsStandard;
-import com.taobao.tddl.common.model.Atom;
 import com.taobao.tddl.common.model.DBType;
 import com.taobao.tddl.common.model.DataSourceType;
-import com.taobao.tddl.common.model.Group;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.common.utils.thread.NamedThreadFactory;
 import com.taobao.tddl.config.ConfigDataHandler;
@@ -90,6 +88,8 @@ public class GroupConfigManager {
         this.tGroupDataSource = tGroupDataSource;
         this.configReceiver = new ConfigReceiver();
         this.extraGroupConfigReceiver = new ExtraGroupConfigReceiver();
+
+        ((ConfigReceiver) this.configReceiver).setConfigManager(this);
     }
 
     /**
@@ -103,43 +103,27 @@ public class GroupConfigManager {
         // 因为有可能在第一次刚取回信息后，Diamond配置中心那边马上修改了记录，导致ManagerListener这个线程立刻收到信息，
         // 造成初始化线程和ManagerListener线程同时解析信息。
 
-        // 初始化配置工程，批量获取配置。
-        // 单纯group ds批量效果不大，且同一个appName
-        // initConfigHoderFactory();
+        // 目前针对parse方法会做同步处理，避免并发操作. 同时针对diamond相同配置的进行cache，避免重复相同内容的通知
 
-        Group group = this.tGroupDataSource.getGroup();
-        Map<String, String> localValues = null;
-        if (group != null) {
-            localValues = group.getProperties();
-        }
-
-        configFactory = ConfigDataHandlerCity.getFactory(tGroupDataSource.getAppName(),
-            tGroupDataSource.getUnitName(),
-            localValues);
-        globalHandler = configFactory.getConfigDataHandler(tGroupDataSource.getFullDbGroupKey(), null);
+        configFactory = ConfigDataHandlerCity.getFactory(tGroupDataSource.getAppName(), tGroupDataSource.getUnitName());
+        globalHandler = configFactory.getConfigDataHandler(tGroupDataSource.getFullDbGroupKey(), configReceiver);
 
         String dsWeightCommaStr = globalHandler.getData(tGroupDataSource.getConfigReceiveTimeout(),
             ConfigDataHandler.FIRST_CACHE_THEN_SERVER_STRATEGY);
 
         // extra config
-        extraFactory = ConfigDataHandlerCity.getFactory(tGroupDataSource.getAppName(),
-            tGroupDataSource.getUnitName(),
-            localValues);
+        extraFactory = ConfigDataHandlerCity.getFactory(tGroupDataSource.getAppName(), tGroupDataSource.getUnitName());
 
-        extraHandler = extraFactory.getConfigDataHandler(tGroupDataSource.getDbGroupExtraConfigKey(), null);
+        extraHandler = extraFactory.getConfigDataHandler(tGroupDataSource.getDbGroupExtraConfigKey(),
+            extraGroupConfigReceiver);
         String extraConfig = extraHandler.getNullableData(tGroupDataSource.getConfigReceiveTimeout(),
             ConfigDataHandler.FIRST_CACHE_THEN_SERVER_STRATEGY);
 
         if (extraConfig != null) {
             parseExtraConfig(extraConfig);
-            extraHandler.addListener(extraGroupConfigReceiver, null);
         }
 
-        List<DataSourceWrapper> dswList = parse2DataSourceWrapperList(dsWeightCommaStr);
-        resetByDataSourceWrapper(dswList);
-        ((ConfigReceiver) this.configReceiver).setConfigManager(this);
-        globalHandler.addListener(configReceiver, null);
-
+        parse(dsWeightCommaStr);
         // 已经使用过的配置移除
         // destoryConfigHoderFactory();
     }
@@ -159,19 +143,7 @@ public class GroupConfigManager {
     private TAtomDsStandard initAtomDataSource(String appName, String dsKey, String unitName) {
         try {
             if (tGroupDataSource.getDataSourceType().equals(DataSourceType.DruidDataSource)) {
-                Atom atom = null;
-                if (this.tGroupDataSource.getGroup() != null) {
-                    atom = this.tGroupDataSource.getGroup().getAtom(dsKey);
-                }
-
-                if (atom == null) {
-                    atom = new Atom();
-                    atom.setName(dsKey);
-                    this.tGroupDataSource.getGroup().getAtoms().add(atom);
-                }
-
                 TAtomDsStandard atomDataSource = new TAtomDataSource();
-                atomDataSource.setAtom(atom);
                 atomDataSource.init(appName, dsKey, unitName);
                 atomDataSource.setLogWriter(tGroupDataSource.getLogWriter());
                 atomDataSource.setLoginTimeout(tGroupDataSource.getLoginTimeout());
@@ -215,7 +187,7 @@ public class GroupConfigManager {
     };
 
     // configInfo样例: db1:rw, db2:r, db3:r
-    private void parse(String dsWeightCommaStr) {
+    private synchronized void parse(String dsWeightCommaStr) {
         List<DataSourceWrapper> dswList = parse2DataSourceWrapperList(dsWeightCommaStr);
         resetByDataSourceWrapper(dswList);
     }
@@ -229,7 +201,7 @@ public class GroupConfigManager {
      * @throws JSONException
      **/
     @SuppressWarnings("rawtypes")
-    private void parseExtraConfig(String extraConfig) {
+    private synchronized void parseExtraConfig(String extraConfig) {
         if (extraConfig == null) {
             this.groupExtraConfig.getSqlForbidSet().clear();
             this.groupExtraConfig.getSqlDsIndexMap().clear();
@@ -340,6 +312,7 @@ public class GroupConfigManager {
         }
         Map<String, DataSourceWrapper> old = this.dataSourceWrapperMap;
         this.dataSourceWrapperMap = newDataSourceWrapperMap;
+        // TODO 需要考虑关闭老的DataSource对象
         old.clear();
         old = null;
 

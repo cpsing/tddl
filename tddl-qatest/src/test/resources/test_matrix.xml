@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<matrix name="test_matrix" xmlns="https://github.com/tddl/tddl/schema/matrix"
+<matrix xmlns="https://github.com/tddl/tddl/schema/matrix"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="https://github.com/tddl/tddl/schema/matrix https://raw.github.com/tddl/tddl/master/tddl-common/src/main/resources/META-INF/matrix.xsd">
-
+	
+	<appName>andor_show</appName>
 	<group name="andor_show_group0" type="MYSQL_JDBC">
 		<properties>
 			<property name="com.taobao.tddl.jdbc.group_V2.4.1_andor_show_group0">

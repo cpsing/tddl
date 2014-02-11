@@ -2,6 +2,8 @@
 <matrix name="test_matrix" xmlns="https://github.com/tddl/tddl/schema/matrix" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="https://github.com/tddl/tddl/schema/matrix https://raw.github.com/tddl/tddl/master/tddl-common/src/main/resources/META-INF/matrix.xsd">
     
+    <appName>test_matrix</appName>
+    
 	<group name="andor_group_0" type="MYSQL_JDBC">
 	</group>
 

@@ -62,7 +62,7 @@ public class TResultSet implements ResultSet {
 
     private final Map             columnToIndexCache         = new HashMap();
 
-    private final boolean         useColumnNamesInFindColumn = false;
+    private boolean               useColumnNamesInFindColumn = false;
 
     public TResultSet(ResultCursor resultCursor){
         this.resultCursor = resultCursor;

@@ -19,7 +19,6 @@ import com.taobao.tddl.atom.exception.AtomIllegalException;
 import com.taobao.tddl.atom.exception.AtomInitialException;
 import com.taobao.tddl.atom.jdbc.TDataSourceWrapper;
 import com.taobao.tddl.atom.utils.ConnRestrictEntry;
-import com.taobao.tddl.common.model.Atom;
 import com.taobao.tddl.common.utils.TStringUtil;
 import com.taobao.tddl.config.ConfigDataListener;
 import com.taobao.tddl.monitor.Monitor;
@@ -82,8 +81,6 @@ public class TAtomDsConfHandle {
      */
     private final ReentrantLock                 lock        = new ReentrantLock();
 
-    private Atom                                atom;
-
     // public static final int druidStatMaxKeySize = 5000;
     // public static final int druidFlushIntervalMill = 300*1000;
 
@@ -107,8 +104,6 @@ public class TAtomDsConfHandle {
         defaultDbConfManager.setGlobalConfigDataId(TAtomConstants.getGlobalDataId(this.dbKey));
         defaultDbConfManager.setAppConfigDataId(TAtomConstants.getAppDataId(this.appName, this.dbKey));
         defaultDbConfManager.setUnitName(unitName);
-
-        defaultDbConfManager.setAtom(this.getAtom());
         // 初始化dbConfManager
         defaultDbConfManager.init(appName);
         dbConfManager = defaultDbConfManager;
@@ -149,7 +144,6 @@ public class TAtomDsConfHandle {
                     runTimeConf.getDbType(),
                     runTimeConf.getUserName()));
                 diamondDbPasswdManager.setUnitName(unitName);
-                diamondDbPasswdManager.setAtom(this.getAtom());
                 diamondDbPasswdManager.init(appName);
                 dbPasswdManager = diamondDbPasswdManager;
                 // 获取密码
@@ -186,14 +180,6 @@ public class TAtomDsConfHandle {
         } finally {
             lock.unlock();
         }
-    }
-
-    public Atom getAtom() {
-        return this.atom;
-    }
-
-    public void setAtom(Atom atom) {
-        this.atom = atom;
     }
 
     private void clearDataSourceWrapper() {

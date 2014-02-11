@@ -9,7 +9,7 @@ import com.taobao.tddl.executor.MatrixExecutor;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.rowset.IRowSet;
-import com.taobao.tddl.matrix.config.ConfigHolder;
+import com.taobao.tddl.matrix.config.MatrixConfigHolder;
 import com.taobao.tddl.optimizer.core.plan.bean.DataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.bean.Merge;
 import com.taobao.tddl.optimizer.core.plan.bean.Query;
@@ -19,7 +19,7 @@ public class HintExecuteTest {
     @Test
     public void initTestWithConfigHolder() throws TddlException {
 
-        ConfigHolder configHolder = new ConfigHolder();
+        MatrixConfigHolder configHolder = new MatrixConfigHolder();
         configHolder.setAppName("andor_show");
         configHolder.setTopologyFilePath("test_matrix.xml");
         configHolder.setSchemaFilePath("test_schema.xml");
