@@ -1,8 +1,6 @@
 package com.taobao.tddl.repo.mysql.spi;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -220,42 +218,7 @@ public class My_Transaction implements ITransaction {
 
     public static void closeStreaming(Connection con) throws SQLException {
         TGroupConnection myconn = getTGroupConnection(con);
-        // Jboss包装
-        // MySQL包装
-        // 获取当前链接执行的ID
-        Long thdid = myconn.getId();
-
-        if (thdid == -1) {
-            myconn.close();
-            return;
-        }
-        // 这里是新建一个链接来关闭，也可以用连接池里的，不过可能会造成额外等待。。所以还是抄驱动的方式吧。
-        // 复制一个链接(等于新创建一个链接)
-        Connection conNew = null;
-
-        try {
-            conNew = myconn.duplicate();
-            // 使用这个链接关闭对应的thdid,主要是为了让ServerKillProcess..从而可以丢流异常，而非drain所有数据到本地
-            conNew.createStatement().executeUpdate("KILL QUERY " + thdid);
-        } finally {
-            conNew.close();
-            // 将mysql真正的链接关闭掉。
-            myconn.close();
-        }
-        // 关闭新建立的这个链接
-
-        /**
-         * 这以后，主要是为了让Jboss能够知道当前这个链接已经挂了。。。被关闭掉了
-         */
-        // 执行一条SQL，让他抛出链接已经被关闭的异常。
-        try {
-            PreparedStatement ps = con.prepareStatement("select 1");
-            ResultSet rs = ps.executeQuery();
-            rs.next();
-            rs.close();
-        } catch (Exception e) {
-            logger.debug(e);
-        }
+        myconn.cancel();
     }
 
     private static TGroupConnection getTGroupConnection(Connection con) {

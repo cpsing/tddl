@@ -131,7 +131,7 @@ public class IndexChooser {
 
     private static boolean chooseIndex(Map<String, Object> extraCmd) {
         String ifChooseIndex = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd,
-            ExtraCmd.OptimizerExtraCmd.ChooseIndex));
+            ExtraCmd.CHOOSE_INDEX));
         // 默认返回true
         if (StringUtils.isEmpty(ifChooseIndex)) {
             return true;

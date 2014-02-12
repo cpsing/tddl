@@ -395,7 +395,7 @@ public class CostBasedOptimizer extends AbstractLifecycle implements Optimizer {
             extraCmd = new HashMap();
         }
         // update暂不允许使用索引
-        extraCmd.put(ExtraCmd.OptimizerExtraCmd.ChooseIndex, "FALSE");
+        extraCmd.put(ExtraCmd.CHOOSE_INDEX, "FALSE");
         QueryTreeNode queryCommon = this.optimizeQuery(update.getNode(), extraCmd);
         queryCommon.build();
         update.setNode((TableNode) queryCommon);

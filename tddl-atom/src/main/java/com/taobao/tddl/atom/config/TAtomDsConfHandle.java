@@ -395,6 +395,7 @@ public class TAtomDsConfHandle {
                     newConf.setUserName(tmpConf.getUserName());
                     newConf.setMinPoolSize(tmpConf.getMinPoolSize());
                     newConf.setMaxPoolSize(tmpConf.getMaxPoolSize());
+                    newConf.setInitPoolSize(tmpConf.getInitPoolSize());
                     newConf.setIdleTimeout(tmpConf.getIdleTimeout());
                     newConf.setBlockingTimeout(tmpConf.getBlockingTimeout());
                     newConf.setPreparedStatementCacheSize(tmpConf.getPreparedStatementCacheSize());

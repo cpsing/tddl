@@ -7,9 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.ObjectUtils;
-
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
@@ -160,8 +157,6 @@ public class FilterSpliter {
     }
 
     private static boolean isOptimizeIndexMerge(Map<String, Object> extraCmd) {
-        String value = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd,
-            ExtraCmd.OptimizerExtraCmd.ChooseIndexMerge));
-        return BooleanUtils.toBoolean(value);
+        return GeneralUtil.getExtraCmdBoolean(extraCmd, ExtraCmd.CHOOSE_INDEX_MERGE, false);
     }
 }

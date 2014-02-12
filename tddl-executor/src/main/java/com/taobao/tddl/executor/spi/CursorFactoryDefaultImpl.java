@@ -128,7 +128,7 @@ public class CursorFactoryDefaultImpl implements ICursorFactory {
                                                                                                                       throws TddlException {
         try {
             if ("True".equalsIgnoreCase(GeneralUtil.getExtraCmdString(executionContext.getExtraCmds(),
-                ExtraCmd.ExecutionExtraCmd.ALLOW_TEMPORARY_TABLE))) {
+                ExtraCmd.ALLOW_TEMPORARY_TABLE))) {
 
                 IRepository bdbRepo = ExecutorContext.getContext()
                     .getRepositoryHolder()

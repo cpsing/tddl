@@ -9,16 +9,12 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.optimizer.OptimizerContext;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
@@ -50,6 +46,9 @@ import com.taobao.tddl.optimizer.utils.FilterUtils;
 import com.taobao.tddl.optimizer.utils.OptimizerUtils;
 import com.taobao.tddl.rule.model.Field;
 import com.taobao.tddl.rule.model.TargetDB;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * <pre>
@@ -543,20 +542,11 @@ public class DataNodeChooser {
     }
 
     private static boolean chooseJoinMergeJoinByRule(Map<String, Object> extraCmd) {
-        String choose = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd,
-            ExtraCmd.OptimizerExtraCmd.JoinMergeJoinJudgeByRule));
-        if (StringUtils.isEmpty(choose)) {
-            // 默认返回true
-            return true;
-        } else {
-            return BooleanUtils.toBoolean(choose);
-        }
+        return GeneralUtil.getExtraCmdBoolean(extraCmd, ExtraCmd.JOIN_MERGE_JOIN_JUDGE_BY_RULE, true);
     }
 
     private static boolean chooseJoinMergeJoinForce(Map<String, Object> extraCmd) {
-        String choose = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd,
-            ExtraCmd.OptimizerExtraCmd.JoinMergeJoin));
-        return BooleanUtils.toBoolean(choose);
+        return GeneralUtil.getExtraCmdBoolean(extraCmd, ExtraCmd.JOIN_MERGE_JOIN, false);
     }
 
     private static class PartitionJoinResult {

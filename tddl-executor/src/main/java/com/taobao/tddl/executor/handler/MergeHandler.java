@@ -131,7 +131,7 @@ public class MergeHandler extends QueryHandlerCommon {
                                        List<IDataNodeExecutor> subNodes, List<ISchematicCursor> subCursors)
                                                                                                            throws TddlException {
 
-        executionContext.getExtraCmds().put(ExtraCmd.ExecutionExtraCmd.EXECUTE_QUERY_WHEN_CREATED, "True");
+        executionContext.getExtraCmds().put(ExtraCmd.EXECUTE_QUERY_WHEN_CREATED, "True");
         List<Future<ISchematicCursor>> futureCursors = new LinkedList<Future<ISchematicCursor>>();
         for (IDataNodeExecutor q : subNodes) {
             Future<ISchematicCursor> rcfuture = executeFuture(executionContext, q);

@@ -27,7 +27,7 @@ public class MergeConcurrentOptimizer implements QueryPlanOptimizer {
     }
 
     /**
-     * 如果设置了OptimizerExtraCmd.MergeConcurrent 并且值为True，则将所有的Merge变为并行
+     * 如果设置了MergeConcurrent 并且值为True，则将所有的Merge变为并行
      */
     @Override
     public IDataNodeExecutor optimize(IDataNodeExecutor dne, Map<Integer, ParameterContext> parameterSettings,
@@ -62,8 +62,7 @@ public class MergeConcurrentOptimizer implements QueryPlanOptimizer {
     }
 
     private static boolean isMergeConcurrent(Map<String, Object> extraCmd, IMerge query) {
-        String value = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd,
-            ExtraCmd.OptimizerExtraCmd.MergeConcurrent));
+        String value = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd, ExtraCmd.MERGE_CONCURRENT));
         if (StringUtils.isEmpty(value)) {
             if (query.getSql() != null) {
                 // 如果存在sql，那说明是hint直接路由

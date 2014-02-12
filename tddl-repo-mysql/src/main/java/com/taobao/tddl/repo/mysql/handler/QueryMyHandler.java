@@ -76,8 +76,9 @@ public class QueryMyHandler extends QueryHandler implements ICommandHandler {
             if (order.getColumn().getAlias() != null) order.getColumn().setColumnName(order.getColumn().getAlias());
         }
 
-        if ("True".equalsIgnoreCase(GeneralUtil.getExtraCmdString(executionContext.getExtraCmds(),
-            ExtraCmd.ExecutionExtraCmd.EXECUTE_QUERY_WHEN_CREATED))) {
+        if (GeneralUtil.getExtraCmdBoolean(executionContext.getExtraCmds(),
+            ExtraCmd.EXECUTE_QUERY_WHEN_CREATED,
+            false)) {
             my_cursor.init();
         }
         return new SchematicMyCursor(my_cursor, meta, orderBy);

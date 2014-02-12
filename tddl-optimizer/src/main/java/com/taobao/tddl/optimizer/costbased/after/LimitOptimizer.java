@@ -21,7 +21,7 @@ public class LimitOptimizer implements QueryPlanOptimizer {
     }
 
     /**
-     * 如果设置了OptimizerExtraCmd.MergeConcurrent 并且值为True，则将所有的Merge变为并行
+     * 如果设置了MergeConcurrent 并且值为True，则将所有的Merge变为并行
      */
     @Override
     public IDataNodeExecutor optimize(IDataNodeExecutor dne, Map<Integer, ParameterContext> parameterSettings,

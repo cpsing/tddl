@@ -30,7 +30,7 @@ public class IndexChooserTest extends BaseOptimizerTest {
 
     @Before
     public void setUp() {
-        extraCmd.put(ExtraCmd.OptimizerExtraCmd.ChooseIndex, true);
+        extraCmd.put(ExtraCmd.CHOOSE_INDEX, true);
     }
 
     @Test

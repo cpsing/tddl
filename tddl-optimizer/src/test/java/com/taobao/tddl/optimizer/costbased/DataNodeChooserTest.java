@@ -385,8 +385,8 @@ public class DataNodeChooserTest extends BaseOptimizerTest {
 
     private QueryTreeNode shard(QueryTreeNode qtn, boolean joinMergeJoin, boolean joinMergeJoinByRule) {
         Map<String, Object> extraCmd = new HashMap<String, Object>();
-        extraCmd.put(ExtraCmd.OptimizerExtraCmd.JoinMergeJoin, joinMergeJoin);
-        extraCmd.put(ExtraCmd.OptimizerExtraCmd.JoinMergeJoinJudgeByRule, joinMergeJoinByRule);
+        extraCmd.put(ExtraCmd.JOIN_MERGE_JOIN, joinMergeJoin);
+        extraCmd.put(ExtraCmd.JOIN_MERGE_JOIN_JUDGE_BY_RULE, joinMergeJoinByRule);
         return (QueryTreeNode) DataNodeChooser.shard(qtn, null, extraCmd);
     }
 }

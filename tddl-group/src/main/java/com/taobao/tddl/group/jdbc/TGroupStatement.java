@@ -223,9 +223,9 @@ public class TGroupStatement implements TStatement {
             stmt = conn.createStatement();
         } else {
             int resultSetHoldability = this.resultSetHoldability;
-            if (resultSetHoldability == -1) // 未调用过setResultSetHoldability
-            resultSetHoldability = conn.getHoldability();
-
+            if (resultSetHoldability == -1) {// 未调用过setResultSetHoldability
+                resultSetHoldability = conn.getHoldability();
+            }
             stmt = conn.createStatement(this.resultSetType, this.resultSetConcurrency, resultSetHoldability);
         }
 
@@ -489,6 +489,12 @@ public class TGroupStatement implements TStatement {
         return tGroupConnection;
     }
 
+    public void cancel() throws SQLException {
+        // 调用底层进行关闭
+        // see com.mysql.jdbc.StatementImpl
+        this.baseStatement.cancel();
+    }
+
     /*
      * ========================================================================
      * 以下为不支持的方法
@@ -545,10 +551,6 @@ public class TGroupStatement implements TStatement {
             throw new SQLException("在调用getGeneratedKeys前未执行过任何更新操作");
         }
         // throw new UnsupportedOperationException("getGeneratedKeys");
-    }
-
-    public void cancel() throws SQLException {
-        throw new UnsupportedOperationException("cancel");
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {

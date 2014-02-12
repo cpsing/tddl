@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang.BooleanUtils;
+
 import com.taobao.tddl.atom.securety.impl.PasswordCoder;
 import com.taobao.tddl.atom.utils.ConnRestrictEntry;
 import com.taobao.tddl.common.utils.TStringUtil;
@@ -31,6 +33,7 @@ public class TAtomConfParser {
     public static final String GLOBA_DB_STATUS_KEY                   = "dbStatus";
     public static final String APP_USER_NAME_KEY                     = "userName";
     public static final String APP_INIT_POOL_SIZE_KEY                = "initPoolSize";
+    public static final String APP_PREFILL                           = "prefill";
     public static final String APP_MIN_POOL_SIZE_KEY                 = "minPoolSize";
     public static final String APP_MAX_POOL_SIZE_KEY                 = "maxPoolSize";
     public static final String APP_IDLE_TIMEOUT_KEY                  = "idleTimeout";
@@ -151,6 +154,15 @@ public class TAtomConfParser {
                     String driverClass = connectionProperties.get(TAtomConfParser.APP_DRIVER_CLASS_KEY);
                     if (!TStringUtil.isBlank(driverClass)) {
                         pasObj.setDriverClass(driverClass);
+                    }
+
+                    if (connectionProperties.containsKey(APP_PREFILL)) {
+                        // add by agapple, 简单处理支持下初始化链接
+                        String prefill = connectionProperties.get(APP_PREFILL);
+                        if (BooleanUtils.toBoolean(prefill)
+                            && pasObj.getInitPoolSize() == TAtomDsConfDO.defaultInitPoolSize) {
+                            pasObj.setInitPoolSize(pasObj.getMinPoolSize());
+                        }
                     }
                 }
 

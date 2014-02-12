@@ -1,6 +1,5 @@
 package com.taobao.tddl.group.jdbc;
 
-import java.lang.reflect.Method;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -16,7 +15,6 @@ import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
-import java.sql.Wrapper;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -25,8 +23,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import com.taobao.tddl.atom.jdbc.TConnectionWrapper;
-import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.jdbc.TExceptionUtils;
 import com.taobao.tddl.group.config.GroupIndex;
 import com.taobao.tddl.group.dbselector.DBSelector;
@@ -578,56 +574,10 @@ public class TGroupConnection implements Connection {
         }
     }
 
-    /**
-     * @return thread id
-     */
-    public long getId() {
-        try {
-            // TODO 判断是否为mysql
-            Connection atomConnection = this.rBaseConnection;
-            if (atomConnection == null) {
-                atomConnection = this.wBaseConnection;
-            }
-
-            /**
-             * 这个连接上没做过查询，不会创建真正连接的
-             */
-            if (atomConnection == null) {
-                return -1;
-            }
-
-            TConnectionWrapper conn = (TConnectionWrapper) atomConnection;
-            Connection delegate = conn.getTargetConnection();
-            if (delegate instanceof Wrapper) {
-                delegate = delegate.unwrap(Connection.class);
-            }
-            // DruidPooledConnection druidConnection = (DruidPooledConnection)
-            // conn.getTargetConnection();
-            // Connection delegateConn = druidConnection.getConnection();
-            Method method = null;
-            Class clazz = delegate.getClass();
-            do {
-                try {
-                    method = clazz.getDeclaredMethod("getId", new Class[] {});
-                } catch (NoSuchMethodException e) {
-                    clazz = clazz.getSuperclass();
-                }
-            } while (method == null);
-            if (!method.isAccessible()) {
-                method.setAccessible(true);
-            }
-            return (Long) method.invoke(delegate, new Object[] {});
-        } catch (Exception ex) {
-            throw new TddlRuntimeException("connection get thread id fail !", ex);
+    public void cancel() throws SQLException {
+        for (TGroupStatement stat : openedStatements) {
+            stat.cancel();
         }
-
-    }
-
-    public Connection duplicate() throws SQLException {
-        if (this.tGroupDataSource == null) {
-            return null;
-        }
-        return this.tGroupDataSource.getConnection();
     }
 
     /*

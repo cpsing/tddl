@@ -3,9 +3,6 @@ package com.taobao.tddl.optimizer.costbased.after;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.ObjectUtils;
-
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
@@ -18,14 +15,14 @@ import com.taobao.tddl.optimizer.core.plan.query.IMerge;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 
 /**
- * 如果设置了OptimizerExtraCmd.MergeConcurrent 并且值为True，则将所有的Merge变为并行
+ * 如果设置了MergeConcurrent 并且值为True，则将所有的Merge变为并行
  * 
  * @since 5.0.0
  */
 public class MergeJoinMergeOptimizer implements QueryPlanOptimizer {
 
     /**
-     * 如果设置了OptimizerExtraCmd.MergeConcurrent 并且值为True，则将所有的Merge变为并行
+     * 如果设置了MergeConcurrent 并且值为True，则将所有的Merge变为并行
      */
     @Override
     public IDataNodeExecutor optimize(IDataNodeExecutor dne, Map<Integer, ParameterContext> parameterSettings,
@@ -215,8 +212,6 @@ public class MergeJoinMergeOptimizer implements QueryPlanOptimizer {
     }
 
     private static boolean isMergeExpand(Map<String, Object> extraCmd) {
-        String value = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd,
-            ExtraCmd.OptimizerExtraCmd.MergeExpand));
-        return BooleanUtils.toBoolean(value);
+        return GeneralUtil.getExtraCmdBoolean(extraCmd, ExtraCmd.MERGE_EXPAND, false);
     }
 }

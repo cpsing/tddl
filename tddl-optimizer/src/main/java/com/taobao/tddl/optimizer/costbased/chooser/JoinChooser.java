@@ -4,9 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.ObjectUtils;
-
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.optimizer.config.table.IndexMeta;
@@ -179,9 +176,8 @@ public class JoinChooser {
     /**
      * 遍历每个节点 分解Query 为Query选择索引与Join策略 只遍历一棵子查询树
      */
-    private static QueryTreeNode chooseStrategyAndIndexAndSplitQuery(QueryTreeNode node,
-                                                                     Map<String, Object> extraCmd)
-                                                                                                      throws QueryException {
+    private static QueryTreeNode chooseStrategyAndIndexAndSplitQuery(QueryTreeNode node, Map<String, Object> extraCmd)
+                                                                                                                      throws QueryException {
         if (node instanceof JoinNode) {
             for (int i = 0; i < node.getChildren().size(); i++) {
                 QueryTreeNode child = (QueryTreeNode) node.getChildren().get(i);
@@ -426,8 +422,6 @@ public class JoinChooser {
     }
 
     private static boolean isOptimizeJoinOrder(Map<String, Object> extraCmd) {
-        String value = ObjectUtils.toString(GeneralUtil.getExtraCmdString(extraCmd, ExtraCmd.OptimizerExtraCmd.ChooseJoin));
-        return BooleanUtils.toBoolean(value);
+        return GeneralUtil.getExtraCmdBoolean(extraCmd, ExtraCmd.CHOOSE_JOIN, false);
     }
-
 }

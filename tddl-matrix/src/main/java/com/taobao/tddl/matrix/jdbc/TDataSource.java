@@ -64,7 +64,7 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
          * 如果不为每个连接都初始化，则为整个ds初始化一个线程池
          */
         boolean everyConnectionPool = GeneralUtil.getExtraCmdBoolean(this.getConnectionProperties(),
-            ExtraCmd.ConnectionExtraCmd.INIT_CONCURRENT_POOL_EVERY_CONNECTION,
+            ExtraCmd.INIT_CONCURRENT_POOL_EVERY_CONNECTION,
             true);
         if (everyConnectionPool) {
             executorServiceQueue = new LinkedBlockingQueue<ExecutorService>();
@@ -72,7 +72,7 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
             // 全局共享线程池
             int poolSize;
             Object poolSizeObj = GeneralUtil.getExtraCmdString(this.getConnectionProperties(),
-                ExtraCmd.ConnectionExtraCmd.CONCURRENT_THREAD_SIZE);
+                ExtraCmd.CONCURRENT_THREAD_SIZE);
 
             if (poolSizeObj == null) {
                 throw new TddlRuntimeException("如果线程池为整个datasource共用，请使用CONCURRENT_THREAD_SIZE指定线程池大小");
@@ -101,7 +101,7 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
             ExecutorService executor = executorServiceQueue.poll();
             if (executor == null) {
                 Object poolSizeObj = GeneralUtil.getExtraCmdString(this.getConnectionProperties(),
-                    ExtraCmd.ConnectionExtraCmd.CONCURRENT_THREAD_SIZE);
+                    ExtraCmd.CONCURRENT_THREAD_SIZE);
                 int poolSize = 0;
                 if (poolSizeObj != null) {
                     poolSize = Integer.valueOf(poolSizeObj.toString());

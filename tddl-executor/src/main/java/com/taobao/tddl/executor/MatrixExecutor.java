@@ -89,7 +89,7 @@ public class MatrixExecutor extends AbstractLifecycle implements IExecutor {
 
     public IDataNodeExecutor parseAndOptimize(String sql, ExecutionContext executionContext) throws TddlException {
         boolean cache = GeneralUtil.getExtraCmdBoolean(executionContext.getExtraCmds(),
-            ExtraCmd.ConnectionExtraCmd.OPTIMIZER_CACHE,
+            ExtraCmd.OPTIMIZER_CACHE,
             true);
 
         return OptimizerContext.getContext()

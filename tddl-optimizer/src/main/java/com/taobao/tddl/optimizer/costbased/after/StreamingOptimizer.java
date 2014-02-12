@@ -3,6 +3,8 @@ package com.taobao.tddl.optimizer.costbased.after;
 import java.util.Map;
 
 import com.taobao.tddl.common.jdbc.ParameterContext;
+import com.taobao.tddl.common.model.ExtraCmd;
+import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.optimizer.core.expression.IBindVal;
 import com.taobao.tddl.optimizer.core.plan.IDataNodeExecutor;
 import com.taobao.tddl.optimizer.core.plan.IQueryTree;
@@ -25,13 +27,13 @@ public class StreamingOptimizer implements QueryPlanOptimizer {
                                       Map<String, Object> extraCmd) {
 
         if (dne instanceof IQueryTree) {
-            this.findMergeAndOptimizeStreaming(dne);
+            this.findMergeAndOptimizeStreaming(dne, extraCmd);
         }
 
         return dne;
     }
 
-    void findMergeAndOptimizeStreaming(IDataNodeExecutor dne) {
+    void findMergeAndOptimizeStreaming(IDataNodeExecutor dne, Map<String, Object> extraCmd) {
         if (dne instanceof IMerge) {
             Comparable from = ((IMerge) dne).getLimitFrom();
             Comparable to = ((IMerge) dne).getLimitTo();
@@ -40,7 +42,8 @@ public class StreamingOptimizer implements QueryPlanOptimizer {
                 useStreaming = true;
             }
 
-            if ((from instanceof Long && ((Long) from) != 0) || (to instanceof Long && ((Long) to) != 0)) {
+            if (from instanceof Long && isNeedStreaming((Long) from, extraCmd)
+                || (to instanceof Long && isNeedStreaming((Long) to, extraCmd))) {
                 useStreaming = true;
             }
 
@@ -54,13 +57,17 @@ public class StreamingOptimizer implements QueryPlanOptimizer {
 
         }
         if (dne instanceof IJoin) {
-            this.findMergeAndOptimizeStreaming(((IJoin) dne).getLeftNode());
-            this.findMergeAndOptimizeStreaming(((IJoin) dne).getRightNode());
+            this.findMergeAndOptimizeStreaming(((IJoin) dne).getLeftNode(), extraCmd);
+            this.findMergeAndOptimizeStreaming(((IJoin) dne).getRightNode(), extraCmd);
         }
 
         if (dne instanceof IQuery && ((IQuery) dne).getSubQuery() != null) {
-            this.findMergeAndOptimizeStreaming(((IQuery) dne).getSubQuery());
+            this.findMergeAndOptimizeStreaming(((IQuery) dne).getSubQuery(), extraCmd);
         }
 
+    }
+
+    private static boolean isNeedStreaming(Long limit, Map<String, Object> extraCmd) {
+        return limit > GeneralUtil.getExtraCmdLong(extraCmd, ExtraCmd.STREAMI_THRESHOLD, 100);
     }
 }

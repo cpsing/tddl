@@ -125,7 +125,7 @@ public class MatrixConfigHolder extends AbstractConfigDataHolder {
         RuleSchemaManager ruleSchemaManager = new RuleSchemaManager(optimizerRule,
             topologyHandler.getMatrix(),
             GeneralUtil.getExtraCmdLong(this.connectionProperties,
-                ExtraCmd.ConnectionExtraCmd.TABLE_META_CACHE_EXPIRE_TIME,
+                ExtraCmd.TABLE_META_CACHE_EXPIRE_TIME,
                 TddlConstants.DEFAULT_TABLE_META_EXPIRE_TIME));
         StaticSchemaManager staticSchemaManager = new StaticSchemaManager(schemaFilePath, appName, unitName);
         ruleSchemaManager.setLocal(staticSchemaManager);
@@ -141,7 +141,7 @@ public class MatrixConfigHolder extends AbstractConfigDataHolder {
     public void optimizerInit() throws TddlException {
         CostBasedOptimizer optimizer = new CostBasedOptimizer();
         optimizer.setExpireTime(GeneralUtil.getExtraCmdLong(this.connectionProperties,
-            ExtraCmd.ConnectionExtraCmd.OPTIMIZER_CACHE_EXPIRE_TIME,
+            ExtraCmd.OPTIMIZER_CACHE_EXPIRE_TIME,
             TddlConstants.DEFAULT_OPTIMIZER_EXPIRE_TIME));
         optimizer.init();
 

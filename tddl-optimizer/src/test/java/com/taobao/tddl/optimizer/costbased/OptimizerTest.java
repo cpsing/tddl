@@ -30,11 +30,11 @@ public class OptimizerTest extends BaseOptimizerTest {
 
     @BeforeClass
     public static void setUp() {
-        extraCmd.put(ExtraCmd.OptimizerExtraCmd.ChooseIndex, true);
-        extraCmd.put(ExtraCmd.OptimizerExtraCmd.ChooseJoin, false);
-        extraCmd.put(ExtraCmd.OptimizerExtraCmd.ChooseIndexMerge, false);
-        extraCmd.put(ExtraCmd.OptimizerExtraCmd.MergeExpand, false);
-        extraCmd.put(ExtraCmd.OptimizerExtraCmd.JoinMergeJoinJudgeByRule, true);
+        extraCmd.put(ExtraCmd.CHOOSE_INDEX, true);
+        extraCmd.put(ExtraCmd.CHOOSE_JOIN, false);
+        extraCmd.put(ExtraCmd.CHOOSE_INDEX_MERGE, false);
+        extraCmd.put(ExtraCmd.MERGE_EXPAND, false);
+        extraCmd.put(ExtraCmd.JOIN_MERGE_JOIN_JUDGE_BY_RULE, true);
     }
 
     @Test
@@ -137,9 +137,9 @@ public class OptimizerTest extends BaseOptimizerTest {
     public void test_单表查询_OR条件_1() {
         TableNode table = new TableNode("TABLE1");
         table.query("NAME = 2323 OR ID=1");
-        extraCmd.put(ExtraCmd.OptimizerExtraCmd.ChooseIndexMerge, true);
+        extraCmd.put(ExtraCmd.CHOOSE_INDEX_MERGE, true);
         IQueryTree qc = (IQueryTree) optimizer.optimizeAndAssignment(table, null, extraCmd);
-        extraCmd.put(ExtraCmd.OptimizerExtraCmd.ChooseIndexMerge, false);
+        extraCmd.put(ExtraCmd.CHOOSE_INDEX_MERGE, false);
         Assert.assertTrue(qc instanceof IMerge);
         Assert.assertTrue(((IMerge) qc).isUnion());// 是union查询
         Assert.assertTrue(((IMerge) qc).getSubNode().get(0) instanceof IQuery);
@@ -159,9 +159,9 @@ public class OptimizerTest extends BaseOptimizerTest {
     public void test_单表查询_复杂条件展开() {
         TableNode table = new TableNode("TABLE1");
         table.query("SCHOOL=1 AND (ID=4 OR ID=3)");
-        extraCmd.put(ExtraCmd.OptimizerExtraCmd.ChooseIndexMerge, true);
+        extraCmd.put(ExtraCmd.CHOOSE_INDEX_MERGE, true);
         IQueryTree qc = (IQueryTree) optimizer.optimizeAndAssignment(table, null, extraCmd);
-        extraCmd.put(ExtraCmd.OptimizerExtraCmd.ChooseIndexMerge, false);
+        extraCmd.put(ExtraCmd.CHOOSE_INDEX_MERGE, false);
         Assert.assertTrue(qc instanceof IMerge);
         Assert.assertTrue(((IMerge) qc).isUnion());// 是union查询
         Assert.assertTrue(((IMerge) qc).getSubNode().get(0) instanceof IQuery);

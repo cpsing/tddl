@@ -101,18 +101,14 @@ public class BaseMatrixTestCase extends PrepareData {
 
         Map<String, Object> cp = new HashMap<String, Object>();
         if ("tdhs".equalsIgnoreCase(dbTypeStack)) {
-            cp.put(ExtraCmd.ConnectionExtraCmd.USE_TDHS_FOR_DEFAULT, "true");
-        }
-        if (async && "mysql".equalsIgnoreCase(dbTypeStack)) {
-            cp.put(ExtraCmd.ExecutionExtraCmd.ALLOW_BIO, "FALSE");
-            us.setTopologyFile(machineTapologyAyncFile);
+            cp.put(ExtraCmd.USE_TDHS_FOR_DEFAULT, "true");
         }
 
         if ("hbase".equalsIgnoreCase(dbTypeStack)) {
-            cp.put(ExtraCmd.ExecutionExtraCmd.HBASE_MAPPING_FILE, "matrix/hbase_mapping.xml");
+            cp.put(ExtraCmd.HBASE_MAPPING_FILE, "matrix/hbase_mapping.xml");
         }
-        // cp.put(ExtraCmd.ConnectionExtraCmd.INIT_TEMP_TABLE, "true");
-        // cp.put(ExtraCmd.ConnectionExtraCmd.INIT_TDDL_DATASOURCE, "true");
+        // cp.put(ExtraCmd.INIT_TEMP_TABLE, "true");
+        // cp.put(ExtraCmd.INIT_TDDL_DATASOURCE, "true");
         us.setConnectionProperties(cp);
         try {
             us.init();

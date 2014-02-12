@@ -15,6 +15,7 @@ import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.SqlType;
+import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.matrix.jdbc.utils.PreParser;
 
@@ -311,15 +312,11 @@ public class TStatement implements Statement {
     }
 
     public void setFetchSize(int rows) throws SQLException {
-        extraCmd.put(ExtraCmd.ExecutionExtraCmd.FETCH_SIZE, rows);
+        extraCmd.put(ExtraCmd.FETCH_SIZE, rows);
     }
 
     public int getFetchSize() throws SQLException {
-        Object val = extraCmd.get(ExtraCmd.ExecutionExtraCmd.FETCH_SIZE);
-        if (val == null) {
-            return 0;
-        }
-        return (Integer) val;
+        return (int) GeneralUtil.getExtraCmdLong(extraCmd, ExtraCmd.FETCH_SIZE, 0L);
     }
 
     public int getResultSetConcurrency() throws SQLException {
