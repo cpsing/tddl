@@ -35,6 +35,7 @@ public interface DataType<DATA> extends Comparator<Object> {
     public static final DataType<Integer>    BitType        = new BitType();
     public static final DataType<byte[]>     BytesType      = new BytesType();
     public static final DataType<Byte>       ByteType       = new ByteType();
+    public static final DataType             NullType       = StringType;
 
     public static interface ResultGetter {
 
