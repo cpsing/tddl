@@ -12,6 +12,7 @@ import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
 import com.taobao.tddl.optimizer.core.datatype.DataType;
+import com.taobao.tddl.optimizer.core.datatype.DataTypeUtil;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter;
@@ -155,42 +156,10 @@ public class RangeMaker {
     }
 
     public Object decr(Object c, DataType type) {
-
+        if (type == null) {
+            type = DataTypeUtil.getTypeOfObject(c); // 可能为null
+        }
         return type.decr(c);
-
-        // switch (type) {
-        // case INT_VAL:
-        // c = ((Integer) c) - 1;
-        // break;
-        // case LONG_VAL:
-        // c = ((Long) c) - 1;
-        // break;
-        // case SHORT_VAL:
-        // c = ((Long) c) - 1;
-        // break;
-        // case FLOAT_VAL:
-        // c = ((Long) c) - 0.000001f;
-        // break;
-        // case DOUBLE_VAL:
-        // c = ((Double) c) - 0.000001d;
-        // break;
-        // case DATE_VAL:
-        // c = new Date(((Date) c).getTime() - 1l);
-        // break;
-        // case TIMESTAMP_VAL:
-        // c = new Date(((Date) c).getTime() - 1l);
-        // break;
-        // case STRING_VAL:
-        // StringBuilder newStr = new StringBuilder();
-        // newStr.append(c);
-        // newStr.setCharAt(newStr.length() - 1, (char)
-        // (newStr.charAt(newStr.length() - 1) - 1));
-        // c = newStr.toString();
-        // break;
-        // default:
-        // throw new IllegalArgumentException("not supported yet");
-        // }
-        // return c;
     }
 
     /**
@@ -204,51 +173,11 @@ public class RangeMaker {
     }
 
     public Object incr(Object c, DataType type) {
+        if (type == null) {
+            type = DataTypeUtil.getTypeOfObject(c); // 可能为null
+        }
 
         return type.incr(c);
-
-        // switch (type) {
-        // case INT_VAL: {
-        // if (c instanceof String) {// fix
-        // c = Integer.valueOf(c.toString());
-        // }
-        // c = ((Integer) c) + 1;
-        // break;
-        // }
-        //
-        // case SHORT_VAL: {
-        // if (c instanceof String) {// fix
-        // c = Short.valueOf(c.toString());
-        // }
-        // c = ((Short) c) + 1;
-        // break;
-        // }
-        // case LONG_VAL:
-        // c = ((Long) c) + 1;
-        // break;
-        // case FLOAT_VAL:
-        // c = ((Float) c) + 0.000001f;
-        // break;
-        // case DOUBLE_VAL:
-        // c = ((Double) c) + 0.000001d;
-        // break;
-        // case DATE_VAL:
-        // c = new Date(((Date) c).getTime() + 1l);
-        // break;
-        // case TIMESTAMP_VAL:
-        // c = new Date(((Date) c).getTime() + 1l);
-        // break;
-        // case STRING_VAL:
-        // StringBuilder newStr = new StringBuilder();
-        // newStr.append(c);
-        // newStr.setCharAt(newStr.length() - 1, (char)
-        // (newStr.charAt(newStr.length() - 1) + 1));
-        // c = newStr.toString();
-        // break;
-        // default:
-        // throw new IllegalArgumentException("not supported yet");
-        // }
-        // return c;
     }
 
     @SuppressWarnings("rawtypes")

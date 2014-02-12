@@ -21,10 +21,10 @@ public class Not extends ScalarFunction {
         DataType type = null;
         if (args[0] instanceof ISelectable) {
             type = ((ISelectable) args[0]).getDataType();
-        } else {
+        }
+        if (type == null) {
             type = DataTypeUtil.getTypeOfObject(args[0]);
         }
-
         if (type == DataType.BooleanType) {
             return DataType.BooleanType;
         } else {

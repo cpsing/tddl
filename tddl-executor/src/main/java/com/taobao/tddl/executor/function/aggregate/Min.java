@@ -53,11 +53,14 @@ public class Min extends AggregateFunction {
     public DataType getMapReturnType() {
         Object[] args = function.getArgs().toArray();
 
+        DataType type = null;
         if (args[0] instanceof ISelectable) {
-            return ((ISelectable) args[0]).getDataType();
+            type = ((ISelectable) args[0]).getDataType();
         }
-
-        return DataTypeUtil.getTypeOfObject(args[0]);
+        if (type == null) {
+            type = DataTypeUtil.getTypeOfObject(args[0]);
+        }
+        return type;
     }
 
 }

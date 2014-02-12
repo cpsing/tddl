@@ -92,7 +92,9 @@ public class Avg extends AggregateFunction {
         DataType type = null;
         if (args[0] instanceof ISelectable) {
             type = ((ISelectable) args[0]).getDataType();
-        } else {
+        }
+
+        if (type == null) {
             type = DataTypeUtil.getTypeOfObject(args[0]);
         }
 
@@ -113,10 +115,11 @@ public class Avg extends AggregateFunction {
         DataType type = null;
         if (args[0] instanceof ISelectable) {
             type = ((ISelectable) args[0]).getDataType();
-        } else {
-            type = DataTypeUtil.getTypeOfObject(args[0]);
         }
 
+        if (type == null) {
+            type = DataTypeUtil.getTypeOfObject(args[0]);
+        }
         if (type == DataType.IntegerType || type == DataType.ShortType) {
             return DataType.LongType;
         } else {

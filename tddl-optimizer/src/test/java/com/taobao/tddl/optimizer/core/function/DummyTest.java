@@ -3,7 +3,6 @@ package com.taobao.tddl.optimizer.core.function;
 import org.junit.Ignore;
 
 import com.taobao.tddl.optimizer.core.datatype.DataType;
-import com.taobao.tddl.optimizer.core.datatype.DateType;
 import com.taobao.tddl.optimizer.core.expression.IExtraFunction;
 import com.taobao.tddl.optimizer.core.expression.IFunction;
 import com.taobao.tddl.optimizer.core.expression.IFunction.FunctionType;
@@ -18,7 +17,7 @@ import com.taobao.tddl.optimizer.exceptions.FunctionException;
 public class DummyTest implements IExtraFunction {
 
     public DataType getReturnType() {
-        return DateType.LongType;
+        return null;
     }
 
     public void compute(Object[] args) throws FunctionException {
@@ -33,7 +32,7 @@ public class DummyTest implements IExtraFunction {
     }
 
     public DataType getMapReturnType() {
-        return DateType.LongType;
+        return getReturnType();
     }
 
     public Object getResult() {

@@ -26,10 +26,10 @@ public class Division extends ScalarFunction {
         DataType type = null;
         if (args[0] instanceof ISelectable) {
             type = ((ISelectable) args[0]).getDataType();
-        } else {
+        }
+        if (type == null) {
             type = DataTypeUtil.getTypeOfObject(args[0]);
         }
-
         if (type == DataType.BigIntegerType) {
             // 如果是大整数，返回bigDecimal
             return DataType.BigDecimalType;

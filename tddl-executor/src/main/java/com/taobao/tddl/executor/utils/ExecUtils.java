@@ -379,22 +379,6 @@ public class ExecUtils {
         return v;
     }
 
-    public static List<ISelectable> getIColumns(ColumnMeta[] columns) {
-        List<ISelectable> _columns = new ArrayList<ISelectable>(columns.length);
-        for (ColumnMeta c : columns) {
-            IColumn ic = ASTNodeFactory.getInstance().createColumn();
-            ic.setColumnName(c.getName());
-            ic.setTableName(c.getTableName());
-
-            ic.setDataType(c.getDataType());
-            ic.setAlias(c.getAlias());
-            _columns.add(ic);
-
-            if (ic.getDataType() == null) throw new RuntimeException("fuck!");
-        }
-        return _columns;
-    }
-
     public static List<ISelectable> getIColumnsWithISelectable(ColumnMeta[] columns) {
         List<ISelectable> _columns = new ArrayList<ISelectable>(columns.length);
         for (ColumnMeta c : columns) {
@@ -619,7 +603,9 @@ public class ExecUtils {
 
     public static int comp(Object c1, Object c2, DataType type1, DataType type2) {
 
-        if (type1 == null) type1 = DataTypeUtil.getTypeOfObject(c1);
+        if (type1 == null) {
+            type1 = DataTypeUtil.getTypeOfObject(c1);
+        }
 
         // 类型相同，直接比较
         if (type1 == type2) {
@@ -628,7 +614,6 @@ public class ExecUtils {
 
         // 类型不同，先进行类型转换
         c2 = type1.convertFrom(c2);
-
         return type1.compare(c1, c2);
     }
 
@@ -639,7 +624,6 @@ public class ExecUtils {
         }
 
         int n = type.compare(c1, c2);
-
         if (n == 0) {
             return n;
         }

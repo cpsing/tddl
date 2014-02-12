@@ -14,7 +14,7 @@ public class DataTypeUtil {
 
     public static DataType getTypeOfObject(Object v) {
         if (v == null) {
-            return DataType.NullType;
+            return null;
         }
         Class clazz = v.getClass();
         if (clazz == Integer.class || clazz == int.class) {

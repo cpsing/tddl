@@ -26,10 +26,10 @@ public class Add extends ScalarFunction {
         DataType type = null;
         if (args[0] instanceof ISelectable) {
             type = ((ISelectable) args[0]).getDataType();
-        } else {
+        }
+        if (type == null) {
             type = DataTypeUtil.getTypeOfObject(args[0]);
         }
-
         return type;
     }
 
