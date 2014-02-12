@@ -3,7 +3,6 @@ package com.taobao.tddl.executor.function.scalar;
 import com.taobao.tddl.executor.function.ScalarFunction;
 import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.datatype.DataTypeUtil;
-import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.ISelectable;
 
 /**
@@ -32,7 +31,7 @@ public class IfNull extends ScalarFunction {
         Object[] args = function.getArgs().toArray();
         DataType type = null;
         if (args[0] instanceof ISelectable) {
-            type = ((IColumn) args[0]).getDataType();
+            type = ((ISelectable) args[0]).getDataType();
         }
         if (type == null) {
             type = DataTypeUtil.getTypeOfObject(args[0]);
