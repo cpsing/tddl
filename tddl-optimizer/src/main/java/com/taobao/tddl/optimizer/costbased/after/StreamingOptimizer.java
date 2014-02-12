@@ -2,6 +2,7 @@ package com.taobao.tddl.optimizer.costbased.after;
 
 import java.util.Map;
 
+import com.taobao.tddl.common.TddlConstants;
 import com.taobao.tddl.common.jdbc.ParameterContext;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.utils.GeneralUtil;
@@ -68,6 +69,8 @@ public class StreamingOptimizer implements QueryPlanOptimizer {
     }
 
     private static boolean isNeedStreaming(Long limit, Map<String, Object> extraCmd) {
-        return limit > GeneralUtil.getExtraCmdLong(extraCmd, ExtraCmd.STREAMI_THRESHOLD, 100);
+        return limit > GeneralUtil.getExtraCmdLong(extraCmd,
+            ExtraCmd.STREAMI_THRESHOLD,
+            TddlConstants.DEFAULT_STREAM_THRESOLD);
     }
 }

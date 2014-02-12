@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
+import com.taobao.tddl.common.TddlConstants;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.ExtraCmd;
@@ -21,7 +22,6 @@ import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.common.utils.thread.NamedThreadFactory;
 import com.taobao.tddl.executor.MatrixExecutor;
 import com.taobao.tddl.matrix.config.MatrixConfigHolder;
-import com.taobao.tddl.matrix.config.TDefaultConfig;
 
 /**
  * matrix的jdbc datasource实现
@@ -106,7 +106,7 @@ public class TDataSource extends AbstractLifecycle implements DataSource {
                 if (poolSizeObj != null) {
                     poolSize = Integer.valueOf(poolSizeObj.toString());
                 } else {
-                    poolSize = TDefaultConfig.CONCURRENT_THREAD_SIZE;
+                    poolSize = TddlConstants.DEFAULT_CONCURRENT_THREAD_SIZE;
                 }
                 executor = createThreadPool(poolSize);
             }

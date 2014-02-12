@@ -20,4 +20,8 @@ public class TddlConstants {
     public static final long DEFAULT_TABLE_META_EXPIRE_TIME = 300 * 1000;
 
     public static final int  DEFAULT_OPTIMIZER_EXPIRE_TIME  = 300 * 1000;
+
+    public static final int  DEFAULT_STREAM_THRESOLD        = 100;
+
+    public static final int  DEFAULT_CONCURRENT_THREAD_SIZE = 8;
 }

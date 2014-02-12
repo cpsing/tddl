@@ -143,8 +143,8 @@ public class SelectWithConditionTest extends BaseMatrixTestCase {
 
     @Test
     public void selectNotFun() throws Exception {
-        String sql = "select not max(pk) a from " + normaltblTableName;
         String[] columnParam = { "a" };
+        String sql = "select not max(pk) a from " + normaltblTableName;
         selectContentSameAssert(sql, columnParam, null);
     }
 

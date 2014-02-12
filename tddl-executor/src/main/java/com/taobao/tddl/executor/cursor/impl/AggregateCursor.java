@@ -316,7 +316,6 @@ public class AggregateCursor extends SchematicCursor implements IAggregateCursor
     }
 
     void putRetColumnInMeta(ISelectable column, List<ColumnMeta> metaColumns) {
-
         String columnName;
 
         columnName = column.getColumnName();

@@ -633,10 +633,10 @@ public class ExecUtils {
     }
 
     public static int comp(Comparable c1, Comparable c2, IOrderBy order) {
-
         DataType type = order.getColumn().getDataType();
-
-        if (type == null) type = DataTypeUtil.getTypeOfObject(c1);
+        if (type == null) {
+            type = DataTypeUtil.getTypeOfObject(c1);
+        }
 
         int n = type.compare(c1, c2);
 

@@ -42,7 +42,7 @@ public class BigDecimalType extends CommonType<BigDecimal> {
                                                    public Object divide(Object v1, Object v2) {
                                                        BigDecimal i1 = convertFrom(v1);
                                                        BigDecimal i2 = convertFrom(v2);
-                                                       return i1.divide(i2);
+                                                       return i1.divide(i2, 6, BigDecimal.ROUND_HALF_UP);
                                                    }
 
                                                    @Override
