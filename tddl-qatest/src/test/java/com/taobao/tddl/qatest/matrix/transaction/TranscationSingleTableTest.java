@@ -358,11 +358,11 @@ public class TranscationSingleTableTest extends BaseMatrixTestCase {
         String[] columnParam = { "PK", "ID" };
         selectOrderAssertTranscation(sql, columnParam, null);
 
-        sql = "select * from " + normaltblTableName + " where pk=" + RANDOM_ID + 1;
-        selectOrderAssertTranscation(sql, columnParam, null);
-
         con.setAutoCommit(true);
         andorCon.setAutoCommit(true);
+
+        sql = "select * from " + normaltblTableName + " where pk=" + RANDOM_ID + 1;
+        selectOrderAssertTranscation(sql, columnParam, null);
 
         // 数据提交，验证数值正确性
         sql = "select * from " + normaltblTableName + " where pk=" + RANDOM_ID;
