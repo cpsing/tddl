@@ -18,7 +18,6 @@ public class HintExecuteTest {
 
     @Test
     public void initTestWithConfigHolder() throws TddlException {
-
         MatrixConfigHolder configHolder = new MatrixConfigHolder();
         configHolder.setAppName("andor_show");
         configHolder.setTopologyFilePath("test_matrix.xml");

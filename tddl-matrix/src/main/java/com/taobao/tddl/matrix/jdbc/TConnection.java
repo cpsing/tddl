@@ -47,7 +47,7 @@ public class TConnection implements Connection {
 
     private MatrixExecutor         executor             = null;
     private final TDataSource      ds;
-    private ExecutionContext       executionContext     = null;                                                      // 记录上一次的执行上下文
+    private ExecutionContext       executionContext     = new ExecutionContext();                                    // 记录上一次的执行上下文
     private final List<TStatement> openedStatements     = Collections.synchronizedList(new ArrayList<TStatement>(2));
     private boolean                isAutoCommit         = true;                                                      // jdbc规范，新连接为true
     private boolean                closed;
@@ -163,7 +163,9 @@ public class TConnection implements Connection {
 
         if (this.executionContext != null) {
             try {
+                // 事务结束,清理事务内容
                 this.executor.commit(this.executionContext);
+                this.executionContext.getTransaction().close();
                 this.executionContext = null;
             } catch (TddlException e) {
                 throw new SQLException(e);
@@ -181,6 +183,8 @@ public class TConnection implements Connection {
         if (this.executionContext != null) {
             try {
                 this.executor.rollback(executionContext);
+                // 事务结束,清理事务内容
+                this.executionContext.getTransaction().close();
                 this.executionContext = null;
             } catch (TddlException e) {
                 throw new SQLException(e);
@@ -229,15 +233,12 @@ public class TConnection implements Connection {
             this.ds.releaseExecutorService(executorService);
         }
 
-        if (this.executionContext != null) {
-            if (this.executionContext.getTransaction() != null) {
-                try {
-                    this.executionContext.getTransaction().close();
-                } catch (TddlException e) {
-                    exceptions.add(new SQLException(e));
-                }
+        if (this.executionContext != null && this.executionContext.getTransaction() != null) {
+            try {
+                this.executionContext.getTransaction().close();
+            } catch (TddlException e) {
+                exceptions.add(new SQLException(e));
             }
-
         }
 
         closed = true;

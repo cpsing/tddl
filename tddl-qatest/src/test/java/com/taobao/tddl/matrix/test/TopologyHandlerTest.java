@@ -12,12 +12,9 @@ public class TopologyHandlerTest {
 
     @Test
     public void initTestWithTopologyFileHasAllConfig() {
-
         ExecutorContext executorContext = new ExecutorContext();
         ExecutorContext.setContext(executorContext);
         TopologyHandler topology = new TopologyHandler("andor_show", null, "test_matrix.xml");
-        // TopologyHandler topology = new TopologyHandler("andor_show", null,
-        // null);
         try {
             topology.init();
         } catch (TddlException e) {
@@ -28,12 +25,9 @@ public class TopologyHandlerTest {
 
     @Test
     public void initTestWithTopologyFileHasNoGroupConfig() {
-
         ExecutorContext executorContext = new ExecutorContext();
         ExecutorContext.setContext(executorContext);
         TopologyHandler topology = new TopologyHandler("andor_show", null, "test_matrix_without_group_config.xml");
-        // TopologyHandler topology = new TopologyHandler("andor_show", null,
-        // null);
         try {
             topology.init();
         } catch (TddlException e) {
@@ -47,8 +41,6 @@ public class TopologyHandlerTest {
         ExecutorContext executorContext = new ExecutorContext();
         ExecutorContext.setContext(executorContext);
         TopologyHandler topology = new TopologyHandler("andor_show", null, null);
-        // TopologyHandler topology = new TopologyHandler("andor_show", null,
-        // null);
         try {
             topology.init();
         } catch (TddlException e) {

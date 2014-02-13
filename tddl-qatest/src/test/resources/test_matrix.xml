@@ -2,7 +2,7 @@
 <matrix xmlns="https://github.com/tddl/tddl/schema/matrix"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="https://github.com/tddl/tddl/schema/matrix https://raw.github.com/tddl/tddl/master/tddl-common/src/main/resources/META-INF/matrix.xsd">
-	
+
 	<appName>andor_show</appName>
 	<group name="andor_show_group0" type="MYSQL_JDBC">
 		<properties>
@@ -22,7 +22,8 @@
 					dbStatus=RW
 				</value>
 				</property>
-				<property name="com.taobao.tddl.atom.app.andor_show.andor_show_group0_atom0">
+				<property
+					name="com.taobao.tddl.atom.app.andor_show.andor_show_group0_atom0">
 					<value>
 					userName=andor
 					minPoolSize=20
@@ -53,12 +54,12 @@
 
 	<group name="andor_show_group1" type="MYSQL_JDBC">
 	</group>
-	
-		<group name="ob_group" type="OCEANBASE_JDBC">
+
+	<group name="ob_group" type="OCEANBASE_JDBC">
 		<properties>
-						<property name="CONFIGURL">
-					<value>http://obconsole.test.alibaba-inc.com/ob-config/config.co?dataId=wireless_message</value>
-				</property>
-			</properties>
+			<property name="CONFIGURL">
+				<value>http://obconsole.test.alibaba-inc.com/ob-config/config.co?dataId=wireless_message</value>
+			</property>
+		</properties>
 	</group>
 </matrix>

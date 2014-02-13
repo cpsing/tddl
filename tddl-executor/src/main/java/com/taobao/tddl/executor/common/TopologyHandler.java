@@ -181,7 +181,7 @@ public class TopologyHandler extends AbstractLifecycle {
             doc.appendChild(matrix); // 将根元素添加到文档上
             Element appNameNode = doc.createElement("appName");
             appNameNode.appendChild(doc.createTextNode(appName));
-            doc.appendChild(appNameNode);
+            matrix.appendChild(appNameNode);
 
             for (String str : keysArray) {
                 Element group = doc.createElement("group");

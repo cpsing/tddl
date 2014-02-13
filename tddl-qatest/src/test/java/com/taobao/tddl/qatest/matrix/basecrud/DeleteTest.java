@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
@@ -70,7 +71,7 @@ public class DeleteTest extends BaseMatrixTestCase {
         selectConutAssert(sql, Collections.EMPTY_LIST);
     }
 
-    // @Ignore("目前delete操作不支持后面跟order by ? limit ?操作")
+    @Ignore("目前delete操作不支持后面跟order by ? limit ?操作")
     @Test
     public void deleteWithOrderByLimitTest() throws Exception {
         int limitNum = 1;

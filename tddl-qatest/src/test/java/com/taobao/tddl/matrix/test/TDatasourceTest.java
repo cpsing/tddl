@@ -1,4 +1,5 @@
 package com.taobao.tddl.matrix.test;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,7 +20,6 @@ public class TDatasourceTest {
         ds.setAppName("andor_show");
         ds.setTopologyFile("test_matrix.xml");
         ds.setSchemaFile("test_schema.xml");
-
         ds.init();
 
         Connection conn = ds.getConnection();
@@ -31,6 +31,5 @@ public class TDatasourceTest {
         rs.close();
         ps.close();
         conn.close();
-
     }
 }

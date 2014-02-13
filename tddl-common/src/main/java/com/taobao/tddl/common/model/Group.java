@@ -27,6 +27,10 @@ public class Group {
         public boolean isMysql() {
             return this == MYSQL_JDBC;
         }
+
+        public boolean isOracle() {
+            return this == ORACLE_JDBC;
+        }
     }
 
     /**

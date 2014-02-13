@@ -1,6 +1,7 @@
 package com.taobao.tddl.matrix.config;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +9,7 @@ import com.taobao.tddl.common.TddlConstants;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.model.ExtraCmd;
 import com.taobao.tddl.common.model.Group;
+import com.taobao.tddl.common.model.Group.GroupType;
 import com.taobao.tddl.common.model.Matrix;
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.config.impl.holder.AbstractConfigDataHolder;
@@ -87,9 +89,13 @@ public class MatrixConfigHolder extends AbstractConfigDataHolder {
         addDatas(matrix.getProperties());
         initSonHolder();
         // 将自己做为config holder
-        ConfigHolderFactory.addConfigDataHolder(appName, this);
-        if (createGroupExecutor) {
-            initGroups();
+        try {
+            ConfigHolderFactory.addConfigDataHolder(appName, this);
+            if (createGroupExecutor) {
+                initGroups();
+            }
+        } finally {
+            ConfigHolderFactory.removeConfigHoder(appName);
         }
     }
 
@@ -165,9 +171,16 @@ public class MatrixConfigHolder extends AbstractConfigDataHolder {
         }
 
         try {
+            List<Group> groups = new ArrayList<Group>();
+            for (Group group : matrix.getGroups()) {
+                GroupType type = group.getType();
+                if (type.isMysql() || type.isOracle()) {
+                    groups.add(group);
+                }
+            }
             Constructor constructor = sonHolderClass.getConstructor(String.class, List.class, String.class);
             sonConfigDataHolder = (AbstractConfigDataHolder) constructor.newInstance(this.appName,
-                matrix.getGroups(),
+                groups,
                 this.unitName);
             sonConfigDataHolder.init();
             delegateDataHolder.setSonConfigDataHolder(sonConfigDataHolder);// 传递给deletegate，由它进行son传递

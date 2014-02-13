@@ -1,4 +1,5 @@
 package com.taobao.tddl.matrix.test;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,24 +20,19 @@ public class TransactionTest {
 
     @BeforeClass
     public static void initTestWithDS() throws TddlException, SQLException {
-
         ds.setAppName("andor_show");
         ds.setTopologyFile("test_matrix.xml");
         ds.setSchemaFile("test_schema.xml");
 
         ds.init();
-
     }
 
     @Test
     public void testNotAutoCommit() throws Exception {
         TConnection conn = (TConnection) ds.getConnection();
         conn.setAutoCommit(false);
-
         ExecutionContext context = conn.getExecutionContext();
-
         Assert.assertTrue(context.getTransaction() == null);
-
         {
             PreparedStatement ps = conn.prepareStatement("select * from bmw_users where id=1");
             ResultSet rs = ps.executeQuery();
@@ -72,11 +68,8 @@ public class TransactionTest {
     public void testNotAutoCommitOnDifferentGroup() throws Exception {
         TConnection conn = (TConnection) ds.getConnection();
         conn.setAutoCommit(false);
-
         ExecutionContext context = conn.getExecutionContext();
-
         Assert.assertTrue(context.getTransaction() == null);
-
         {
             PreparedStatement ps = conn.prepareStatement("select * from bmw_users where id=1");
             ResultSet rs = ps.executeQuery();
@@ -86,12 +79,9 @@ public class TransactionTest {
 
         Assert.assertTrue(context.getTransaction() != null);
         My_Transaction t = (My_Transaction) context.getTransaction();
-
         Assert.assertEquals("My_Transaction", t.getClass().getSimpleName());
         Assert.assertEquals("andor_show_group1", context.getTransactionGroup());
-
         Assert.assertEquals(1, t.getConnMap().size());
-
         {
             try {
                 PreparedStatement ps = conn.prepareStatement("select * from bmw_users where id=2");
@@ -100,8 +90,7 @@ public class TransactionTest {
                 rs.close();
                 Assert.fail();
             } catch (Exception ex) {
-                Assert.assertEquals("com.taobao.tddl.common.exception.TddlException: com.taobao.tddl.common.exception.TddlRuntimeException: transaction across group is not supported, aim group is:andor_show_group0, current transaction group is:andor_show_group1",
-                    ex.getMessage());
+                Assert.assertTrue(ex.getMessage().contains("transaction across group is not supported"));
             }
         }
 
@@ -121,25 +110,21 @@ public class TransactionTest {
         conn.setAutoCommit(true);
 
         ExecutionContext context = conn.getExecutionContext();
-
         Assert.assertTrue(context.getTransaction() == null);
         My_Transaction t1 = null;
         {
             PreparedStatement ps = conn.prepareStatement("select * from bmw_users where id=1");
             ResultSet rs = ps.executeQuery();
-
             rs.next();
 
             context = conn.getExecutionContext();
-
             Assert.assertTrue(context.getTransaction() != null);
             t1 = (My_Transaction) context.getTransaction();
             Assert.assertEquals("My_Transaction", t1.getClass().getSimpleName());
             Assert.assertEquals("andor_show_group1", context.getTransactionGroup());
-            Assert.assertEquals(1, t1.getConnMap().size());
-
+            // autocommit, 事务链接不共享，单独管理
+            Assert.assertEquals(0, t1.getConnMap().size());
             rs.close();
-
             Assert.assertEquals(0, t1.getConnMap().size());
         }
 
@@ -147,16 +132,12 @@ public class TransactionTest {
         {
             PreparedStatement ps = conn.prepareStatement("select * from bmw_users where id=1");
             ResultSet rs = ps.executeQuery();
-
             context = conn.getExecutionContext();
-
             rs.next();
 
             t2 = (My_Transaction) context.getTransaction();
-            Assert.assertEquals(1, t2.getConnMap().size());
-
+            Assert.assertEquals(0, t2.getConnMap().size());
             rs.close();
-
             Assert.assertEquals(0, t2.getConnMap().size());
         }
 
@@ -177,11 +158,8 @@ public class TransactionTest {
     public void testNotAutoCommit2() throws Exception {
         TConnection conn = (TConnection) ds.getConnection();
         conn.setAutoCommit(false);
-
         ExecutionContext context1 = conn.getExecutionContext();
-
         Assert.assertTrue(context1.getTransaction() == null);
-
         {
             PreparedStatement ps = conn.prepareStatement("select * from bmw_users where id=1");
             ResultSet rs = ps.executeQuery();
@@ -196,9 +174,7 @@ public class TransactionTest {
 
         Assert.assertEquals("My_Transaction", t1.getClass().getSimpleName());
         Assert.assertEquals("andor_show_group1", context1.getTransactionGroup());
-
         Assert.assertEquals(1, t1.getConnMap().size());
-
         {
             PreparedStatement ps = conn.prepareStatement("select * from bmw_users where id=1");
             ResultSet rs = ps.executeQuery();
@@ -211,11 +187,9 @@ public class TransactionTest {
         Assert.assertEquals(t1, conn.getExecutionContext().getTransaction());
         Assert.assertEquals(1, t1.getConnMap().size());
         conn.commit();
-
-        Assert.assertEquals(1, t1.getConnMap().size());
-
+        // commit之后，事务就会关闭
+        Assert.assertEquals(0, t1.getConnMap().size());
         conn.setAutoCommit(true);
-
         {
             PreparedStatement ps = conn.prepareStatement("select * from bmw_users where id=2");
             ResultSet rs = ps.executeQuery();
@@ -224,17 +198,12 @@ public class TransactionTest {
         }
 
         ExecutionContext context2 = conn.getExecutionContext();
-
         My_Transaction t2 = (My_Transaction) context2.getTransaction();
         Assert.assertEquals("andor_show_group0", context2.getTransactionGroup());
         Assert.assertTrue(context2 != context1);
-
         conn.close();
-
         Assert.assertEquals(0, t1.getConnMap().size());
-
         Assert.assertEquals(0, t2.getConnMap().size());
-
     }
 
 }
