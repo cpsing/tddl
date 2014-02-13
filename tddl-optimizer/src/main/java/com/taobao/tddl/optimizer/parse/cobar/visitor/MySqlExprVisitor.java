@@ -103,6 +103,11 @@ import com.taobao.tddl.optimizer.exceptions.OptimizerException;
 /**
  * 解析mysql表达式
  * 
+ * <pre>
+ * 参考资料：
+ * 1. https://dev.mysql.com/doc/refman/5.6/en/comparison-operators.html
+ * </pre>
+ * 
  * @since 5.0.0
  */
 public class MySqlExprVisitor extends EmptySQLASTVisitor {
@@ -180,8 +185,6 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         }
 
         this.filter = ibf;
-
-        ibf.getFunctionName();
     }
 
     @Override
@@ -221,13 +224,17 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         } else if (node instanceof AssignmentExpression) {
             throw new NotSupportException("not support ':=' ");
         } else if (node instanceof BitAndExpression) {
-            this.handleArithmetric(node, node.getOperator());
+            this.handleArithmetric(node, IFunction.BuiltInFunction.BITAND);
         } else if (node instanceof BitOrExpression) {
-            this.handleArithmetric(node, node.getOperator());
+            this.handleArithmetric(node, IFunction.BuiltInFunction.BITOR);
         } else if (node instanceof BitShiftExpression) {
-            this.handleArithmetric(node, node.getOperator());
+            if (((BitShiftExpression) node).isRightShift()) {
+                this.handleArithmetric(node, IFunction.BuiltInFunction.BITRSHIFT);
+            } else {
+                this.handleArithmetric(node, IFunction.BuiltInFunction.BITLSHIFT);
+            }
         } else if (node instanceof BitXORExpression) {
-            this.handleArithmetric(node, node.getOperator());
+            this.handleArithmetric(node, IFunction.BuiltInFunction.BITXOR);
         } else if (node instanceof InExpression) {
             this.handleInExpression((InExpression) node);
         } else if (node instanceof LogicalXORExpression) {
@@ -258,7 +265,11 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
         }
 
         IFunction f = ASTNodeFactory.getInstance().createFunction();
-        f.setFunctionName(node.getOperator());
+        if (node instanceof MinusExpression) {
+            f.setFunctionName(IFunction.BuiltInFunction.MINUS);
+        } else {
+            f.setFunctionName(node.getOperator());
+        }
         MySqlExprVisitor ev = new MySqlExprVisitor();
         node.getOperand().accept(ev);
         Object arg = ev.getColumnOrValue();

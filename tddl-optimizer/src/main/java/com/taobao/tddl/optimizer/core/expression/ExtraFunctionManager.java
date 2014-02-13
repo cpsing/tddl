@@ -119,6 +119,16 @@ public class ExtraFunctionManager {
             return "DIVISION";
         } else if (IFunction.BuiltInFunction.MOD.equals(name)) {
             return "MOD";
+        } else if (IFunction.BuiltInFunction.BITAND.equals(name)) {
+            return "BITAND";
+        } else if (IFunction.BuiltInFunction.BITOR.equals(name)) {
+            return "BITOR";
+        } else if (IFunction.BuiltInFunction.BITXOR.equals(name)) {
+            return "BITXOR";
+        } else if (IFunction.BuiltInFunction.BITLSHIFT.equals(name)) {
+            return "BITLSHIFT";
+        } else if (IFunction.BuiltInFunction.BITRSHIFT.equals(name)) {
+            return "BITRSHIFT";
         }
 
         return name;// 默认语法树中所有节点均为大写

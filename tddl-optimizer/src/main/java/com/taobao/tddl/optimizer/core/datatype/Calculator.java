@@ -27,5 +27,4 @@ public interface Calculator {
     Object bitXor(Object v1, Object v2);
 
     Object bitNot(Object v1);
-
 }

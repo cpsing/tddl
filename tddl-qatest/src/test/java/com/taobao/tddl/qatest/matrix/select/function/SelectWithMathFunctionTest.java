@@ -223,4 +223,46 @@ public class SelectWithMathFunctionTest extends BaseMatrixTestCase {
         selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
     }
 
+    @Test
+    public void divTest() throws Exception {
+        String sql = "select SUM(id) div sum(pk) as d FROM " + normaltblTableName;
+        String[] columnParam1 = { "d" };
+        selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+    }
+
+    @Test
+    public void bitAndTest() throws Exception {
+        String sql = "select SUM(id) & sum(pk) as d FROM " + normaltblTableName;
+        String[] columnParam1 = { "d" };
+        selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+    }
+
+    @Test
+    public void bitOrTest() throws Exception {
+        String sql = "select SUM(id) | sum(pk) as d FROM " + normaltblTableName;
+        String[] columnParam1 = { "d" };
+        selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+    }
+
+    @Test
+    public void bitXorTest() throws Exception {
+        String sql = "select SUM(id) ^ sum(pk) as d FROM " + normaltblTableName;
+        String[] columnParam1 = { "d" };
+        selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+    }
+
+    @Test
+    public void bitLShiftTest() throws Exception {
+        String sql = "select SUM(id) >> 2 as d FROM " + normaltblTableName;
+        String[] columnParam1 = { "d" };
+        selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+    }
+
+    @Test
+    public void bitRShiftTest() throws Exception {
+        String sql = "select SUM(id) << 2 as d FROM " + normaltblTableName;
+        String[] columnParam1 = { "d" };
+        selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+    }
+
 }

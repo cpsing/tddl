@@ -17,6 +17,12 @@ public interface IFunction<RT extends IFunction> extends ISelectable<RT> {
         final static String MULTIPLY      = "*";
         final static String DIVISION      = "/";
         final static String MOD           = "%";
+        final static String BITAND        = "&";
+        final static String BITOR         = "|";
+        final static String BITXOR        = "^";
+        final static String BITLSHIFT     = "<<";
+        final static String BITRSHIFT     = ">>";
+        final static String MINUS         = "MINUS";
         final static String AVG           = "AVG";
         final static String SUM           = "SUM";
         final static String COUNT         = "COUNT";

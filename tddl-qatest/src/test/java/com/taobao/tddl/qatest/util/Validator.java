@@ -1,6 +1,7 @@
 package com.taobao.tddl.qatest.util;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -364,6 +365,8 @@ public class Validator {
             data = ((Date) data).getTime();
         } else if (data instanceof byte[]) {
             data = rs.getString(columnParam[i]);
+        } else if (data instanceof BigInteger) {
+            data = new BigDecimal((BigInteger) data);
         }
 
         if (data instanceof BigDecimal) {
