@@ -320,9 +320,12 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
                 sqlBuilder.append(" ").append(funcName);
             } else {
                 if (!isMiddle) {
-                    if (!"ROW".equals(funcName)) { // row代表向量匹配
+                    if (IFunction.BuiltInFunction.MINUS.equals(funcName)) {
+                        sqlBuilder.append("-");
+                    } else if (!IFunction.BuiltInFunction.ROW.equals(funcName)) { // row代表向量匹配
                         sqlBuilder.append(funcName);
                     }
+
                     sqlBuilder.append("(");
                 }
                 boolean first = true;

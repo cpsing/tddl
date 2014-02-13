@@ -310,7 +310,7 @@ public class MySqlExprVisitor extends EmptySQLASTVisitor {
     @Override
     public void visit(RowExpression node) {
         IFunction ifunc = ASTNodeFactory.getInstance().createFunction();
-        ifunc.setFunctionName("ROW");
+        ifunc.setFunctionName(IFunction.BuiltInFunction.ROW);
         List<Comparable> args = new ArrayList<Comparable>();
         for (int i = 0; i < node.getRowExprList().size(); i++) {
             MySqlExprVisitor mv = new MySqlExprVisitor();

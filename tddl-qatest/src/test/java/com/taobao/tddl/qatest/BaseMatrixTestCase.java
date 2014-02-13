@@ -32,20 +32,19 @@ import com.taobao.tddl.qatest.util.PrepareData;
 @Ignore(value = "提供初始化环境的实际方法")
 public class BaseMatrixTestCase extends PrepareData {
 
-    protected static final ExecutorService pool                    = Executors.newCachedThreadPool();
-    private static String                  ruleFile                = "V0#classpath:matrix/";
-    private static String                  rule                    = "rule.xml";
+    protected static final ExecutorService pool                = Executors.newCachedThreadPool();
+    private static String                  ruleFile            = "V0#classpath:matrix/";
+    private static String                  rule                = "rule.xml";
 
-    private static String                  schemaFile              = "matrix/";
-    private static String                  schema                  = "schema.xml";
+    private static String                  schemaFile          = "matrix/";
+    private static String                  schema              = "schema.xml";
     // dbType为mysql运行mysql测试，bdb值为bdb运行bdb测试，如果为空则运行bdb和mysql测试
-    protected static String                dbType                  = null;
+    protected static String                dbType              = null;
 
-    protected static boolean               needPerparedData        = true;
-    private static String                  machineTapologyFile     = "matrix/server_topology.xml";
-    private static String                  machineTapologyAyncFile = "matrix/server_async_topology.xml";
+    protected static boolean               needPerparedData    = true;
+    private static String                  machineTapologyFile = "matrix/server_topology.xml";
 
-    private static String                  typeFile                = "db_type.properties";
+    private static String                  typeFile            = "db_type.properties";
 
     static {
         dbType = LoadPropsUtil.loadProps(typeFile).getProperty("dbType");
