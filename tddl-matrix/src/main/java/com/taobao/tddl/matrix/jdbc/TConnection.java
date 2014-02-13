@@ -47,7 +47,7 @@ public class TConnection implements Connection {
 
     private MatrixExecutor         executor             = null;
     private final TDataSource      ds;
-    private ExecutionContext       executionContext     = new ExecutionContext();
+    private ExecutionContext       executionContext     = null;                                                      // 记录上一次的执行上下文
     private final List<TStatement> openedStatements     = Collections.synchronizedList(new ArrayList<TStatement>(2));
     private boolean                isAutoCommit         = true;                                                      // jdbc规范，新连接为true
     private boolean                closed;
@@ -97,16 +97,8 @@ public class TConnection implements Connection {
     @Override
     public PreparedStatement prepareStatement(String sql) throws SQLException {
         checkClosed();
-        if (isAutoCommit) {
-            executionContext = new ExecutionContext();
-        } else {
-            if (executionContext == null) {
-                executionContext = new ExecutionContext();
-                executionContext.setAutoCommit(false);
-            }
-        }
-
-        TPreparedStatement stmt = new TPreparedStatement(ds, this, sql, executionContext);
+        ExecutionContext context = prepareExecutionContext();
+        TPreparedStatement stmt = new TPreparedStatement(ds, this, sql, context);
         openedStatements.add(stmt);
         return stmt;
     }
@@ -114,18 +106,27 @@ public class TConnection implements Connection {
     @Override
     public Statement createStatement() throws SQLException {
         checkClosed();
-        if (isAutoCommit) {
-            executionContext = new ExecutionContext();
-        } else {
-            if (executionContext == null) {
-                executionContext = new ExecutionContext();
-                executionContext.setAutoCommit(false);
-            }
-        }
-
-        TStatement stmt = new TStatement(ds, this, executionContext);
+        ExecutionContext context = prepareExecutionContext();
+        TStatement stmt = new TStatement(ds, this, context);
         openedStatements.add(stmt);
         return stmt;
+    }
+
+    private ExecutionContext prepareExecutionContext() {
+        if (isAutoCommit) {
+            // 即使为autoCommit也需要记录
+            // 因为在JDBC规范中，只要在statement.execute执行之前,设置autoCommit=false都是有效的
+            this.executionContext = new ExecutionContext();
+        } else {
+            if (this.executionContext == null) {
+                this.executionContext = new ExecutionContext();
+            }
+
+            if (this.executionContext.isAutoCommit()) {
+                this.executionContext.setAutoCommit(false);
+            }
+        }
+        return this.executionContext;
     }
 
     /*
@@ -142,7 +143,9 @@ public class TConnection implements Connection {
             return;
         }
         this.isAutoCommit = autoCommit;
-        this.executionContext.setAutoCommit(autoCommit);
+        if (this.executionContext != null) {
+            this.executionContext.setAutoCommit(autoCommit);
+        }
     }
 
     @Override
@@ -158,12 +161,14 @@ public class TConnection implements Connection {
             return;
         }
 
-        try {
-            this.executor.commit(this.executionContext);
-        } catch (TddlException e) {
-            throw new SQLException(e);
+        if (this.executionContext != null) {
+            try {
+                this.executor.commit(this.executionContext);
+                this.executionContext = null;
+            } catch (TddlException e) {
+                throw new SQLException(e);
+            }
         }
-
     }
 
     @Override
@@ -173,10 +178,13 @@ public class TConnection implements Connection {
             return;
         }
 
-        try {
-            this.executor.rollback(executionContext);
-        } catch (TddlException e) {
-            throw new SQLException(e);
+        if (this.executionContext != null) {
+            try {
+                this.executor.rollback(executionContext);
+                this.executionContext = null;
+            } catch (TddlException e) {
+                throw new SQLException(e);
+            }
         }
     }
 

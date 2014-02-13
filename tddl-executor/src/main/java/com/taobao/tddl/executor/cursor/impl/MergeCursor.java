@@ -284,7 +284,6 @@ public class MergeCursor extends SchematicCursor implements IMergeCursor {
      * @param srcFilter
      * @param mergeFilter
      */
-    @SuppressWarnings("unused")
     private IFilter removeDupFilter(IFilter srcFilter, IBooleanFilter inFilter) {
         List<List<IFilter>> filters = FilterUtils.toDNFNodesArray(srcFilter);
         List<List<IFilter>> newFilters = new ArrayList<List<IFilter>>();

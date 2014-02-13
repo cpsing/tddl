@@ -94,10 +94,11 @@ public class TopologyExecutor extends AbstractLifecycle implements ITopologyExec
     public ResultCursor rollback(ExecutionContext executionContext) throws TddlException {
 
         ResultCursor rc = new ResultCursor(null, executionContext);
-        if (executionContext.getTransactionGroup() == null) return rc;
+        if (executionContext.getTransactionGroup() == null) {
+            return rc;
+        }
 
         return getGroupExecutor(executionContext.getTransactionGroup(), executionContext).rollback(executionContext);
-
     }
 
     @Override
