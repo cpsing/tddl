@@ -14,8 +14,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
-import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.ExecuteTableName;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 
 /**
  * Comment for SelectWithLike
@@ -87,8 +87,10 @@ public class SelectWithLike extends BaseMatrixTestCase {
         String[] columnParam = { "ID", "NAME" };
         selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
 
-        sql = "select * from " + normaltblTableName + " where name like 'ZHuoXUE'";
-        selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
+        if (!normaltblTableName.contains("ob_")) {
+            sql = "select * from " + normaltblTableName + " where name like 'ZHuoXUE'";
+            selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
+        }
     }
 
     /**
@@ -184,7 +186,7 @@ public class SelectWithLike extends BaseMatrixTestCase {
         param.add(25);
         selectConutAssert(sql, param);
 
-        sql = "select * from " + normaltblTableName + " as tab  where name like ? and gmt_create > ? limit ?,?";
+        sql = "select * from " + normaltblTableName + " as tab  where name like ? and gmt_timestamp > ? limit ?,?";
         param.clear();
         param.add("%uo%");
         param.add(gmt);
@@ -192,16 +194,16 @@ public class SelectWithLike extends BaseMatrixTestCase {
         param.add(25);
         selectConutAssert(sql, param);
 
-        sql = "select * from " + normaltblTableName + " as tab where (name like ? and gmt_create > ?) limit ?,?";
+        sql = "select * from " + normaltblTableName + " as tab where (name like ? and gmt_timestamp > ?) limit ?,?";
         selectConutAssert(sql, param);
     }
 
     @Test
     public void likeWithOrder() throws Exception {
-        String[] columnParam = { "name", "gmt_create" };
-        String notKeyCloumn = "gmt_create";
+        String[] columnParam = { "name", "gmt_timestamp" };
+        String notKeyCloumn = "gmt_timestamp";
         String sql = "SELECT * from " + normaltblTableName
-                     + " where name like ? and gmt_create> ? and gmt_create< ? order by gmt_create";
+                     + " where name like ? and gmt_timestamp> ? and gmt_timestamp< ? order by gmt_timestamp";
         List<Object> param = new ArrayList<Object>();
         param.add("%zh%xue%");
         param.add(gmtBefore);
@@ -209,20 +211,21 @@ public class SelectWithLike extends BaseMatrixTestCase {
         selectOrderAssertNotKeyCloumn(sql, columnParam, param, notKeyCloumn);
 
         sql = "SELECT * from " + normaltblTableName
-              + " where name like ? and gmt_create> ? and gmt_create< ? order by gmt_create desc";
+              + " where name like ? and gmt_timestamp> ? and gmt_timestamp< ? order by gmt_timestamp desc";
         selectOrderAssertNotKeyCloumn(sql, columnParam, param, notKeyCloumn);
 
         sql = "SELECT * from " + normaltblTableName
-              + " as tab where (name like ? and (gmt_create> ? and gmt_create< ?)) order by  gmt_create desc";
+              + " as tab where (name like ? and (gmt_timestamp> ? and gmt_timestamp< ?)) order by  gmt_timestamp desc";
         selectOrderAssertNotKeyCloumn(sql, columnParam, param, notKeyCloumn);
 
         sql = "SELECT * from "
               + normaltblTableName
-              + " as tab where (name like '%zhuo%' and (gmt_create> '2011-1-1' and gmt_create< '2018-7-9')) order by  gmt_create desc limit 10";
+              + " as tab where (name like '%zhuo%' and (gmt_timestamp> '2011-1-1' and gmt_timestamp< '2018-7-9')) order by  gmt_timestamp desc limit 10";
         selectOrderAssertNotKeyCloumn(sql, columnParam, Collections.EMPTY_LIST, notKeyCloumn);
 
-        sql = "SELECT * from " + normaltblTableName
-              + " as tab where (name like ? and (gmt_create> ? and gmt_create< ?)) order by  gmt_create desc limit ?,?";
+        sql = "SELECT * from "
+              + normaltblTableName
+              + " as tab where (name like ? and (gmt_timestamp> ? and gmt_timestamp< ?)) order by  gmt_timestamp desc limit ?,?";
         param.clear();
         param.add("%zh%xue%");
         param.add(gmtBefore);

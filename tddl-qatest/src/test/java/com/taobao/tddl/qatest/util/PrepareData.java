@@ -100,8 +100,8 @@ public class PrepareData extends BaseTestCase {
             ps.setObject(1, Long.parseLong(i + ""));
             andorPs.setObject(2, i * 100);
             ps.setObject(2, i * 100);
-            andorPs.setObject(3, gmt);
-            ps.setObject(3, gmt);
+            andorPs.setObject(3, gmtDay);
+            ps.setObject(3, gmtDay);
             andorPs.setObject(4, gmt);
             ps.setObject(4, gmt);
             andorPs.setObject(5, gmt);
@@ -384,7 +384,7 @@ public class PrepareData extends BaseTestCase {
         param.clear();
         param.add(20l);
         param.add(name1);
-        param.add(gmt);
+        param.add(gmtDay);
         andorUpdateData(sql, param);
         mysqlUpdateData(sql, param);
 
@@ -392,7 +392,7 @@ public class PrepareData extends BaseTestCase {
         param.clear();
         param.add(21l);
         param.add(name2);
-        param.add(gmt);
+        param.add(gmtDay);
         andorUpdateData(sql, param);
         mysqlUpdateData(sql, param);
     }

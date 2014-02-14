@@ -667,12 +667,10 @@ public class Validator {
                     Assert.assertTrue("长度不够", false);
                 }
                 for (int i = 0; i < columnParam.length; i++) {
-                    Object obj = rs.getObject(columnParam[i]);
-                    if (obj instanceof BigDecimal) {
-                        obj = ((BigDecimal) obj).longValue();
-                    }
+                    Object obj = getObject(rs, columnParam, i);
                     mysqlResult.add(obj);
-                    result.add(rc.getObject(columnParam[i]));
+                    obj = getObject(rc, columnParam, i);
+                    result.add(obj);
                 }
                 Assert.assertEquals(mysqlResult, result);
             }

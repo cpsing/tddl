@@ -40,6 +40,7 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
     protected StringBuilder                    sqlBuilder     = new StringBuilder();
     protected FunctionStringConstructorManager manager        = new FunctionStringConstructorManager();
     protected IDataNodeExecutor                query;
+    protected boolean                          isGroupBy      = false;
 
     private static Set<String>                 middleFuncName = new HashSet<String>();
 
@@ -79,6 +80,11 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
 
     public MysqlPlanVisitorImpl(IDataNodeExecutor query, Map<Integer, ParameterContext> paramMap,
                                 AtomicInteger bindValSequence, boolean bindVal){
+        this(query, paramMap, bindValSequence, bindVal, false);
+    }
+
+    public MysqlPlanVisitorImpl(IDataNodeExecutor query, Map<Integer, ParameterContext> paramMap,
+                                AtomicInteger bindValSequence, boolean bindVal, boolean isGroupBy){
         this.query = query;
         if (paramMap != null) {
             this.paramMap = paramMap;
@@ -93,6 +99,7 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
         }
 
         this.bindVal = bindVal;
+        this.isGroupBy = isGroupBy;
     }
 
     protected void buildGroupBy(IQueryTree<IQueryTree> query) {
@@ -107,7 +114,7 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
                     sqlBuilder.append(",");
                 }
 
-                MysqlPlanVisitorImpl visitor = this.getNewVisitor(order);
+                MysqlPlanVisitorImpl visitor = this.getOrderbyVisitor(order, true);
                 sqlBuilder.append(visitor.getString());
             }
         }
@@ -116,7 +123,7 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
     protected void buildHaving(IQueryTree query) {
         if (query.getHavingFilter() != null) {
             sqlBuilder.append(" having ");
-            MysqlPlanVisitorImpl visitor = this.getNewVisitor(query, query.getHavingFilter());
+            MysqlPlanVisitorImpl visitor = this.getNewVisitor(query.getHavingFilter());
             sqlBuilder.append(visitor.getString());
         }
     }
@@ -148,7 +155,7 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
                     sqlBuilder.append(",");
                 }
 
-                MysqlPlanVisitorImpl visitor = this.getNewVisitor(query, order);
+                MysqlPlanVisitorImpl visitor = this.getOrderbyVisitor(order, false);
                 sqlBuilder.append(visitor.getString());
             }
         }
@@ -168,7 +175,7 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
             if (selected.isDistinct()) {
                 hasDistinct = true;
             }
-            MysqlPlanVisitorImpl visitor = this.getNewVisitor(query, selected);
+            MysqlPlanVisitorImpl visitor = this.getNewVisitor(selected);
             sb.append(visitor.getString());
             if (selected.getAlias() != null) {
                 sb.append(" as ").append(selected.getAlias());
@@ -182,8 +189,20 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
         sqlBuilder.append(sb);
     }
 
+    public MysqlPlanVisitorImpl getOrderbyVisitor(IOrderBy o, boolean isGroupBy) {
+        MysqlPlanVisitorImpl visitor = new MysqlPlanVisitorImpl(query, paramMap, bindValSequence, bindVal, isGroupBy);
+
+        if (o instanceof CanVisit) {
+            ((CanVisit) o).accept(visitor);
+        } else {
+            visitor.visit(o);
+        }
+
+        return visitor;
+    }
+
     public MysqlPlanVisitorImpl getNewVisitor(Object o) {
-        MysqlPlanVisitorImpl visitor = new MysqlPlanVisitorImpl(query, paramMap, bindValSequence, bindVal);
+        MysqlPlanVisitorImpl visitor = new MysqlPlanVisitorImpl(query, paramMap, bindValSequence, bindVal, false);
 
         if (o instanceof CanVisit) {
             ((CanVisit) o).accept(visitor);
@@ -195,7 +214,7 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
     }
 
     public MysqlPlanVisitorImpl getNewVisitor(IQueryTree query, Object o) {
-        MysqlPlanVisitorImpl visitor = new MysqlPlanVisitorImpl(query, paramMap, bindValSequence, bindVal);
+        MysqlPlanVisitorImpl visitor = new MysqlPlanVisitorImpl(query, paramMap, bindValSequence, bindVal, false);
 
         if (o instanceof CanVisit) {
             ((CanVisit) o).accept(visitor);
@@ -447,12 +466,13 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
         MysqlPlanVisitorImpl visitor = this.getNewVisitor(orderBy.getColumn());
         sqlBuilder.append(visitor.getString());
 
-        if (orderBy.getDirection()) {
-            sqlBuilder.append(" asc ");
-        } else {
-            sqlBuilder.append(" desc ");
+        if (!isGroupBy) {
+            if (orderBy.getDirection()) {
+                sqlBuilder.append(" asc ");
+            } else {
+                sqlBuilder.append(" desc ");
+            }
         }
-
     }
 
     @Override

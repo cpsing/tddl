@@ -14,8 +14,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
-import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.ExecuteTableName;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 
 /**
  * 带条件的选择查询
@@ -513,8 +513,9 @@ public class SelectWithConditionTest extends BaseMatrixTestCase {
 
     @Test
     public void dateTypeWithLimit() throws Exception {
-        String sql = "select * from " + normaltblTableName
-                     + " where gmt_create>? and gmt_create <? and name like ? order by gmt_create desc limit 2,5";
+        String sql = "select * from "
+                     + normaltblTableName
+                     + " where gmt_timestamp>? and gmt_timestamp <? and name like ? order by gmt_timestamp desc limit 2,5";
         List<Object> param = new ArrayList<Object>();
         param.add(gmtBefore);
         param.add(gmtNext);
@@ -522,7 +523,7 @@ public class SelectWithConditionTest extends BaseMatrixTestCase {
         selectConutAssert(sql, param);
 
         sql = "select * from " + normaltblTableName
-              + " where gmt_create>=? and gmt_create <=? and name like ? order by gmt_create desc limit 2,5";
+              + " where gmt_timestamp>=? and gmt_timestamp <=? and name like ? order by gmt_timestamp desc limit 2,5";
         param.clear();
         param.add(gmtBefore);
         param.add(gmtNext);
@@ -530,7 +531,7 @@ public class SelectWithConditionTest extends BaseMatrixTestCase {
         selectConutAssert(sql, param);
 
         sql = "select * from " + normaltblTableName
-              + " where gmt_create>? and gmt_create <? and name like ? order by gmt_create desc limit 10,5";
+              + " where gmt_timestamp>? and gmt_timestamp <? and name like ? order by gmt_timestamp desc limit 10,5";
 
         param.clear();
         param.add(gmtBefore);
