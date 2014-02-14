@@ -29,6 +29,7 @@
 		<result column="datetimer" property="datetimeDate" />
 		<result column="timestampr" property="timestampr" />
 		<result column="yearr" property="yearr" />
+		<result column="unsignedintr" property="unsignedintr" />
 	</resultMap>
 	<resultMap id="normalTblNullRow" class="com.taobao.tddl.qatest.util.NormalTblNullRow">
 		<result column="pk" property="pk" />
@@ -54,6 +55,7 @@
 		<result column="datetimer" property="datetimeDate" />
 		<result column="timestampr" property="timestampr" />
 		<result column="yearr" property="yearr" />
+		<result column="unsignedintr" property="unsignedintr" />
 	</resultMap>
 	
    <select id="select_test" resultMap="normalTblRow">
@@ -78,16 +80,16 @@
 	</select>
 	<insert id="insert_test">
 		insert into mysql_ibatis_type (pk,varcharr,charr,blobr,integerr,tinyintr,smallintr,mediumintr,bitr,bigintr,floatr,doubler,decimalr,dater,
-		timer,datetimer,timestampr,yearr) values
+		timer,datetimer,timestampr,yearr,unsignedintr) values
 		(#pk#,#varcharr#,#charr#,#blobr#,#integerr#,#tinyintr#,#smallintr#,#mediumintr#,#bitr#,#bigintr#,#floatr#,#doubler#,#decimalr#,#dater#,
-		#timer#,#datetimer#,#timestampr#,#yearr#)
+		#timer#,#datetimer#,#timestampr#,#yearr#,#unsignedintr#)
     </insert>
     
     	<insert id="insert_tdhs_test">
 		insert into tdhs_ibatis_type (pk,varcharr,charr,blobr,integerr,tinyintr,smallintr,mediumintr,bitr,bigintr,floatr,doubler,decimalr,dater,
-		timer,datetimer,timestampr,yearr) values
+		timer,datetimer,timestampr,yearr,unsignedintr) values
 		(#pk#,#varcharr#,#charr#,#blobr#,#integerr#,#tinyintr#,#smallintr#,#mediumintr#,#bitr#,#bigintr#,#floatr#,#doubler#,#decimalr#,#dater#,
-		#timer#,#datetimer#,#timestampr#,#yearr#)
+		#timer#,#datetimer#,#timestampr#,#yearr#,#unsignedintr#)
     </insert>
     	<insert id="delete_test">
 		delete from mysql_ibatis_type where pk=#pk#

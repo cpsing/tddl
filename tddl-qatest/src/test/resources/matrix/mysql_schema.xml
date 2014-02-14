@@ -124,6 +124,7 @@
 			<column name="datetimer" type="Timestamp" />
 			<column name="timestampr" type="Timestamp" />
 			<column name="yearr" type="Date" />
+			<column name="unsignedintr" type="Long" />
 		</columns>
 		<primaryKey>pk</primaryKey>
 	</table>

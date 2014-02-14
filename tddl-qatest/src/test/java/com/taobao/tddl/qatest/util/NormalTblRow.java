@@ -42,6 +42,17 @@ public class NormalTblRow {
     private long       decimalLong;
     private int        decimalInt;
 
+    private long		unsignedintr;
+
+
+	public long getUnsignedintr() {
+		return unsignedintr;
+	}
+
+	public void setUnsignedintr(long unsignedintr) {
+		this.unsignedintr = unsignedintr;
+	}
+
     /**
      * @return the pk
      */
