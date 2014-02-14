@@ -33,8 +33,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         Main main = new Main();
-        main.dir(new File(
-                          "/media/BC4CF85E4CF814BC/work/cobar/cobar-1.1.0-dev/cobar-parser/src/main/java/com/alibaba/cobar/parser/ast/expression"));
+        main.dir(new File("/media/BC4CF85E4CF814BC/work/cobar/cobar-1.1.0-dev/cobar-parser/src/main/java/com/alibaba/cobar/parser/ast/expression"));
     }
 
     private void dir(File dir) throws Exception {
@@ -53,15 +52,15 @@ public class Main {
     protected static final String srcString    = "<a href=\"mailto:QiuShuo1985@gmail.com\">";
     protected static final String targetString = "<a href=\"mailto:shuo.qius@alibaba-inc.com\">";
 
-    //void visit(ASTNode groupBy);
+    // void visit(ASTNode groupBy);
     private void handleFile(File file) throws Exception {
         if (file == null || !file.getName().endsWith(".java")) {
             return;
         }
-        InputStream fileInputStream = null;
+        BufferedReader fin = null;
         try {
-            fileInputStream = new FileInputStream(file);
-            BufferedReader fin = new BufferedReader(new InputStreamReader(fileInputStream, "gbk"));
+            InputStream fileInputStream = new FileInputStream(file);
+            fin = new BufferedReader(new InputStreamReader(fileInputStream, "gbk"));
             File tmp = getTmpFile(file);
             PrintWriter tout = null;
             try {
@@ -90,7 +89,7 @@ public class Main {
             tmp.renameTo(new File(opath));
         } finally {
             try {
-                fileInputStream.close();
+                fin.close();
             } catch (Exception e) {
             }
         }

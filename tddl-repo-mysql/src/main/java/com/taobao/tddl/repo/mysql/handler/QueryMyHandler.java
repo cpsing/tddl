@@ -48,11 +48,8 @@ public class QueryMyHandler extends QueryHandler implements ICommandHandler {
         }
 
         IndexMeta indexMeta = null;
-
         My_JdbcHandler jdbcHandler = MysqlRepoUtils.getJdbcHandler(dsGetter, executor, executionContext);
-
         ICursorMeta meta = ExecUtils.convertToICursorMeta((IQueryTree) executor);
-
         My_Cursor my_cursor = new My_Cursor(jdbcHandler, meta, executor, executor.isStreaming());
 
         // if (executor.getSql() != null) {
@@ -76,9 +73,7 @@ public class QueryMyHandler extends QueryHandler implements ICommandHandler {
             if (order.getColumn().getAlias() != null) order.getColumn().setColumnName(order.getColumn().getAlias());
         }
 
-        if (GeneralUtil.getExtraCmdBoolean(executionContext.getExtraCmds(),
-            ExtraCmd.EXECUTE_QUERY_WHEN_CREATED,
-            false)) {
+        if (GeneralUtil.getExtraCmdBoolean(executionContext.getExtraCmds(), ExtraCmd.EXECUTE_QUERY_WHEN_CREATED, false)) {
             my_cursor.init();
         }
         return new SchematicMyCursor(my_cursor, meta, orderBy);
