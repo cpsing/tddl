@@ -54,7 +54,7 @@ public class StreamingOptimizer implements QueryPlanOptimizer {
                     child.setStreaming(true);
                 }
                 // 让子节点递归进行计算
-                this.findQueryOptimizeStreaming(((IJoin) dne).getLeftNode(), streaming, extraCmd);
+                this.findQueryOptimizeStreaming(child, streaming, extraCmd);
             }
         } else if (dne instanceof IJoin) {
             if (streaming) {
