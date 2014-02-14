@@ -38,6 +38,18 @@ public class NormalTblNullRow {
     private Double     floatDouble;
     private Float      doubleFloat;
 
+    private long		unsignedintr;
+    
+  
+
+	public long getUnsignedintr() {
+		return unsignedintr;
+	}
+
+	public void setUnsignedintr(long unsignedintr) {
+		this.unsignedintr = unsignedintr;
+	}
+
     /**
      * @return the pk
      */
