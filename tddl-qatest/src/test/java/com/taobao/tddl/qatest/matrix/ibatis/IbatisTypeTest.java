@@ -1,4 +1,4 @@
-package com.taobao.tddl.qatest.ibatis;
+package com.taobao.tddl.qatest.matrix.ibatis;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -23,7 +23,7 @@ import com.taobao.tddl.qatest.util.NormalTblRow;
  * Author By: zhuoxue.yll Created Date: 2013-4-7 下午4:54:30
  */
 
-public class ibatisTypeTest {
+public class IbatisTypeTest {
 
     protected static SqlMapClient andorSqlMapClient          = null;
     // protected static SqlMapClient andorTDHSSqlMapClient = null;
