@@ -362,7 +362,7 @@ public class Validator {
         } else if (data instanceof BigDecimal) {
             // data = data;
         } else if (data instanceof Date) {
-            data = ((Date) data).getTime();
+            data = ((Date) data).getTime() / 1000;
         } else if (data instanceof byte[]) {
             data = rs.getString(columnParam[i]);
         } else if (data instanceof BigInteger) {

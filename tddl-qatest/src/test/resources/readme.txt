@@ -4,3 +4,6 @@ atom/group
 
 matrix
 1. 测试库： 10.232.24.104
+
+oceanbase
+1. 测试库:  mysql -h10.235.152.7 -uadmin -padmin -P2828

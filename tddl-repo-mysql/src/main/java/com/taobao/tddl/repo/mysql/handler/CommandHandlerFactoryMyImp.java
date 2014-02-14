@@ -21,8 +21,6 @@ import com.taobao.tddl.optimizer.core.plan.query.IQuery;
  */
 public class CommandHandlerFactoryMyImp implements ICommandHandlerFactory {
 
-    private QueryMyHandler CONDENSABLE_JOIN_HANDLER;
-
     public CommandHandlerFactoryMyImp(){
         INSERT_HANDLER = new InsertMyHandler();
         UPDATE_HANDLER = new UpdateMyHandler();
@@ -36,15 +34,16 @@ public class CommandHandlerFactoryMyImp implements ICommandHandlerFactory {
         CONDENSABLE_JOIN_HANDLER = new QueryMyHandler();
     }
 
-    private final ICommandHandler INSERT_HANDLER;
-    private final ICommandHandler UPDATE_HANDLER;
-    private final ICommandHandler DELETE_HANDLER;
-    private final ICommandHandler REPLACE_HANDLER;
-    private final ICommandHandler QUERY_HANDLER;
-    private final ICommandHandler MERGE_HANDLER;
-    private final ICommandHandler INDEX_NEST_LOOP_JOIN_HANDLER;
-    private final ICommandHandler NEST_LOOP_JOIN_HANDLER;
-    private final ICommandHandler SORT_MERGE_JOIN_HANDLER;
+    protected QueryMyHandler  CONDENSABLE_JOIN_HANDLER;
+    protected ICommandHandler INSERT_HANDLER;
+    protected ICommandHandler UPDATE_HANDLER;
+    protected ICommandHandler DELETE_HANDLER;
+    protected ICommandHandler REPLACE_HANDLER;
+    protected ICommandHandler QUERY_HANDLER;
+    protected ICommandHandler MERGE_HANDLER;
+    protected ICommandHandler INDEX_NEST_LOOP_JOIN_HANDLER;
+    protected ICommandHandler NEST_LOOP_JOIN_HANDLER;
+    protected ICommandHandler SORT_MERGE_JOIN_HANDLER;
 
     @Override
     public ICommandHandler getCommandHandler(IDataNodeExecutor executor, ExecutionContext executionContext) {

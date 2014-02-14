@@ -13,7 +13,7 @@ import org.junit.runners.Parameterized.Parameters;
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
-import com.taobao.tddl.qatest.util.ExecuteTableName;
+import com.taobao.tddl.qatest.ExecuteTableName;
 
 @RunWith(EclipseParameterized.class)
 public class SelectWithFunctionOperationTest extends BaseMatrixTestCase {

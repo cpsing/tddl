@@ -16,8 +16,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
+import com.taobao.tddl.qatest.ExecuteTableName;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
-import com.taobao.tddl.qatest.util.ExecuteTableName;
 
 /**
  * Comment for LocalServerInsertTest
@@ -48,7 +48,7 @@ public class InsertTest extends BaseMatrixTestCase {
         List<Object> param = new ArrayList<Object>();
         param.add(RANDOM_ID);
         param.add(RANDOM_INT);
-        param.add(gmt);
+        param.add(gmtDay);
         param.add(gmt);
         param.add(gmt);
         param.add(name);
@@ -81,7 +81,7 @@ public class InsertTest extends BaseMatrixTestCase {
         String sql = "insert into " + normaltblTableName + " (pk,gmt_create,gmt_timestamp,gmt_datetime)values(?,?,?,?)";
         List<Object> param = new ArrayList<Object>();
         param.add(RANDOM_ID);
-        param.add(gmtString);
+        param.add(df.format(gmtDay));
         param.add(gmtString);
         param.add(gmtString);
         execute(sql, param);
@@ -149,7 +149,7 @@ public class InsertTest extends BaseMatrixTestCase {
         List<Object> param = new ArrayList<Object>();
         param.add(RANDOM_ID);
         param.add(fl);
-        param.add(gmt);
+        param.add(gmtDay);
         execute(sql, param);
 
         sql = "select * from " + normaltblTableName + " where pk=" + RANDOM_ID;
@@ -163,7 +163,7 @@ public class InsertTest extends BaseMatrixTestCase {
         List<Object> param = new ArrayList<Object>();
         param.add(RANDOM_ID);
         param.add(fl);
-        param.add(gmt);
+        param.add(gmtDay);
         execute(sql, param);
 
         sql = "select * from " + normaltblTableName + " where pk=" + RANDOM_ID;
@@ -180,7 +180,7 @@ public class InsertTest extends BaseMatrixTestCase {
     public void insertWithBdbOutParamTest() throws Exception {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String sql = "insert into " + normaltblTableName + "(pk,gmt_create,gmt_timestamp,gmt_datetime,id) values("
-                     + RANDOM_ID + ",'" + df.format(gmt) + "','" + df.format(gmt) + "','" + df.format(gmt) + "',"
+                     + RANDOM_ID + ",'" + df.format(gmtDay) + "','" + df.format(gmt) + "','" + df.format(gmt) + "',"
                      + RANDOM_INT + ")";
         execute(sql, Collections.EMPTY_LIST);
 
@@ -211,7 +211,7 @@ public class InsertTest extends BaseMatrixTestCase {
         List<Object> param = new ArrayList<Object>();
         param.add(RANDOM_INT);
         param.add(fl);
-        param.add(gmt);
+        param.add(gmtDay);
         try {
             andorUpdateData(sql, param);
             Assert.fail();
@@ -289,7 +289,7 @@ public class InsertTest extends BaseMatrixTestCase {
 
     @Test
     public void insertWithNowTest() throws Exception {
-        String sql = "insert into " + normaltblTableName + "(pk,gmt_create,id) values(" + RANDOM_ID + ",now()," + 1
+        String sql = "insert into " + normaltblTableName + "(pk,gmt_timestamp,id) values(" + RANDOM_ID + ",now()," + 1
                      + ")";
         mysqlUpdateData(sql, null);
         andorUpdateData(sql, null);
@@ -297,7 +297,7 @@ public class InsertTest extends BaseMatrixTestCase {
         sql = "select * from " + normaltblTableName + " where pk=" + 1;
         rs = mysqlQueryData(sql, null);
         rc = andorQueryData(sql, null);
-        String[] columnParam = { "gmt_create" };
+        String[] columnParam = { "gmt_timestamp" };
         assertOrder(rs, rc, columnParam);
     }
 
@@ -309,11 +309,11 @@ public class InsertTest extends BaseMatrixTestCase {
         param.add(fl);
         try {
             andorUpdateData(sql, param);
-            if (!normaltblTableName.contains("mysql")) {
+            if (!normaltblTableName.contains("mysql") && !normaltblTableName.contains("ob")) {
                 Assert.fail();
             }
         } catch (Exception ex) {
-            if (!normaltblTableName.contains("mysql")) {
+            if (!normaltblTableName.contains("mysql") && !normaltblTableName.contains("ob")) {
                 Assert.assertTrue(ex.getMessage().contains("is not supported"));
             } else {
                 Assert.assertTrue(ex.getMessage().contains("is not supported"));

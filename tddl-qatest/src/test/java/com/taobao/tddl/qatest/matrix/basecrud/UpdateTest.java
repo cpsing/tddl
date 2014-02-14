@@ -13,8 +13,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
+import com.taobao.tddl.qatest.ExecuteTableName;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
-import com.taobao.tddl.qatest.util.ExecuteTableName;
 
 @RunWith(EclipseParameterized.class)
 public class UpdateTest extends BaseMatrixTestCase {
@@ -39,7 +39,7 @@ public class UpdateTest extends BaseMatrixTestCase {
                      + " SET id=?,gmt_create=?,gmt_timestamp=?,gmt_datetime=?,name=?,floatCol=?";
         List<Object> param = new ArrayList<Object>();
         param.add(9999);
-        param.add(gmt);
+        param.add(gmtDay);
         param.add(gmt);
         param.add(gmt);
         param.add("new_name");
@@ -58,7 +58,7 @@ public class UpdateTest extends BaseMatrixTestCase {
                      + " SET id=?,gmt_create=?,gmt_timestamp=?,gmt_datetime=?,name=?,floatCol=? WHERE pk=?";
         List<Object> param = new ArrayList<Object>();
         param.add(rand.nextInt());
-        param.add(gmt);
+        param.add(gmtDay);
         param.add(gmt);
         param.add(gmt);
         param.add("new_name" + rand.nextInt());
@@ -78,7 +78,7 @@ public class UpdateTest extends BaseMatrixTestCase {
                      + "  SET id=?,gmt_create=?,gmt_timestamp=?,gmt_datetime=?,name=?,floatCol=? WHERE pk BETWEEN 3 AND 7";
         List<Object> param = new ArrayList<Object>();
         param.add(rand.nextInt());
-        param.add(gmt);
+        param.add(gmtDay);
         param.add(gmt);
         param.add(gmt);
         param.add("new_name" + rand.nextInt());
@@ -96,7 +96,7 @@ public class UpdateTest extends BaseMatrixTestCase {
                      + "  SET id=?,gmt_create=?,gmt_timestamp=?,gmt_datetime=?,name=?,floatCol=? WHERE pk > 7";
         List<Object> param = new ArrayList<Object>();
         param.add(rand.nextInt());
-        param.add(gmt);
+        param.add(gmtDay);
         param.add(gmt);
         param.add(gmt);
         param.add("new_name" + rand.nextInt());
@@ -114,7 +114,7 @@ public class UpdateTest extends BaseMatrixTestCase {
                      + "  SET id=?,gmt_create=?,gmt_timestamp=?,gmt_datetime=?,name=?,floatCol=? WHERE pk < 7";
         List<Object> param = new ArrayList<Object>();
         param.add(rand.nextInt());
-        param.add(gmt);
+        param.add(gmtDay);
         param.add(gmt);
         param.add(gmt);
         param.add("new_name" + rand.nextInt());
@@ -131,7 +131,7 @@ public class UpdateTest extends BaseMatrixTestCase {
         String sql = "UPDATE " + normaltblTableName + "  SET id=?,gmt_create=?,name=?,floatCol=? WHERE pk >= 7";
         List<Object> param = new ArrayList<Object>();
         param.add(rand.nextInt());
-        param.add(gmt);
+        param.add(gmtDay);
         param.add("new_name" + rand.nextInt());
         param.add(fl);
         executeCountAssert(sql, param);
@@ -146,7 +146,7 @@ public class UpdateTest extends BaseMatrixTestCase {
         String sql = "UPDATE " + normaltblTableName + "  SET id=?,gmt_create=?,name=?,floatCol=? WHERE pk <= 7";
         List<Object> param = new ArrayList<Object>();
         param.add(rand.nextInt());
-        param.add(gmt);
+        param.add(gmtDay);
         param.add("new_name" + rand.nextInt());
         param.add(fl);
         executeCountAssert(sql, param);

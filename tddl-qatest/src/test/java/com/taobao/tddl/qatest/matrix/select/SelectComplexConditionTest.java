@@ -12,7 +12,7 @@ import org.junit.runners.Parameterized.Parameters;
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
-import com.taobao.tddl.qatest.util.ExecuteTableName;
+import com.taobao.tddl.qatest.ExecuteTableName;
 
 /**
  * 主要针对合并约束条件的测试 Author By: zhuoxue.yll Created Date: 2012-9-14 下午02:35:55

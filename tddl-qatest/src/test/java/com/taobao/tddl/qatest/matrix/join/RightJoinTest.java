@@ -13,7 +13,7 @@ import org.junit.runners.Parameterized.Parameters;
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
-import com.taobao.tddl.qatest.util.ExecuteTableName;
+import com.taobao.tddl.qatest.ExecuteTableName;
 
 /**
  * LeftJoin测试，bdb不支持LeftJoin，只有当dbType="mysql"时测试用例才会运行

@@ -14,8 +14,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
+import com.taobao.tddl.qatest.ExecuteTableName;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
-import com.taobao.tddl.qatest.util.ExecuteTableName;
 
 @RunWith(EclipseParameterized.class)
 public class DeleteTest extends BaseMatrixTestCase {
@@ -94,8 +94,7 @@ public class DeleteTest extends BaseMatrixTestCase {
             sql = String.format("delete from %s where gmt_datetime > now()", normaltblTableName);
             executeCountAssert(sql, Collections.EMPTY_LIST);
         } catch (Exception e) {
-            Assert.assertEquals("com.taobao.ustore.client.andor.exception.DataAccessException: com.taobao.ustore.common.exception.QueryException: java.lang.UnsupportedOperationException: delete中暂不支持按照索引进行查询",
-                e.getMessage());
+            Assert.assertTrue(e.getMessage().contains("delete中暂不支持按照索引进行查询"));
         }
     }
 

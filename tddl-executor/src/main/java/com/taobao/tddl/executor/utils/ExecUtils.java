@@ -651,7 +651,6 @@ public class ExecUtils {
         CloneableRecord cr = new FixedLengthRecord(iRowSet.getParentCursorMeta().getColumns());
         while (columnIterator.hasNext()) {
             ColMetaAndIndex cmAndIndex = columnIterator.next();
-
             cr.put(cmAndIndex.getName(), iRowSet.getObject(cmAndIndex.getIndex()));
         }
         return cr;

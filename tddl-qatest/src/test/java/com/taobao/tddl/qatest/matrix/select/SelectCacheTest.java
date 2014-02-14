@@ -12,7 +12,7 @@ import org.junit.runners.Parameterized.Parameters;
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
 import com.taobao.tddl.qatest.util.EclipseParameterized;
-import com.taobao.tddl.qatest.util.ExecuteTableName;
+import com.taobao.tddl.qatest.ExecuteTableName;
 
 /**
  * 在缓存情况下，执行计划是否正确

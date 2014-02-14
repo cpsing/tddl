@@ -54,8 +54,7 @@ public class BaseMatrixTestCase extends PrepareData {
         if (us == null) {
             if (dbType.equals("bdb") || dbType == "") {
                 JDBCClient(dbType);
-            } else if (dbType.equals("mysql") || dbType.equals("tdhs") || dbType.equals("tddl")
-                       || dbType.equals("hbase")) {
+            } else if (dbType.equals("mysql") || dbType.equals("tdhs") || dbType.equals("hbase")) {
                 JDBCClient(dbType, false);
             }
         }
@@ -102,8 +101,6 @@ public class BaseMatrixTestCase extends PrepareData {
         if ("hbase".equalsIgnoreCase(dbTypeStack)) {
             cp.put(ExtraCmd.HBASE_MAPPING_FILE, "matrix/hbase_mapping.xml");
         }
-        // cp.put(ExtraCmd.INIT_TEMP_TABLE, "true");
-        // cp.put(ExtraCmd.INIT_TDDL_DATASOURCE, "true");
         us.setConnectionProperties(cp);
         try {
             us.init();

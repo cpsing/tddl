@@ -62,7 +62,6 @@ public class My_Table implements ITable {
     @Override
     public ISchematicCursor getCursor(ExecutionContext executionContext, IndexMeta indexName, IQuery executor)
                                                                                                               throws TddlException {
-
         My_JdbcHandler jdbcHandler = MysqlRepoUtils.getJdbcHandler(this.dsGetter, executor, executionContext);
         ICursorMeta meta = ExecUtils.convertToICursorMeta(indexName);
         My_Cursor my_cursor = new My_Cursor(jdbcHandler, meta, executor, executor.isStreaming());
@@ -139,19 +138,21 @@ public class My_Table implements ITable {
         StringBuilder delSb = new StringBuilder("delete from ");
         delSb.append(schema.getTableName()).append(" where ");
         if (key != null) {
-            String and = "and";
+            String and = " and ";
+            int size = key.getMap().size();
+            int i = 0;
             for (Entry<String, Object> en : key.getMap().entrySet()) {
-                delSb.append(en.getKey()).append("='").append(en.getValue()).append("' ").append(and);
+                delSb.append(en.getKey()).append("='").append(en.getValue()).append("'");
+                if (++i < size) {
+                    delSb.append(and);
+                }
             }
-
-            delSb.delete(delSb.length() - and.length(), delSb.length());
         } else {
             log.warn("注意！删除了该表所有信息：" + schema.getTableName());
         }
 
         Connection con = null;
         PreparedStatement ps = null;
-
         try {
             con = ds.getConnection();
             ps = con.prepareStatement(delSb.toString());

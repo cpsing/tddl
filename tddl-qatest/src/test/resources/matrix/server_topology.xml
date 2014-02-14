@@ -186,7 +186,15 @@
 			</properties>
 		</atom>
 	</group>
-
+	
+	<group name="ob_group_oneAtom" type="OCEANBASE_JDBC">
+		<properties>
+			<property name="CONFIGURL">
+				<value>http://obconsole.test.alibaba-inc.com/ob-config/config.co?dataId=wireless_message</value>
+			</property>
+		</properties>
+	</group>
+	
 	<!-- hbase group 
 	<group name="andor_hbase_group" type="HBASE_CLIENT">
 		<properties>

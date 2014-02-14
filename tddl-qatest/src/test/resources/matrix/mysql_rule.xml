@@ -145,6 +145,12 @@
 				<entry key="mysql_module_host_mutilGroup" value-ref="mysql_module_host_mutilGroup" />
 				<entry key="student" value-ref="student" />
 				<entry key="course" value-ref="course" />
+				<entry key="ob_student_onegroup_oneatom" value-ref="ob_student_onegroup_oneatom" />
+				<entry key="ob_normaltbl_onegroup_oneatom" value-ref="ob_normaltbl_onegroup_oneatom" />
+				<entry key="ob_module_info_onegroup_oneatom" value-ref="ob_module_info_onegroup_oneatom" />
+				<entry key="ob_module_host_onegroup_oneatom" value-ref="ob_module_host_onegroup_oneatom" />
+				<entry key="ob_hostgroup_info_onegroup_oneatom" value-ref="ob_hostgroup_info_onegroup_oneatom" />
+				<entry key="ob_host_info_onegroup_oneatom" value-ref="ob_host_info_onegroup_oneatom" />
 			</map>
 		</property>
 	</bean>
@@ -1052,5 +1058,41 @@
 			<value>(#NAME,1,16#.hashCode() % 12).intdiv(6)</value>
 		</property>
 		<property name="tbNamePattern" value="student" />
+	</bean>
+	
+	<bean id="ob_student_onegroup_oneatom" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="ob_group_oneAtom" />
+		<property name="tbNamePattern" value="ob_student_onegroup_oneatom" />
+	</bean>
+	
+	<bean id="ob_normaltbl_onegroup_oneatom" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="ob_group_oneAtom" />
+		<property name="tbNamePattern" value="ob_normaltbl_onegroup_oneatom" />
+	</bean>
+	
+	<bean id="ob_module_info_onegroup_oneatom" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="ob_group_oneAtom" />
+		<property name="tbNamePattern" value="ob_module_info_onegroup_oneatom" />
+	</bean>
+	
+	<bean id="ob_module_host_onegroup_oneatom" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="ob_group_oneAtom" />
+		<property name="tbNamePattern" value="ob_module_host_onegroup_oneatom" />
+	</bean>
+	
+	<bean id="ob_hostgroup_info_onegroup_oneatom" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="ob_group_oneAtom" />
+		<property name="tbNamePattern" value="ob_hostgroup_info_onegroup_oneatom" />
+	</bean>
+	
+	<bean id="ob_host_info_onegroup_oneatom" class="com.taobao.tddl.rule.TableRule">
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="ob_group_oneAtom" />
+		<property name="tbNamePattern" value="ob_host_info_onegroup_oneatom" />
 	</bean>
 </beans>
