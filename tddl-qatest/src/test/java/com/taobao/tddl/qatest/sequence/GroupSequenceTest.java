@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -20,8 +21,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DataAccessException;
 
 import com.taobao.diamond.mockserver.MockServer;
+import com.taobao.tddl.common.GroupDataSourceRouteHelper;
 import com.taobao.tddl.qatest.BaseAtomGroupTestCase;
-import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.sequence.exception.SequenceException;
 import com.taobao.tddl.sequence.impl.GroupSequence;
 import com.taobao.tddl.sequence.impl.GroupSequenceDao;
@@ -29,7 +30,7 @@ import com.taobao.tddl.sequence.impl.GroupSequenceDao;
 /**
  * @author yaolingling.pt
  */
-public class GroupSequenceTest extends BaseMatrixTestCase {
+public class GroupSequenceTest extends BaseAtomGroupTestCase {
 
     protected static ClassPathXmlApplicationContext context = null;
     protected static GroupSequence                  seque   = null;
@@ -43,9 +44,14 @@ public class GroupSequenceTest extends BaseMatrixTestCase {
     }
 
     @Before
-    public void init() throws Exception {
+    public void before() {
         context = new ClassPathXmlApplicationContext(new String[] { "classpath:sequence/spring_context_group_sequence.xml" });
         seque = (GroupSequence) context.getBean("sequence");
+    }
+
+    @After
+    public void after() {
+        context.destroy();
     }
 
     /**
@@ -116,7 +122,6 @@ public class GroupSequenceTest extends BaseMatrixTestCase {
      */
     @Test
     public void greaterStepTest() throws Exception {
-
         Connection con = getConnection("qatest_normal_0");
         Statement stmt = (Statement) con.createStatement();
         stmt.executeUpdate("update sequence set value='0' where name='ni'");
@@ -138,7 +143,6 @@ public class GroupSequenceTest extends BaseMatrixTestCase {
      */
     @Test
     public void lessStepTest() throws Exception {
-
         Connection con = getConnection("qatest_normal_0");
         Statement stmt = (Statement) con.createStatement();
         stmt.executeUpdate("update sequence set value='0' where name='ni'");
@@ -280,6 +284,7 @@ public class GroupSequenceTest extends BaseMatrixTestCase {
                     } catch (InterruptedException e) {
                     }
                     try {
+                        GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
                         GroupSequenceDao sequeDao = (GroupSequenceDao) context.getBean("sequenceDao");
                         GroupSequence sq = new GroupSequence();
                         sq.setName("ni");
@@ -306,7 +311,6 @@ public class GroupSequenceTest extends BaseMatrixTestCase {
      */
     @Test
     public void multiThreadOneDbTest() throws SequenceException, InterruptedException {
-
         ExecutorService es = Executors.newFixedThreadPool(100);
         final CountDownLatch count = new CountDownLatch(1);
         int times = 15;
@@ -318,7 +322,9 @@ public class GroupSequenceTest extends BaseMatrixTestCase {
                         count.await();
                     } catch (InterruptedException e) {
                     }
+
                     try {
+                        GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
                         GroupSequenceDao sequeDao = (GroupSequenceDao) context.getBean("sequenceDao_one_db");
                         GroupSequence sq = new GroupSequence();
                         sq.setName("ni");
@@ -328,6 +334,8 @@ public class GroupSequenceTest extends BaseMatrixTestCase {
                     } catch (DataAccessException e) {
                     } catch (SequenceException e) {
                         e.printStackTrace();
+                    } finally {
+                        count.countDown();
                     }
                 }
             });
@@ -343,7 +351,7 @@ public class GroupSequenceTest extends BaseMatrixTestCase {
         Connection conn = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            String url = "jdbc:mysql://10.232.31.118:3306/" + db;
+            String url = "jdbc:mysql://10.232.31.154:3306/" + db;
             String user = "tddl";
             String passWord = "tddl";
             conn = (Connection) DriverManager.getConnection(url, user, passWord);

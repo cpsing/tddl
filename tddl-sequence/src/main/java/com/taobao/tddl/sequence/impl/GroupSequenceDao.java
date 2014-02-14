@@ -25,14 +25,16 @@ import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
+import com.taobao.tddl.common.GroupDataSourceRouteHelper;
 import com.taobao.tddl.group.jdbc.TGroupDataSource;
 import com.taobao.tddl.monitor.eagleeye.EagleeyeHelper;
 import com.taobao.tddl.sequence.SequenceDao;
 import com.taobao.tddl.sequence.SequenceRange;
 import com.taobao.tddl.sequence.exception.SequenceException;
 import com.taobao.tddl.sequence.util.RandomSequence;
+
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 /**
  * @author JIECHEN 2013-10-31 下午5:48:48
@@ -226,8 +228,7 @@ public class GroupSequenceDao implements SequenceDao {
                 conn = tGroupDataSource.getConnection();
                 stmt = conn.prepareStatement(getSelectSql());
                 stmt.setString(1, name);
-                // FIXME QUERY FROM MASTER
-                // GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
+                GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
                 rs = stmt.executeQuery();
                 int item = 0;
                 while (rs.next()) {
@@ -283,8 +284,7 @@ public class GroupSequenceDao implements SequenceDao {
             stmt.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
             stmt.setString(3, name);
             stmt.setLong(4, value);
-            // FIXME QUERY FROM MASTER
-            // GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
+            GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
                 throw new SequenceException("faild to auto adjust init value at  " + name + " update affectedRow =0");
@@ -322,8 +322,7 @@ public class GroupSequenceDao implements SequenceDao {
             stmt.setString(1, name);
             stmt.setLong(2, newValue);
             stmt.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
-            // FIXME QUERY FROM MASTER
-            // GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
+            GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
                 throw new SequenceException("faild to auto adjust init value at  " + name + " update affectedRow =0");
@@ -381,7 +380,7 @@ public class GroupSequenceDao implements SequenceDao {
         return result;
     }
 
-    protected long queryOldValue(DataSource dataSource, String keyName) throws SQLException {
+    protected long queryOldValue(DataSource dataSource, String keyName) throws SQLException, SequenceException {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -389,11 +388,13 @@ public class GroupSequenceDao implements SequenceDao {
             conn = dataSource.getConnection();
             stmt = conn.prepareStatement(getSelectSql());
             stmt.setString(1, keyName);
-            // FIXME QUERY FROM MASTER
-            // GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
+            GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
             rs = stmt.executeQuery();
-            rs.next();
-            return rs.getLong(1);
+            if (rs.next()) {
+                return rs.getLong(1);
+            } else {
+                throw new SequenceException("找不到对应的sequence记录，请检查sequence : " + keyName);
+            }
         } finally {
             closeDbResource(rs, stmt, conn);
         }
@@ -421,8 +422,7 @@ public class GroupSequenceDao implements SequenceDao {
             stmt.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
             stmt.setString(3, keyName);
             stmt.setLong(4, oldValue);
-            // FIXME QUERY FROM MASTER
-            // GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
+            GroupDataSourceRouteHelper.executeByGroupDataSourceIndex(0);
             return stmt.executeUpdate();
         } finally {
             closeDbResource(rs, stmt, conn);
@@ -436,8 +436,10 @@ public class GroupSequenceDao implements SequenceDao {
      * @param keyName
      * @return
      * @throws SQLException
+     * @throws SequenceException
      */
-    protected long getOldValue(final DataSource dataSource, final String keyName) throws SQLException {
+    protected long getOldValue(final DataSource dataSource, final String keyName) throws SQLException,
+                                                                                 SequenceException {
         long result = 0;
 
         // 如果未使用超时保护或者已经只剩下了1个数据源，无论怎么样去拿

@@ -34,7 +34,7 @@
 		<property name="innerStep" value="100" />
 		<!--是否开启自适应，默认是false -->
 		<property name="adjust" value="true" />
-		<property name="retryTimes" value="4" />
+		<property name="retryTimes" value="100" />
 
 		<property name="gmtModifiedColumnName" value="gmt_modified" />
 		<property name="nameColumnName" value="name" />
@@ -59,7 +59,7 @@
 		<property name="innerStep" value="100" />
 		<!--是否开启自适应，默认是false -->
 		<property name="adjust" value="true" />
-		<property name="retryTimes" value="7" />
+		<property name="retryTimes" value="100" />
 		<property name="gmtModifiedColumnName" value="gmt_modified" />
 		<property name="nameColumnName" value="name" />
 		<property name="tableName" value="sequence" />

@@ -35,6 +35,7 @@ import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.common.ExecutorContext;
 import com.taobao.tddl.executor.cursor.ResultCursor;
 import com.taobao.tddl.executor.cursor.impl.ResultSetCursor;
+import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.group.utils.GroupHintParser;
 import com.taobao.tddl.matrix.jdbc.utils.ExceptionUtils;
 import com.taobao.tddl.optimizer.OptimizerContext;
@@ -165,7 +166,10 @@ public class TConnection implements Connection {
             try {
                 // 事务结束,清理事务内容
                 this.executor.commit(this.executionContext);
-                this.executionContext.getTransaction().close();
+                ITransaction transtion = this.executionContext.getTransaction();
+                if (transtion != null) {
+                    transtion.close();
+                }
                 this.executionContext = null;
             } catch (TddlException e) {
                 throw new SQLException(e);
@@ -184,7 +188,10 @@ public class TConnection implements Connection {
             try {
                 this.executor.rollback(executionContext);
                 // 事务结束,清理事务内容
-                this.executionContext.getTransaction().close();
+                ITransaction transtion = this.executionContext.getTransaction();
+                if (transtion != null) {
+                    transtion.close();
+                }
                 this.executionContext = null;
             } catch (TddlException e) {
                 throw new SQLException(e);

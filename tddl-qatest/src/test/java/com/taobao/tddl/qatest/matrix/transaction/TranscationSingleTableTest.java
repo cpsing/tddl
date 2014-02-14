@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -194,7 +195,7 @@ public class TranscationSingleTableTest extends BaseMatrixTestCase {
             andorCon.rollback();
             andorCon.rollback();
         } catch (Exception e) {
-            Assert.fail(e.toString());
+            Assert.fail(ExceptionUtils.getFullStackTrace(e));
         }
     }
 

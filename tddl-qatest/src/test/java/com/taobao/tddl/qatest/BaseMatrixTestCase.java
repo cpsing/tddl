@@ -1,13 +1,11 @@
 package com.taobao.tddl.qatest;
 
 import java.sql.SQLException;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -18,8 +16,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.taobao.diamond.mockserver.MockServer;
 import com.taobao.tddl.common.model.ExtraCmd;
-import com.taobao.tddl.config.ConfigServerHelper;
-import com.taobao.tddl.group.jdbc.TGroupDataSource;
 import com.taobao.tddl.matrix.jdbc.TDataSource;
 import com.taobao.tddl.qatest.util.LoadPropsUtil;
 import com.taobao.tddl.qatest.util.PrepareData;
@@ -121,51 +117,4 @@ public class BaseMatrixTestCase extends PrepareData {
         return new JdbcTemplate(us);
     }
 
-    protected static void setMatrixMockInfo(String groupsPath, String key) throws Exception {
-        setMatrixMockInfo(groupsPath, key, false);
-    }
-
-    protected static void setMatrixMockInfo(String groupsPath, String key, boolean isOracle) throws Exception {
-        // -----------------获取groups信息
-        String groupsStr = LoadPropsUtil.loadProps2OneLine(groupsPath, key);
-        if (groupsStr == null || StringUtils.isBlank(groupsStr)) {
-            throw new Exception("指定path = " + groupsPath + ",key = " + key + "的groups信息为null或者为空字符。");
-        }
-
-        // -----------------oracle or mysql
-        String groupPath = BaseAtomGroupTestCase.GROUP_PATH;
-        String atomPath = BaseAtomGroupTestCase.ATOM_PATH;
-        if (isOracle) {
-            groupPath = BaseAtomGroupTestCase.GROUP_ORA_PATH;
-            atomPath = BaseAtomGroupTestCase.ATOM_ORA_PATH;
-        }
-
-        // -----------------获取group信息
-        BaseAtomGroupTestCase.dataMap = new HashMap<String, String>();
-        String[] groupArr = groupsStr.split(",");
-
-        for (String group : groupArr) {
-            group = group.trim();
-            String groupStr = "";
-            groupStr = LoadPropsUtil.loadProps2OneLine(groupPath + group + BaseAtomGroupTestCase.PROPERTIES_FILE, group);
-            if (groupsStr != null && StringUtils.isNotBlank(groupsStr)) {
-                // 获取atom信息
-                String[] atomArr = groupStr.split(",");
-                for (String atom : atomArr) {
-                    atom = atom.trim();
-                    atom = atom.substring(0, atom.indexOf(":"));
-                    BaseAtomGroupTestCase.initAtomConfig(atomPath + atom, BaseAtomGroupTestCase.APPNAME, atom);
-                }
-                // 获取groupkey
-                BaseAtomGroupTestCase.dataMap.put(TGroupDataSource.getFullDbGroupKey(group), groupStr);
-            }
-        }
-
-        // -----------------dbgroups
-        BaseAtomGroupTestCase.dataMap.put(new MessageFormat(ConfigServerHelper.DATA_ID_DB_GROUP_KEYS).format(new Object[] { BaseAtomGroupTestCase.APPNAME }),
-            groupsStr);
-
-        // 建立MockServer
-        MockServer.setConfigInfos(BaseAtomGroupTestCase.dataMap);
-    }
 }

@@ -1,8 +1,6 @@
 package com.taobao.tddl.repo.oceanbase;
 
 import com.taobao.tddl.common.utils.extension.Activate;
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.spi.IDataSourceGetter;
 import com.taobao.tddl.repo.mysql.MysqlTableMetaManager;
 import com.taobao.tddl.repo.oceanbase.spi.ObDatasourceGetter;
@@ -14,7 +12,6 @@ import com.taobao.tddl.repo.oceanbase.spi.ObDatasourceGetter;
 @Activate(name = "OCEANBASE_JDBC", order = 2)
 public class ObTableMetaManager extends MysqlTableMetaManager {
 
-    private final static Logger     logger     = LoggerFactory.getLogger(ObTableMetaManager.class);
     private final IDataSourceGetter obDsGetter = new ObDatasourceGetter();
 
     @Override

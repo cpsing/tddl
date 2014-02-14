@@ -228,42 +228,6 @@ public class TableMetaParser {
         return metas;
     }
 
-    private static DataType getDataType(String type) {
-        if ("INT".equalsIgnoreCase(type) || "INTEGER".equalsIgnoreCase(type)) {
-            return DataType.IntegerType;
-        } else if ("LONG".equalsIgnoreCase(type)) {
-            return DataType.LongType;
-        } else if ("SHORT".equalsIgnoreCase(type)) {
-            return DataType.ShortType;
-        } else if ("BIGDECIMAL".equalsIgnoreCase(type)) {
-            return DataType.BigDecimalType;
-        } else if ("FLOAT".equalsIgnoreCase(type)) {
-            return DataType.FloatType;
-        } else if ("DOUBLE".equalsIgnoreCase(type)) {
-            return DataType.DoubleType;
-        } else if ("STRING".equalsIgnoreCase(type)) {
-            return DataType.StringType;
-        } else if ("BYTES".equalsIgnoreCase(type)) {
-            return DataType.BytesType;
-        } else if ("BOOLEAN".equalsIgnoreCase(type)) {
-            return DataType.BooleanType;
-        } else if ("DATE".equalsIgnoreCase(type)) {
-            return DataType.DateType;
-        } else if ("TIMESTAMP".equalsIgnoreCase(type)) {
-            return DataType.TimestampType;
-        } else if ("DATETIME".equalsIgnoreCase(type)) {
-            return DataType.DatetimeType;
-        } else if ("TIME".equalsIgnoreCase(type)) {
-            return DataType.TimeType;
-        } else if ("BLOB".equalsIgnoreCase(type)) {
-            return DataType.BlobType;
-        } else if ("BIT".equalsIgnoreCase(type)) {
-            return DataType.BitType;
-        }
-
-        return null;
-    }
-
     private static IndexType getIndexType(String type) {
         if ("BTREE".equalsIgnoreCase(type)) {
             return IndexType.BTREE;
@@ -293,17 +257,62 @@ public class TableMetaParser {
         return getDataType(jdbcTypeToDataTypeString(jdbcType));
     }
 
+    private static DataType getDataType(String type) {
+        if ("INT".equalsIgnoreCase(type) || "INTEGER".equalsIgnoreCase(type)) {
+            return DataType.IntegerType;
+        } else if ("LONG".equalsIgnoreCase(type)) {
+            return DataType.LongType;
+        } else if ("SHORT".equalsIgnoreCase(type)) {
+            return DataType.ShortType;
+        } else if ("BIGINTEGER".equalsIgnoreCase(type)) {
+            return DataType.BigIntegerType;
+        } else if ("BIGDECIMAL".equalsIgnoreCase(type)) {
+            return DataType.BigDecimalType;
+        } else if ("FLOAT".equalsIgnoreCase(type)) {
+            return DataType.FloatType;
+        } else if ("DOUBLE".equalsIgnoreCase(type)) {
+            return DataType.DoubleType;
+        } else if ("STRING".equalsIgnoreCase(type)) {
+            return DataType.StringType;
+        } else if ("BYTES".equalsIgnoreCase(type)) {
+            return DataType.BytesType;
+        } else if ("BOOLEAN".equalsIgnoreCase(type)) {
+            return DataType.BooleanType;
+        } else if ("DATE".equalsIgnoreCase(type)) {
+            return DataType.DateType;
+        } else if ("TIMESTAMP".equalsIgnoreCase(type)) {
+            return DataType.TimestampType;
+        } else if ("DATETIME".equalsIgnoreCase(type)) {
+            return DataType.DatetimeType;
+        } else if ("TIME".equalsIgnoreCase(type)) {
+            return DataType.TimeType;
+        } else if ("BLOB".equalsIgnoreCase(type)) {
+            return DataType.BlobType;
+        } else if ("BIT".equalsIgnoreCase(type)) {
+            return DataType.BitType;
+        } else {
+            throw new IllegalArgumentException("不支持的类型：" + type);
+        }
+    }
+
     public static String jdbcTypeToDataTypeString(int jdbcType) {
         String type = null;
         switch (jdbcType) {
             case Types.BIGINT:
+                // 考虑unsigned
+                type = "BIGINTEGER";
+                break;
+            case Types.NUMERIC:
             case Types.DECIMAL:
-                type = "LONG";
+                type = "BIGDECIMAL";
                 break;
             case Types.INTEGER:
+                // 考虑unsigned
+                type = "LONG";
+                break;
             case Types.TINYINT:
             case Types.SMALLINT:
-            case Types.NUMERIC:
+                // 考虑unsigned
                 type = "INT";
                 break;
             case Types.DATE:
@@ -320,6 +329,7 @@ public class TableMetaParser {
             case Types.DOUBLE:
                 type = "DOUBLE";
                 break;
+            case Types.CHAR:
             case Types.VARCHAR:
             case Types.NCHAR:
             case Types.NVARCHAR:
@@ -333,9 +343,6 @@ public class TableMetaParser {
             case Types.LONGVARBINARY:
                 type = "BYTES";
                 break;
-            case Types.CHAR:
-                type = "STRING";
-                break;
             case Types.BLOB:
                 type = "BLOB";
                 break;
@@ -343,7 +350,7 @@ public class TableMetaParser {
                 type = "BIT";
                 break;
             default:
-                type = null;
+                throw new IllegalArgumentException("不支持的类型：" + jdbcType);
         }
 
         return type;

@@ -117,6 +117,7 @@ public class JE_Cursor implements Cursor {
         return false;
     }
 
+    @SuppressWarnings("unused")
     private boolean isEquals(CloneableRecord right, CloneableRecord left) {
         boolean equals = true;
         List<String> leftColumns = left.getColumnList();

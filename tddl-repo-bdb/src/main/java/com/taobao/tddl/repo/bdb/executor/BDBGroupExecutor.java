@@ -42,13 +42,12 @@ public class BDBGroupExecutor extends AbstractLifecycle implements IGroupExecuto
     private static int findIndexToExecute(ResourceSelector selector, Map<Integer, String> excludeKeys)
                                                                                                       throws TddlException {
         int index = 0;
-        Integer specIndex = null;
-
-        if (specIndex != null) {
-            index = specIndex;
-        } else {
-            index = selector.select(excludeKeys);
-        }
+        // Integer specIndex = null;
+        // if (specIndex != null) {
+        // index = specIndex;
+        // } else {
+        index = selector.select(excludeKeys);
+        // }
         return index;
     }
 
@@ -124,15 +123,12 @@ public class BDBGroupExecutor extends AbstractLifecycle implements IGroupExecuto
 
         if (executeType == ExecuteType.READ) {
             selector = this.getSlaveSelector();
-
         } else {
             selector = this.getMasterSelector();
 
         }
         int index = findIndexToExecute(selector, excludeKeys);
-
         atomExecutor = executorList.get(index);
-
         return atomExecutor;
     }
 
