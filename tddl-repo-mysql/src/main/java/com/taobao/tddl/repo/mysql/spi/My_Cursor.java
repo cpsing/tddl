@@ -1,6 +1,5 @@
 package com.taobao.tddl.repo.mysql.spi;
 
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,16 +14,13 @@ import com.taobao.tddl.executor.common.KVPair;
 import com.taobao.tddl.executor.cursor.Cursor;
 import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
-import com.taobao.tddl.executor.cursor.impl.CursorMetaImp;
 import com.taobao.tddl.executor.record.CloneableRecord;
 import com.taobao.tddl.executor.record.FixedLengthRecord;
 import com.taobao.tddl.executor.record.NamedRecord;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.utils.ExecUtils;
 import com.taobao.tddl.optimizer.config.table.ColumnMeta;
-import com.taobao.tddl.optimizer.config.table.parse.TableMetaParser;
 import com.taobao.tddl.optimizer.core.ASTNodeFactory;
-import com.taobao.tddl.optimizer.core.datatype.DataType;
 import com.taobao.tddl.optimizer.core.expression.IBooleanFilter;
 import com.taobao.tddl.optimizer.core.expression.IColumn;
 import com.taobao.tddl.optimizer.core.expression.IFilter.OPERATION;
@@ -88,19 +84,24 @@ public class My_Cursor implements Cursor {
         }
         try {
             myJdbcHandler.executeQuery(meta, isStreaming);
-            ResultSetMetaData rsmd = this.myJdbcHandler.getResultSet().getMetaData();
+            // ResultSetMetaData rsmd =
+            // this.myJdbcHandler.getResultSet().getMetaData();
             returnColumns = new ArrayList();
-            for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                DataType type = TableMetaParser.jdbcTypeToDataType(rsmd.getColumnType(i));
-                String name = rsmd.getColumnLabel(i);
-                ColumnMeta cm = new ColumnMeta(null, name, type, null, true);
-                returnColumns.add(cm);
-            }
-
-            if (this.meta == null) {
-                meta = CursorMetaImp.buildNew(returnColumns);
-                myJdbcHandler.setContext(meta, isStreaming);
-            }
+            // 使用meta做为returncolumns
+            // resultset中返回的meta信息是物理表名，会导致join在构造返回对象时找不到index(表名不同/为null)
+            returnColumns.addAll(meta.getColumns());
+            // for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+            // DataType type =
+            // TableMetaParser.jdbcTypeToDataType(rsmd.getColumnType(i));
+            // String name = rsmd.getColumnLabel(i);
+            // ColumnMeta cm = new ColumnMeta(null, name, type, null, true);
+            // returnColumns.add(cm);
+            // }
+            //
+            // if (this.meta == null) {
+            // meta = CursorMetaImp.buildNew(returnColumns);
+            // myJdbcHandler.setContext(meta, isStreaming);
+            // }
             inited = true;
         } catch (SQLException e) {
             throw new TddlException(e);
@@ -196,7 +197,6 @@ public class My_Cursor implements Cursor {
                                                                    boolean keyFilterOrValueFilter) throws TddlException {
 
         IQuery tmpQuery = (IQuery) query.copy();
-
         List<Object> values = new ArrayList<Object>();
         String cm = keys.get(0).getColumnList().get(0);
         for (CloneableRecord key : keys) {
@@ -278,7 +278,6 @@ public class My_Cursor implements Cursor {
 
     @Override
     public String toStringWithInden(int inden) {
-
         String tabTittle = GeneralUtil.getTab(inden);
         String tabContent = GeneralUtil.getTab(inden + 1);
         StringBuilder sb = new StringBuilder();

@@ -13,8 +13,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
-import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.ExecuteTableName;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 
 /**
  * 带条件的选择查询
@@ -122,10 +122,10 @@ public class SelectWithOperatorTest extends BaseMatrixTestCase {
         param.add(start2);
         param.add(end1);
         param.add(end2);
-        String[] columnParam = { "PK", "NAME", "ID", "GMT_CREATE", "GMT_TIMESTAMP", "GMT_DATETIME" };
+        String[] columnParam = { "PK", "NAME", "ID", "GMT_TIMESTAMP", "GMT_DATETIME" };
         selectContentSameAssert(sql, columnParam, param);
 
-        sql = "select * from " + normaltblTableName + " where pk>=? and pk>? and name like ? or gmt_create >?";
+        sql = "select * from " + normaltblTableName + " where pk>=? and pk>? and name like ? or gmt_timestamp >?";
         param.clear();
         param.add(start1);
         param.add(start2);
@@ -141,7 +141,7 @@ public class SelectWithOperatorTest extends BaseMatrixTestCase {
         param.add(gmtNext);
         selectContentSameAssert(sql, columnParam, param);
 
-        sql = "select * from " + normaltblTableName + " where pk>? or (id<? and name like ? and gmt_create= ?)";
+        sql = "select * from " + normaltblTableName + " where pk>? or (id<? and name like ? and gmt_timestamp= ?)";
         param.clear();
         param.add(start1);
         param.add(1500);
@@ -150,7 +150,7 @@ public class SelectWithOperatorTest extends BaseMatrixTestCase {
         selectContentSameAssert(sql, columnParam, param);
 
         sql = "select * from " + normaltblTableName
-              + " where pk<=? and id>?  or name like ? and gmt_create =? or floatCol=?";
+              + " where pk<=? and id>?  or name like ? and gmt_timestamp =? or floatCol=?";
         param.clear();
         param.add(start1);
         param.add(516);

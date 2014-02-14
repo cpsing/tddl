@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.taobao.tddl.common.utils.GeneralUtil;
 import com.taobao.tddl.executor.common.IRowsValueScaner;
 import com.taobao.tddl.executor.common.RowsValueScanerImp;
@@ -146,9 +148,9 @@ public class CursorMetaImp implements ICursorMeta {
 
     }
 
-    String                                                           name;
+    private String                                                   name;
 
-    List<ColumnMeta>                                                 columns;
+    private List<ColumnMeta>                                         columns;
 
     private Map<String/* 列名字哦。注意，不是表名，因为列名更长取，量也更大 */, ColumnHolder> indexMap = null;
 
@@ -203,7 +205,7 @@ public class CursorMetaImp implements ICursorMeta {
     }
 
     private static Integer findTableName(String tableName, ColumnHolder ch) {
-        if (tableName.equals(ch.tablename)) {
+        if (StringUtils.equals(tableName, ch.tablename)) {
             return ch.index;
         }
         return null;
@@ -283,7 +285,7 @@ public class CursorMetaImp implements ICursorMeta {
      */
     private static boolean findTableAndReplaceIndexNumber(String tableName, Integer index, ColumnHolder ch) {
         boolean success = false;
-        if (tableName.equals(ch.tablename)) {
+        if (StringUtils.equals(tableName, ch.tablename)) {
             ch.index = index;
             success = true;
         } else if (ch.next == null) {
@@ -387,7 +389,6 @@ public class CursorMetaImp implements ICursorMeta {
 
     @Override
     public boolean isSureLogicalIndexEqualActualIndex() {
-
         return this.isSureLogicalIndexEqualActualIndex;
     }
 
