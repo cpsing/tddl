@@ -13,6 +13,7 @@ import com.taobao.tddl.executor.cursor.ISchematicCursor;
 import com.taobao.tddl.executor.rowset.ArrayRowSet;
 import com.taobao.tddl.executor.rowset.IRowSet;
 import com.taobao.tddl.executor.utils.ExecUtils;
+import com.taobao.tddl.optimizer.core.expression.IOrderBy;
 import com.taobao.tddl.optimizer.core.plan.query.IJoin;
 
 /**
@@ -57,21 +58,23 @@ import com.taobao.tddl.optimizer.core.plan.query.IJoin;
 @SuppressWarnings("rawtypes")
 public class SortMergeJoinCursor extends JoinSchematicCursor implements IMergeSortJoinCursor {
 
-    protected IRowSet current;
+    protected IRowSet            current;
 
-    Iterator<IRowSet> resultsIter      = null;
+    private Iterator<IRowSet>    resultsIter      = null;
 
-    private IRowSet   left_key;
+    private IRowSet              left_key;
 
-    private IRowSet   right_key;
+    private IRowSet              right_key;
 
-    private boolean   needAdvanceLeft  = true;
+    private boolean              needAdvanceLeft  = true;
 
-    private boolean   needAdvanceRight = true;
+    private boolean              needAdvanceRight = true;
 
-    private List      leftSubSet;
+    private List                 leftSubSet;
 
-    private List      rightSubSet;
+    private List                 rightSubSet;
+
+    private List<List<IOrderBy>> joinOrderbys;
 
     public SortMergeJoinCursor(ISchematicCursor left_cursor, ISchematicCursor right_cursor, List leftJoinOnColumns,
                                List rightJoinOnColumns) throws TddlException{
@@ -81,6 +84,9 @@ public class SortMergeJoinCursor extends JoinSchematicCursor implements IMergeSo
         // 暂时以右表的顺序为准，因为目前选择sort merge join主要是针对outter右表存在排序字段
         // 后续需要优化orderbys信息，针对sort merge join，左右表的顺序字段都是正确的
         this.orderBys = right_cursor.getOrderBy();
+        this.joinOrderbys = new ArrayList<List<IOrderBy>>();
+        joinOrderbys.add(left_cursor.getOrderBy());
+        joinOrderbys.add(right_cursor.getOrderBy());
     }
 
     public SortMergeJoinCursor(ISchematicCursor left_cursor, ISchematicCursor right_cursor, List leftJoinOnColumns,
@@ -229,6 +235,11 @@ public class SortMergeJoinCursor extends JoinSchematicCursor implements IMergeSo
         }
 
         return key;
+    }
+
+    @Override
+    public List<List<IOrderBy>> getJoinOrderBys() {
+        return joinOrderbys;
     }
 
     @Override

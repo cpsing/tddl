@@ -23,7 +23,6 @@ public class ReverseOrderCursor extends SchematicCursor implements IReverseOrder
         super(cursor, null, cursor.getOrderBy());
         List<IOrderBy> orderByList = cursor.getOrderBy();
         reverseOrderBy(orderByList);
-
     }
 
     private void reverseOrderBy(List<IOrderBy> orderBy) {

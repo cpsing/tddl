@@ -1,5 +1,6 @@
 package com.taobao.tddl.executor.cursor;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,10 @@ public class SchematicCursor extends AbstractCursor implements ISchematicCursor 
 
     public List<IOrderBy> getOrderBy() {
         return orderBys;
+    }
+
+    public List<List<IOrderBy>> getJoinOrderBys() {
+        return Arrays.asList(orderBys);
     }
 
     @Override
@@ -132,4 +137,5 @@ public class SchematicCursor extends AbstractCursor implements ISchematicCursor 
     public List<ColumnMeta> getReturnColumns() throws TddlException {
         return parentCursorGetReturnColumns();
     }
+
 }

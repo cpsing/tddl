@@ -126,12 +126,14 @@ public class SelectWithConditionTest extends BaseMatrixTestCase {
 
     @Test
     public void isTrue() throws Exception {
-        String sql = "select * from " + normaltblTableName + " where pk is true";
-        String[] columnParam = { "ID", "NAME", "PK" };
-        selectContentSameAssert(sql, columnParam, null);
-        sql = "select id is true a,name from " + normaltblTableName;
-        String[] columnParam1 = { "a", "NAME", };
-        selectContentSameAssert(sql, columnParam1, null);
+        if (!normaltblTableName.startsWith("ob")) {
+            String sql = "select * from " + normaltblTableName + " where pk is true";
+            String[] columnParam = { "ID", "NAME", "PK" };
+            selectContentSameAssert(sql, columnParam, null);
+            sql = "select id is true a,name from " + normaltblTableName;
+            String[] columnParam1 = { "a", "NAME", };
+            selectContentSameAssert(sql, columnParam1, null);
+        }
     }
 
     @Test
@@ -475,10 +477,12 @@ public class SelectWithConditionTest extends BaseMatrixTestCase {
     // 狄龙项目的
     @Test
     public void groupByScalarFunction() throws Exception {
-        String sql = "SELECT  COUNT(1) daily_illegal,DATE_FORMAT(gmt_create, '%Y-%m-%d') d ,name FROM "
-                     + normaltblTableName + " group by DATE_FORMAT(gmt_create, '%Y-%m-%d'),name";
-        String[] columnParam = { "daily_illegal", "d", "name" };
-        selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
+        if (!normaltblTableName.startsWith("ob")) { // ob不支持
+            String sql = "SELECT  COUNT(1) daily_illegal,DATE_FORMAT(gmt_create, '%Y-%m-%d') d ,name FROM "
+                         + normaltblTableName + " group by DATE_FORMAT(gmt_create, '%Y-%m-%d'),name";
+            String[] columnParam = { "daily_illegal", "d", "name" };
+            selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
+        }
     }
 
     @Test

@@ -11,8 +11,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
-import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.ExecuteTableName;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 
 /**
  * 主要针对合并约束条件的测试 Author By: zhuoxue.yll Created Date: 2012-9-14 下午02:35:55
@@ -49,7 +49,7 @@ public class SelectComplexConditionTest extends BaseMatrixTestCase {
         param.add(start2);
         param.add(end1);
         param.add(end2);
-        String[] columnParam = { "PK", "NAME", "ID", "GMT_CREATE", "GMT_DATETIME", "FLOATCOL" };
+        String[] columnParam = { "PK", "NAME", "ID", "gmt_timestamp", "GMT_DATETIME", "FLOATCOL" };
         selectContentSameAssert(sql, columnParam, param);
 
         sql = "select * from " + normaltblTableName + " where pk>=? and pk>? and name like ? or gmt_datetime >?";
@@ -70,7 +70,7 @@ public class SelectComplexConditionTest extends BaseMatrixTestCase {
         selectContentSameAssert(sql, columnParam, param);
 
         sql = "select * from " + normaltblTableName
-              + " where pk<=? and id>?  or name like ? and gmt_create =? or floatCol=?";
+              + " where pk<=? and id>?  or name like ? and gmt_timestamp =? or floatCol=?";
         param.clear();
         param.add(start1);
         param.add(516);
@@ -90,7 +90,7 @@ public class SelectComplexConditionTest extends BaseMatrixTestCase {
     public void sumBetweenAndInGroupTest() throws Exception {
         String sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */ select id, sum(pk) as p, sum(floatCol) as flo from "
                      + normaltblTableName
-                     + " as a where floatCol =? and gmt_create between ? and ? and(name = ? and id in(?,?,?,?,?,?)) group by id";
+                     + " as a where floatCol >=? and gmt_timestamp between ? and ? and(name = ? and id in(?,?,?,?,?,?)) group by id";
         List<Object> param = new ArrayList<Object>();
         param.add(1.1);
         param.add(gmtBefore);
@@ -109,7 +109,7 @@ public class SelectComplexConditionTest extends BaseMatrixTestCase {
         sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */ select id, sum(pk) as p, sum(floatCol) as flo ,name,gmt_timestamp,gmt_datetime  from "
               + normaltblTableName
               + " as a "
-              + "where (( gmt_create >= ? and gmt_create<= ? and name = ? and id in(?,?,?,?,?,?)) and floatCol=?) group by id";
+              + "where (( gmt_timestamp >= ? and gmt_timestamp<= ? and name = ? and id in(?,?,?,?,?,?)) and floatCol>=?) group by id";
         List<Object> param1 = new ArrayList<Object>();
         param1.add(gmtBefore);
         param1.add(gmtNext);
@@ -132,9 +132,9 @@ public class SelectComplexConditionTest extends BaseMatrixTestCase {
      */
     @Test
     public void betweenAndInGroupTest() throws Exception {
-        String sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */ select id as sid, gmt_create  from " + normaltblTableName
-                     + " as a where floatCol =? and "
-                     + "gmt_create between ? and ? and(name = ? and id in(?,?,?,?,?,?)) group by id,gmt_create";
+        String sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */ select id as sid, gmt_timestamp  from "
+                     + normaltblTableName + " as a where floatCol >=? and "
+                     + "gmt_timestamp between ? and ? and(name = ? and id in(?,?,?,?,?,?)) group by id,gmt_timestamp";
         List<Object> param = new ArrayList<Object>();
         param.add(1.1);
         param.add(gmtBefore);
@@ -147,13 +147,13 @@ public class SelectComplexConditionTest extends BaseMatrixTestCase {
         param.add(400);
         param.add(1000);
 
-        String[] columnParam = { "sid", "gmt_create" };
+        String[] columnParam = { "sid", "gmt_timestamp" };
         selectContentSameAssert(sql, columnParam, param);
 
-        sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */ select id as sid, gmt_create ,name,gmt_timestamp,gmt_datetime  from "
+        sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */ select id as sid, name,gmt_timestamp,gmt_datetime  from "
               + normaltblTableName
               + " as a "
-              + "where (( gmt_create >= ? and gmt_create<= ? and name = ? and id in(?,?,?,?,?,?)) and floatCol=?) group by id,gmt_create";
+              + "where (( gmt_timestamp >= ? and gmt_timestamp<= ? and name = ? and id in(?,?,?,?,?,?)) and floatCol>=?) group by id,gmt_timestamp";
         List<Object> param1 = new ArrayList<Object>();
         param1.add(gmtBefore);
         param1.add(gmtNext);
@@ -165,7 +165,7 @@ public class SelectComplexConditionTest extends BaseMatrixTestCase {
         param1.add(400);
         param1.add(1000);
         param1.add(1.1);
-        String[] columnParam1 = { "sid", "gmt_create", "name", "gmt_timestamp", "gmt_datetime" };
+        String[] columnParam1 = { "sid", "name", "gmt_timestamp", "gmt_datetime" };
         selectContentSameAssert(sql, columnParam1, param1);
     }
 
@@ -176,18 +176,18 @@ public class SelectComplexConditionTest extends BaseMatrixTestCase {
      */
     @Test
     public void betweenGroupAndTest() throws Exception {
-        String sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */ select name, gmt_create from " + normaltblTableName
-                     + " as a where floatCol=? and gmt_create  BETWEEN ? and ? " + "group by name, gmt_create";
+        String sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */ select name, gmt_timestamp from " + normaltblTableName
+                     + " as a where floatCol>=? and gmt_timestamp  BETWEEN ? and ? " + "group by name, gmt_timestamp";
         List<Object> param = new ArrayList<Object>();
         param.add(1.1);
         param.add(gmtBefore);
         param.add(gmtNext);
 
-        String[] columnParam = { "name", "gmt_create" };
+        String[] columnParam = { "name", "gmt_timestamp" };
         selectContentSameAssert(sql, columnParam, param);
 
-        sql = "select name, gmt_create from " + normaltblTableName + " as a where floatCol=? and "
-              + "gmt_create >=? and gmt_create<=?  group by name, gmt_create";
+        sql = "select name, gmt_timestamp from " + normaltblTableName + " as a where floatCol>=? and "
+              + "gmt_timestamp >=? and gmt_timestamp<=?  group by name, gmt_timestamp";
         selectContentSameAssert(sql, columnParam, param);
     }
 
@@ -195,7 +195,7 @@ public class SelectComplexConditionTest extends BaseMatrixTestCase {
     public void betweenOrderAnd() throws Exception {
         String sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */ select gmt_timestamp, floatCol, id from "
                      + normaltblTableName + " as a where " + "id = ? and gmt_timestamp between ? and ? and "
-                     + "(name = ? and gmt_create = ?) order by gmt_timestamp";
+                     + "(name = ? and gmt_timestamp = ?) order by gmt_timestamp";
         List<Object> param = new ArrayList<Object>();
         param.add(100);
         param.add(gmtBefore);
@@ -209,7 +209,7 @@ public class SelectComplexConditionTest extends BaseMatrixTestCase {
         sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */ select gmt_timestamp, floatCol, id,name from "
               + normaltblTableName + " as a where "
               + "((gmt_timestamp >= ? and gmt_timestamp<= ? and name= ?  and id =? )"
-              + " and floatCol=? ) order by gmt_timestamp asc";
+              + " and floatCol>=? ) order by gmt_timestamp asc";
         List<Object> param1 = new ArrayList<Object>();
         param1.add(gmtBefore);
         param1.add(gmtNext);
