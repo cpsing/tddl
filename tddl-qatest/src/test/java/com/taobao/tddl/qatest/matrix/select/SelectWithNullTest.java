@@ -11,8 +11,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
-import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.ExecuteTableName;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 
 /**
  * @author zhuoxue.yll 2013.01.23
@@ -75,8 +75,10 @@ public class SelectWithNullTest extends BaseMatrixTestCase {
 
     @Test
     public void asciiNULLTest() throws Exception {
-        String sql = String.format("select ASCII(name) as a from %s", normaltblTableName);
-        String[] columnParam = { "a" };
-        selectContentSameAssert(sql, columnParam, null);
+        if (!normaltblTableName.startsWith("ob")) {
+            String sql = String.format("select ASCII(name) as a from %s", normaltblTableName);
+            String[] columnParam = { "a" };
+            selectContentSameAssert(sql, columnParam, null);
+        }
     }
 }

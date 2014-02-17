@@ -240,16 +240,19 @@ public class SelectWithOperatorTest extends BaseMatrixTestCase {
      */
     @Test
     public void bitwiseAndTest() throws Exception {
-        String sql = "select count(*) from " + normaltblTableName + " where pk in (?,?,?) and name =? and id & ? = ?";
-        String[] columnParam = { "count(*)" };
-        List<Object> param = new ArrayList<Object>();
-        param.add(1);
-        param.add(2);
-        param.add(3);
-        param.add(name);
-        param.add(300);
-        param.add(300);
-        selectContentSameAssert(sql, columnParam, param);
+        if (!normaltblTableName.startsWith("ob")) {
+            String sql = "select count(*) from " + normaltblTableName
+                         + " where pk in (?,?,?) and name =? and id & ? = ?";
+            String[] columnParam = { "count(*)" };
+            List<Object> param = new ArrayList<Object>();
+            param.add(1);
+            param.add(2);
+            param.add(3);
+            param.add(name);
+            param.add(300);
+            param.add(300);
+            selectContentSameAssert(sql, columnParam, param);
+        }
     }
 
     /**
@@ -257,17 +260,19 @@ public class SelectWithOperatorTest extends BaseMatrixTestCase {
      */
     @Test
     public void bitwiseLikeTest() throws Exception {
-        String sql = "select count(*) from " + normaltblTableName
-                     + " where pk in (?,?,?) and name like ? and id & ? = ?";
-        String[] columnParam = { "count(*)" };
-        List<Object> param = new ArrayList<Object>();
-        param.add(1);
-        param.add(2);
-        param.add(3);
-        param.add(name);
-        param.add(300);
-        param.add(300);
-        selectContentSameAssert(sql, columnParam, param);
+        if (!normaltblTableName.startsWith("ob")) {
+            String sql = "select count(*) from " + normaltblTableName
+                         + " where pk in (?,?,?) and name like ? and id & ? = ?";
+            String[] columnParam = { "count(*)" };
+            List<Object> param = new ArrayList<Object>();
+            param.add(1);
+            param.add(2);
+            param.add(3);
+            param.add(name);
+            param.add(300);
+            param.add(300);
+            selectContentSameAssert(sql, columnParam, param);
+        }
     }
 
     /**
@@ -275,14 +280,16 @@ public class SelectWithOperatorTest extends BaseMatrixTestCase {
      */
     @Test
     public void xorTest() throws Exception {
-        String sql = "select count(*) from " + normaltblTableName + " where pk ^ id > ?";
-        String[] columnParam = { "count(*)" };
-        List<Object> param = new ArrayList<Object>();
-        param.add(100);
-        selectContentSameAssert(sql, columnParam, param);
+        if (!normaltblTableName.startsWith("ob")) {
+            String sql = "select count(*) from " + normaltblTableName + " where pk ^ id > ?";
+            String[] columnParam = { "count(*)" };
+            List<Object> param = new ArrayList<Object>();
+            param.add(100);
+            selectContentSameAssert(sql, columnParam, param);
 
-        sql = "select count(*) from " + normaltblTableName + " where pk xor id > ?";
-        selectContentSameAssert(sql, columnParam, param);
+            sql = "select count(*) from " + normaltblTableName + " where pk xor id > ?";
+            selectContentSameAssert(sql, columnParam, param);
+        }
     }
 
     /**

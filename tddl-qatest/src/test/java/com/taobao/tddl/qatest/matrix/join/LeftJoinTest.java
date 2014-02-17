@@ -172,8 +172,8 @@ public class LeftJoinTest extends BaseMatrixTestCase {
         // 使用sort merge join，不需要临时表排序
         sql = "select a.host_id,a.host_name,a.hostgroup_id,b.hostgroup_name from " + hostgroup + " as b left join "
               + host_info + " as a "
-              + "on b.hostgroup_id=a.hostgroup_id where b.hostgroup_name='hostgroupname0' order by a.hostgroup_id desc";
-        selectOrderAssert(sql, columnParam, Collections.EMPTY_LIST);
+              + "on b.hostgroup_id=a.hostgroup_id where b.hostgroup_name='hostgroupname0' order by b.hostgroup_id desc";
+        selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
     }
 
     @Ignore

@@ -483,22 +483,43 @@ public abstract class QueryHandlerCommon extends HandlerCommon {
      */
     protected static OrderByResult chooseOrderByMethod(ISchematicCursor cursor, List<IOrderBy> ordersInRequest,
                                                        ExecutionContext executionContext, boolean needOrderMatch) {
-        List<IOrderBy> ordersInCursor = cursor.getOrderBy();
-        if (ordersInCursor == null) {
-            ordersInCursor = Collections.emptyList();
+        if (cursor.getJoinOrderBys() != null && cursor.getJoinOrderBys().size() > 1) {
+            OrderByResult last = OrderByResult.temporaryTable;
+            for (List<IOrderBy> ordersInCursor : cursor.getJoinOrderBys()) {
+                if (ordersInCursor == null) {
+                    ordersInCursor = Collections.emptyList();
+                }
+                OrderByResult result = chooseOrderByMethod(ordersInCursor,
+                    ordersInRequest,
+                    executionContext,
+                    needOrderMatch);
+                // 不可能出现一个匹配reverse，另一个匹配normal的情况
+                if (result == OrderByResult.normal) {
+                    return result;
+                } else if (result.ordinal() > last.ordinal()) {
+                    last = result;
+                }
+            }
+            // 没有匹配的normal/reverseCurosr，直接返回临时表
+            return last;
+        } else {
+            List<IOrderBy> ordersInCursor = cursor.getOrderBy();
+            if (ordersInCursor == null) {
+                ordersInCursor = Collections.emptyList();
+            }
+            return chooseOrderByMethod(ordersInCursor, ordersInRequest, executionContext, needOrderMatch);
         }
-        return chooseOrderByMethod(ordersInCursor, ordersInRequest, executionContext, needOrderMatch);
     }
 
     protected static enum OrderByResult {
         /**
-         * 需要反转
-         */
-        reverseCursor,
-        /**
          * 临时表
          */
         temporaryTable,
+        /**
+         * 需要反转
+         */
+        reverseCursor,
         /**
          * 正常
          */

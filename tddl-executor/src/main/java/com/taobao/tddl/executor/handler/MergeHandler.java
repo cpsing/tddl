@@ -229,7 +229,6 @@ public class MergeHandler extends QueryHandlerCommon {
              */
             OrderByResult tempOBR = null;
             for (ISchematicCursor subCur : cursors) {
-
                 OrderByResult obR = chooseOrderByMethod(subCur, ordersInRequest, executionContext, needOrderMatch);
                 if (tempOBR == null) {
                     tempOBR = obR;

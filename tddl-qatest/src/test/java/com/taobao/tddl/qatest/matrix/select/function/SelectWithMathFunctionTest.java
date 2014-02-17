@@ -13,8 +13,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
-import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.ExecuteTableName;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 
 @RunWith(EclipseParameterized.class)
 public class SelectWithMathFunctionTest extends BaseMatrixTestCase {
@@ -194,75 +194,94 @@ public class SelectWithMathFunctionTest extends BaseMatrixTestCase {
 
     @Test
     public void countWithDistinctMutilCloumnTest() throws Exception {
-        String sql = "SELECT COUNT(distinct name,gmt_create) as d FROM " + normaltblTableName;
-        String[] columnParam1 = { "d" };
-        selectOrderAssert(sql, columnParam1, Collections.EMPTY_LIST);
+        if (!normaltblTableName.startsWith("ob")) {
+            String sql = "SELECT COUNT(distinct name,gmt_create) as d FROM " + normaltblTableName;
+            String[] columnParam1 = { "d" };
+            selectOrderAssert(sql, columnParam1, Collections.EMPTY_LIST);
+        }
     }
 
     @Test
     public void roundTest() throws Exception {
-        String sql = "select round(floatCol,2) as a from " + normaltblTableName;
-        String[] columnParam = { "a" };
-        selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
+        if (!normaltblTableName.startsWith("ob")) {
+            String sql = "select round(floatCol,2) as a from " + normaltblTableName;
+            String[] columnParam = { "a" };
+            selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
 
-        sql = "select round(floatCol) from " + normaltblTableName + " where id >400";
-        String[] columnParam1 = { "round(floatCol)" };
-        selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+            sql = "select round(floatCol) from " + normaltblTableName + " where id >400";
+            String[] columnParam1 = { "round(floatCol)" };
+            selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
 
-        sql = "select round(id/pk,2) as a from " + normaltblTableName + " where name=?";
-        List<Object> param = new ArrayList<Object>();
-        param.add(name);
-        String[] columnParam2 = { "a" };
-        selectContentSameAssert(sql, columnParam2, param);
+            sql = "select round(id/pk,2) as a from " + normaltblTableName + " where name=?";
+            List<Object> param = new ArrayList<Object>();
+            param.add(name);
+            String[] columnParam2 = { "a" };
+            selectContentSameAssert(sql, columnParam2, param);
+        }
     }
 
     @Test
     public void intervalTest() throws Exception {
-        String sql = "select interval(pk,id) as d FROM " + normaltblTableName;
-        String[] columnParam1 = { "d" };
-        selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+        if (!normaltblTableName.startsWith("ob")) {
+            String sql = "select interval(pk,id) as d FROM " + normaltblTableName;
+            String[] columnParam1 = { "d" };
+            selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+        }
     }
 
     @Test
     public void divTest() throws Exception {
-        String sql = "select SUM(id) div sum(pk) as d FROM " + normaltblTableName;
-        String[] columnParam1 = { "d" };
-        selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+        if (!normaltblTableName.startsWith("ob")) {
+            String sql = "select SUM(id) div sum(pk) as d FROM " + normaltblTableName;
+            String[] columnParam1 = { "d" };
+            selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+        }
     }
 
     @Test
     public void bitAndTest() throws Exception {
-        String sql = "select SUM(id) & sum(pk) as d FROM " + normaltblTableName;
-        String[] columnParam1 = { "d" };
-        selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+        if (!normaltblTableName.startsWith("ob")) {
+            String sql = "select SUM(id) & sum(pk) as d FROM " + normaltblTableName;
+            String[] columnParam1 = { "d" };
+            selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+        }
     }
 
     @Test
     public void bitOrTest() throws Exception {
-        String sql = "select SUM(id) | sum(pk) as d FROM " + normaltblTableName;
-        String[] columnParam1 = { "d" };
-        selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+        if (!normaltblTableName.startsWith("ob")) {
+            String sql = "select SUM(id) | sum(pk) as d FROM " + normaltblTableName;
+            String[] columnParam1 = { "d" };
+            selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+        }
     }
 
     @Test
     public void bitXorTest() throws Exception {
-        String sql = "select SUM(id) ^ sum(pk) as d FROM " + normaltblTableName;
-        String[] columnParam1 = { "d" };
-        selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+        if (!normaltblTableName.startsWith("ob")) {
+            String sql = "select SUM(id) ^ sum(pk) as d FROM " + normaltblTableName;
+            String[] columnParam1 = { "d" };
+            selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+        }
     }
 
     @Test
     public void bitLShiftTest() throws Exception {
-        String sql = "select SUM(id) >> 2 as d FROM " + normaltblTableName;
-        String[] columnParam1 = { "d" };
-        selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+        if (!normaltblTableName.startsWith("ob")) {
+            String sql = "select SUM(id) >> 2 as d FROM " + normaltblTableName;
+            String[] columnParam1 = { "d" };
+            selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+        }
+
     }
 
     @Test
     public void bitRShiftTest() throws Exception {
-        String sql = "select SUM(id) << 2 as d FROM " + normaltblTableName;
-        String[] columnParam1 = { "d" };
-        selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+        if (!normaltblTableName.startsWith("ob")) {
+            String sql = "select SUM(id) << 2 as d FROM " + normaltblTableName;
+            String[] columnParam1 = { "d" };
+            selectContentSameAssert(sql, columnParam1, Collections.EMPTY_LIST);
+        }
     }
 
 }
