@@ -35,6 +35,11 @@ public class UpdateTest extends BaseMatrixTestCase {
 
     @Test
     public void updateAll() throws Exception {
+
+        if (normaltblTableName.startsWith("ob")) {
+            // ob不支持批量更新
+            return;
+        }
         String sql = "UPDATE " + normaltblTableName
                      + " SET id=?,gmt_create=?,gmt_timestamp=?,gmt_datetime=?,name=?,floatCol=?";
         List<Object> param = new ArrayList<Object>();
@@ -73,6 +78,10 @@ public class UpdateTest extends BaseMatrixTestCase {
 
     @Test
     public void updateSome() throws Exception {
+        if (normaltblTableName.startsWith("ob")) {
+            // ob不支持批量更新
+            return;
+        }
         String sql = "UPDATE "
                      + normaltblTableName
                      + "  SET id=?,gmt_create=?,gmt_timestamp=?,gmt_datetime=?,name=?,floatCol=? WHERE pk BETWEEN 3 AND 7";
@@ -92,6 +101,10 @@ public class UpdateTest extends BaseMatrixTestCase {
 
     @Test
     public void updateSome1() throws Exception {
+        if (normaltblTableName.startsWith("ob")) {
+            // ob不支持批量更新
+            return;
+        }
         String sql = "UPDATE " + normaltblTableName
                      + "  SET id=?,gmt_create=?,gmt_timestamp=?,gmt_datetime=?,name=?,floatCol=? WHERE pk > 7";
         List<Object> param = new ArrayList<Object>();
@@ -110,6 +123,10 @@ public class UpdateTest extends BaseMatrixTestCase {
 
     @Test
     public void updateSome2() throws Exception {
+        if (normaltblTableName.startsWith("ob")) {
+            // ob不支持批量更新
+            return;
+        }
         String sql = "UPDATE " + normaltblTableName
                      + "  SET id=?,gmt_create=?,gmt_timestamp=?,gmt_datetime=?,name=?,floatCol=? WHERE pk < 7";
         List<Object> param = new ArrayList<Object>();
@@ -128,6 +145,10 @@ public class UpdateTest extends BaseMatrixTestCase {
 
     @Test
     public void updateSome3() throws Exception {
+        if (normaltblTableName.startsWith("ob")) {
+            // ob不支持批量更新
+            return;
+        }
         String sql = "UPDATE " + normaltblTableName + "  SET id=?,gmt_create=?,name=?,floatCol=? WHERE pk >= 7";
         List<Object> param = new ArrayList<Object>();
         param.add(rand.nextInt());
@@ -143,6 +164,10 @@ public class UpdateTest extends BaseMatrixTestCase {
 
     @Test
     public void updateSome4() throws Exception {
+        if (normaltblTableName.startsWith("ob")) {
+            // ob不支持批量更新
+            return;
+        }
         String sql = "UPDATE " + normaltblTableName + "  SET id=?,gmt_create=?,name=?,floatCol=? WHERE pk <= 7";
         List<Object> param = new ArrayList<Object>();
         param.add(rand.nextInt());
@@ -158,6 +183,11 @@ public class UpdateTest extends BaseMatrixTestCase {
 
     @Test
     public void nowTest() throws Exception {
+
+        if (normaltblTableName.startsWith("ob")) {
+            // ob不支持批量更新
+            return;
+        }
         String sql = "update " + normaltblTableName
                      + " set  gmt_create= now(),gmt_timestamp= now(),gmt_datetime=now() where pk=1";
         int mysqlRow = mysqlUpdateData(sql, null);
@@ -178,6 +208,10 @@ public class UpdateTest extends BaseMatrixTestCase {
      */
     @Test
     public void whereWithComplexTest() throws Exception {
+        if (normaltblTableName.startsWith("ob")) {
+            // ob不支持批量更新
+            return;
+        }
         String sql = "update " + normaltblTableName
                      + " set floatCol= ? where name= ? and ((?-id>100)||(?<id && ?-id >200))";
         List<Object> param = new ArrayList<Object>();
@@ -194,6 +228,10 @@ public class UpdateTest extends BaseMatrixTestCase {
      */
     @Test
     public void setWithIncrementTest() throws Exception {
+        if (normaltblTableName.startsWith("ob")) {
+            // ob不支持批量更新
+            return;
+        }
         String sql = "update " + normaltblTableName + " set floatCol= floatCol+ ? where id =? and name =?";
         List<Object> param = new ArrayList<Object>();
         param.add(2);
@@ -211,6 +249,10 @@ public class UpdateTest extends BaseMatrixTestCase {
 
     @Test
     public void updateNotExistDateTest() throws Exception {
+        if (normaltblTableName.startsWith("ob")) {
+            // ob不支持批量更新
+            return;
+        }
         long pk = -11l;
         String sql = "UPDATE " + normaltblTableName + "  SET id=? WHERE pk=?";
         List<Object> param = new ArrayList<Object>();
@@ -221,6 +263,10 @@ public class UpdateTest extends BaseMatrixTestCase {
 
     @Test
     public void updateNotExistFiledTest() throws Exception {
+        if (normaltblTableName.startsWith("ob")) {
+            // ob不支持批量更新
+            return;
+        }
         String sql = "UPDATE " + normaltblTableName + "  SET nothisfield = ?";
         try {
             andorUpdateData(sql, null);
@@ -232,6 +278,10 @@ public class UpdateTest extends BaseMatrixTestCase {
 
     @Test
     public void updateNotExistTableTest() throws Exception {
+        if (normaltblTableName.startsWith("ob")) {
+            // ob不支持批量更新
+            return;
+        }
         String sql = "UPDATE nor SET pk = ?";
         List<Object> param = new ArrayList<Object>();
         param.add(RANDOM_ID);
@@ -245,6 +295,10 @@ public class UpdateTest extends BaseMatrixTestCase {
 
     @Test
     public void updateNotMatchTypeTest() throws Exception {
+        if (normaltblTableName.startsWith("ob")) {
+            // ob不支持批量更新
+            return;
+        }
         String sql = "UPDATE " + normaltblTableName + "  SET id=? WHERE pk=?";
         List<Object> param = new ArrayList<Object>();
         param.add("NIHAO");

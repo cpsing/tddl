@@ -3,11 +3,15 @@ package com.taobao.tddl.repo.mysql.spi;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
 import com.taobao.tddl.common.exception.TddlException;
+import com.taobao.tddl.common.utils.logger.Logger;
+import com.taobao.tddl.common.utils.logger.LoggerFactory;
 import com.taobao.tddl.executor.common.ExecutionContext;
 import com.taobao.tddl.executor.cursor.ICursorMeta;
 import com.taobao.tddl.executor.cursor.ISchematicCursor;
@@ -20,9 +24,6 @@ import com.taobao.tddl.optimizer.config.table.TableMeta;
 import com.taobao.tddl.optimizer.core.plan.query.IQuery;
 import com.taobao.tddl.repo.mysql.cursor.SchematicMyCursor;
 import com.taobao.tddl.repo.mysql.utils.MysqlRepoUtils;
-
-import com.taobao.tddl.common.utils.logger.Logger;
-import com.taobao.tddl.common.utils.logger.LoggerFactory;
 
 public class My_Table implements ITable {
 
@@ -73,20 +74,27 @@ public class My_Table implements ITable {
                     String dbName) throws TddlException {
         StringBuilder putSb = null;
 
-        putSb = new StringBuilder("insert into ");
+        putSb = new StringBuilder("replace into ");
         putSb.append(schema.getTableName()).append(" (");
         StringBuilder tmpSb = new StringBuilder(" values (");
+        List values = new ArrayList();
         for (Entry<String, Object> en : value.getMap().entrySet()) {
             if (en.getValue() != null) {
                 putSb.append(en.getKey()).append(",");
-                tmpSb.append("'").append(en.getValue()).append("',");
+
+                values.add(en.getValue());
+
+                tmpSb.append("").append("?").append(",");
             }
         }
 
         for (Entry<String, Object> en1 : key.getMap().entrySet()) {
             if (en1.getValue() != null) {
                 putSb.append(en1.getKey()).append(",");
-                tmpSb.append("'").append(en1.getValue()).append("',");
+
+                values.add(en1.getValue());
+
+                tmpSb.append("").append("?").append(",");
             }
         }
 
@@ -101,6 +109,11 @@ public class My_Table implements ITable {
         try {
             con = ds.getConnection();
             ps = con.prepareStatement(putSb.toString());
+
+            int i = 1;
+            for (Object v : values) {
+                ps.setObject(i++, v);
+            }
             int res = ps.executeUpdate();
             if (res <= 0) {
                 throw new TddlException("执行失败" + key.getColumnList());
