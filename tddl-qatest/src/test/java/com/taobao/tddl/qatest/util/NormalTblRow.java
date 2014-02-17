@@ -1,6 +1,5 @@
 package com.taobao.tddl.qatest.util;
 
-
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
@@ -13,421 +12,281 @@ import java.sql.Timestamp;
  */
 public class NormalTblRow {
 
-    private long       pk;
-    private Integer    pkInteger;
+    private Long       pk;
     private String     varcharr;
     private String     charr;
+    private String     varbinaryr;
+    private String     binaryr;
     private byte[]     blobr;
-    private Long       integerr;
+    private String     textr;
     private Integer    tinyintr;
     private Integer    smallintr;
     private Integer    mediumintr;
+    private Integer    integerr;
+    private Long       bigintr;
+    private Integer    utinyintr;
+    private Integer    usmallintr;
+    private Integer    umediumintr;
+    private Long       uintegerr;
+    private BigDecimal ubigintr;
     private Boolean    bitr;
-    private Integer    bigintr;
     private Float      floatr;
     private Double     doubler;
     private BigDecimal decimalr;
+
     private Date       dater;
     private String     dateString;
     private Time       timer;
     private Timestamp  datetimer;
     private Timestamp  timestampr;
     private Date       yearr;
-    private long       integerLong;
-    private long       bigintLong;
     private Date       datetimeDate;
 
     private Double     floatDouble;
     private Float      doubleFloat;
-    private long       decimalLong;
-    private int        decimalInt;
 
-    private long		unsignedintr;
-
-
-	public long getUnsignedintr() {
-		return unsignedintr;
-	}
-
-	public void setUnsignedintr(long unsignedintr) {
-		this.unsignedintr = unsignedintr;
-	}
-
-    /**
-     * @return the pk
-     */
     public long getPk() {
         return pk;
     }
 
-    /**
-     * @param pk the pk to set
-     */
     public void setPk(long pk) {
         this.pk = pk;
     }
 
-    /**
-     * @return the pkInteger
-     */
-    public Integer getPkInteger() {
-        return pkInteger;
-    }
-
-    /**
-     * @param pkInteger the pkInteger to set
-     */
-    public void setPkInteger(Integer pkInteger) {
-        this.pkInteger = pkInteger;
-    }
-
-    /**
-     * @return the varcharr
-     */
     public String getVarcharr() {
         return varcharr;
     }
 
-    /**
-     * @param varcharr the varcharr to set
-     */
     public void setVarcharr(String varcharr) {
         this.varcharr = varcharr;
     }
 
-    /**
-     * @return the charr
-     */
     public String getCharr() {
         return charr;
     }
 
-    /**
-     * @param charr the charr to set
-     */
     public void setCharr(String charr) {
         this.charr = charr;
     }
 
-    /**
-     * @return the blobr
-     */
+    public String getVarbinaryr() {
+        return varbinaryr;
+    }
+
+    public void setVarbinaryr(String varbinaryr) {
+        this.varbinaryr = varbinaryr;
+    }
+
+    public String getBinaryr() {
+        return binaryr;
+    }
+
+    public void setBinaryr(String binaryr) {
+        this.binaryr = binaryr;
+    }
+
     public byte[] getBlobr() {
         return blobr;
     }
 
-    /**
-     * @param blobr the blobr to set
-     */
     public void setBlobr(byte[] blobr) {
         this.blobr = blobr;
     }
 
-    /**
-     * @return the integerr
-     */
-    public Long getIntegerr() {
-        return integerr;
+    public void setPk(Long pk) {
+        this.pk = pk;
     }
 
-    /**
-     * @param integerr the integerr to set
-     */
-    public void setIntegerr(Long integerr) {
-        this.integerr = integerr;
+    public String getTextr() {
+        return textr;
     }
 
-    /**
-     * @return the tinyintr
-     */
+    public void setTextr(String textr) {
+        this.textr = textr;
+    }
+
     public Integer getTinyintr() {
         return tinyintr;
     }
 
-    /**
-     * @param tinyintr the tinyintr to set
-     */
     public void setTinyintr(Integer tinyintr) {
         this.tinyintr = tinyintr;
     }
 
-    /**
-     * @return the smallintr
-     */
     public Integer getSmallintr() {
         return smallintr;
     }
 
-    /**
-     * @param smallintr the smallintr to set
-     */
     public void setSmallintr(Integer smallintr) {
         this.smallintr = smallintr;
     }
 
-    /**
-     * @return the mediumintr
-     */
     public Integer getMediumintr() {
         return mediumintr;
     }
 
-    /**
-     * @param mediumintr the mediumintr to set
-     */
     public void setMediumintr(Integer mediumintr) {
         this.mediumintr = mediumintr;
     }
 
-    /**
-     * @return the bitr
-     */
+    public Integer getIntegerr() {
+        return integerr;
+    }
+
+    public void setIntegerr(Integer integerr) {
+        this.integerr = integerr;
+    }
+
+    public Long getBigintr() {
+        return bigintr;
+    }
+
+    public void setBigintr(Long bigintr) {
+        this.bigintr = bigintr;
+    }
+
+    public Integer getUtinyintr() {
+        return utinyintr;
+    }
+
+    public void setUtinyintr(Integer utinyintr) {
+        this.utinyintr = utinyintr;
+    }
+
+    public Integer getUsmallintr() {
+        return usmallintr;
+    }
+
+    public void setUsmallintr(Integer usmallintr) {
+        this.usmallintr = usmallintr;
+    }
+
+    public Integer getUmediumintr() {
+        return umediumintr;
+    }
+
+    public void setUmediumintr(Integer umediumintr) {
+        this.umediumintr = umediumintr;
+    }
+
+    public Long getUintegerr() {
+        return uintegerr;
+    }
+
+    public void setUintegerr(Long uintegerr) {
+        this.uintegerr = uintegerr;
+    }
+
+    public BigDecimal getUbigintr() {
+        return ubigintr;
+    }
+
+    public void setUbigintr(BigDecimal ubigintr) {
+        this.ubigintr = ubigintr;
+    }
+
     public Boolean getBitr() {
         return bitr;
     }
 
-    /**
-     * @param bitr the bitr to set
-     */
     public void setBitr(Boolean bitr) {
         this.bitr = bitr;
     }
 
-    /**
-     * @return the bigintr
-     */
-    public Integer getBigintr() {
-        return bigintr;
-    }
-
-    /**
-     * @param bigintr the bigintr to set
-     */
-    public void setBigintr(Integer bigintr) {
-        this.bigintr = bigintr;
-    }
-
-    /**
-     * @return the floatr
-     */
     public Float getFloatr() {
         return floatr;
     }
 
-    /**
-     * @param floatr the floatr to set
-     */
     public void setFloatr(Float floatr) {
         this.floatr = floatr;
     }
 
-    /**
-     * @return the doubler
-     */
     public Double getDoubler() {
         return doubler;
     }
 
-    /**
-     * @param doubler the doubler to set
-     */
     public void setDoubler(Double doubler) {
         this.doubler = doubler;
     }
 
-    /**
-     * @return the decimalr
-     */
     public BigDecimal getDecimalr() {
         return decimalr;
     }
 
-    /**
-     * @param decimalr the decimalr to set
-     */
     public void setDecimalr(BigDecimal decimalr) {
         this.decimalr = decimalr;
     }
 
-    /**
-     * @return the dater
-     */
     public Date getDater() {
         return dater;
     }
 
-    /**
-     * @param dater the dater to set
-     */
     public void setDater(Date dater) {
         this.dater = dater;
     }
 
-    /**
-     * @return the dateString
-     */
     public String getDateString() {
         return dateString;
     }
 
-    /**
-     * @param dateString the dateString to set
-     */
     public void setDateString(String dateString) {
         this.dateString = dateString;
     }
 
-    /**
-     * @return the timer
-     */
     public Time getTimer() {
         return timer;
     }
 
-    /**
-     * @param timer the timer to set
-     */
     public void setTimer(Time timer) {
         this.timer = timer;
     }
 
-    /**
-     * @return the datetimer
-     */
     public Timestamp getDatetimer() {
         return datetimer;
     }
 
-    /**
-     * @param datetimer the datetimer to set
-     */
     public void setDatetimer(Timestamp datetimer) {
         this.datetimer = datetimer;
     }
 
-    /**
-     * @return the timestampr
-     */
     public Timestamp getTimestampr() {
         return timestampr;
     }
 
-    /**
-     * @param timestampr the timestampr to set
-     */
     public void setTimestampr(Timestamp timestampr) {
         this.timestampr = timestampr;
     }
 
-    /**
-     * @return the yearr
-     */
     public Date getYearr() {
         return yearr;
     }
 
-    /**
-     * @param yearr the yearr to set
-     */
     public void setYearr(Date yearr) {
         this.yearr = yearr;
     }
 
-    /**
-     * @return the integerLong
-     */
-    public long getIntegerLong() {
-        return integerLong;
-    }
-
-    /**
-     * @param integerLong the integerLong to set
-     */
-    public void setIntegerLong(long integerLong) {
-        this.integerLong = integerLong;
-    }
-
-    /**
-     * @return the bigintLong
-     */
-    public long getBigintLong() {
-        return bigintLong;
-    }
-
-    /**
-     * @param bigintLong the bigintLong to set
-     */
-    public void setBigintLong(long bigintLong) {
-        this.bigintLong = bigintLong;
-    }
-
-    /**
-     * @return the datetimeDate
-     */
     public Date getDatetimeDate() {
         return datetimeDate;
     }
 
-    /**
-     * @param datetimeDate the datetimeDate to set
-     */
     public void setDatetimeDate(Date datetimeDate) {
         this.datetimeDate = datetimeDate;
     }
 
-    /**
-     * @return the floatDouble
-     */
     public Double getFloatDouble() {
         return floatDouble;
     }
 
-    /**
-     * @param floatDouble the floatDouble to set
-     */
     public void setFloatDouble(Double floatDouble) {
         this.floatDouble = floatDouble;
     }
 
-    /**
-     * @return the doubleFloat
-     */
     public Float getDoubleFloat() {
         return doubleFloat;
     }
 
-    /**
-     * @param doubleFloat the doubleFloat to set
-     */
     public void setDoubleFloat(Float doubleFloat) {
         this.doubleFloat = doubleFloat;
     }
 
-    /**
-     * @return the decimalLong
-     */
-    public long getDecimalLong() {
-        return decimalLong;
-    }
-
-    /**
-     * @param decimalLong the decimalLong to set
-     */
-    public void setDecimalLong(long decimalLong) {
-        this.decimalLong = decimalLong;
-    }
-
-    /**
-     * @return the decimalInt
-     */
-    public int getDecimalInt() {
-        return decimalInt;
-    }
-
-    /**
-     * @param decimalInt the decimalInt to set
-     */
-    public void setDecimalInt(int decimalInt) {
-        this.decimalInt = decimalInt;
-    }
 }

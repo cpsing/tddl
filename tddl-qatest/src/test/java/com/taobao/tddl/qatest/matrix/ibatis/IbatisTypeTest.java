@@ -8,13 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
-import com.taobao.tddl.qatest.util.NormalTblNullRow;
 import com.taobao.tddl.qatest.util.NormalTblRow;
 
 /**
@@ -43,7 +43,7 @@ public class IbatisTypeTest {
 
     @Test
     public void seletctTypeTest() throws SQLException {
-    	prepareOneRowData();
+        prepareOneRowData();
         Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("pk", 122345l);
         // andor的mysql
@@ -61,15 +61,15 @@ public class IbatisTypeTest {
 
     @Test
     public void selectTypeWithNullTest() throws SQLException {
-    	prepareOneRowData();
+        prepareOneRowData();
         Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("pk", 122345l);
         // andor的mysql
         List listMysql = mysqlSqlMapClient.queryForList("select_test_null", map);
-        NormalTblNullRow rowMysql = (NormalTblNullRow) listMysql.get(0);
+        NormalTblRow rowMysql = (NormalTblRow) listMysql.get(0);
         List list = andorSqlMapClient.queryForList("select_test_null", map);
-        NormalTblNullRow row = (NormalTblNullRow) list.get(0);
-        rowNullEquals(row, rowMysql);
+        NormalTblRow row = (NormalTblRow) list.get(0);
+        rowEquals(row, rowMysql);
         // andor的tdhs
         // List listTdhs =
         // andorTDHSSqlMapClient.queryForList("select_tdhs_null", map);
@@ -77,7 +77,7 @@ public class IbatisTypeTest {
         // rowNullEquals(rowTdhs, rowMysql);
     }
 
-    public void prepareOneRowData() throws SQLException {
+    private void prepareOneRowData() throws SQLException {
         long pk = 122345l;
         String s = "abc";
         Byte b = '1';
@@ -107,15 +107,13 @@ public class IbatisTypeTest {
         map.put("datetimer", da);
         map.put("timestampr", da);
         map.put("yearr", 2012);
-        map.put("unsignedintr",1000);
+        map.put("unsignedintr", 1000);
 
         andorSqlMapClient.delete("delete_test", map);
         mysqlSqlMapClient.delete("delete_test", map);
 
         andorSqlMapClient.insert("insert_test", map);
         mysqlSqlMapClient.insert("insert_test", map);
-
-
     }
 
     @Test
@@ -177,36 +175,33 @@ public class IbatisTypeTest {
     }
 
     @Test
-    public void boundaryValue1Test() throws SQLException {
-        long pk = 0xffffffffffffffL;
-        String s = "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
-                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
-                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
-                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
-                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
-                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
-                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
-                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
-                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
-                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
-                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz";
-        Byte b = '~';
-        BigDecimal big = new BigDecimal(new String("1234567890123456789012345678901234567890"));
-        Date da = new Date(0xffffffffffffffL);
-        Time ti = new Time(0xffffffffffffffL);
+    public void boundaryValue_最大值Test() throws SQLException {
+        String s = RandomStringUtils.randomAlphanumeric(255);
+        byte[] b = s.getBytes();
+        BigDecimal big = new BigDecimal(new String("18446744073709551616.99999"));
+        String da = "2015-12-31 12:59:59";
+        String ti = "12:59:59";
         Boolean bl = true;
         Float f = 3.40E+38f;
         Double d = 1.79E+308d;
         Map<Object, Object> map = new HashMap<Object, Object>();
-        map.put("pk", pk);
+        map.put("pk", Integer.MAX_VALUE);
         map.put("varcharr", s);
         map.put("charr", s);
+        map.put("varbinaryr", s);
+        map.put("binaryr", s);
         map.put("blobr", b);
-        map.put("integerr", pk);
-        map.put("tinyintr", pk);
-        map.put("smallintr", pk);
-        map.put("mediumintr", pk);
-        map.put("bigintr", pk);
+        map.put("textr", s);
+        map.put("tinyintr", 127);
+        map.put("smallintr", 32767);
+        map.put("mediumintr", 8388607);
+        map.put("integerr", 2147483647);
+        map.put("bigintr", 9223372036854775807l);
+        map.put("utinyintr", 255);
+        map.put("usmallintr", 65535);
+        map.put("umediumintr", 16777215);
+        map.put("uintegerr", 4294967295l);
+        map.put("ubigintr", new BigDecimal("18446744073709551615"));
         map.put("bitr", bl);
         map.put("floatr", f);
         map.put("doubler", d);
@@ -215,8 +210,7 @@ public class IbatisTypeTest {
         map.put("timer", ti);
         map.put("datetimer", da);
         map.put("timestampr", da);
-        map.put("yearr", 5000);
-        map.put("unsignedintr", pk);
+        map.put("yearr", 40);
 
         andorSqlMapClient.delete("delete_test", map);
         mysqlSqlMapClient.delete("delete_test", map);
@@ -240,30 +234,36 @@ public class IbatisTypeTest {
         andorSqlMapClient.delete("delete_test", map);
         mysqlSqlMapClient.delete("delete_test", map);
         // andorTDHSSqlMapClient.insert("delete_tdhs_test", map);
-
     }
 
     @Test
-    public void boundaryValue2Test() throws SQLException {
-        long pk = -0xffffffffffffffL;
-        String s = "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz";
-        Byte b = '!';
-        BigDecimal big = new BigDecimal(new String("-1234567890123456789012345678901234567890"));
-        Date da = new Date(-0xffffffffffffffL);
-        Time ti = new Time(-0xffffffffffffffL);
-        Boolean bl = false;
+    public void boundaryValue_最小值Test() throws SQLException {
+        String s = RandomStringUtils.randomAlphanumeric(255);
+        byte[] b = s.getBytes();
+        BigDecimal big = new BigDecimal(new String("-18446744073709551616.99999"));
+        String da = "2015-12-31 12:59:59";
+        String ti = "12:59:59";
+        Boolean bl = true;
         Float f = -3.40E+38f;
         Double d = -1.79E+308d;
         Map<Object, Object> map = new HashMap<Object, Object>();
-        map.put("pk", pk);
+        map.put("pk", Integer.MIN_VALUE);
         map.put("varcharr", s);
         map.put("charr", s);
+        map.put("varbinaryr", s);
+        map.put("binaryr", s);
         map.put("blobr", b);
-        map.put("integerr", pk);
-        map.put("tinyintr", pk);
-        map.put("smallintr", pk);
-        map.put("mediumintr", pk);
-        map.put("bigintr", pk);
+        map.put("textr", s);
+        map.put("tinyintr", -128);
+        map.put("smallintr", -32768);
+        map.put("mediumintr", -8388608);
+        map.put("integerr", -2147483648);
+        map.put("bigintr", -9223372036854775808l);
+        map.put("utinyintr", 1);
+        map.put("usmallintr", 1);
+        map.put("umediumintr", 1);
+        map.put("uintegerr", 1);
+        map.put("ubigintr", new BigDecimal("1"));
         map.put("bitr", bl);
         map.put("floatr", f);
         map.put("doubler", d);
@@ -272,8 +272,7 @@ public class IbatisTypeTest {
         map.put("timer", ti);
         map.put("datetimer", da);
         map.put("timestampr", da);
-        map.put("yearr", -5000);
-        map.put("unsignedintr", pk);
+        map.put("yearr", 40);
 
         andorSqlMapClient.delete("delete_test", map);
         mysqlSqlMapClient.delete("delete_test", map);
@@ -297,115 +296,28 @@ public class IbatisTypeTest {
         andorSqlMapClient.delete("delete_test", map);
         mysqlSqlMapClient.delete("delete_test", map);
         // andorTDHSSqlMapClient.insert("delete_tdhs_test", map);
-
-    }
-
-    @Test
-    public void boundaryValue3Test() throws SQLException {
-        long pk = 0;
-        String s = "";
-        Byte b = 'z';
-        BigDecimal big = new BigDecimal(0.12345678901234567890123456789012345678901234567890);
-        Date da = new Date(0);
-        Time ti = new Time(0);
-        Boolean bl = false;
-        Float f = 0.1234567f;
-        Double d = 0.1234567890123456d;
-        Map<Object, Object> map = new HashMap<Object, Object>();
-        map.put("pk", pk);
-        map.put("varcharr", s);
-        map.put("charr", s);
-        map.put("blobr", b);
-        map.put("integerr", pk);
-        map.put("tinyintr", pk);
-        map.put("smallintr", pk);
-        map.put("mediumintr", pk);
-        map.put("bigintr", pk);
-        map.put("bitr", bl);
-        map.put("floatr", f);
-        map.put("doubler", d);
-        map.put("decimalr", big);
-        map.put("dater", da);
-        map.put("timer", ti);
-        map.put("datetimer", da);
-        map.put("timestampr", da);
-        map.put("yearr", -5000);
-        map.put("unsignedintr", pk);
-
-        andorSqlMapClient.delete("delete_test", map);
-        mysqlSqlMapClient.delete("delete_test", map);
-        // andorTDHSSqlMapClient.delete("delete_tdhs_test", map);
-
-        andorSqlMapClient.insert("insert_test", map);
-        mysqlSqlMapClient.insert("insert_test", map);
-        // andorTDHSSqlMapClient.insert("insert_tdhs_test", map);
-
-        List list = andorSqlMapClient.queryForList("select_test", map);
-        row = (NormalTblRow) list.get(0);
-        List listMysql = mysqlSqlMapClient.queryForList("select_test", map);
-        rowMysql = (NormalTblRow) listMysql.get(0);
-        rowEquals(row, rowMysql);
-        // andor的tdhs
-        // List listTdhs =
-        // andorTDHSSqlMapClient.queryForList("select_tdhs_test", map);
-        // rowTdhs = (NormalTblRow) list.get(0);
-        // rowEquals(rowTdhs, rowMysql);
-
-        andorSqlMapClient.delete("delete_test", map);
-        mysqlSqlMapClient.delete("delete_test", map);
-        // andorTDHSSqlMapClient.insert("delete_tdhs_test", map);
-
     }
 
     private void rowEquals(NormalTblRow row, NormalTblRow rowMysql) {
         Assert.assertEquals(rowMysql.getPk(), row.getPk());
-        Assert.assertEquals(rowMysql.getPkInteger(), row.getPkInteger());
-
         Assert.assertEquals(rowMysql.getCharr(), row.getCharr());
         Assert.assertEquals(rowMysql.getVarcharr(), row.getVarcharr());
-        Assert.assertEquals(rowMysql.getBigintr(), row.getBigintr());
-        Assert.assertEquals(rowMysql.getBitr(), row.getBitr());
-        if (rowMysql.getBlobr() != null) {
-            Assert.assertEquals(rowMysql.getBlobr()[0], row.getBlobr()[0]);
-        } else {
-            Assert.assertEquals(rowMysql.getBlobr(), row.getBlobr());
-        }
-        Assert.assertEquals(rowMysql.getDater(), row.getDater());
-        Assert.assertEquals(rowMysql.getDateString(), row.getDateString());
-        Assert.assertEquals(rowMysql.getDatetimer(), row.getDatetimer());
-        Assert.assertEquals(rowMysql.getDecimalr(), row.getDecimalr());
-        Assert.assertEquals(rowMysql.getDecimalLong(), row.getDecimalLong());
-        Assert.assertEquals(rowMysql.getDecimalInt(), row.getDecimalInt());
-        Assert.assertEquals(rowMysql.getDoubler(), row.getDoubler());
-        Assert.assertEquals(rowMysql.getDoubleFloat(), row.getDoubleFloat());
-        Assert.assertEquals(rowMysql.getFloatr(), row.getFloatr());
-        Assert.assertEquals(rowMysql.getFloatDouble(), row.getFloatDouble());
-        Assert.assertEquals(rowMysql.getIntegerr(), row.getIntegerr());
-        Assert.assertEquals(rowMysql.getMediumintr(), row.getMediumintr());
-        Assert.assertEquals(rowMysql.getSmallintr(), row.getSmallintr());
-        Assert.assertEquals(rowMysql.getTimer(), row.getTimer());
-        Assert.assertEquals(rowMysql.getTimestampr(), row.getTimestampr());
+        Assert.assertEquals(rowMysql.getVarbinaryr(), row.getVarbinaryr());
+        Assert.assertEquals(rowMysql.getBinaryr(), row.getBinaryr());
+        Assert.assertArrayEquals(rowMysql.getBlobr(), row.getBlobr());
+        Assert.assertEquals(rowMysql.getTextr(), row.getTextr());
         Assert.assertEquals(rowMysql.getTinyintr(), row.getTinyintr());
-        Assert.assertEquals(rowMysql.getYearr(), row.getYearr());
-        Assert.assertEquals(rowMysql.getIntegerLong(), row.getIntegerLong());
-        Assert.assertEquals(rowMysql.getBigintLong(), row.getBigintLong());
-        Assert.assertEquals(rowMysql.getDatetimeDate(), row.getDatetimeDate());
-        Assert.assertEquals(rowMysql.getUnsignedintr(), row.getUnsignedintr());
-    }
-
-    private void rowNullEquals(NormalTblNullRow row, NormalTblNullRow rowMysql) {
-        Assert.assertEquals(rowMysql.getPk(), row.getPk());
-        Assert.assertEquals(rowMysql.getPkInteger(), row.getPkInteger());
-
-        Assert.assertEquals(rowMysql.getCharr(), row.getCharr());
-        Assert.assertEquals(rowMysql.getVarcharr(), row.getVarcharr());
+        Assert.assertEquals(rowMysql.getSmallintr(), row.getSmallintr());
+        Assert.assertEquals(rowMysql.getMediumintr(), row.getMediumintr());
+        Assert.assertEquals(rowMysql.getIntegerr(), row.getIntegerr());
         Assert.assertEquals(rowMysql.getBigintr(), row.getBigintr());
+        Assert.assertEquals(rowMysql.getUtinyintr(), row.getUtinyintr());
+        Assert.assertEquals(rowMysql.getUsmallintr(), row.getUsmallintr());
+        Assert.assertEquals(rowMysql.getUmediumintr(), row.getUmediumintr());
+        Assert.assertEquals(rowMysql.getUintegerr(), row.getUintegerr());
+        Assert.assertEquals(rowMysql.getUbigintr(), row.getUbigintr());
         Assert.assertEquals(rowMysql.getBitr(), row.getBitr());
-        if (rowMysql.getBlobr() != null) {
-            Assert.assertEquals(rowMysql.getBlobr()[0], row.getBlobr()[0]);
-        } else {
-            Assert.assertEquals(rowMysql.getBlobr(), row.getBlobr());
-        }
+
         Assert.assertEquals(rowMysql.getDater(), row.getDater());
         Assert.assertEquals(rowMysql.getDateString(), row.getDateString());
         Assert.assertEquals(rowMysql.getDatetimer(), row.getDatetimer());
@@ -414,14 +326,10 @@ public class IbatisTypeTest {
         Assert.assertEquals(rowMysql.getDoubleFloat(), row.getDoubleFloat());
         Assert.assertEquals(rowMysql.getFloatr(), row.getFloatr());
         Assert.assertEquals(rowMysql.getFloatDouble(), row.getFloatDouble());
-        Assert.assertEquals(rowMysql.getIntegerr(), row.getIntegerr());
-        Assert.assertEquals(rowMysql.getMediumintr(), row.getMediumintr());
-        Assert.assertEquals(rowMysql.getSmallintr(), row.getSmallintr());
         Assert.assertEquals(rowMysql.getTimer(), row.getTimer());
         Assert.assertEquals(rowMysql.getTimestampr(), row.getTimestampr());
-        Assert.assertEquals(rowMysql.getTinyintr(), row.getTinyintr());
-        Assert.assertEquals(rowMysql.getYearr(), row.getYearr());
         Assert.assertEquals(rowMysql.getDatetimeDate(), row.getDatetimeDate());
-        Assert.assertEquals(rowMysql.getUnsignedintr(), row.getUnsignedintr());
+        Assert.assertEquals(rowMysql.getYearr(), row.getYearr());
     }
+
 }

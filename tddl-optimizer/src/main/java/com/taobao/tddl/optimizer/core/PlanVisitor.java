@@ -32,8 +32,6 @@ public interface PlanVisitor {
 
     public abstract void visit(List cl);
 
-    public abstract void visit(Comparable comp);
-
     public abstract void visit(Object s);
 
     public abstract void visit(IReplace put);
