@@ -13,8 +13,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
-import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.ExecuteTableName;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 
 @RunWith(EclipseParameterized.class)
 public class TransactionMultiTableTest extends BaseMatrixTestCase {
@@ -46,6 +46,11 @@ public class TransactionMultiTableTest extends BaseMatrixTestCase {
 
     @Test
     public void testCommit() throws Exception {
+
+        if (!normaltblTableName.substring(0, 2).equals(studentTableName.substring(0, 2))) {
+            // 跨库事务暂不支持
+            return;
+        }
         String sql = "insert into " + normaltblTableName + "(pk,id) values(" + RANDOM_ID + "," + RANDOM_INT + ")";
         andorCon = us.getConnection();
         andorCon.setAutoCommit(false);
@@ -87,6 +92,10 @@ public class TransactionMultiTableTest extends BaseMatrixTestCase {
 
     @Test
     public void testRollback() throws Exception {
+        if (!normaltblTableName.substring(0, 2).equals(studentTableName.substring(0, 2))) {
+            // 跨库事务暂不支持
+            return;
+        }
         String sql = "insert into " + normaltblTableName + "(pk,id) values(" + RANDOM_ID + "," + RANDOM_INT + ")";
         andorCon = us.getConnection();
         andorCon.setAutoCommit(false);
@@ -129,6 +138,10 @@ public class TransactionMultiTableTest extends BaseMatrixTestCase {
 
     @Test
     public void testBeforeRollback() throws Exception {
+        if (!normaltblTableName.substring(0, 2).equals(studentTableName.substring(0, 2))) {
+            // 跨库事务暂不支持
+            return;
+        }
         String sql = "insert into " + normaltblTableName + "(pk,id) values(" + RANDOM_ID + "," + RANDOM_INT + ")";
         andorCon = us.getConnection();
         andorCon.setAutoCommit(false);

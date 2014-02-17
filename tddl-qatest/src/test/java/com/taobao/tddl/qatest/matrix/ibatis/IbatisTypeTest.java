@@ -106,7 +106,7 @@ public class IbatisTypeTest {
         map.put("datetimer", da);
         map.put("timestampr", da);
         map.put("yearr", 2012);
-        map.put("unsignedintr",1000);
+        map.put("unsignedintr", 1000);
 
         andorSqlMapClient.delete("delete_test", map);
         mysqlSqlMapClient.delete("delete_test", map);
@@ -132,21 +132,21 @@ public class IbatisTypeTest {
         // andorTDHSSqlMapClient.insert("delete_tdhs_test", map);
 
     }
-    
+
     @Test
     public void boundaryValue1Test() throws SQLException {
         long pk = 0xffffffffffffffL;
-        String s = "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz" +
-        		"abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz" +
-        		"abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz" +
-        		"abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz" +
-        		"abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz" +
-        		"abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz" +
-        		"abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz" +
-        		"abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz" +
-        		"abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz" +
-        		"abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz" +
-        		"abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz";
+        String s = "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
+                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
+                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
+                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
+                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
+                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
+                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
+                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
+                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
+                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz"
+                   + "abcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyzabcefghijklmnopqrstuvwxyz";
         Byte b = '~';
         BigDecimal big = new BigDecimal(new String("1234567890123456789012345678901234567890"));
         Date da = new Date(0xffffffffffffffL);
@@ -173,7 +173,7 @@ public class IbatisTypeTest {
         map.put("datetimer", da);
         map.put("timestampr", da);
         map.put("yearr", 5000);
-        map.put("unsignedintr",pk);
+        map.put("unsignedintr", pk);
 
         andorSqlMapClient.delete("delete_test", map);
         mysqlSqlMapClient.delete("delete_test", map);
@@ -199,7 +199,7 @@ public class IbatisTypeTest {
         // andorTDHSSqlMapClient.insert("delete_tdhs_test", map);
 
     }
-    
+
     @Test
     public void boundaryValue2Test() throws SQLException {
         long pk = -0xffffffffffffffL;
@@ -230,7 +230,7 @@ public class IbatisTypeTest {
         map.put("datetimer", da);
         map.put("timestampr", da);
         map.put("yearr", -5000);
-        map.put("unsignedintr",pk);
+        map.put("unsignedintr", pk);
 
         andorSqlMapClient.delete("delete_test", map);
         mysqlSqlMapClient.delete("delete_test", map);
@@ -256,8 +256,7 @@ public class IbatisTypeTest {
         // andorTDHSSqlMapClient.insert("delete_tdhs_test", map);
 
     }
-    
-    
+
     @Test
     public void boundaryValue3Test() throws SQLException {
         long pk = 0;
@@ -288,7 +287,7 @@ public class IbatisTypeTest {
         map.put("datetimer", da);
         map.put("timestampr", da);
         map.put("yearr", -5000);
-        map.put("unsignedintr",pk);
+        map.put("unsignedintr", pk);
 
         andorSqlMapClient.delete("delete_test", map);
         mysqlSqlMapClient.delete("delete_test", map);

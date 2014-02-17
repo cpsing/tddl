@@ -12,8 +12,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
-import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.ExecuteTableName;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 
 /**
  * LeftJoin测试，bdb不支持LeftJoin，只有当dbType="mysql"时测试用例才会运行
@@ -135,6 +135,10 @@ public class RightJoinTest extends BaseMatrixTestCase {
 
     @Test
     public void rightJoinWithSubQueryTest() throws Exception {
+        if (hostgroup.startsWith("ob") && host_info.startsWith("ob")) {
+            // TODO:ob join bug，对别名支持不好
+            return;
+        }
         // {
         // String sql =
         // "/* ANDOR ALLOW_TEMPORARY_TABLE=True */select  sum(host_id) as sumId,host_name,hostgroup_id from "

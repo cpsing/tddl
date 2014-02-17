@@ -301,8 +301,13 @@ public class Validator {
                 List<Object> mysqlResult = new ArrayList<Object>();
                 List<Object> result = new ArrayList<Object>();
                 for (int i = 0; i < columnParam.length; i++) {
-                    mysqlResult.add(rs.getObject(columnParam[i]));
-                    result.add(ret.getObject(columnParam[i]));
+
+                    mysqlResult.add(getObject(rs, columnParam, i));
+                    // mysqlResult.add(rs.getObject(columnParam[i]));
+                    // result.add(ret.getObject(columnParam[i]));
+
+                    result.add(getObject(ret, columnParam, i));
+
                 }
                 Assert.assertEquals(mysqlResult, result);
             }
