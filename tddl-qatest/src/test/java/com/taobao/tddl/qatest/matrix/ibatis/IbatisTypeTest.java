@@ -43,8 +43,9 @@ public class IbatisTypeTest {
 
     @Test
     public void seletctTypeTest() throws SQLException {
+    	prepareOneRowData();
         Map<Object, Object> map = new HashMap<Object, Object>();
-        map.put("pk", 1);
+        map.put("pk", 122345l);
         // andor的mysql
         List listMysql = mysqlSqlMapClient.queryForList("select_test", map);
         rowMysql = (NormalTblRow) listMysql.get(0);
@@ -60,8 +61,9 @@ public class IbatisTypeTest {
 
     @Test
     public void selectTypeWithNullTest() throws SQLException {
+    	prepareOneRowData();
         Map<Object, Object> map = new HashMap<Object, Object>();
-        map.put("pk", 11);
+        map.put("pk", 122345l);
         // andor的mysql
         List listMysql = mysqlSqlMapClient.queryForList("select_test_null", map);
         NormalTblNullRow rowMysql = (NormalTblNullRow) listMysql.get(0);
@@ -73,6 +75,47 @@ public class IbatisTypeTest {
         // andorTDHSSqlMapClient.queryForList("select_tdhs_null", map);
         // NormalTblNullRow rowTdhs = (NormalTblNullRow) list.get(0);
         // rowNullEquals(rowTdhs, rowMysql);
+    }
+
+    public void prepareOneRowData() throws SQLException {
+        long pk = 122345l;
+        String s = "abc";
+        Byte b = '1';
+        int i = 11;
+        BigDecimal big = new BigDecimal(11);
+        Date da = new Date();
+        Time ti = new Time(111111);
+        Boolean bl = false;
+        Float f = 0.1f;
+        Double d = 0.12d;
+        Map<Object, Object> map = new HashMap<Object, Object>();
+        map.put("pk", pk);
+        map.put("varcharr", s);
+        map.put("charr", s);
+        map.put("blobr", b);
+        map.put("integerr", pk);
+        map.put("tinyintr", i);
+        map.put("smallintr", i);
+        map.put("mediumintr", i);
+        map.put("bigintr", i);
+        map.put("bitr", bl);
+        map.put("floatr", f);
+        map.put("doubler", d);
+        map.put("decimalr", big);
+        map.put("dater", da);
+        map.put("timer", ti);
+        map.put("datetimer", da);
+        map.put("timestampr", da);
+        map.put("yearr", 2012);
+        map.put("unsignedintr",1000);
+
+        andorSqlMapClient.delete("delete_test", map);
+        mysqlSqlMapClient.delete("delete_test", map);
+
+        andorSqlMapClient.insert("insert_test", map);
+        mysqlSqlMapClient.insert("insert_test", map);
+
+
     }
 
     @Test
