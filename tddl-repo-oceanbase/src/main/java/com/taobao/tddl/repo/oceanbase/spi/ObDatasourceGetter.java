@@ -7,7 +7,6 @@ public class ObDatasourceGetter extends DatasourceMySQLImplement {
 
     @Override
     protected boolean isNotValidateNode(Group.GroupType type) {
-
         return super.isNotValidateNode(type) && !Group.GroupType.OCEANBASE_JDBC.equals(type);
     }
 

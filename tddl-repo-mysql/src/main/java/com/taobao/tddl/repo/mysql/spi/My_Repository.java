@@ -1,12 +1,12 @@
 package com.taobao.tddl.repo.mysql.spi;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import javax.sql.DataSource;
 
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.taobao.tddl.common.exception.TddlException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.Group;
@@ -23,17 +23,19 @@ import com.taobao.tddl.executor.spi.ITable;
 import com.taobao.tddl.executor.spi.ITransaction;
 import com.taobao.tddl.group.jdbc.TGroupDataSource;
 import com.taobao.tddl.optimizer.config.table.TableMeta;
+import com.taobao.tddl.optimizer.core.PlanVisitor;
 import com.taobao.tddl.repo.mysql.executor.TddlGroupExecutor;
 import com.taobao.tddl.repo.mysql.handler.CommandHandlerFactoryMyImp;
 
 public class My_Repository extends AbstractLifecycle implements IRepository {
 
-    protected Cache<String, ITable>        tables    = CacheBuilder.newBuilder().build();
-    protected Cache<Group, IGroupExecutor> executors = CacheBuilder.newBuilder().build();
-    protected RepositoryConfig             config;
-    protected CursorFactoryMyImpl          cfm;
-    protected ICommandHandlerFactory       cef       = null;
-    protected IDataSourceGetter            dsGetter  = new DatasourceMySQLImplement();
+    protected LoadingCache<String, LoadingCache<TableMeta, ITable>> tables;
+    protected LoadingCache<Group, IGroupExecutor>                   executors;
+    protected RepositoryConfig                                      config;
+    protected CursorFactoryMyImpl                                   cfm;
+    protected ICommandHandlerFactory                                cef      = null;
+    protected IDataSourceGetter                                     dsGetter = new DatasourceMySQLImplement();
+    protected PlanVisitor                                           planVisitor;
 
     @Override
     public void doInit() {
@@ -42,7 +44,45 @@ public class My_Repository extends AbstractLifecycle implements IRepository {
         this.config.setProperty(RepositoryConfig.IS_TRANSACTIONAL, "true");
         cfm = new CursorFactoryMyImpl();
         cef = new CommandHandlerFactoryMyImp();
+        tables = CacheBuilder.newBuilder().build(new CacheLoader<String, LoadingCache<TableMeta, ITable>>() {
 
+            @Override
+            public LoadingCache<TableMeta, ITable> load(final String groupNode) throws Exception {
+                return CacheBuilder.newBuilder().build(new CacheLoader<TableMeta, ITable>() {
+
+                    @Override
+                    public ITable load(TableMeta meta) throws Exception {
+                        try {
+                            DataSource ds = dsGetter.getDataSource(groupNode);
+                            My_Table table = new My_Table(ds, meta, groupNode);
+                            table.setSelect(false);
+                            return table;
+                        } catch (Exception ex) {
+                            throw new TddlException(ExceptionErrorCodeUtils.Read_only, ex);
+                        }
+                    }
+
+                });
+            }
+        });
+
+        executors = CacheBuilder.newBuilder().build(new CacheLoader<Group, IGroupExecutor>() {
+
+            @Override
+            public IGroupExecutor load(Group group) throws Exception {
+                TGroupDataSource groupDS = new TGroupDataSource(group.getName(), group.getAppName());
+                groupDS.init();
+
+                TddlGroupExecutor executor = new TddlGroupExecutor(getRepo());
+                executor.setGroup(group);
+                executor.setRemotingExecutableObject(groupDS);
+                return executor;
+            }
+        });
+    }
+
+    protected IRepository getRepo() {
+        return this;
     }
 
     @Override
@@ -60,22 +100,9 @@ public class My_Repository extends AbstractLifecycle implements IRepository {
             return getTempTable(meta);
         } else {
             try {
-                return tables.get(groupNode, new Callable<ITable>() {
-
-                    @Override
-                    public ITable call() throws Exception {
-                        try {
-                            DataSource ds = dsGetter.getDataSource(groupNode);
-                            My_Table table = new My_Table(ds, meta, groupNode);
-                            table.setSelect(false);
-                            return table;
-                        } catch (Exception ex) {
-                            throw new TddlException(ExceptionErrorCodeUtils.Read_only, ex);
-                        }
-                    }
-                });
+                return tables.get(groupNode).get(meta);
             } catch (ExecutionException e) {
-                throw new TddlException(e);
+                throw new TddlRuntimeException(e);
             }
         }
     }
@@ -120,20 +147,7 @@ public class My_Repository extends AbstractLifecycle implements IRepository {
     @Override
     public IGroupExecutor getGroupExecutor(final Group group) {
         try {
-            final IRepository repo = (this);
-            return executors.get(group, new Callable<IGroupExecutor>() {
-
-                @Override
-                public IGroupExecutor call() throws Exception {
-                    TGroupDataSource groupDS = new TGroupDataSource(group.getName(), group.getAppName());
-                    groupDS.init();
-
-                    TddlGroupExecutor executor = new TddlGroupExecutor(repo);
-                    executor.setGroup(group);
-                    executor.setRemotingExecutableObject(groupDS);
-                    return executor;
-                }
-            });
+            return executors.get(group);
         } catch (ExecutionException e) {
             throw new TddlRuntimeException(e);
         }
