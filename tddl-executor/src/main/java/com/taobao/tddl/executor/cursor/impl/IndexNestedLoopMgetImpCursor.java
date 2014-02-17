@@ -133,6 +133,7 @@ public class IndexNestedLoopMgetImpCursor extends IndexNestLoopCursor implements
                     // 匹配，找到了
                     right = rightDuplicateCache.currentKey;
                     current = joinRecord(left, right);
+
                     // 如果有重复，那么指针下移，让下次可以直接去选择。
                     rightDuplicateCache = rightDuplicateCache.next;
                     return current;

@@ -26,7 +26,7 @@ public class BytesType extends AbstractDataType<byte[]> {
         if (value == null) {
             return 1;
         } else {
-            return DataEncoder.calculateEncodedLength((byte[]) value);
+            return DataEncoder.calculateEncodedLength(convertFrom(value));
         }
     }
 

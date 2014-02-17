@@ -50,7 +50,7 @@ public class SortMergeJoinHandler extends QueryHandlerCommon {
         cursor_right = ExecutorContext.getContext()
             .getTopologyExecutor()
             .execByExecPlanNode(rightQuery, executionContext);
-        right_match = matchIndex(getOrderBy(join.getRightJoinOnColumns()), rightQuery.getOrderBys());
+        right_match = matchIndex(getOrderBy(join.getRightJoinOnColumns()), cursor_right.getOrderBy());
         if (right_match == NOT_MATCH) {
             // 这里是，排序不匹配，所以使用leftJoinOnColumns进行临时表构建。
             cursor_right = repo.getCursorFactory().tempTableSortCursor(executionContext,

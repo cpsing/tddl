@@ -121,7 +121,7 @@ public class BigDecimalType extends CommonType<BigDecimal> {
         if (value == null) {
             return 1;
         } else {
-            return KeyEncoder.calculateEncodedLength((BigDecimal) value);
+            return KeyEncoder.calculateEncodedLength(convertFrom(value));
         }
     }
 

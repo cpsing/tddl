@@ -13,8 +13,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
-import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.ExecuteTableName;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 
 /**
  * LeftJoin测试，bdb不支持LeftJoin，只有当dbType="mysql"时测试用例才会运行
@@ -167,7 +167,7 @@ public class LeftJoinTest extends BaseMatrixTestCase {
         // 使用sort merge join，不需要临时表排序
         sql = "select a.host_id,a.host_name,a.hostgroup_id,b.hostgroup_name from " + hostgroup + " as b left join "
               + host_info + " as a " + "on b.hostgroup_id=a.hostgroup_id order by a.hostgroup_id asc , a.host_id asc";
-        selectOrderAssert(sql, columnParam, Collections.EMPTY_LIST);
+        selectContentSameAssert(sql, columnParam, Collections.EMPTY_LIST);
 
         // 使用sort merge join，不需要临时表排序
         sql = "select a.host_id,a.host_name,a.hostgroup_id,b.hostgroup_name from " + hostgroup + " as b left join "

@@ -121,7 +121,7 @@ public class BigIntegerType extends CommonType<BigInteger> {
         if (value == null) {
             return 1;
         } else {
-            return KeyEncoder.calculateEncodedLength((BigInteger) value);
+            return KeyEncoder.calculateEncodedLength(convertFrom(value));
         }
     }
 
