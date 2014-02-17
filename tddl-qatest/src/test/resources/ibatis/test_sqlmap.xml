@@ -3,46 +3,23 @@
 <sqlMap>
 	<resultMap id="normalTblRow" class="com.taobao.tddl.qatest.util.NormalTblRow">
 		<result column="pk" property="pk" />
-		<result column="pk" property="pkInteger" />
 		<result column="varcharr" property="varcharr" />
 		<result column="charr" property="charr" />
+		<result column="varbinaryr" property="varbinaryr" />
+		<result column="binaryr" property="binaryr" />
 		<result column="blobr" property="blobr" />
-		<result column="integerr" property="integerr" />
-		<result column="integerr" property="integerLong" />
+		<result column="textr" property="textr" />
 		<result column="tinyintr" property="tinyintr" />
 		<result column="smallintr" property="smallintr" />
 		<result column="mediumintr" property="mediumintr" />
-		<result column="bitr" property="bitr" />
-		<result column="bigintr" property="bigintr" />
-		<result column="bigintr" property="bigintLong" />
-		<result column="floatr" property="floatr" />
-		<result column="floatr" property="floatDouble" />
-		<result column="doubler" property="doubler" />
-		<result column="doubler" property="doubleFloat" />
-		<result column="decimalr" property="decimalr" />
-		<result column="decimalr" property="decimalLong" />
-		<result column="decimalr" property="decimalInt" />
-		<result column="dater" property="dater" />
-		<result column="dater" property="dateString" />
-		<result column="timer" property="timer" />
-		<result column="datetimer" property="datetimer" />
-		<result column="datetimer" property="datetimeDate" />
-		<result column="timestampr" property="timestampr" />
-		<result column="yearr" property="yearr" />
-		<result column="unsignedintr" property="unsignedintr" />
-	</resultMap>
-	<resultMap id="normalTblNullRow" class="com.taobao.tddl.qatest.util.NormalTblNullRow">
-		<result column="pk" property="pk" />
-		<result column="pk" property="pkInteger" />
-		<result column="varcharr" property="varcharr" />
-		<result column="charr" property="charr" />
-		<result column="blobr" property="blobr" />
 		<result column="integerr" property="integerr" />
-		<result column="tinyintr" property="tinyintr" />
-		<result column="smallintr" property="smallintr" />
-		<result column="mediumintr" property="mediumintr" />
-		<result column="bitr" property="bitr" />
 		<result column="bigintr" property="bigintr" />
+		<result column="utinyintr" property="utinyintr" />
+		<result column="usmallintr" property="usmallintr" />
+		<result column="umediumintr" property="umediumintr" />
+		<result column="uintegerr" property="uintegerr" />
+		<result column="ubigintr" property="ubigintr" />
+		<result column="bitr" property="bitr" />
 		<result column="floatr" property="floatr" />
 		<result column="floatr" property="floatDouble" />
 		<result column="doubler" property="doubler" />
@@ -55,20 +32,18 @@
 		<result column="datetimer" property="datetimeDate" />
 		<result column="timestampr" property="timestampr" />
 		<result column="yearr" property="yearr" />
-		<result column="unsignedintr" property="unsignedintr" />
 	</resultMap>
-	
    <select id="select_test" resultMap="normalTblRow">
  		<![CDATA[
 		select * from mysql_ibatis_type where pk = #pk#
 		]]>
 	</select>
-	<select id="select_test_null" resultMap="normalTblNullRow">
+	<select id="select_test_null" resultMap="normalTblRow">
  		<![CDATA[
 		select * from mysql_ibatis_type where pk = #pk#
 		]]>
 	</select>
-	<select id="select_tdhs_null" resultMap="normalTblNullRow">
+	<select id="select_tdhs_null" resultMap="normalTblRow">
  		<![CDATA[
 		select * from tdhs_ibatis_type where pk = #pk#
 		]]>
@@ -79,17 +54,13 @@
 		]]>
 	</select>
 	<insert id="insert_test">
-		insert into mysql_ibatis_type (pk,varcharr,charr,blobr,integerr,tinyintr,smallintr,mediumintr,bitr,bigintr,floatr,doubler,decimalr,dater,
-		timer,datetimer,timestampr,yearr,unsignedintr) values
-		(#pk#,#varcharr#,#charr#,#blobr#,#integerr#,#tinyintr#,#smallintr#,#mediumintr#,#bitr#,#bigintr#,#floatr#,#doubler#,#decimalr#,#dater#,
-		#timer#,#datetimer#,#timestampr#,#yearr#,#unsignedintr#)
+		insert into mysql_ibatis_type (pk,varcharr,charr,varbinaryr,binaryr,blobr,textr,tinyintr,smallintr,mediumintr,integerr,bigintr,utinyintr,usmallintr,umediumintr,uintegerr,ubigintr,bitr,floatr,doubler,decimalr,dater,timer,datetimer,timestampr,yearr) values
+		(#pk#,#varcharr#,#charr#,#varbinaryr#,#binaryr#,#blobr#,#textr#,#tinyintr#,#smallintr#,#mediumintr#,#integerr#,#bigintr#,#utinyintr#,#usmallintr#,#umediumintr#,#uintegerr#,#ubigintr#,#bitr#,#floatr#,#doubler#,#decimalr#,#dater#,#timer#,#datetimer#,#timestampr#,#yearr#)
     </insert>
     
-    	<insert id="insert_tdhs_test">
-		insert into tdhs_ibatis_type (pk,varcharr,charr,blobr,integerr,tinyintr,smallintr,mediumintr,bitr,bigintr,floatr,doubler,decimalr,dater,
-		timer,datetimer,timestampr,yearr,unsignedintr) values
-		(#pk#,#varcharr#,#charr#,#blobr#,#integerr#,#tinyintr#,#smallintr#,#mediumintr#,#bitr#,#bigintr#,#floatr#,#doubler#,#decimalr#,#dater#,
-		#timer#,#datetimer#,#timestampr#,#yearr#,#unsignedintr#)
+    <insert id="insert_tdhs_test">
+		insert into mysql_ibatis_type (pk,varcharr,charr,varbinaryr,binaryr,blobr,textr,tinyintr,smallintr,mediumintr,integerr,bigintr,utinyintr,usmallintr,umediumintr,uintegerr,ubigintr,bitr,floatr,doubler,decimalr,dater,timer,datetimer,timestampr,yearr) values
+		(#pk#,#varcharr#,#charr#,#varbinaryr#,#binaryr#,#blobr#,#textr#,#tinyintr#,#smallintr#,#mediumintr#,#integerr#,#bigintr#,#utinyintr#,#usmallintr#,#umediumintr#,#uintegerr#,#ubigintr#,#bitr#,#floatr#,#doubler#,#decimalr#,#dater#,#timer#,#datetimer#,#timestampr#,#yearr#)
     </insert>
     	<insert id="delete_test">
 		delete from mysql_ibatis_type where pk=#pk#

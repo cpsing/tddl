@@ -109,13 +109,21 @@
 			<column name="pk" type="long" />
 			<column name="varcharr" type="String" />
 			<column name="charr" type="String" />
+			<column name="varbinaryr" type="String" />
+			<column name="binaryr" type="String" />
 			<column name="blobr" type="bytes" />
-			<column name="integerr" type="Long" />
+			<column name="textr" type="String" />
 			<column name="tinyintr" type="Integer" />
 			<column name="smallintr" type="Integer" />
 			<column name="mediumintr" type="Integer" />
+			<column name="integerr" type="Integer" />
+			<column name="bigintr" type="Long" />
+			<column name="utinyintr" type="Integer" />
+			<column name="usmallintr" type="Integer" />
+			<column name="umediumintr" type="Integer" />
+			<column name="uintegerr" type="Long" />
+			<column name="ubigintr" type="BigInteger" />
 			<column name="bitr" type="Boolean" />
-			<column name="bigintr" type="BigInteger" />
 			<column name="floatr" type="Float" />
 			<column name="doubler" type="Double" />
 			<column name="decimalr" type="BigDecimal" />
@@ -124,7 +132,6 @@
 			<column name="datetimer" type="Timestamp" />
 			<column name="timestampr" type="Timestamp" />
 			<column name="yearr" type="Date" />
-			<column name="unsignedintr" type="Long" />
 		</columns>
 		<primaryKey>pk</primaryKey>
 	</table>

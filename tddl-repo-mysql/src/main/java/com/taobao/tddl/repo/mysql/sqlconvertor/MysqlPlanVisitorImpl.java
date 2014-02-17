@@ -249,29 +249,6 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
     }
 
     @Override
-    public void visit(Comparable val) {
-        if (val instanceof Boolean) {
-            sqlBuilder.append(((Boolean) val).toString());
-            return;
-        }
-
-        if (val instanceof NullValue) {
-            sqlBuilder.append("null");
-            return;
-        }
-
-        int index = bindValSequence.getAndIncrement();
-        ParameterContext context = null;
-        if (val != null && !(val instanceof NullValue)) {
-            context = new ParameterContext(ParameterMethod.setObject1, new Object[] { index, val });
-        } else {
-            context = new ParameterContext(ParameterMethod.setNull1, new Object[] { index, Types.NULL });
-        }
-        this.paramMap.put(index, context);
-        sqlBuilder.append("?");
-    }
-
-    @Override
     public void visit(IColumn column) {
         // 别名加在select之外，如(select * from table) as t1,列名之前不能使用这个别名
         // 别名加在select之内，如select * from table as t1，列名之前可以使用这个别名
@@ -554,11 +531,28 @@ public class MysqlPlanVisitorImpl implements PlanVisitor {
 
     @Override
     public void visit(Object s) {
-        if (s instanceof Comparable) {
-            visit((Comparable) s);
-        }
         if (s instanceof List) {
             visit((List) s);
+        } else {
+            if (s instanceof Boolean) {
+                sqlBuilder.append(((Boolean) s).toString());
+                return;
+            }
+
+            if (s instanceof NullValue) {
+                sqlBuilder.append("null");
+                return;
+            }
+
+            int index = bindValSequence.getAndIncrement();
+            ParameterContext context = null;
+            if (s != null && !(s instanceof NullValue)) {
+                context = new ParameterContext(ParameterMethod.setObject1, new Object[] { index, s });
+            } else {
+                context = new ParameterContext(ParameterMethod.setNull1, new Object[] { index, Types.NULL });
+            }
+            this.paramMap.put(index, context);
+            sqlBuilder.append("?");
         }
 
     }

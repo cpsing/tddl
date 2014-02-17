@@ -20,16 +20,6 @@ public class TResultSetMetaData implements ResultSetMetaData {
         this.columnMetas = columns;
     }
 
-    // public boolean columnIsExist(String column) {
-    // for (ColumnMeta metaItem : columnMetas) {
-    // if (column.equalsIgnoreCase(metaItem.getName()) ||
-    // column.equalsIgnoreCase(metaItem.getAlias())) {
-    // return true;
-    // }
-    // }
-    // return false;
-    // }
-
     public DataType getColumnDataType(String column) {
         for (ColumnMeta metaItem : columnMetas)
             if (column.equalsIgnoreCase(metaItem.getName()) || column.equalsIgnoreCase(metaItem.getAlias())) {
