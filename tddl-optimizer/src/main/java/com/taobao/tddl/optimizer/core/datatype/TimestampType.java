@@ -61,8 +61,12 @@ public class TimestampType extends AbstractDataType<java.sql.Timestamp> {
         try {
             String[] vs = new String[1];
             int lenght = DataDecoder.decodeString(bytes, offset, vs);
-            Timestamp date = (Timestamp) longToDate.convert(vs[0], getDataClass());
-            return new DecodeResult(date, lenght);
+            if (vs[0] == null) {
+                return new DecodeResult(null, lenght);
+            } else {
+                Timestamp date = (Timestamp) longToDate.convert(vs[0], getDataClass());
+                return new DecodeResult(date, lenght);
+            }
         } catch (CorruptEncodingException e) {
             throw new TddlRuntimeException(e);
         }

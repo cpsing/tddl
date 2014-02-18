@@ -61,8 +61,12 @@ public class DateType extends AbstractDataType<java.sql.Date> {
         try {
             String[] vs = new String[1];
             int lenght = DataDecoder.decodeString(bytes, offset, vs);
-            Date date = (Date) longToDate.convert(vs[0], getDataClass());
-            return new DecodeResult(date, lenght);
+            if (vs[0] == null) {
+                return new DecodeResult(null, lenght);
+            } else {
+                Date date = (Date) longToDate.convert(vs[0], getDataClass());
+                return new DecodeResult(date, lenght);
+            }
         } catch (CorruptEncodingException e) {
             throw new TddlRuntimeException(e);
         }
