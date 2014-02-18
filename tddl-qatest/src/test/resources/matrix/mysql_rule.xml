@@ -274,9 +274,15 @@
 	</bean>
 
 	<bean id="mysql_ibatis_type" class="com.taobao.tddl.rule.TableRule">
+		<!-- 
 		<property name="allowFullTableScan" value="true" />
 		<property name="dbNamePattern" value="andor_mysql_group_oneAtom" />
 		<property name="tbNamePattern" value="mysql_ibatis_type" />
+		-->
+		<property name="allowFullTableScan" value="true" />
+		<property name="dbNamePattern" value="andor_mysql_group_2" />
+		<property name="tbRules" value="Math.abs(Long.valueOf(#pk,1,4#)) % 4 % 2" />
+		<property name="tbNamePattern" value="mysql_ibatis_type_{00}" />
 	</bean>
 	<!-- 单group多个atom 分表 -->
 	<bean id="mysql_normaltbl_oneGroup_mutilAtom" class="com.taobao.tddl.rule.TableRule">

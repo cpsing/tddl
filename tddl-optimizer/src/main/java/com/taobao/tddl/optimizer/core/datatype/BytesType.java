@@ -17,6 +17,11 @@ import com.taobao.tddl.common.model.BaseRowSet;
 public class BytesType extends AbstractDataType<byte[]> {
 
     @Override
+    public Class getDataClass() {
+        return byte[].class;
+    }
+
+    @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
         return DataEncoder.encode(this.convertFrom(value), dst, offset);
     }

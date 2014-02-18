@@ -167,7 +167,7 @@ public abstract class QueryTreeNodeBuilder {
         }
 
         if (column instanceof IFunction) {
-            buildFunction((IFunction) column, findInSelectList);
+            buildFunction((IFunction) column, false);
         }
 
         return column;

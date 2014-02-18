@@ -42,9 +42,6 @@ public class NormalTblRow {
     private Date       yearr;
     private Date       datetimeDate;
 
-    private Double     floatDouble;
-    private Float      doubleFloat;
-
     public long getPk() {
         return pk;
     }
@@ -271,22 +268,6 @@ public class NormalTblRow {
 
     public void setDatetimeDate(Date datetimeDate) {
         this.datetimeDate = datetimeDate;
-    }
-
-    public Double getFloatDouble() {
-        return floatDouble;
-    }
-
-    public void setFloatDouble(Double floatDouble) {
-        this.floatDouble = floatDouble;
-    }
-
-    public Float getDoubleFloat() {
-        return doubleFloat;
-    }
-
-    public void setDoubleFloat(Float doubleFloat) {
-        this.doubleFloat = doubleFloat;
     }
 
 }

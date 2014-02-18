@@ -325,6 +325,8 @@ public class TableMetaParser {
                 type = "TIME";
                 break;
             case Types.FLOAT:
+                type = "FLOAT";
+                break;
             case Types.REAL:
             case Types.DOUBLE:
                 type = "DOUBLE";

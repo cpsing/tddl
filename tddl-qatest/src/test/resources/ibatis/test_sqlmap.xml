@@ -21,9 +21,7 @@
 		<result column="ubigintr" property="ubigintr" />
 		<result column="bitr" property="bitr" />
 		<result column="floatr" property="floatr" />
-		<result column="floatr" property="floatDouble" />
 		<result column="doubler" property="doubler" />
-		<result column="doubler" property="doubleFloat" />
 		<result column="decimalr" property="decimalr" />
 		<result column="dater" property="dater" />
 		<result column="dater" property="dateString" />
@@ -33,24 +31,40 @@
 		<result column="timestampr" property="timestampr" />
 		<result column="yearr" property="yearr" />
 	</resultMap>
-   <select id="select_test" resultMap="normalTblRow">
+    <select id="select_test" resultMap="normalTblRow">
  		<![CDATA[
-		select * from mysql_ibatis_type where pk = #pk#
+		select * from mysql_ibatis_type where pk = #pk# order by pk asc
 		]]>
 	</select>
-	<select id="select_test_null" resultMap="normalTblRow">
+	<select id="select_test_max" resultMap="normalTblRow">
  		<![CDATA[
-		select * from mysql_ibatis_type where pk = #pk#
+		select max(pk) as pk ,max(varcharr) as varcharr ,max(charr) as charr,max(varbinaryr) as varbinaryr,max(binaryr) as binaryr,max(blobr) as blobr ,max(textr) as textr,max(tinyintr)as tinyintr,max(smallintr) as smallintr,max(mediumintr) as mediumintr,max(integerr) as integerr,max(bigintr) as bigintr,
+		max(utinyintr) as utinyintr,max(usmallintr) as usmallintr,max(umediumintr) as umediumintr,max(uintegerr) as uintegerr,max(ubigintr) as ubigintr,max(bitr) as bitr,max(floatr) as floatr,max(doubler) as doubler,max(decimalr) as decimalr,max(dater) as dater,max(timer) as timer,max(datetimer) as datetimer,max(timestampr) as timestampr,max(yearr) as yearr
+		from mysql_ibatis_type where pk in 
+		]]>
+		<iterate property="pks" open="(" close=")" conjunction=",">
+			#pks[]#
+		</iterate>
+		<![CDATA[
+		 order by pk asc
 		]]>
 	</select>
-	<select id="select_tdhs_null" resultMap="normalTblRow">
+	<select id="select_test_min" resultMap="normalTblRow">
  		<![CDATA[
-		select * from tdhs_ibatis_type where pk = #pk#
+		select min(pk) as pk ,min(varcharr) as varcharr ,min(charr) as charr,min(varbinaryr) as varbinaryr,min(binaryr) as binaryr,min(blobr) as blobr ,min(textr) as textr,min(tinyintr)as tinyintr,min(smallintr) as smallintr,min(mediumintr) as mediumintr,min(integerr) as integerr,min(bigintr) as bigintr,
+		min(utinyintr) as utinyintr,min(usmallintr) as usmallintr,min(umediumintr) as umediumintr,min(uintegerr) as uintegerr,min(ubigintr) as ubigintr,min(bitr) as bitr,min(floatr) as floatr,min(doubler) as doubler,min(decimalr) as decimalr,min(dater) as dater,min(timer) as timer,min(datetimer) as datetimer,min(timestampr) as timestampr,min(yearr) as yearr
+		from mysql_ibatis_type where pk in 
+		]]>
+		<iterate property="pks" open="(" close=")" conjunction=",">
+			#pks[]#
+		</iterate>
+		<![CDATA[
+		 order by pk asc
 		]]>
 	</select>
 	 <select id="select_tdhs_test" resultMap="normalTblRow">
  		<![CDATA[
-		select * from tdhs_ibatis_type where pk = #pk#
+		select * from tdhs_ibatis_type where pk = #pk# order by pk asc
 		]]>
 	</select>
 	<insert id="insert_test">

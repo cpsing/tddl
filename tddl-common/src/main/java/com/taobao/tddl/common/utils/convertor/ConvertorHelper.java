@@ -36,6 +36,7 @@ public class ConvertorHelper {
     public static final Convertor           dateToSql              = new SqlDateAndDateConvertor.DateToSqlDateConvertor();
     public static final Convertor           blobToBytes            = new BlobAndBytesConvertor.BlobToBytes();
     public static final Convertor           stringToBytes          = new StringAndObjectConvertor.StringToBytes();
+    public static final Convertor           bytesToString          = new StringAndObjectConvertor.BytesToString();
 
     private static volatile ConvertorHelper singleton              = null;
 
@@ -193,6 +194,7 @@ public class ConvertorHelper {
         repository.registerConvertor(java.sql.Time.class, java.sql.Date.class, dateToSql);
         repository.registerConvertor(Blob.class, byte[].class, blobToBytes);
         repository.registerConvertor(String.class, byte[].class, stringToBytes);
+        repository.registerConvertor(byte[].class, String.class, bytesToString);
     }
 
     private void initCommonTypes() {

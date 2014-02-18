@@ -103,7 +103,6 @@
 			</indexMeta>
 		</secondaryIndexes>
 	</table>
-	
 	<table name="mysql_ibatis_type">
 		<columns>
 			<column name="pk" type="long" />
@@ -122,7 +121,7 @@
 			<column name="usmallintr" type="Integer" />
 			<column name="umediumintr" type="Integer" />
 			<column name="uintegerr" type="Long" />
-			<column name="ubigintr" type="BigInteger" />
+			<column name="ubigintr" type="BigDecimal" />
 			<column name="bitr" type="Boolean" />
 			<column name="floatr" type="Float" />
 			<column name="doubler" type="Double" />
@@ -135,7 +134,6 @@
 		</columns>
 		<primaryKey>pk</primaryKey>
 	</table>
-
 	<table name="mysql_normaltbl_oneGroup_mutilAtom">
 		<columns>
 			<column name="pk" type="long" />

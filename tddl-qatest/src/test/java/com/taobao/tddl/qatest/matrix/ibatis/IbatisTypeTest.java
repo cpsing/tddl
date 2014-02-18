@@ -3,6 +3,7 @@ package com.taobao.tddl.qatest.matrix.ibatis;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -65,9 +66,9 @@ public class IbatisTypeTest {
         Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("pk", 122345l);
         // andor的mysql
-        List listMysql = mysqlSqlMapClient.queryForList("select_test_null", map);
+        List listMysql = mysqlSqlMapClient.queryForList("select_test", map);
         NormalTblRow rowMysql = (NormalTblRow) listMysql.get(0);
-        List list = andorSqlMapClient.queryForList("select_test_null", map);
+        List list = andorSqlMapClient.queryForList("select_test", map);
         NormalTblRow row = (NormalTblRow) list.get(0);
         rowEquals(row, rowMysql);
         // andor的tdhs
@@ -182,10 +183,10 @@ public class IbatisTypeTest {
         String da = "2015-12-31 12:59:59";
         String ti = "12:59:59";
         Boolean bl = true;
-        Float f = 3.40E+38f;
-        Double d = 1.79E+308d;
+        Float f = Float.MAX_VALUE;
+        Double d = Double.MAX_VALUE;
         Map<Object, Object> map = new HashMap<Object, Object>();
-        map.put("pk", Integer.MAX_VALUE);
+        map.put("pk", 1);
         map.put("varcharr", s);
         map.put("charr", s);
         map.put("varbinaryr", s);
@@ -225,12 +226,43 @@ public class IbatisTypeTest {
         List listMysql = mysqlSqlMapClient.queryForList("select_test", map);
         rowMysql = (NormalTblRow) listMysql.get(0);
         rowEquals(row, rowMysql);
+
+        map.put("pk", 2);
+
+        andorSqlMapClient.delete("delete_test", map);
+        mysqlSqlMapClient.delete("delete_test", map);
+        // andorTDHSSqlMapClient.delete("delete_tdhs_test", map);
+
+        andorSqlMapClient.insert("insert_test", map);
+        mysqlSqlMapClient.insert("insert_test", map);
+        // andorTDHSSqlMapClient.insert("insert_tdhs_test", map);
+
+        list = andorSqlMapClient.queryForList("select_test", map);
+        row = (NormalTblRow) list.get(0);
+        listMysql = mysqlSqlMapClient.queryForList("select_test", map);
+        rowMysql = (NormalTblRow) listMysql.get(0);
+        rowEquals(row, rowMysql);
+
         // andor的tdhs
         // List listTdhs =
         // andorTDHSSqlMapClient.queryForList("select_tdhs_test", map);
         // rowTdhs = (NormalTblRow) list.get(0);
         // rowEquals(rowTdhs, rowMysql);
 
+        Map idsMap = new HashMap();
+        idsMap.put("pks", Arrays.asList(1, 2));
+        list = andorSqlMapClient.queryForList("select_test_max", idsMap);
+        row = (NormalTblRow) list.get(0);
+        listMysql = mysqlSqlMapClient.queryForList("select_test_max", idsMap);
+        rowMysql = (NormalTblRow) listMysql.get(0);
+        rowEquals(row, rowMysql);
+
+        map.put("pk", 1);
+        andorSqlMapClient.delete("delete_test", map);
+        mysqlSqlMapClient.delete("delete_test", map);
+        // andorTDHSSqlMapClient.insert("delete_tdhs_test", map);
+
+        map.put("pk", 2);
         andorSqlMapClient.delete("delete_test", map);
         mysqlSqlMapClient.delete("delete_test", map);
         // andorTDHSSqlMapClient.insert("delete_tdhs_test", map);
@@ -244,8 +276,8 @@ public class IbatisTypeTest {
         String da = "2015-12-31 12:59:59";
         String ti = "12:59:59";
         Boolean bl = true;
-        Float f = -3.40E+38f;
-        Double d = -1.79E+308d;
+        Float f = Float.MIN_VALUE;
+        Double d = Double.MIN_VALUE;
         Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("pk", Integer.MIN_VALUE);
         map.put("varcharr", s);
@@ -287,12 +319,43 @@ public class IbatisTypeTest {
         List listMysql = mysqlSqlMapClient.queryForList("select_test", map);
         rowMysql = (NormalTblRow) listMysql.get(0);
         rowEquals(row, rowMysql);
+
+        map.put("pk", 2);
+
+        andorSqlMapClient.delete("delete_test", map);
+        mysqlSqlMapClient.delete("delete_test", map);
+        // andorTDHSSqlMapClient.delete("delete_tdhs_test", map);
+
+        andorSqlMapClient.insert("insert_test", map);
+        mysqlSqlMapClient.insert("insert_test", map);
+        // andorTDHSSqlMapClient.insert("insert_tdhs_test", map);
+
+        list = andorSqlMapClient.queryForList("select_test", map);
+        row = (NormalTblRow) list.get(0);
+        listMysql = mysqlSqlMapClient.queryForList("select_test", map);
+        rowMysql = (NormalTblRow) listMysql.get(0);
+        rowEquals(row, rowMysql);
+
         // andor的tdhs
         // List listTdhs =
         // andorTDHSSqlMapClient.queryForList("select_tdhs_test", map);
         // rowTdhs = (NormalTblRow) list.get(0);
         // rowEquals(rowTdhs, rowMysql);
 
+        Map idsMap = new HashMap();
+        idsMap.put("pks", Arrays.asList(1, 2));
+        list = andorSqlMapClient.queryForList("select_test_min", idsMap);
+        row = (NormalTblRow) list.get(0);
+        listMysql = mysqlSqlMapClient.queryForList("select_test_min", idsMap);
+        rowMysql = (NormalTblRow) listMysql.get(0);
+        rowEquals(row, rowMysql);
+
+        map.put("pk", 1);
+        andorSqlMapClient.delete("delete_test", map);
+        mysqlSqlMapClient.delete("delete_test", map);
+        // andorTDHSSqlMapClient.insert("delete_tdhs_test", map);
+
+        map.put("pk", 2);
         andorSqlMapClient.delete("delete_test", map);
         mysqlSqlMapClient.delete("delete_test", map);
         // andorTDHSSqlMapClient.insert("delete_tdhs_test", map);
@@ -318,18 +381,16 @@ public class IbatisTypeTest {
         Assert.assertEquals(rowMysql.getUbigintr(), row.getUbigintr());
         Assert.assertEquals(rowMysql.getBitr(), row.getBitr());
 
-        Assert.assertEquals(rowMysql.getDater(), row.getDater());
-        Assert.assertEquals(rowMysql.getDateString(), row.getDateString());
-        Assert.assertEquals(rowMysql.getDatetimer(), row.getDatetimer());
+        Assert.assertEquals(rowMysql.getDater().toString(), row.getDater().toString());
+        Assert.assertEquals(rowMysql.getDateString().toString(), row.getDateString().toString());
+        Assert.assertEquals(rowMysql.getDatetimer().toString(), row.getDatetimer().toString());
         Assert.assertEquals(rowMysql.getDecimalr(), row.getDecimalr());
         Assert.assertEquals(rowMysql.getDoubler(), row.getDoubler());
-        Assert.assertEquals(rowMysql.getDoubleFloat(), row.getDoubleFloat());
         Assert.assertEquals(rowMysql.getFloatr(), row.getFloatr());
-        Assert.assertEquals(rowMysql.getFloatDouble(), row.getFloatDouble());
-        Assert.assertEquals(rowMysql.getTimer(), row.getTimer());
-        Assert.assertEquals(rowMysql.getTimestampr(), row.getTimestampr());
-        Assert.assertEquals(rowMysql.getDatetimeDate(), row.getDatetimeDate());
-        Assert.assertEquals(rowMysql.getYearr(), row.getYearr());
+        Assert.assertEquals(rowMysql.getTimer().toString(), row.getTimer().toString());
+        Assert.assertEquals(rowMysql.getTimestampr().toString(), row.getTimestampr().toString());
+        Assert.assertEquals(rowMysql.getDatetimeDate().toString(), row.getDatetimeDate().toString());
+        Assert.assertEquals(rowMysql.getYearr().toString(), row.getYearr().toString());
     }
 
 }

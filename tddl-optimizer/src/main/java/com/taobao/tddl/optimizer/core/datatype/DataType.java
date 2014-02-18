@@ -26,27 +26,27 @@ import com.taobao.tddl.common.model.BaseRowSet;
  */
 public interface DataType<DATA> extends Comparator<Object> {
 
-    public static final DataType<Integer>    IntegerType    = new IntegerType();
-    public static final DataType<Long>       LongType       = new LongType();
-    public static final DataType<Short>      ShortType      = new ShortType();
-    public static final DataType<String>     StringType     = new StringType();
-    public static final DataType<Double>     DoubleType     = new DoubleType();
-    public static final DataType<Float>      FloatType      = new FloatType();
-    public static final DataType<Date>       DateType       = new DateType();
-    public static final DataType<Timestamp>  TimestampType  = new TimestampType();
-    public static final DataType<Boolean>    BooleanType    = new BooleanType();
-    public static final DataType<BigInteger> BigIntegerType = new BigIntegerType();
-    public static final DataType<BigDecimal> BigDecimalType = new BigDecimalType();
-    public static final DataType             DatetimeType   = new TimestampType();
-    public static final DataType             TimeType       = new TimeType();
+    public static final DataType<Integer>            IntegerType    = new IntegerType();
+    public static final DataType<Long>               LongType       = new LongType();
+    public static final DataType<Short>              ShortType      = new ShortType();
+    public static final DataType<String>             StringType     = new StringType();
+    public static final DataType<Double>             DoubleType     = new DoubleType();
+    public static final DataType<Float>              FloatType      = new FloatType();
+    public static final DataType<Date>               DateType       = new DateType();
+    public static final DataType<Timestamp>          TimestampType  = new TimestampType();
+    public static final DataType<Boolean>            BooleanType    = new BooleanType();
+    public static final DataType<BigInteger>         BigIntegerType = new BigIntegerType();
+    public static final DataType<BigDecimal>         BigDecimalType = new BigDecimalType();
+    public static final DataType<java.sql.Timestamp> DatetimeType   = new TimestampType();
+    public static final DataType<java.sql.Time>      TimeType       = new TimeType();
 
-    public static final DataType<byte[]>     BlobType       = new BlobType();
-    public static final DataType<String>     ClobType       = new ClobType();
+    public static final DataType<byte[]>             BlobType       = new BlobType();
+    public static final DataType<String>             ClobType       = new ClobType();
 
-    public static final DataType<Integer>    BitType        = new BitType();
-    public static final DataType<byte[]>     BytesType      = new BytesType();
-    public static final DataType<Byte>       ByteType       = new ByteType();
-    public static final DataType             NullType       = LongType;
+    public static final DataType<Integer>            BitType        = new BitType();
+    public static final DataType<byte[]>             BytesType      = new BytesType();
+    public static final DataType<Byte>               ByteType       = new ByteType();
+    public static final DataType                     NullType       = LongType;
 
     public static interface ResultGetter {
 

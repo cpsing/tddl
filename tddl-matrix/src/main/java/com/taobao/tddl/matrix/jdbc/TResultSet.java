@@ -3,7 +3,6 @@ package com.taobao.tddl.matrix.jdbc;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.net.URL;
 import java.sql.Array;
 import java.sql.Blob;
@@ -517,10 +516,11 @@ public class TResultSet implements ResultSet {
         if (ts == null) {
             wasNull = true;
             return null;
+        } else {
+            wasNull = false;
+            cal.setTimeInMillis(ts.getTime());
+            return new Timestamp(cal.getTimeInMillis());
         }
-        wasNull = false;
-        cal.setTimeInMillis(ts.getTime());
-        return new Timestamp(cal.getTimeInMillis());
     }
 
     @Override
@@ -529,10 +529,11 @@ public class TResultSet implements ResultSet {
         if (ts == null) {
             wasNull = true;
             return null;
+        } else {
+            wasNull = false;
+            cal.setTimeInMillis(ts.getTime());
+            return new Timestamp(cal.getTimeInMillis());
         }
-        wasNull = false;
-        cal.setTimeInMillis(ts.getTime());
-        return new Timestamp(cal.getTimeInMillis());
     }
 
     @Override
@@ -541,9 +542,10 @@ public class TResultSet implements ResultSet {
         if (ts == null) {
             wasNull = true;
             return null;
+        } else {
+            wasNull = false;
+            return new Time(ts.getTime());
         }
-        wasNull = false;
-        return new Time(ts.getTime());
     }
 
     @Override
@@ -552,9 +554,10 @@ public class TResultSet implements ResultSet {
         if (ts == null) {
             wasNull = true;
             return null;
+        } else {
+            wasNull = false;
+            return new Time(ts.getTime());
         }
-        wasNull = false;
-        return new Time(ts.getTime());
     }
 
     @Override
@@ -563,10 +566,11 @@ public class TResultSet implements ResultSet {
         if (ts == null) {
             wasNull = true;
             return null;
+        } else {
+            wasNull = false;
+            cal.setTimeInMillis(ts.getTime());
+            return new Time(cal.getTimeInMillis());
         }
-        wasNull = false;
-        cal.setTimeInMillis(ts.getTime());
-        return new Time(cal.getTimeInMillis());
     }
 
     @Override
@@ -575,10 +579,11 @@ public class TResultSet implements ResultSet {
         if (ts == null) {
             wasNull = true;
             return null;
+        } else {
+            wasNull = false;
+            cal.setTimeInMillis(ts.getTime());
+            return new Time(cal.getTimeInMillis());
         }
-        wasNull = false;
-        cal.setTimeInMillis(ts.getTime());
-        return new Time(cal.getTimeInMillis());
     }
 
     @Override
@@ -613,53 +618,16 @@ public class TResultSet implements ResultSet {
     @Override
     public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
         validateColumnIndex(columnIndex);
-        Object value = getObject(columnIndex);
+        columnIndex--;
+        BigDecimal value = currentKVPair.getBigDecimal(getActualIndex(columnIndex));
         if (value == null) {
             wasNull = true;
             return null;
+        } else {
+            wasNull = false;
+            return value;
         }
 
-        wasNull = false;
-        return this.validBigDecimal(value);
-    }
-
-    private BigDecimal validBigDecimal(Object value) {
-        if (value instanceof BigDecimal) {
-            return (BigDecimal) value;
-        }
-        if (value instanceof Long) {
-            return new BigDecimal((Long) value);
-        }
-
-        if (value instanceof Short) {
-            return new BigDecimal((Short) value);
-        }
-
-        if (value instanceof Double) {
-            return new BigDecimal((Double) value);
-        }
-
-        if (value instanceof Float) {
-            return new BigDecimal((Float) value);
-        }
-
-        if (value instanceof Integer) {
-            return new BigDecimal((Integer) value);
-        }
-
-        if (value instanceof BigInteger) {
-            return new BigDecimal((BigInteger) value);
-        }
-
-        if (value instanceof String) {
-            return new BigDecimal((String) value);
-        }
-
-        if (value instanceof Date) {
-            return new BigDecimal(((Date) value).getTime());
-        }
-
-        throw new RuntimeException("不支持类型" + value.getClass().getSimpleName() + " 到BigDecimal的转换");
     }
 
     @Override

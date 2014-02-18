@@ -42,8 +42,8 @@ public class BooleanFilter extends Function<IBooleanFilter> implements IBooleanF
     }
 
     @Override
-    public Comparable getColumn() {
-        return (Comparable) this.args.get(0);
+    public Object getColumn() {
+        return this.args.get(0);
     }
 
     @Override
@@ -53,11 +53,11 @@ public class BooleanFilter extends Function<IBooleanFilter> implements IBooleanF
     }
 
     @Override
-    public Comparable getValue() {
+    public Object getValue() {
         if (this.args.get(1) instanceof List) {
             return null;
         } else {
-            return (Comparable) this.args.get(1);
+            return this.args.get(1);
         }
     }
 

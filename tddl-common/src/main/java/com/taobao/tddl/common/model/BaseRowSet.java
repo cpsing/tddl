@@ -1,6 +1,8 @@
 package com.taobao.tddl.common.model;
 
+import java.math.BigDecimal;
 import java.sql.Date;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -43,6 +45,14 @@ public interface BaseRowSet {
     public byte[] getBytes(int index);
 
     public void setBytes(int index, byte[] bytes);
+
+    public BigDecimal getBigDecimal(int index);
+
+    public void setBigDecimal(int index, BigDecimal bigDecimal);
+
+    public Time getTime(int index);
+
+    public void setTime(int index, Time time);
 
     public Date getDate(int index);
 

@@ -14,7 +14,7 @@ import com.taobao.tddl.common.utils.convertor.ConvertorHelper;
  */
 public abstract class AbstractDataType<DATA> implements DataType<DATA> {
 
-    private Class dataClass = null;
+    protected Class dataClass = null;
 
     @Override
     public Class getDataClass() {
