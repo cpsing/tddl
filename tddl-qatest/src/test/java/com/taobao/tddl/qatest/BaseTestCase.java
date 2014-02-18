@@ -39,6 +39,8 @@ public class BaseTestCase extends Validator {
     protected final String            newName       = "zhuoxue.yll";
     protected final String            school        = "taobao";
     protected final Date              gmtDay        = new Date(1350230400000l);
+    protected final Date              gmtDayBefore  = new Date(1150300800000l);
+    protected final Date              gmtDayNext    = new Date(1550246400000l);
     protected final Date              gmt           = new Date(1350304585380l);
     protected final Date              gmtNext       = new Date(1550304585380l);
     protected final Date              gmtBefore     = new Date(1150304585380l);

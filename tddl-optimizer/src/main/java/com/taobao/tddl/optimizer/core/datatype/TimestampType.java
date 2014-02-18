@@ -2,7 +2,6 @@ package com.taobao.tddl.optimizer.core.datatype;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.sql.Timestamp;
 
 import com.taobao.tddl.common.exception.NotSupportException;
@@ -62,7 +61,7 @@ public class TimestampType extends AbstractDataType<java.sql.Timestamp> {
         try {
             String[] vs = new String[1];
             int lenght = DataDecoder.decodeString(bytes, offset, vs);
-            Time date = (Time) stringToDate.convert(vs[0], getDataClass());
+            Timestamp date = (Timestamp) stringToDate.convert(vs[0], getDataClass());
             return new DecodeResult(date, lenght);
         } catch (CorruptEncodingException e) {
             throw new TddlRuntimeException(e);

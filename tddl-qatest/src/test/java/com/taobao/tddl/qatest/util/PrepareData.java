@@ -46,8 +46,8 @@ public class PrepareData extends BaseTestCase {
             ps.setObject(1, Long.parseLong(i + ""));
             andorPs.setObject(2, i * 100);
             ps.setObject(2, i * 100);
-            andorPs.setObject(3, gmtNext);
-            ps.setObject(3, gmtNext);
+            andorPs.setObject(3, gmtDayNext);
+            ps.setObject(3, gmtDayNext);
             andorPs.setObject(4, gmtNext);
             ps.setObject(4, gmtNext);
             andorPs.setObject(5, gmtNext);
@@ -65,8 +65,8 @@ public class PrepareData extends BaseTestCase {
             ps.setObject(1, Long.parseLong(i + ""));
             andorPs.setObject(2, i * 100);
             ps.setObject(2, i * 100);
-            andorPs.setObject(3, gmtBefore);
-            ps.setObject(3, gmtBefore);
+            andorPs.setObject(3, gmtDayBefore);
+            ps.setObject(3, gmtDayBefore);
             andorPs.setObject(4, gmtBefore);
             ps.setObject(4, gmtBefore);
             andorPs.setObject(5, gmtBefore);

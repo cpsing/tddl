@@ -11,8 +11,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
-import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.ExecuteTableName;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 
 /**
  * 在缓存情况下，执行计划是否正确
@@ -43,34 +43,39 @@ public class SelectCacheTest extends BaseMatrixTestCase {
      */
     @Test
     public void selectWhereTest() throws Exception {
-        for (int i = 0; i < 4; i++) {
-            String sql = "select * from " + normaltblTableName + " where id=?";
-            List<Object> param = new ArrayList<Object>();
-            param.add(i);
+        if (!normaltblTableName.startsWith("ob")) {
+            for (int i = 0; i < 4; i++) {
+                String sql = "select * from " + normaltblTableName + " where id=?";
+                List<Object> param = new ArrayList<Object>();
+                param.add(i);
 
-            selectContentSameAssert(sql, columnParam, param);
+                selectContentSameAssert(sql, columnParam, param);
 
-            sql = "select * from " + normaltblTableName + " where id=? and name =?";
-            param.clear();
-            param.add(i);
-            param.add(name);
-            selectContentSameAssert(sql, columnParam, param);
+                sql = "select * from " + normaltblTableName + " where id=? and name =?";
+                param.clear();
+                param.add(i);
+                param.add(name);
+                selectContentSameAssert(sql, columnParam, param);
 
-            sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */ select * from " + normaltblTableName + " where id=? or pk =?";
-            param.clear();
-            param.add(i);
-            param.add(Long.parseLong(i + 1 + ""));
-            selectContentSameAssert(sql, columnParam, param);
+                sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */ select * from " + normaltblTableName
+                      + " where id=? or pk =?";
+                param.clear();
+                param.add(i);
+                param.add(Long.parseLong(i + 1 + ""));
+                selectContentSameAssert(sql, columnParam, param);
+            }
         }
     }
 
     @Test
     public void selectAliasTest() throws Exception {
-        for (long i = 0; i < 4; i++) {
-            String sql = "select * from  " + normaltblTableName + "  nor where nor.pk=?";
-            List<Object> param = new ArrayList<Object>();
-            param.add(i);
-            selectContentSameAssert(sql, columnParam, param);
+        if (!normaltblTableName.startsWith("ob")) {
+            for (long i = 0; i < 4; i++) {
+                String sql = "select * from  " + normaltblTableName + "  nor where nor.pk=?";
+                List<Object> param = new ArrayList<Object>();
+                param.add(i);
+                selectContentSameAssert(sql, columnParam, param);
+            }
         }
     }
 
@@ -104,10 +109,10 @@ public class SelectCacheTest extends BaseMatrixTestCase {
     @Test
     public void selectLGroupTest() throws Exception {
         String[] stringName = { name, newName, name1 };
-        String[] columnParam = { "gmt_create", "count(pk)" };
+        String[] columnParam = { "gmt_timestamp", "count(pk)" };
         for (int i = 0; i < stringName.length; i++) {
-            String sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */ select gmt_create,count(pk) from "
-                         + normaltblTableName + " where name=? group by gmt_create  order by count(pk)";
+            String sql = "/* ANDOR ALLOW_TEMPORARY_TABLE=True */ select gmt_timestamp,count(pk) from "
+                         + normaltblTableName + " where name=? group by gmt_timestamp  order by count(pk)";
             List<Object> param = new ArrayList<Object>();
             param.add(stringName[i]);
             selectContentSameAssert(sql, columnParam, param);
@@ -172,7 +177,7 @@ public class SelectCacheTest extends BaseMatrixTestCase {
             List<Object> param = new ArrayList<Object>();
             param.add(i);
             param.add(fl);
-            param.add(gmt);
+            param.add(gmtDay);
             param.add(gmt);
             param.add(gmt);
             execute(sql, param);
@@ -194,7 +199,7 @@ public class SelectCacheTest extends BaseMatrixTestCase {
             List<Object> param = new ArrayList<Object>();
             param.add(i);
             param.add(fl);
-            param.add(gmt);
+            param.add(gmtDay);
             param.add(gmt);
             param.add(gmt);
             execute(sql, param);
@@ -208,24 +213,26 @@ public class SelectCacheTest extends BaseMatrixTestCase {
 
     @Test
     public void updateTest() throws Exception {
-        for (long i = 0; i < 4; i++) {
-            String sql = "UPDATE " + normaltblTableName
-                         + " SET id=?,gmt_create=?,gmt_timestamp=?,gmt_datetime=?,name=?,floatCol=? WHERE pk=?";
-            List<Object> param = new ArrayList<Object>();
-            param.add(rand.nextInt());
-            param.add(gmt);
-            param.add(gmt);
-            param.add(gmt);
-            param.add("new_name" + rand.nextInt());
-            param.add(fl);
-            param.add(i);
-            executeCountAssert(sql, param);
+        if (!normaltblTableName.startsWith("ob")) {
+            for (long i = 0; i < 4; i++) {
+                String sql = "UPDATE " + normaltblTableName
+                             + " SET id=?,gmt_create=?,gmt_timestamp=?,gmt_datetime=?,name=?,floatCol=? WHERE pk=?";
+                List<Object> param = new ArrayList<Object>();
+                param.add(rand.nextInt());
+                param.add(gmt);
+                param.add(gmt);
+                param.add(gmt);
+                param.add("new_name" + rand.nextInt());
+                param.add(fl);
+                param.add(i);
+                executeCountAssert(sql, param);
 
-            sql = "SELECT * FROM " + normaltblTableName + " WHERE pk=?";
-            param.clear();
-            param.add(i);
-            String[] columnParam = { "ID", "GMT_CREATE", "GMT_DATETIME", "FLOATCOL", "NAME", "FLOATCOL" };
-            selectOrderAssert(sql, columnParam, param);
+                sql = "SELECT * FROM " + normaltblTableName + " WHERE pk=?";
+                param.clear();
+                param.add(i);
+                String[] columnParam = { "ID", "GMT_CREATE", "GMT_DATETIME", "FLOATCOL", "NAME", "FLOATCOL" };
+                selectOrderAssert(sql, columnParam, param);
+            }
         }
     }
 
@@ -234,24 +241,26 @@ public class SelectCacheTest extends BaseMatrixTestCase {
      */
     @Test
     public void updateIncrementTest() throws Exception {
-        for (long i = 0; i < 4; i++) {
-            String sql = "UPDATE " + normaltblTableName
-                         + " SET id=id+?,gmt_create=?,gmt_timestamp=?,gmt_datetime=?,name=?,floatCol=? WHERE pk=?";
-            List<Object> param = new ArrayList<Object>();
-            param.add(rand.nextInt());
-            param.add(gmt);
-            param.add(gmt);
-            param.add(gmt);
-            param.add("new_name" + rand.nextInt());
-            param.add(fl);
-            param.add(i);
-            executeCountAssert(sql, param);
+        if (!normaltblTableName.startsWith("ob")) {
+            for (long i = 0; i < 4; i++) {
+                String sql = "UPDATE " + normaltblTableName
+                             + " SET id=id+?,gmt_create=?,gmt_timestamp=?,gmt_datetime=?,name=?,floatCol=? WHERE pk=?";
+                List<Object> param = new ArrayList<Object>();
+                param.add(rand.nextInt());
+                param.add(gmt);
+                param.add(gmt);
+                param.add(gmt);
+                param.add("new_name" + rand.nextInt());
+                param.add(fl);
+                param.add(i);
+                executeCountAssert(sql, param);
 
-            sql = "SELECT * FROM " + normaltblTableName + " WHERE pk=?";
-            param.clear();
-            param.add(i);
-            String[] columnParam = { "ID", "GMT_CREATE", "GMT_DATETIME", "FLOATCOL", "NAME", "FLOATCOL" };
-            selectOrderAssert(sql, columnParam, param);
+                sql = "SELECT * FROM " + normaltblTableName + " WHERE pk=?";
+                param.clear();
+                param.add(i);
+                String[] columnParam = { "ID", "GMT_CREATE", "GMT_DATETIME", "FLOATCOL", "NAME", "FLOATCOL" };
+                selectOrderAssert(sql, columnParam, param);
+            }
         }
     }
 
