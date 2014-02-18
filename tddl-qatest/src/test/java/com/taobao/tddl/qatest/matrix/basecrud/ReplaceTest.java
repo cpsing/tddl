@@ -16,8 +16,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.taobao.tddl.qatest.BaseMatrixTestCase;
 import com.taobao.tddl.qatest.BaseTestCase;
-import com.taobao.tddl.qatest.util.EclipseParameterized;
 import com.taobao.tddl.qatest.ExecuteTableName;
+import com.taobao.tddl.qatest.util.EclipseParameterized;
 
 /**
  * Comment for ReplaceTest
@@ -80,6 +80,7 @@ public class ReplaceTest extends BaseMatrixTestCase {
 
     @Test
     public void replaceWithSetTest() throws Exception {
+
         String sql = "replace into  " + normaltblTableName + "  set pk=? ,name=?";
         List<Object> param = new ArrayList<Object>();
         param.add(RANDOM_ID);
