@@ -44,7 +44,7 @@ public class GroupHintParserTest {
             GroupHintParser.convertHint2Index(sql);
             Assert.fail();
         } catch (Exception e) {
-            Assert.assertEquals("the standard group hint is:'groupIndex:12[,failRetry:true]',current index hint is:failretry:true",
+            Assert.assertEquals("the standard group hint is:'groupIndex:12[,failRetry:true]',current index hint is:failRetry:true",
                 e.getMessage());
         }
     }
@@ -56,7 +56,7 @@ public class GroupHintParserTest {
             GroupHintParser.convertHint2Index(sql);
             Assert.fail();
         } catch (Exception e) {
-            Assert.assertEquals("the standard group hint is:'groupIndex:12[,failRetry:true]',current index hint is:groupindexx:12",
+            Assert.assertEquals("the standard group hint is:'groupIndex:12[,failRetry:true]',current index hint is:groupIndexx:12",
                 e.getMessage());
         }
     }

@@ -166,7 +166,9 @@ public class MysqlTableMetaManager extends RepoSchemaManager {
                     table.appendChild(primaryKey);
                 }
             } catch (Exception ex) {
-                logger.warn("fetch pk error, choose the first column as pk, tablename is: " + logicalTableName, ex);
+                // logger.warn("fetch pk error, choose the first column as pk, tablename is: "
+                // + logicalTableName, ex);
+                logger.warn("fetch pk error, choose the first column as pk, tablename is: " + logicalTableName);
                 Element primaryKey = doc.createElement("primaryKey");
                 primaryKey.appendChild(doc.createTextNode(rsmd.getColumnName(1)));
                 table.appendChild(primaryKey);

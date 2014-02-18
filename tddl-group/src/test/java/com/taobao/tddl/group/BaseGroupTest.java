@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.taobao.diamond.mockserver.MockServer;
@@ -19,6 +20,7 @@ import com.taobao.tddl.group.jdbc.DataSourceWrapper;
 import com.taobao.tddl.group.jdbc.TGroupDataSource;
 import com.taobao.tddl.group.utils.PropLoadTestUtil;
 
+@Ignore("测试基类")
 public class BaseGroupTest {
 
     protected static final String APPNAME = "tddl_sample";

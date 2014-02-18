@@ -63,6 +63,6 @@ public class SimpleHintParserTest {
         String sql = "/*+TDDL({\"extra\":{\"ChooseIndex\":\"true\",\"ALLOW_TEMPORARY_TABLE\":\"true\"}})*/select * from real_tab";
         ExtraCmdRouteCondition route = (ExtraCmdRouteCondition) SimpleHintParser.convertHint2RouteCondition(sql, null);
         System.out.println(route);
-        Assert.assertEquals("{ChooseIndex=true, ALLOW_TEMPORARY_TABLE=true}", route.getExtraCmds().toString());
+        Assert.assertEquals("{CHOOSEINDEX=true, ALLOW_TEMPORARY_TABLE=true}", route.getExtraCmds().toString());
     }
 }

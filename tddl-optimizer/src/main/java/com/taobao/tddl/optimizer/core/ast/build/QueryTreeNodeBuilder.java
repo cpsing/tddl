@@ -141,6 +141,8 @@ public abstract class QueryTreeNodeBuilder {
             ISelectable columnFromSelected = getColumnFromSelecteList(c);
             if (columnFromSelected != null) {
                 column = columnFromSelected;
+                // 在select中找到了一次后，下次不能再从select中，遇到MAX(ID) AS ID会陷入死循环
+                findInSelectList = false;
             }
         }
 
@@ -167,7 +169,7 @@ public abstract class QueryTreeNodeBuilder {
         }
 
         if (column instanceof IFunction) {
-            buildFunction((IFunction) column, false);
+            buildFunction((IFunction) column, findInSelectList);
         }
 
         return column;
