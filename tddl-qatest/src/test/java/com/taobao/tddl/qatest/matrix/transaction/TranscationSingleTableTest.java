@@ -412,6 +412,9 @@ public class TranscationSingleTableTest extends BaseMatrixTestCase {
 
     @Test
     public void updateRollbackTest() throws Exception {
+        // TODO:ob bug，读取不到事务内的最新数据
+        if (normaltblTableName.startsWith("ob")) return;
+
         long pk = 0l;
         normaltblPrepare(0, 1);
         String sql = "UPDATE " + normaltblTableName + " SET id=?,gmt_create=?,name=?,floatCol=? WHERE pk=?";
@@ -489,7 +492,6 @@ public class TranscationSingleTableTest extends BaseMatrixTestCase {
 
     @Test
     public void deleteRollbackTest() throws Exception {
-
         // TODO:ob bug，读取不到事务内的最新数据
         if (normaltblTableName.startsWith("ob")) return;
 
