@@ -44,7 +44,7 @@ public class ReplaceTest extends BaseMatrixTestCase {
 
     @Test
     public void replaceAllFieldTest() throws Exception {
-        if (normaltblTableName.startsWith("mysql")) {
+        if (normaltblTableName.startsWith("mysql") || normaltblTableName.startsWith("ob")) {
             Assert.assertTrue(true);
             return;
         }
@@ -119,7 +119,7 @@ public class ReplaceTest extends BaseMatrixTestCase {
 
     @Test
     public void replaceWithBdbOutParamTest() throws Exception {
-        if (!normaltblTableName.contains("mysql")) {
+        if (!normaltblTableName.contains("mysql") || !normaltblTableName.startsWith("ob")) {
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String sql = "replace into " + normaltblTableName + "(pk,gmt_create,gmt_timestamp,gmt_datetime,id) values("
                          + RANDOM_ID + ",'" + df.format(gmt) + "','" + df.format(gmt) + "','" + df.format(gmt) + "',"
@@ -138,7 +138,7 @@ public class ReplaceTest extends BaseMatrixTestCase {
         List<Object> param = new ArrayList<Object>();
         param.add(RANDOM_ID);
         param.add(fl);
-        param.add(gmt);
+        param.add(gmtDay);
         execute(sql, param);
 
         sql = "select * from " + normaltblTableName + " where pk=" + RANDOM_ID;
@@ -152,7 +152,7 @@ public class ReplaceTest extends BaseMatrixTestCase {
         List<Object> param = new ArrayList<Object>();
         param.add(RANDOM_ID);
         param.add(fl);
-        param.add(gmt);
+        param.add(gmtDay);
         execute(sql, param);
 
         sql = "select * from " + normaltblTableName + " where pk=" + RANDOM_ID;
@@ -166,7 +166,7 @@ public class ReplaceTest extends BaseMatrixTestCase {
         List<Object> param = new ArrayList<Object>();
         param.add(RANDOM_INT);
         param.add(fl);
-        param.add(gmt);
+        param.add(gmtDay);
         try {
             andorUpdateData(sql, param);
             Assert.fail();

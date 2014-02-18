@@ -198,6 +198,7 @@ public class SelectWithConditionTest extends BaseMatrixTestCase {
         selectOrderAssert(sql, new String[] {}, Collections.EMPTY_LIST);
     }
 
+    @Ignore("ob暂时不支持desc排序，而mysql会计算desc")
     @Test
     public void groupByWithDescTest() throws Exception {
         andorUpdateData("insert into " + normaltblTableName + " (pk,name) values(?,?)",

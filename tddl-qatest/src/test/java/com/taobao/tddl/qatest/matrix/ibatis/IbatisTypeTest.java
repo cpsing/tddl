@@ -183,8 +183,8 @@ public class IbatisTypeTest {
         String da = "2015-12-31 12:59:59";
         String ti = "12:59:59";
         Boolean bl = true;
-        Float f = Float.MAX_VALUE;
-        Double d = Double.MAX_VALUE;
+        Float f = 1.1f;
+        Double d = 1.1d;
         Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("pk", 1);
         map.put("varcharr", s);
@@ -276,8 +276,8 @@ public class IbatisTypeTest {
         String da = "2015-12-31 12:59:59";
         String ti = "12:59:59";
         Boolean bl = true;
-        Float f = Float.MIN_VALUE;
-        Double d = Double.MIN_VALUE;
+        Float f = -1.1f;
+        Double d = -1.1d;
         Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("pk", Integer.MIN_VALUE);
         map.put("varcharr", s);

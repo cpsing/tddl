@@ -243,6 +243,19 @@ public class JoinChooserTest extends BaseOptimizerTest {
     }
 
     @Test
+    public void test_JoinStrategy选择sortmerge_右表存在group条件和order条件不能合并() {
+        TableNode table1 = new TableNode("TABLE1");
+        TableNode table2 = new TableNode("TABLE2");
+        JoinNode join = table1.join(table2).setLeftOuterJoin().addJoinKeys("ID", "ID").addJoinKeys("NAME", "NAME");
+        join.orderBy("TABLE2.SCHOOL");
+        join.groupBy("TABLE2.NAME").groupBy("TABLE2.ID");
+        join.build();
+
+        QueryTreeNode qn = optimize(join, true, true, true);
+        Assert.assertEquals(JoinStrategy.SORT_MERGE_JOIN, ((JoinNode) qn).getJoinStrategy());
+    }
+
+    @Test
     public void test_JoinStrategy选择sortmerge_右表存在order条件() {
         TableNode table1 = new TableNode("TABLE1");
         TableNode table2 = new TableNode("TABLE2");

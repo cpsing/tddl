@@ -377,12 +377,14 @@ public class SelectDateFunctionTest extends BaseMatrixTestCase {
         rc = andorQueryData(sql, null);
         assertContentSame(rs, rc, columnParamDatetime);
 
-        sql = "select * from " + normaltblTableName + " where gmt_create >( now()- INTERVAL ? day )";
-        List<Object> param = new ArrayList<Object>();
-        param.add(12);
-        rs = mysqlQueryData(sql, param);
-        rc = andorQueryData(sql, param);
-        assertContentSame(rs, rc, columnParamDatetime);
+        if (!normaltblTableName.startsWith("ob")) {
+            sql = "select * from " + normaltblTableName + " where gmt_create >( now()- INTERVAL ? day )";
+            List<Object> param = new ArrayList<Object>();
+            param.add(12);
+            rs = mysqlQueryData(sql, param);
+            rc = andorQueryData(sql, param);
+            assertContentSame(rs, rc, columnParamDatetime);
+        }
     }
 
 }

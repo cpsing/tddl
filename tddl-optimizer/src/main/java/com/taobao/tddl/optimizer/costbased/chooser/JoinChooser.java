@@ -378,10 +378,18 @@ public class JoinChooser {
      * </pre>
      */
     private static boolean canChooseSortMerge(JoinNode node) {
-        List<IOrderBy> orderBys = node.getImplicitOrderBys();
         List<ISelectable> columns = node.isLeftOuterJoin() ? node.getRightKeys() : node.getLeftKeys();
         // 先判断group，判断排序条件是否满足
-        if (!orderBys.isEmpty()) {
+        // 再判断order
+        return match(node.getGroupBys(), columns, false) || match(node.getImplicitOrderBys(), columns, true);
+    }
+
+    private static boolean match(List<IOrderBy> orderBys, List<ISelectable> columns, boolean needOrder) {
+        if (orderBys.isEmpty()) {
+            return false; // 这种情况就用传统的模式
+        }
+
+        if (needOrder) {
             for (int i = 0; i < orderBys.size(); i++) {
                 IOrderBy order = orderBys.get(i);
                 if (i >= columns.size()) {
@@ -402,9 +410,30 @@ public class JoinChooser {
             }
 
             return true;// 走到这一步，代表匹配成功
+        } else {
+            // 针对group by的情况，只要是一个包含关系，不需要顺序
+            for (int i = 0; i < columns.size(); i++) {
+                ISelectable column = columns.get(i);
+                if (i >= orderBys.size()) {
+                    return true; // 代表前缀匹配成功
+                }
+
+                boolean match = false;
+                for (IOrderBy order : orderBys) {
+                    if (order.getColumn().equals(column)) {
+                        match = true;
+                        break;
+                    }
+                }
+
+                if (!match) {
+                    return false;
+                }
+            }
+
+            return true;// 走到这一步，代表匹配成功
         }
 
-        return false; // 这种情况就用传统的模式
     }
 
     private static void buildTableFilter(TableNode tableNode) {
