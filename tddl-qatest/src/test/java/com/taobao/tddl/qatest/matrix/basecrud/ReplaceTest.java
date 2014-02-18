@@ -119,7 +119,7 @@ public class ReplaceTest extends BaseMatrixTestCase {
 
     @Test
     public void replaceWithBdbOutParamTest() throws Exception {
-        if (!normaltblTableName.contains("mysql") || !normaltblTableName.startsWith("ob")) {
+        if (!(normaltblTableName.contains("mysql") || normaltblTableName.startsWith("ob"))) {
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String sql = "replace into " + normaltblTableName + "(pk,gmt_create,gmt_timestamp,gmt_datetime,id) values("
                          + RANDOM_ID + ",'" + df.format(gmt) + "','" + df.format(gmt) + "','" + df.format(gmt) + "',"

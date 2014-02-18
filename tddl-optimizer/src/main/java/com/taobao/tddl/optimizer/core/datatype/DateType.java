@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.taobao.tddl.common.exception.NotSupportException;
 import com.taobao.tddl.common.exception.TddlRuntimeException;
 import com.taobao.tddl.common.model.BaseRowSet;
 import com.taobao.tddl.common.utils.convertor.Convertor;
@@ -16,12 +17,12 @@ import com.taobao.tddl.common.utils.convertor.Convertor;
  */
 public class DateType extends AbstractDataType<java.sql.Date> {
 
-    private static final Date maxDate      = Date.valueOf("9999-12-31");
-    private static final Date minDate      = Date.valueOf("1900-01-01");
-    private Convertor         stringToDate = null;
+    private static final Date maxDate    = Date.valueOf("9999-12-31");
+    private static final Date minDate    = Date.valueOf("1900-01-01");
+    private Convertor         longToDate = null;
 
     public DateType(){
-        stringToDate = this.getConvertor(String.class);
+        longToDate = this.getConvertor(Long.class);
     }
 
     @Override
@@ -43,7 +44,7 @@ public class DateType extends AbstractDataType<java.sql.Date> {
 
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
-        return DataEncoder.encode(DataType.StringType.convertFrom(value), dst, offset);
+        return DataEncoder.encode(DataType.LongType.convertFrom(value), dst, offset);
     }
 
     @Override
@@ -51,7 +52,7 @@ public class DateType extends AbstractDataType<java.sql.Date> {
         if (value == null) {
             return 1;
         } else {
-            return KeyEncoder.calculateEncodedStringLength(DataType.StringType.convertFrom(value));
+            return 9;
         }
     }
 
@@ -60,7 +61,7 @@ public class DateType extends AbstractDataType<java.sql.Date> {
         try {
             String[] vs = new String[1];
             int lenght = DataDecoder.decodeString(bytes, offset, vs);
-            Date date = (Date) stringToDate.convert(vs[0], getDataClass());
+            Date date = (Date) longToDate.convert(vs[0], getDataClass());
             return new DecodeResult(date, lenght);
         } catch (CorruptEncodingException e) {
             throw new TddlRuntimeException(e);
@@ -108,7 +109,7 @@ public class DateType extends AbstractDataType<java.sql.Date> {
 
     @Override
     public Calculator getCalculator() {
-        return null;
+        throw new NotSupportException("时间类型不支持算术符操作");
     }
 
 }

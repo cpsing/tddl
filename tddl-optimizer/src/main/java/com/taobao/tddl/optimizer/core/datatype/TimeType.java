@@ -17,12 +17,12 @@ import com.taobao.tddl.common.utils.convertor.Convertor;
  */
 public class TimeType extends AbstractDataType<java.sql.Time> {
 
-    private static final Time maxTime      = Time.valueOf("23:59:59");
-    private static final Time minTime      = Time.valueOf("00:00:00");
-    private Convertor         stringToDate = null;
+    private static final Time maxTime    = Time.valueOf("23:59:59");
+    private static final Time minTime    = Time.valueOf("00:00:00");
+    private Convertor         longToDate = null;
 
     public TimeType(){
-        stringToDate = this.getConvertor(String.class);
+        longToDate = this.getConvertor(Long.class);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class TimeType extends AbstractDataType<java.sql.Time> {
 
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
-        return DataEncoder.encode(DataType.StringType.convertFrom(value), dst, offset);
+        return DataEncoder.encode(DataType.LongType.convertFrom(value), dst, offset);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class TimeType extends AbstractDataType<java.sql.Time> {
         if (value == null) {
             return 1;
         } else {
-            return KeyEncoder.calculateEncodedStringLength(DataType.StringType.convertFrom(value));
+            return 9;
         }
     }
 
@@ -61,7 +61,7 @@ public class TimeType extends AbstractDataType<java.sql.Time> {
         try {
             String[] vs = new String[1];
             int lenght = DataDecoder.decodeString(bytes, offset, vs);
-            Time date = (Time) stringToDate.convert(vs[0], getDataClass());
+            Time date = (Time) longToDate.convert(vs[0], getDataClass());
             return new DecodeResult(date, lenght);
         } catch (CorruptEncodingException e) {
             throw new TddlRuntimeException(e);

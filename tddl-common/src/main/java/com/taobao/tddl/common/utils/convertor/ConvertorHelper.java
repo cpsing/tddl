@@ -167,6 +167,8 @@ public class ConvertorHelper {
         Convertor sqlTimeToString = new StringAndDateConvertor.SqlTimeToString();
         Convertor sqlTimestampToString = new StringAndDateConvertor.SqlTimestampToString();
         Convertor calendarToString = new StringAndDateConvertor.CalendarToString();
+        Convertor longToDate = new LongAndDateConvertor.LongToDateConvertor();
+        Convertor dateToLong = new LongAndDateConvertor.DateToLongConvertor();
         // 注册默认的String <-> Date的处理
         repository.registerConvertor(String.class, Date.class, stringToDate);
         repository.registerConvertor(String.class, Calendar.class, stringToCalendar);
@@ -179,6 +181,15 @@ public class ConvertorHelper {
         repository.registerConvertor(java.sql.Time.class, String.class, sqlTimeToString);
         repository.registerConvertor(java.sql.Timestamp.class, String.class, sqlTimestampToString);
         repository.registerConvertor(Calendar.class, String.class, calendarToString);
+        repository.registerConvertor(java.util.Date.class, Long.class, dateToLong);
+        repository.registerConvertor(java.sql.Date.class, Long.class, dateToLong);
+        repository.registerConvertor(java.sql.Time.class, Long.class, dateToLong);
+        repository.registerConvertor(java.sql.Timestamp.class, Long.class, dateToLong);
+
+        repository.registerConvertor(Long.class, java.util.Date.class, longToDate);
+        repository.registerConvertor(Long.class, java.sql.Date.class, longToDate);
+        repository.registerConvertor(Long.class, java.sql.Time.class, longToDate);
+        repository.registerConvertor(Long.class, java.sql.Timestamp.class, longToDate);
         // 注册默认的Date <-> SqlDate的处理
         repository.registerConvertor(java.sql.Date.class, Date.class, sqlToDate);
         repository.registerConvertor(java.sql.Time.class, Date.class, sqlToDate);

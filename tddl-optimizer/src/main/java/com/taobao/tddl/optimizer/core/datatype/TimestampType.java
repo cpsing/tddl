@@ -19,10 +19,10 @@ public class TimestampType extends AbstractDataType<java.sql.Timestamp> {
 
     private static final Timestamp maxTimestamp = Timestamp.valueOf("9999-12-31 23:59:59");
     private static final Timestamp minTimestamp = Timestamp.valueOf("1900-01-01 00:00:00");
-    private Convertor              stringToDate = null;
+    private Convertor              longToDate   = null;
 
     public TimestampType(){
-        stringToDate = this.getConvertor(String.class);
+        longToDate = this.getConvertor(Long.class);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class TimestampType extends AbstractDataType<java.sql.Timestamp> {
 
     @Override
     public int encodeToBytes(Object value, byte[] dst, int offset) {
-        return DataEncoder.encode(DataType.StringType.convertFrom(value), dst, offset);
+        return DataEncoder.encode(DataType.LongType.convertFrom(value), dst, offset);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class TimestampType extends AbstractDataType<java.sql.Timestamp> {
         if (value == null) {
             return 1;
         } else {
-            return KeyEncoder.calculateEncodedStringLength(DataType.StringType.convertFrom(value));
+            return 9;
         }
     }
 
@@ -61,7 +61,7 @@ public class TimestampType extends AbstractDataType<java.sql.Timestamp> {
         try {
             String[] vs = new String[1];
             int lenght = DataDecoder.decodeString(bytes, offset, vs);
-            Timestamp date = (Timestamp) stringToDate.convert(vs[0], getDataClass());
+            Timestamp date = (Timestamp) longToDate.convert(vs[0], getDataClass());
             return new DecodeResult(date, lenght);
         } catch (CorruptEncodingException e) {
             throw new TddlRuntimeException(e);
